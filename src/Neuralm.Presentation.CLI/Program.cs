@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Neuralm.Server
+namespace Neuralm.Presentation.CLI
 {
     class Program
     {
