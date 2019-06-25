@@ -32,7 +32,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 * **Glovali** - *Initial work* - [Metalglove](https://github.com/metalglove)
 * **Suppergerrie2** - *Initial work* - [Suppergerrie2](https://github.com/suppergerrie2)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/neuralm/Neuralm-Server/contributors) who participated in this project.
 
 ## License
 
