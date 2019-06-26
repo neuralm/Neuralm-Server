@@ -74,7 +74,6 @@ Follow these steps to get your development environment set up:
      GO
      ```
   10. Now users are able to register and login.
----
 
 ## Running the tests
 
