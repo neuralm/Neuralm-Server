@@ -45,7 +45,6 @@ namespace Neuralm.Application.Services
                 return new AuthenticateResponse(Guid.NewGuid(), authenticateRequest.Id, error: AuthenticateError.CredentialTypeNotFound);
 
             CredentialType credentialType = await _credentialTypeRepository.FindSingleByExpressionAsync(ct => CredentialTypeCodePredicate(ct, authenticateRequest.CredentialTypeCode));
-            
             if (!await _credentialRepository.ExistsAsync(cred => CredentialPredicate(credentialType, cred, authenticateRequest.Username)))
                 return new AuthenticateResponse(Guid.NewGuid(), authenticateRequest.Id, error: AuthenticateError.CredentialNotFound);
 

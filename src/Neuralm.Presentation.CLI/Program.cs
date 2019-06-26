@@ -48,17 +48,20 @@ namespace Neuralm.Presentation.CLI
                 Username = Guid.NewGuid().ToString(),
                 Password = Guid.NewGuid().ToString()
             };
+            Console.WriteLine($"RegisterRequest:\n\tId: {registerRequest.Id}\n\tCredentialTypeCode: {registerRequest.CredentialTypeCode}\n\tUsername: {registerRequest.Username}\n\tPassword: {registerRequest.Password}");
             RegisterResponse registerResponse = await userService.RegisterAsync(registerRequest);
-            Console.WriteLine(registerResponse.Success);
+            Console.WriteLine($"RegisterResponse:\n\tId: {registerResponse.Id}\n\tRequestId: {registerResponse.RequestId}\n\tError: {registerResponse.Error}\n\tSuccess: {registerResponse.Success}");
 
             AuthenticateRequest authenticateRequest = new AuthenticateRequest()
             {
                 Id = Guid.NewGuid(),
+                CredentialTypeCode = "Name",
                 Username = registerRequest.Username,
                 Password = registerRequest.Password
             };
+            Console.WriteLine($"AuthenticateRequest:\n\tId: {authenticateRequest.Id}\n\tCredentialTypeCode: {authenticateRequest.CredentialTypeCode}\n\tUsername: {authenticateRequest.Username}\n\tPassword: {authenticateRequest.Password}");
             AuthenticateResponse authenticateResponse = await userService.AuthenticateAsync(authenticateRequest);
-            Console.WriteLine(authenticateResponse.AccessToken);
+            Console.WriteLine($"AuthenticateResponse:\n\tId: {authenticateResponse.Id}\n\tRequestId: {authenticateResponse.RequestId}\n\tAccessToken:{authenticateResponse.AccessToken}\n\tError: {authenticateResponse.Error}\n\tSuccess: {authenticateResponse.Success}");
         }
 
         private static IConfiguration BuildConfiguration()

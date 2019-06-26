@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Neuralm.Application.Configurations;
@@ -92,6 +93,7 @@ namespace Neuralm.Mapping
         {
             serviceCollection.AddOptions();
             serviceCollection.Configure<ServerConfiguration>(configuration.GetSection("Server").Bind);
+            serviceCollection.Configure<DbConfiguration>(configuration.GetSection("NeuralmDb").Bind);
             serviceCollection.Configure<JwtConfiguration>(configuration.GetSection("Jwt").Bind);
             return serviceCollection;
         }

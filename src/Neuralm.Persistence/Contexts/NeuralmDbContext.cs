@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Neuralm.Domain.Entities;
 using Neuralm.Domain.Entities.Authentication;
+using Neuralm.Persistence.Extensions;
 
 namespace Neuralm.Persistence.Contexts
 {
@@ -14,9 +15,21 @@ namespace Neuralm.Persistence.Contexts
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
 
-        public NeuralmDbContext(DbContextOptions options) : base(options)
+        public NeuralmDbContext(DbContextOptions<NeuralmDbContext> options) : base(options)
         {
 
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyAllConfigurations();
+        }
+
+        //protected override void OnConfiguring(DbContextOptionsBuilder builder)
+        //{
+        //    builder.UseSqlServer("Server=(LocalDb)\\MSSQLLocalDB;Database=NeuralmDbContext;Trusted_Connection=True;MultipleActiveResultSets=true");
+        //    base.OnConfiguring(builder);
+        //}
     }
 }
