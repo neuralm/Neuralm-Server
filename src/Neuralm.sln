@@ -3,17 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Domain", "Neuralm.Domain\Neuralm.Domain.csproj", "{F92D850C-396A-4C43-93B8-9877DF83A12D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Domain", "Neuralm.Domain\Neuralm.Domain.csproj", "{F92D850C-396A-4C43-93B8-9877DF83A12D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Application", "Neuralm.Application\Neuralm.Application.csproj", "{376623E1-D28D-4815-8D0B-838C5C44B51C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Application", "Neuralm.Application\Neuralm.Application.csproj", "{376623E1-D28D-4815-8D0B-838C5C44B51C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Infrastructure", "Neuralm.Infrastructure\Neuralm.Infrastructure.csproj", "{47BE0B12-BDEB-4E5A-B3D6-A556A2E57331}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Infrastructure", "Neuralm.Infrastructure\Neuralm.Infrastructure.csproj", "{47BE0B12-BDEB-4E5A-B3D6-A556A2E57331}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Persistence", "Neuralm.Persistence\Neuralm.Persistence.csproj", "{E37D2058-9AE5-4582-9CF1-FB2B2A54FD30}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Persistence", "Neuralm.Persistence\Neuralm.Persistence.csproj", "{E37D2058-9AE5-4582-9CF1-FB2B2A54FD30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Presentation.CLI", "Neuralm.Presentation.CLI\Neuralm.Presentation.CLI.csproj", "{713D2ECD-E376-46F1-B452-5FE1828E1B59}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Presentation.CLI", "Neuralm.Presentation.CLI\Neuralm.Presentation.CLI.csproj", "{713D2ECD-E376-46F1-B452-5FE1828E1B59}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Application.Messages", "Neuralm.Application.Messages\Neuralm.Application.Messages.csproj", "{63B04230-AE76-4C64-82D3-98610EB34CDF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Mapping", "Neuralm.Mapping\Neuralm.Mapping.csproj", "{8CC674B6-E238-49DC-BD3E-925CDF4EEE15}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,6 +99,18 @@ Global
 		{63B04230-AE76-4C64-82D3-98610EB34CDF}.Release|x64.Build.0 = Release|Any CPU
 		{63B04230-AE76-4C64-82D3-98610EB34CDF}.Release|x86.ActiveCfg = Release|Any CPU
 		{63B04230-AE76-4C64-82D3-98610EB34CDF}.Release|x86.Build.0 = Release|Any CPU
+		{8CC674B6-E238-49DC-BD3E-925CDF4EEE15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CC674B6-E238-49DC-BD3E-925CDF4EEE15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CC674B6-E238-49DC-BD3E-925CDF4EEE15}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8CC674B6-E238-49DC-BD3E-925CDF4EEE15}.Debug|x64.Build.0 = Debug|Any CPU
+		{8CC674B6-E238-49DC-BD3E-925CDF4EEE15}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8CC674B6-E238-49DC-BD3E-925CDF4EEE15}.Debug|x86.Build.0 = Debug|Any CPU
+		{8CC674B6-E238-49DC-BD3E-925CDF4EEE15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CC674B6-E238-49DC-BD3E-925CDF4EEE15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CC674B6-E238-49DC-BD3E-925CDF4EEE15}.Release|x64.ActiveCfg = Release|Any CPU
+		{8CC674B6-E238-49DC-BD3E-925CDF4EEE15}.Release|x64.Build.0 = Release|Any CPU
+		{8CC674B6-E238-49DC-BD3E-925CDF4EEE15}.Release|x86.ActiveCfg = Release|Any CPU
+		{8CC674B6-E238-49DC-BD3E-925CDF4EEE15}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

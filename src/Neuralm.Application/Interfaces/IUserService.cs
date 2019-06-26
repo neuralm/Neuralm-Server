@@ -4,9 +4,9 @@ using Neuralm.Application.Messages.Responses;
 
 namespace Neuralm.Application.Interfaces
 {
-    public interface IAuthenticationService
+    public interface IUserService
     {
-        Task<LoginResponse> LoginAsync(LoginRequest loginRequest);
+        Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest authenticateRequest);
         Task<RegisterResponse> RegisterAsync(RegisterRequest registerRequest);
     }
 }

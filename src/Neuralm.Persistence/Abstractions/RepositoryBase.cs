@@ -2,27 +2,29 @@
 using Neuralm.Domain.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Neuralm.Persistence.Abstractions
 {
-    public abstract class RepositoryBase<TEntity> : IRepository<TEntity> where TEntity : class
+    public abstract class RepositoryBase<TEntity, TDbContext> : IRepository<TEntity> where TDbContext : DbContext where TEntity : class
     {
-        private readonly AppDbContext _applicationDbContext;
+        private readonly TDbContext _dbContext;
         private readonly IEntityValidator<TEntity> _entityValidator;
 
-        protected RepositoryBase(AppDbContext applicationDbContext, IEntityValidator<TEntity> entityValidator)
+        protected RepositoryBase(TDbContext dbContext, IEntityValidator<TEntity> entityValidator)
         {
-            _applicationDbContext = applicationDbContext;
+            _dbContext = dbContext;
             _entityValidator = entityValidator;
         }
 
         public virtual async Task<bool> CreateAsync(TEntity entity)
         {
             _entityValidator.Validate(entity);
-            _applicationDbContext.Set<TEntity>().Add(entity);
-            int saveResult = await _applicationDbContext.SaveChangesAsync();
+            _dbContext.Set<TEntity>().Add(entity);
+            int saveResult = await _dbContext.SaveChangesAsync();
             bool saveSuccess;
             try
             {
@@ -36,10 +38,10 @@ namespace Neuralm.Persistence.Abstractions
         }
         public virtual async Task<bool> DeleteAsync(TEntity entity)
         {
-            if (!await _applicationDbContext.Set<TEntity>().ContainsAsync(entity))
+            if (!await _dbContext.Set<TEntity>().ContainsAsync(entity))
                 throw new EntityNotFoundException($"The entity of type {typeof(TEntity).Name} could not be found.");
-            _applicationDbContext.Set<TEntity>().Remove(entity);
-            int saveResult = await _applicationDbContext.SaveChangesAsync();
+            _dbContext.Set<TEntity>().Remove(entity);
+            int saveResult = await _dbContext.SaveChangesAsync();
             bool saveSuccess;
             try
             {
@@ -53,27 +55,27 @@ namespace Neuralm.Persistence.Abstractions
         }
         public virtual async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            return await _applicationDbContext.Set<TEntity>().AnyAsync(predicate);
+            return await _dbContext.Set<TEntity>().AnyAsync(predicate);
         }
         public virtual async Task<IEnumerable<TEntity>> FindManyByExpressionAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            return await _applicationDbContext.Set<TEntity>().Where(predicate).ToListAsync();
+            return await _dbContext.Set<TEntity>().Where(predicate).ToListAsync();
         }
         public virtual async Task<TEntity> FindSingleByExpressionAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            TEntity entity = await _applicationDbContext.Set<TEntity>().SingleOrDefaultAsync(predicate);
+            TEntity entity = await _dbContext.Set<TEntity>().SingleOrDefaultAsync(predicate);
             if (entity == default)
                 throw new EntityNotFoundException($"The entity of type {typeof(TEntity).Name} could not be found by the predicate.");
             return entity;
         }
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
         {
-            return await _applicationDbContext.Set<TEntity>().ToListAsync();
+            return await _dbContext.Set<TEntity>().ToListAsync();
         }
         public virtual async Task<bool> UpdateAsync(TEntity entity)
         {
-            _applicationDbContext.Update(entity);
-            int saveResult = await _applicationDbContext.SaveChangesAsync();
+            _dbContext.Update(entity);
+            int saveResult = await _dbContext.SaveChangesAsync();
             bool saveSuccess;
             try
             {

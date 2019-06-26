@@ -2,7 +2,7 @@
 
 namespace Neuralm.Application.Messages.Requests
 {
-    public class RegisterRequest : IRequest
+    public class AuthenticateRequest : IRequest
     {
         public Guid Id { get; set; }
         public string CredentialTypeCode { get; set; }
