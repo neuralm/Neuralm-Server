@@ -62,8 +62,7 @@ Follow these steps to get your development environment set up:
      ```
      *The `Add-Migration` command scaffolds a migration to create the initial set of tables for the entities in the Persistence layer. The `Update-Database` command creates the database and applies the new migration to it.*
   6. Next, build the solution either by selecting it in the `Build > Build solution` in visual studio or hitting `CTRL + SHIFT + B` or if you are still in the package manager console by typing `dotnet build`.
-  7. Once the build has run succesfully, start the server to confirm that the database connection is succesfull either by hitting `F5` or go to `Debug > Start`. A console will launch and start initializing. Upon completion, the console will log `Server started successfully on port: 9999`.
-  8. For the time being the you need to manually insert a `CredentialType` for authentication. Run this query (in PowerShell):
+  7. For the time being the you need to manually insert a `CredentialType` for authentication. Run this query (in PowerShell):
      ```sql
      USE NeuralmDbContext
 
@@ -73,7 +72,8 @@ Follow these steps to get your development environment set up:
 
      GO
      ```
-  10. Now users are able to register and login.
+  8. Once the build has run succesfully, start the server to confirm that the database connection is succesfull either by hitting `F5` or go to `Debug > Start`. A console will launch and start initializing. Upon completion, the console will log `Server started successfully on port: 9999`.
+  9. Now users are able to register and login.
 
 ## Running the tests
 
