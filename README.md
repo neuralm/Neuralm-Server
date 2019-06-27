@@ -72,7 +72,7 @@ Follow these steps to get your development environment set up:
 
      GO
      ```
-  8. Once the build has run succesfully, start the server to confirm that the database connection is succesfull either by hitting `F5` or go to `Debug > Start`. A console will launch and start initializing. Upon completion, the console will log `Server started successfully on port: 9999`.
+  8. Once the build has run successfully, start the server to confirm that the database connection is successful either by hitting `F5` or go to `Debug > Start`. A console will launch and start initializing. Upon completion, the console will log `Server started successfully on port: 9999`.
   9. Now users are able to register and login.
 
 ## Running the tests
