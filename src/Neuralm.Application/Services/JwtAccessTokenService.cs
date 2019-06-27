@@ -5,9 +5,9 @@ using System.Security.Claims;
 using Neuralm.Application.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Neuralm.Application.Configurations;
+using Microsoft.Extensions.Options;
 
 namespace Neuralm.Application.Services
 {
