@@ -15,13 +15,11 @@ namespace Neuralm.Application.Services
     {
         private readonly JwtSecurityTokenHandler _jwtSecurityTokenHandler;
         private readonly JwtConfiguration _jwtConfiguration;
-        private readonly ConcurrentDictionary<string, SecurityToken> _concurrentTokenDictionary;
 
         public JwtAccessTokenService(IOptions<JwtConfiguration> jwtConfigurationOptions)
         {
             _jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
             _jwtConfiguration = jwtConfigurationOptions.Value;
-            _concurrentTokenDictionary = new ConcurrentDictionary<string, SecurityToken>();
         }
 
         public string GenerateAccessToken(IEnumerable<Claim> claims, DateTime expires)
@@ -35,7 +33,6 @@ namespace Neuralm.Application.Services
             };
             SecurityToken token = _jwtSecurityTokenHandler.CreateToken(tokenDescriptor);
             string tokenString = _jwtSecurityTokenHandler.WriteToken(token);
-            _concurrentTokenDictionary.TryAdd(tokenString, token);
             return tokenString;
         }
 

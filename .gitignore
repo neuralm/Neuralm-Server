@@ -341,8 +341,5 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 
-# Exclude migrations
-src/Neuralm.Persistence/Migrations/
-
 # Exclude the app settings
 src/Neuralm.Presentation.CLI/appSettings.json
