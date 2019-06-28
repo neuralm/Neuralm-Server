@@ -45,6 +45,7 @@ Follow these steps to get your development environment set up:
      ```
      To make sure all dependencies were added succesfully, it should build without dependency warnings else you have probably not installed .NET core 2.2 SDK.
   4. Once the build has run successfully, start the server to confirm that the database connection is successful either by hitting `F5` or go to `Debug > Start`. A console will launch and start initializing. Upon completion, the console will look like this:
+  
  ![Screenshot](https://github.com/neuralm/Neuralm-Server/blob/master/docs/images/Successful%20installation.png?raw=true)
 
 ## Running the tests
