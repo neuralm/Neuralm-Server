@@ -10,7 +10,7 @@ using Neuralm.Persistence.Contexts;
 namespace Neuralm.Persistence.Migrations
 {
     [DbContext(typeof(NeuralmDbContext))]
-    [Migration("20190626143339_InitialCreate")]
+    [Migration("20190628193242_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -68,6 +68,15 @@ namespace Neuralm.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CredentialTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "Name",
+                            Name = "Name",
+                            Position = 1
+                        });
                 });
 
             modelBuilder.Entity("Neuralm.Domain.Entities.Authentication.Permission", b =>

@@ -144,6 +144,11 @@ namespace Neuralm.Persistence.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "CredentialTypes",
+                columns: new[] { "Id", "Code", "Name", "Position" },
+                values: new object[] { 1, "Name", "Name", 1 });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Credentials_CredentialTypeId",
                 table: "Credentials",

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -7,6 +6,7 @@ using Neuralm.Application.Interfaces;
 using Neuralm.Application.Messages.Requests;
 using Neuralm.Application.Messages.Responses;
 using Neuralm.Mapping;
+using Neuralm.Utilities;
 
 namespace Neuralm.Presentation.CLI
 {
@@ -27,11 +27,13 @@ namespace Neuralm.Presentation.CLI
             cancellationTokenSource.Cancel();
             Console.WriteLine();
             Console.WriteLine("Server has shut down");
+            Console.WriteLine("Press any key to continue..");
+            Console.ReadKey();
         }
 
         private async Task RunAsync(CancellationToken token)
         {
-            IConfiguration configuration = BuildConfiguration();
+            IConfiguration configuration = ConfigurationLoader.GetConfiguration("appSettings");
 
             Startup startup = new Startup();
             Console.WriteLine("Initializing...");
@@ -62,15 +64,6 @@ namespace Neuralm.Presentation.CLI
             Console.WriteLine($"AuthenticateRequest:\n\tId: {authenticateRequest.Id}\n\tCredentialTypeCode: {authenticateRequest.CredentialTypeCode}\n\tUsername: {authenticateRequest.Username}\n\tPassword: {authenticateRequest.Password}");
             AuthenticateResponse authenticateResponse = await userService.AuthenticateAsync(authenticateRequest);
             Console.WriteLine($"AuthenticateResponse:\n\tId: {authenticateResponse.Id}\n\tRequestId: {authenticateResponse.RequestId}\n\tAccessToken:{authenticateResponse.AccessToken}\n\tError: {authenticateResponse.Error}\n\tSuccess: {authenticateResponse.Success}");
-        }
-
-        private static IConfiguration BuildConfiguration()
-        {
-            string basePath = Directory.GetCurrentDirectory();
-            IConfigurationBuilder builder = new ConfigurationBuilder()
-                .SetBasePath(basePath)
-                .AddJsonFile("appSettings.json", optional: false, reloadOnChange: true);
-            return builder.Build();
         }
     }
 }

@@ -66,6 +66,15 @@ namespace Neuralm.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CredentialTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "Name",
+                            Name = "Name",
+                            Position = 1
+                        });
                 });
 
             modelBuilder.Entity("Neuralm.Domain.Entities.Authentication.Permission", b =>

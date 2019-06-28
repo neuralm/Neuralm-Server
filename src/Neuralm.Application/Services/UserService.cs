@@ -59,7 +59,6 @@ namespace Neuralm.Application.Services
             string accessToken = _accessTokenService.GenerateAccessToken(claims, DateTime.Now.AddHours(2));
             return new AuthenticateResponse(Guid.NewGuid(), authenticateRequest.Id, accessToken, success: true);
         }
-
         public async Task<RegisterResponse> RegisterAsync(RegisterRequest registerRequest)
         {
             if (string.IsNullOrEmpty(registerRequest.Password))
@@ -95,7 +94,6 @@ namespace Neuralm.Application.Services
 
         private static bool CredentialPredicate(CredentialType credentialType, Credential credential, string username) 
             => credential.CredentialTypeId.Equals(credentialType.Id) && string.Equals(credential.Identifier, username, StringComparison.OrdinalIgnoreCase);
-
         private static bool CredentialTypeCodePredicate(CredentialType credentialType, string credentialTypeCode) 
             => string.Equals(credentialType.Code, credentialTypeCode, StringComparison.OrdinalIgnoreCase);
     }
