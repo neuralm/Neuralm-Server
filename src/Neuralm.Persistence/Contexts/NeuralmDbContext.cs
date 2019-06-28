@@ -22,14 +22,9 @@ namespace Neuralm.Persistence.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyAllConfigurations();
+            modelBuilder.Entity<CredentialType>().HasData(new CredentialType { Name = "Name", Code = "Name", Position = 1, Id = 1 });
+            base.OnModelCreating(modelBuilder);
         }
-
-        //protected override void OnConfiguring(DbContextOptionsBuilder builder)
-        //{
-        //    builder.UseSqlServer("Server=(LocalDb)\\MSSQLLocalDB;Database=NeuralmDbContext;Trusted_Connection=True;MultipleActiveResultSets=true");
-        //    base.OnConfiguring(builder);
-        //}
     }
 }

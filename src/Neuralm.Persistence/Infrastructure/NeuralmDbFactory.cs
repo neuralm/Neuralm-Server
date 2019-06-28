@@ -8,7 +8,7 @@ namespace Neuralm.Persistence.Infrastructure
 {
     public class NeuralmDbFactory : DesignTimeDbContextFactoryBase<NeuralmDbContext>, IFactory<NeuralmDbContext>
     {
-        private static readonly string[] UsePrecompiledConnectionStringArguments = { "" };
+        private static readonly string[] Arguments = { "" };
 
         public NeuralmDbFactory() : base(null)
         {
@@ -16,6 +16,7 @@ namespace Neuralm.Persistence.Infrastructure
         }
         public NeuralmDbFactory(IOptions<DbConfiguration> neuralmDbConfigurationOptions) : base(neuralmDbConfigurationOptions)
         {
+
         }
 
         protected override NeuralmDbContext CreateNewInstance(DbContextOptions<NeuralmDbContext> options)
@@ -24,7 +25,7 @@ namespace Neuralm.Persistence.Infrastructure
         }
         public NeuralmDbContext Create()
         {
-            return base.CreateDbContext(UsePrecompiledConnectionStringArguments);
+            return base.CreateDbContext(Arguments);
         }
     }
 }

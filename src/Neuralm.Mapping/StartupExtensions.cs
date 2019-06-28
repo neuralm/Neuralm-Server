@@ -1,7 +1,8 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore;
+using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Neuralm.Application.Configurations;
 using Neuralm.Application.Cryptography;
 using Neuralm.Application.Interfaces;
@@ -12,6 +13,8 @@ using Neuralm.Domain.Entities.Authentication;
 using Neuralm.Persistence.Contexts;
 using Neuralm.Persistence.Infrastructure;
 using Neuralm.Persistence.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 
 namespace Neuralm.Mapping
 {
@@ -85,10 +88,31 @@ namespace Neuralm.Mapping
             serviceCollection.AddSingleton<IAccessTokenService, JwtAccessTokenService>();
             serviceCollection.AddTransient<IUserService, UserService>();
             #endregion Services
-            
+
             return serviceCollection;
         }
-
+        public static IServiceCollection AddJwtBearerBasedAuthentication(this IServiceCollection serviceCollection)
+        {
+            JwtConfiguration jwtConfiguration = serviceCollection.BuildServiceProvider().GetService<IOptions<JwtConfiguration>>().Value;
+            serviceCollection.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.Default.GetBytes(jwtConfiguration.Secret)),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+            return serviceCollection;
+        }
         public static IServiceCollection AddConfigurations(this IServiceCollection serviceCollection, IConfiguration configuration)
         {
             serviceCollection.AddOptions();
@@ -97,7 +121,6 @@ namespace Neuralm.Mapping
             serviceCollection.Configure<JwtConfiguration>(configuration.GetSection("Jwt").Bind);
             return serviceCollection;
         }
-
         public static IGenericServiceProvider ToGenericServiceProvider(this IServiceProvider serviceProvider)
         {
             return new GenericServiceProvider(serviceProvider);
