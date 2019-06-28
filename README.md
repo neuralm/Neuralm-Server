@@ -21,19 +21,11 @@ You will need the following tools:
 Follow these steps to get your development environment set up:
 
   1. Clone the repository.
-  2. Open PowerShell, connect to your local sqlserver and create a new database:
-     ```sql
-     SQLCMD.EXE -S "(LocalDb)\MSSQLLocalDB" -E
-
-     CREATE DATABASE NeuralmDbContext
-
-     GO
-     ```
-  3. Create an `appSettings.json` file at the root of the Presentation.CLI layer with the connectionstring to the new database:
+  2. Create an `appSettings.json` file at the root of the Presentation.CLI layer with the connectionstring to the new database:
      ```json
       {
           "Jwt": {
-            "Secret": "{YOUR SECRET KEY}" 
+            "Secret": "{YOUR SECRET KEY, MINIMUM LENGTH OF 17!}" 
           },
           "Server": {
             "Port": 9999
@@ -43,7 +35,7 @@ Follow these steps to get your development environment set up:
           } 
       }
      ```
-  4. Next, go to `Tools > NuGet Package Manager > Package Manager Console` in visual studio, To restore all dependencies:
+  3. Next, go to `Tools > NuGet Package Manager > Package Manager Console` in visual studio, To restore all dependencies:
      ```
      dotnet restore
      ```
@@ -52,28 +44,8 @@ Follow these steps to get your development environment set up:
      dotnet build
      ```
      To make sure all dependencies were added succesfully, it should build without dependency warnings else you have probably not installed .NET core 2.2 SDK.
-  5. Next, to add the code first database to your new database (make sure the default project is Neuralm.Persistence):
-     ```
-     Add-Migration InitialCreate
-     ```
-     Finally, update the database:
-     ```
-     Update-Database
-     ```
-     *The `Add-Migration` command scaffolds a migration to create the initial set of tables for the entities in the Persistence layer. The `Update-Database` command creates the database and applies the new migration to it.*
-  6. Next, build the solution either by selecting it in the `Build > Build solution` in visual studio or hitting `CTRL + SHIFT + B` or if you are still in the package manager console by typing `dotnet build`.
-  7. For the time being the you need to manually insert a `CredentialType` for authentication. Run this query (in PowerShell):
-     ```sql
-     USE NeuralmDbContext
-
-     GO
-
-     INSERT INTO [dbo].[CredentialTypes] ([Code], [Name], [Position]) VALUES ('Name', 'Name', 1)
-
-     GO
-     ```
-  8. Once the build has run successfully, start the server to confirm that the database connection is successful either by hitting `F5` or go to `Debug > Start`. A console will launch and start initializing. Upon completion, the console will log `Server started successfully on port: 9999`.
-  9. Now users are able to register and login.
+  4. Once the build has run successfully, start the server to confirm that the database connection is successful either by hitting `F5` or go to `Debug > Start`. A console will launch and start initializing. Upon completion, the console will look like this:
+ ![Screenshot](docs/images/Successful installation.png)
 
 ## Running the tests
 
