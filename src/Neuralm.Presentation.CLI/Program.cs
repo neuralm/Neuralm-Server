@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -38,32 +39,20 @@ namespace Neuralm.Presentation.CLI
             Startup startup = new Startup();
             Console.WriteLine("Initializing...");
             await startup.InitializeAsync(configuration);
-            Console.WriteLine("Finished initializing!");
+            Console.WriteLine("Finished initializing!\n");
 
             _genericServiceProvider = startup.GetServiceProvider();
             IUserService userService = _genericServiceProvider.GetService<IUserService>();
 
-            RegisterRequest registerRequest = new RegisterRequest()
-            {
-                Id = Guid.NewGuid(),
-                CredentialTypeCode = "Name",
-                Username = Guid.NewGuid().ToString(),
-                Password = Guid.NewGuid().ToString()
-            };
-            Console.WriteLine($"RegisterRequest:\n\tId: {registerRequest.Id}\n\tCredentialTypeCode: {registerRequest.CredentialTypeCode}\n\tUsername: {registerRequest.Username}\n\tPassword: {registerRequest.Password}");
+            RegisterRequest registerRequest = new RegisterRequest(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "Name");
+            Console.WriteLine($"RegisterRequest:\n  Id: {registerRequest.Id}\n  CredentialTypeCode: {registerRequest.CredentialTypeCode}\n  Username: {registerRequest.Username}\n  Password: {registerRequest.Password}\n  DateTime: {registerRequest.DateTime.ToString("dd-MM-yyyy HH:mm:ss.fffff", CultureInfo.InvariantCulture)}\n");
             RegisterResponse registerResponse = await userService.RegisterAsync(registerRequest);
-            Console.WriteLine($"RegisterResponse:\n\tId: {registerResponse.Id}\n\tRequestId: {registerResponse.RequestId}\n\tError: {registerResponse.Error}\n\tSuccess: {registerResponse.Success}");
+            Console.WriteLine($"RegisterResponse:\n  Id: {registerResponse.Id}\n  RequestId: {registerResponse.RequestId}\n  Error: {registerResponse.Error}\n  DateTime: {registerResponse.DateTime.ToString("dd-MM-yyyy HH:mm:ss.fffff", CultureInfo.InvariantCulture)}\n  Success: {registerResponse.Success}\n");
 
-            AuthenticateRequest authenticateRequest = new AuthenticateRequest()
-            {
-                Id = Guid.NewGuid(),
-                CredentialTypeCode = "Name",
-                Username = registerRequest.Username,
-                Password = registerRequest.Password
-            };
-            Console.WriteLine($"AuthenticateRequest:\n\tId: {authenticateRequest.Id}\n\tCredentialTypeCode: {authenticateRequest.CredentialTypeCode}\n\tUsername: {authenticateRequest.Username}\n\tPassword: {authenticateRequest.Password}");
+            AuthenticateRequest authenticateRequest = new AuthenticateRequest(registerRequest.Username, registerRequest.Password, "Name");
+            Console.WriteLine($"AuthenticateRequest:\n  Id: {authenticateRequest.Id}\n  CredentialTypeCode: {authenticateRequest.CredentialTypeCode}\n  Username: {authenticateRequest.Username}\n  Password: {authenticateRequest.Password}\n  DateTime: {authenticateRequest.DateTime.ToString("dd-MM-yyyy HH:mm:ss.fffff", CultureInfo.InvariantCulture)}\n");
             AuthenticateResponse authenticateResponse = await userService.AuthenticateAsync(authenticateRequest);
-            Console.WriteLine($"AuthenticateResponse:\n\tId: {authenticateResponse.Id}\n\tRequestId: {authenticateResponse.RequestId}\n\tAccessToken:{authenticateResponse.AccessToken}\n\tError: {authenticateResponse.Error}\n\tSuccess: {authenticateResponse.Success}");
+            Console.WriteLine($"AuthenticateResponse:\n  Id: {authenticateResponse.Id}\n  RequestId: {authenticateResponse.RequestId}\n  AccessToken: {authenticateResponse.AccessToken.Substring(0, 16)}...\n  Error: {authenticateResponse.Error}\n  DateTime: {authenticateResponse.DateTime.ToString("dd-MM-yyyy HH:mm:ss.fffff", CultureInfo.InvariantCulture)}\n  Success: {authenticateResponse.Success}\n");
         }
     }
 }

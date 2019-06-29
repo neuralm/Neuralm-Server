@@ -39,43 +39,43 @@ namespace Neuralm.Application.Services
         public async Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest authenticateRequest)
         {
             if (string.IsNullOrWhiteSpace(authenticateRequest.Username) || string.IsNullOrWhiteSpace(authenticateRequest.Password))
-                return new AuthenticateResponse(Guid.NewGuid(), authenticateRequest.Id, error: AuthenticateError.CredentialsAreNullOrEmpty);
+                return new AuthenticateResponse(authenticateRequest.Id, error: AuthenticateError.CredentialsAreNullOrEmpty);
 
             if (!await _credentialTypeRepository.ExistsAsync(ct => CredentialTypeCodePredicate(ct, authenticateRequest.CredentialTypeCode)))
-                return new AuthenticateResponse(Guid.NewGuid(), authenticateRequest.Id, error: AuthenticateError.CredentialTypeNotFound);
+                return new AuthenticateResponse(authenticateRequest.Id, error: AuthenticateError.CredentialTypeNotFound);
 
             CredentialType credentialType = await _credentialTypeRepository.FindSingleByExpressionAsync(ct => CredentialTypeCodePredicate(ct, authenticateRequest.CredentialTypeCode));
             if (!await _credentialRepository.ExistsAsync(cred => CredentialPredicate(credentialType, cred, authenticateRequest.Username)))
-                return new AuthenticateResponse(Guid.NewGuid(), authenticateRequest.Id, error: AuthenticateError.CredentialNotFound);
+                return new AuthenticateResponse(authenticateRequest.Id, error: AuthenticateError.CredentialNotFound);
 
             Credential credential = await _credentialRepository.FindSingleByExpressionAsync(cred => CredentialPredicate(credentialType, cred, authenticateRequest.Username));
             if (!_hasher.VerifyHash(credential.Secret, credential.Extra, authenticateRequest.Password))
-                return new AuthenticateResponse(Guid.NewGuid(), authenticateRequest.Id, error: AuthenticateError.SecretNotValid);
+                return new AuthenticateResponse(authenticateRequest.Id, error: AuthenticateError.SecretNotValid);
 
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, authenticateRequest.Username)
             };
             string accessToken = _accessTokenService.GenerateAccessToken(claims, DateTime.Now.AddHours(2));
-            return new AuthenticateResponse(Guid.NewGuid(), authenticateRequest.Id, accessToken, success: true);
+            return new AuthenticateResponse(authenticateRequest.Id, accessToken, success: true);
         }
         public async Task<RegisterResponse> RegisterAsync(RegisterRequest registerRequest)
         {
             if (string.IsNullOrEmpty(registerRequest.Password))
-                return new RegisterResponse(Guid.NewGuid(), registerRequest.Id, RegisterError.CredentialsAreNullOrEmpty);
+                return new RegisterResponse(registerRequest.Id, RegisterError.CredentialsAreNullOrEmpty);
 
             if (await _userRepository.ExistsAsync(anyUser => anyUser.Username.Equals(registerRequest.Username, StringComparison.OrdinalIgnoreCase)))
-                return new RegisterResponse(Guid.NewGuid(), registerRequest.Id, RegisterError.UsernameAlreadyExists);
+                return new RegisterResponse(registerRequest.Id, RegisterError.UsernameAlreadyExists);
 
             if (!await _credentialTypeRepository.ExistsAsync(ct => CredentialTypeCodePredicate(ct, registerRequest.CredentialTypeCode)))
-                return new RegisterResponse(Guid.NewGuid(), registerRequest.Id, RegisterError.CredentialTypeNotFound);
+                return new RegisterResponse(registerRequest.Id, RegisterError.CredentialTypeNotFound);
 
             User user = new User
             {
                 Username = registerRequest.Username
             };
             if (!await _userRepository.CreateAsync(user))
-                return new RegisterResponse(Guid.NewGuid(), registerRequest.Id, RegisterError.PersistenceError);
+                return new RegisterResponse(registerRequest.Id, RegisterError.PersistenceError);
 
             CredentialType credentialType = await _credentialTypeRepository.FindSingleByExpressionAsync(ct => CredentialTypeCodePredicate(ct, registerRequest.CredentialTypeCode));
             byte[] salt = _saltGenerator.GenerateSalt();
@@ -89,7 +89,7 @@ namespace Neuralm.Application.Services
             };
 
             bool success = await _credentialRepository.CreateAsync(credential);
-            return new RegisterResponse(Guid.NewGuid(), registerRequest.Id, success: success);
+            return new RegisterResponse(registerRequest.Id, success: success);
         }
 
         private static bool CredentialPredicate(CredentialType credentialType, Credential credential, string username) 

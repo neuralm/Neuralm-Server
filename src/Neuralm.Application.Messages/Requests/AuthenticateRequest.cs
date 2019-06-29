@@ -1,12 +1,16 @@
-﻿using System;
-
-namespace Neuralm.Application.Messages.Requests
+﻿namespace Neuralm.Application.Messages.Requests
 {
-    public class AuthenticateRequest : IRequest
+    public class AuthenticateRequest : Request
     {
-        public Guid Id { get; set; }
-        public string CredentialTypeCode { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public string Username { get; }
+        public string Password { get; }
+        public string CredentialTypeCode { get; }
+
+        public AuthenticateRequest(string username, string password, string credentialTypeCode)
+        {
+            Username = username;
+            Password = password;
+            CredentialTypeCode = credentialTypeCode;
+        }
     }
 }

@@ -6,5 +6,7 @@ namespace Neuralm.Application.Messages
     {
         Guid Id { get; }
         Guid RequestId { get; }
+        DateTime DateTime { get; }
+        bool Success { get; }
     }
 }

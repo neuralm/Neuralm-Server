@@ -3,19 +3,13 @@ using Neuralm.Domain.Enumerations;
 
 namespace Neuralm.Application.Messages.Responses
 {
-    public class RegisterResponse : IResponse
+    public class RegisterResponse : Response
     {
-        public Guid Id { get; }
-        public Guid RequestId { get; }
         public RegisterError Error { get; }
-        public bool Success { get; }
 
-        public RegisterResponse(Guid id, Guid requestId, RegisterError error = RegisterError.None, bool success = false)
+        public RegisterResponse(Guid requestId, RegisterError error = RegisterError.None, bool success = false) : base(requestId, success)
         {
-            Id = id;
-            RequestId = requestId;
             Error = error;
-            Success = success;
         }
     }
 }
