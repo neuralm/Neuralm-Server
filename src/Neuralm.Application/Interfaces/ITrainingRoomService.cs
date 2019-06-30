@@ -7,18 +7,15 @@ namespace Neuralm.Application.Interfaces
     public interface ITrainingRoomService : IService
     {
         Task<CreateTrainingRoomResponse> CreateTrainingRoomAsync(CreateTrainingRoomRequest createTrainingRoomRequest);
-        // Disable (Delete after not re-instating the training room after X amount of time)
         Task<DisableTrainingRoomResponse> DisableTrainingRoomAsync(DisableTrainingRoomRequest disableTrainingRoomRequest);
-
-        // Reenable
-        // AuthorizeUserForRoom
-        // DeauthorizeUserForRoom
-        // UpdateSettings
-        // GetOrganisms
-        // UpdateScores
-        // GetBestOrganisms
-        // StartTrainingSession
-        // EndTrainingSession
-        // GetGenerationStatus
+        Task<EnableTrainingRoomResponse> EnableTrainingRoomAsync(EnableTrainingRoomRequest enableTrainingRoomRequest);
+        Task<AuthorizeUserForTrainingRoomResponse> AuthorizeUserForTrainingRoomAsync(AuthorizeUserForTrainingRoomRequest authorizeUserForRoomRequest);
+        Task<DeauthorizeUserForTrainingRoomResponse> DeauthorizeUserForTrainingRoomAsync(DeauthorizeUserForTrainingRoomRequest authorizeUserForRoomRequest);
+        Task<UpdateScoresResponse> UpdateScoresAsync(UpdateScoresRequest updateScoresRequest);
+        Task<GetOrganismsResponse> GetOrganismsAsync(GetOrganismsRequest getOrganismsRequest);
+        Task<GetBestOrganismsResponse> GetBestOrganismsAsync(GetBestOrganismsRequest getBestOrganismsRequest);
+        Task<StartTrainingSessionResponse> StartTrainingSessionAsync(StartTrainingSessionRequest startTrainingSessionRequest);
+        Task<EndTrainingSessionResponse> EndTrainingSessionAsync(EndTrainingSessionRequest endTrainingSessionRequest);
+        Task<GetGenerationStatusResponse> GetGenerationStatusAsync(GetGenerationStatusRequest getGenerationStatusRequest);
     }
 }
