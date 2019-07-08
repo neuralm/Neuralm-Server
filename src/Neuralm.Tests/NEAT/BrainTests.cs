@@ -5,19 +5,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Neuralm.Tests
+namespace Neuralm.Tests.NEAT
 {
     [TestClass]
     public class BrainTests
     {
         private TrainingRoom _trainingRoom;
-        private User fakeUser;
+        private User _fakeUser;
 
         [TestInitialize]
         public void Initialize()
         {
-            fakeUser = new User();
-            _trainingRoom = new TrainingRoom(fakeUser, new TrainingRoomSettings(0, 2, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
+            _fakeUser = new User();
+            _trainingRoom = new TrainingRoom(_fakeUser, "FakeRoom", new TrainingRoomSettings(0, 2, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
         }
 
         [TestMethod]
@@ -70,15 +70,15 @@ namespace Neuralm.Tests
         [TestClass]
         public class Clone
         {
-            private User fakeUser;
+            private User _fakeUser;
             private TrainingRoom _trainingRoom;
             private Brain _original;
 
             [TestInitialize]
             public void Initialize()
             {
-                fakeUser = new User();
-                _trainingRoom = new TrainingRoom(fakeUser, new TrainingRoomSettings(0, 2, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
+                _fakeUser = new User();
+                _trainingRoom = new TrainingRoom(_fakeUser, "FakeRoom", new TrainingRoomSettings(0, 2, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
                 _original = new Brain(3, 1, _trainingRoom, new List<ConnectionGene>()
                 {
                     new ConnectionGene(0, 3, 1, 1),
@@ -99,7 +99,7 @@ namespace Neuralm.Tests
             }
 
             [TestMethod]
-            public void CloneDoesntAffectOriginalScoreTest()
+            public void CloneDoesNotAffectOriginalScoreTest()
             {
                 _original.Score = 0;
                 Brain clone = _original.Clone();
@@ -109,7 +109,7 @@ namespace Neuralm.Tests
             }
 
             [TestMethod]
-            public void CloneDoesntAffectOriginalGeneTest()
+            public void CloneDoesNotAffectOriginalGeneTest()
             {
                 List<ConnectionGene> originalGenes = new List<ConnectionGene>(_original.Genes.Values);
                 foreach (ConnectionGene gene in originalGenes)
@@ -133,13 +133,13 @@ namespace Neuralm.Tests
         public class EqualsTest
         {
             private TrainingRoom _trainingRoom;
-            private User fakeUser;
+            private User _fakeUser;
 
             [TestInitialize]
             public void Initialize()
             {
-                fakeUser = new User();
-                _trainingRoom = new TrainingRoom(fakeUser, new TrainingRoomSettings(0, 2, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
+                _fakeUser = new User();
+                _trainingRoom = new TrainingRoom(_fakeUser, "FakeRoom", new TrainingRoomSettings(0, 2, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
             }
 
             [TestMethod]
