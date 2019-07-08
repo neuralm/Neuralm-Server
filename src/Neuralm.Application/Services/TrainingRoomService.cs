@@ -23,13 +23,16 @@ namespace Neuralm.Application.Services
 
         public async Task<CreateTrainingRoomResponse> CreateTrainingRoomAsync(CreateTrainingRoomRequest createTrainingRoomRequest)
         {
-            if (createTrainingRoomRequest.OwnerId < 1 || string.IsNullOrWhiteSpace(createTrainingRoomRequest.TrainingRoomName))
-                return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "Invalid request parameters.");
-            
+            if (createTrainingRoomRequest.OwnerId.Equals(Guid.Empty))
+                return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "The ownerId must not be an empty guid.");
+
+            if (string.IsNullOrWhiteSpace(createTrainingRoomRequest.TrainingRoomName))
+                return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "The training room name cannot be null or be empty");
+
             if (await _trainingRoomRepository.ExistsAsync(tr => tr.Name.Equals(createTrainingRoomRequest.TrainingRoomName, StringComparison.CurrentCultureIgnoreCase)))
                 return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "A training room with the requested name already exists.");
             
-            User owner = await _userRepository.FindSingleByExpressionAsync(user => user.Id == createTrainingRoomRequest.OwnerId);
+            User owner = await _userRepository.FindSingleByExpressionAsync(user => user.Id.Equals(createTrainingRoomRequest.OwnerId));
             if (owner == null)
                 return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "User not found.");
 

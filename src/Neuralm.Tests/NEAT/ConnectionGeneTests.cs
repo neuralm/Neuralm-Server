@@ -1,8 +1,7 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Neuralm.Domain.Entities.NEAT;
 
-namespace Neuralm.Tests
+namespace Neuralm.Tests.NEAT
 {
     [TestClass]
     public class ConnectionGeneTests
@@ -27,7 +26,7 @@ namespace Neuralm.Tests
             }
 
             [TestMethod]
-            public void CloneDoesntAffectOriginalTest()
+            public void CloneDoesNotAffectOriginalTest()
             {
                 double originalWeight = _original.Weight;
                 ConnectionGene clone = _original.Clone();

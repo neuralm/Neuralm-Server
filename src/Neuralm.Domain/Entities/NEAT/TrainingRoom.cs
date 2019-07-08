@@ -15,7 +15,7 @@ namespace Neuralm.Domain.Entities.NEAT
         private int generation = 0;
       
         public Guid Id { get; }
-        public int OwnerId { get; }
+        public Guid OwnerId { get; }
         public User Owner { get; }
         public TrainingRoomSettings TrainingRoomSettings { get; }
         public string Name { get; }
@@ -28,12 +28,12 @@ namespace Neuralm.Domain.Entities.NEAT
         public int InnovationId => _innovationId;
 
         /// <summary>
-        /// Create a traningroom with the given settings.
-        /// The trainingroom manages all of the brains and the settings.
+        /// Create a training room with the given settings.
+        /// The training room manages all of the brains and the settings.
         /// </summary>
-        /// <param name="owner">The user who created this trainingroom.</param>
+        /// <param name="owner">The user who created this training room.</param>
         /// <param name="name">The name for the room</param>
-        /// <param name="trainingRoomSettings">The settings for this trainingroom</param>
+        /// <param name="trainingRoomSettings">The settings for this training room</param>
         public TrainingRoom(User owner, string name, TrainingRoomSettings trainingRoomSettings)
         {
             Id = Guid.NewGuid();
@@ -53,7 +53,7 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Add a brain to the trainingroom
+        /// Add a brain to the training room
         /// Checks each species and creates a new species if no species matches.
         /// </summary>
         /// <param name="brain">The brain to add</param>
@@ -73,7 +73,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <summary>
         /// Get a random brain from a random species
         /// </summary>
-        /// <returns>A randomly choosen brain</returns>
+        /// <returns>A randomly chosen brain</returns>
         public Brain GetRandomBrain()
         {
             return _speciesList[Random.Next(_speciesList.Count)].GetRandomBrain();
@@ -93,7 +93,6 @@ namespace Neuralm.Domain.Entities.NEAT
         /// Do 1 generation.
         /// kill the worst ones, mutate and breed and make the system ready for a new generation.
         /// </summary>
-        /// <param name="operation">The operation to test on. Input and output count must match with what was passed into the constructor</param>
         public void EndGeneration()
         {
             HighestScore = double.MinValue;
@@ -162,9 +161,9 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Increase to the nodeID to the value passed in if the nodeid is lower than the value passed in.
+        /// Increase to the nodeID to the value passed in if the nodeId is lower than the value passed in.
         /// </summary>
-        /// <param name="max">The minimum value the nodeid should be</param>
+        /// <param name="max">The minimum value the nodeId should be</param>
         public void IncreaseNodeIdTo(int max)
         {
             _nodeId = Math.Max(_nodeId, max);
@@ -182,8 +181,8 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <summary>
         /// Get the innovation number that corresponds with the given in and out node id.
         /// </summary>
-        /// <param name="inId">The inid of the new connection</param>
-        /// <param name="outId">The outid of the new connection</param>
+        /// <param name="inId">The inId of the new connection</param>
+        /// <param name="outId">The outId of the new connection</param>
         /// <returns>The innovation number</returns>
         public int GetInnovationNumber(int inId, int outId)
         {
