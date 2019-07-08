@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Neuralm.Application.Interfaces;
+using Neuralm.Application.Messages.Dtos;
 using Neuralm.Application.Messages.Requests;
 using Neuralm.Application.Messages.Responses;
 using Neuralm.Domain.Entities;
@@ -81,6 +84,35 @@ namespace Neuralm.Application.Services
         public Task<GetGenerationStatusResponse> GetGenerationStatusAsync(GetGenerationStatusRequest getGenerationStatusRequest)
         {
             throw new NotImplementedException();
+        }
+        public async Task<GetEnabledTrainingRoomsResponse> GetEnabledTrainingRoomsAsync(GetEnabledTrainingRoomsRequest getEnabledTrainingRoomsRequest)
+        {
+            IEnumerable<TrainingRoom> trainingRooms = await _trainingRoomRepository.FindManyByExpressionAsync(trainingRoom => trainingRoom.Enabled);
+            return new GetEnabledTrainingRoomsResponse(getEnabledTrainingRoomsRequest.Id, trainingRooms.Select(TrainingRoomToDto).ToList(), true);
+        }
+
+        private static TrainingRoomDto TrainingRoomToDto(TrainingRoom trainingRoom)
+        {
+            return new TrainingRoomDto()
+            {
+                Id = trainingRoom.Id,
+                Name = trainingRoom.Name,
+                Owner = UserToDto(trainingRoom.Owner),
+                Generation = trainingRoom.Generation,
+                HighestScore = trainingRoom.HighestScore,
+                LowestScore = trainingRoom.LowestScore,
+                AverageScore = trainingRoom.AverageScore,
+                TrainingRoomSettings = trainingRoom.TrainingRoomSettings
+            };
+        }
+        private static UserDto UserToDto(User user)
+        {
+            return new UserDto()
+            {
+                Id = user.Id,
+                Name = user.Username,
+                TimestampCreated = user.TimestampCreated
+            };
         }
     }
 }

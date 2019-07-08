@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Neuralm.Domain.Entities.NEAT
 {
-    public sealed class Species
+    public class Species
     {
         private List<Brain> _lastGenerationBrains;
         private readonly TrainingRoom _trainingRoom;

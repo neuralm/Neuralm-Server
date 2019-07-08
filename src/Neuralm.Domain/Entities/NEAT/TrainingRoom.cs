@@ -8,24 +8,23 @@ namespace Neuralm.Domain.Entities.NEAT
     {
         private readonly Dictionary<(int A, int B), int> _mutationToInnovation;
         private readonly List<Species> _speciesList;
-        private readonly int _brainCount;
-        private int _innovationId;
         private int _nodeId;
         private readonly List<Brain> _children;
-        private int generation = 0;
-      
+        
         public Guid Id { get; }
         public Guid OwnerId { get; }
         public User Owner { get; }
         public TrainingRoomSettings TrainingRoomSettings { get; }
         public string Name { get; }
+        public int Generation { get; private set; }
 
         public Random Random { get; }
         public double HighestScore { get; private set; }
         public double LowestScore { get; private set; }
         public double AverageScore { get; private set; }
         public int SpeciesCount => _speciesList.Count;
-        public int InnovationId => _innovationId;
+        public int InnovationId { get; private set; }
+        public bool Enabled { get; private set; }
 
         /// <summary>
         /// Create a training room with the given settings.
@@ -37,9 +36,11 @@ namespace Neuralm.Domain.Entities.NEAT
         public TrainingRoom(User owner, string name, TrainingRoomSettings trainingRoomSettings)
         {
             Id = Guid.NewGuid();
+            Generation = 0;
             Owner = owner;
             OwnerId = Owner.Id;
             Name = name;
+            Enabled = true;
             TrainingRoomSettings = trainingRoomSettings;
             Random = new Random(trainingRoomSettings.Seed);
             _speciesList = new List<Species>(trainingRoomSettings.BrainCount);
@@ -110,7 +111,7 @@ namespace Neuralm.Domain.Entities.NEAT
                 }
             }
 
-            AverageScore = totalFullScore / _brainCount;
+            AverageScore = totalFullScore / TrainingRoomSettings.BrainCount;
 
             // Reproduce!
             foreach (Species species in _speciesList)
@@ -128,7 +129,7 @@ namespace Neuralm.Domain.Entities.NEAT
             foreach (Species species in _speciesList)
             {
                 double fraction = species.SpeciesScore / totalScore;
-                double amountOfBrains = _brainCount * fraction;
+                double amountOfBrains = TrainingRoomSettings.BrainCount * fraction;
                 rest += amountOfBrains % 1;
 
                 if (rest >= 1)
@@ -144,7 +145,7 @@ namespace Neuralm.Domain.Entities.NEAT
                 }
             }
 
-            while (_children.Count < _brainCount)
+            while (_children.Count < TrainingRoomSettings.BrainCount)
             {
                 _children.Add(new Brain(TrainingRoomSettings.InputCount, TrainingRoomSettings.OutputCount, this));
             }
@@ -157,7 +158,7 @@ namespace Neuralm.Domain.Entities.NEAT
             _speciesList.RemoveAll(species => !species.Brains.Any());
 
             _mutationToInnovation.Clear();
-            generation++;
+            Generation++;
         }
 
         /// <summary>
@@ -189,8 +190,25 @@ namespace Neuralm.Domain.Entities.NEAT
             if (_mutationToInnovation.ContainsKey((inId, outId)))
                 return _mutationToInnovation[(inId, outId)];
 
-            _mutationToInnovation.Add((inId, outId), ++_innovationId);
-            return _innovationId;
+            _mutationToInnovation.Add((inId, outId), ++InnovationId);
+            return InnovationId;
+        }
+
+        /// <summary>
+        /// Sets Enabled to false.
+        /// </summary>
+        public void Disable()
+        {
+            Enabled = false;
+        }
+
+        /// <summary>
+        /// Sets Enabled to true.
+        /// </summary>
+        public void Enable()
+        {
+            // TODO: Is within re-enable period?
+            Enabled = true;
         }
     }
 }

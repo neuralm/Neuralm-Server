@@ -15,10 +15,11 @@ namespace Neuralm.Domain.Entities.NEAT
         /// Create a node with te given id
         /// </summary>
         /// <param name="id">The node's ID</param>
+        /// <param name="type">The type of node</param>
         public Node(int id, NodeType type)
         {
             Layer = int.MinValue;
-            Dependencies = new List<ConnectionGene>();;
+            Dependencies = new List<ConnectionGene>();
             Id = id;
             NodeType = type;
         }
@@ -31,7 +32,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <param name="force">If true it will always set the new layer, else only if it is bigger than the current layer</param>
         public void SetLayer(int layer, bool force = false)
         {
-            Layer = force ? layer : (layer>Layer?layer:Layer);
+            Layer = force ? layer : (layer > Layer ? layer : Layer);
 
             if (!force)
             {
@@ -60,7 +61,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <returns>true if they are the same</returns>
         private bool Equals(Node other)
         {
-            return other.Id == this.Id;
+            return other.Id.Equals(Id);
         }
 
         public override int GetHashCode()
@@ -71,6 +72,6 @@ namespace Neuralm.Domain.Entities.NEAT
 
     public enum NodeType
     {
-        INPUT, HIDDEN, OUTPUT
+        Input, Hidden, Output
     }
 }

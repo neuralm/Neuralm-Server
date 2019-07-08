@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Neuralm.Domain.Entities.NEAT
 {
-    public sealed class Brain
+    public class Brain
     {
         private readonly TrainingRoom _trainingRoom;
         private readonly Dictionary<int, ConnectionGene> _genes;
@@ -13,12 +13,11 @@ namespace Neuralm.Domain.Entities.NEAT
         private readonly List<Node> _inputNodes;
         private readonly int _outputCount;
         private readonly int _inputCount;
-        private bool _shouldRebuildStructure;
-        public IReadOnlyDictionary<int, ConnectionGene> Genes => _genes;
         private readonly List<ConnectionGene> _childGenes;
-        public double Score { get; set; }
         private int _maxInnovation;
 
+        public double Score { get; set; }
+        public IReadOnlyDictionary<int, ConnectionGene> Genes => _genes;
         public Guid Id { get; }
 
         /// <summary>
@@ -26,7 +25,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// </summary>
         /// <param name="inputCount">The amount of input nodes</param>
         /// <param name="outputCount">The amount of output nodes</param>
-        /// <param name="trainingRoom">The trainingroom this brain is a part of</param>
+        /// <param name="trainingRoom">The training room this brain is a part of</param>
         public Brain(int inputCount, int outputCount, TrainingRoom trainingRoom)
         {
             _trainingRoom = trainingRoom;
@@ -36,21 +35,20 @@ namespace Neuralm.Domain.Entities.NEAT
             _inputNodes = new List<Node>();
             _inputCount = inputCount;
             _outputCount = outputCount;
-            _shouldRebuildStructure = true;
             _childGenes = new List<ConnectionGene>();
 
             Id = Guid.NewGuid();
 
             for (int i = 0; i < inputCount; i++)
             {
-                Node node = new Node(i, NodeType.INPUT);
+                Node node = new Node(i, NodeType.Input);
                 _inputNodes.Add(node);
                 _nodes[i] = node;
             }
 
             for (int i = 0; i < outputCount; i++)
             {
-                Node node = new Node(inputCount + i, NodeType.OUTPUT);
+                Node node = new Node(inputCount + i, NodeType.Output);
                 _outputNodes.Add(node);
                 _nodes[inputCount + i] = node;
             }
@@ -63,7 +61,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// </summary>
         /// <param name="inputCount">The amount of input nodes</param>
         /// <param name="outputCount">The amount of output nodes</param>
-        /// <param name="trainingRoom">The trainingroom this brain is a part of</param>
+        /// <param name="trainingRoom">The training room this brain is a part of</param>
         /// <param name="genes">The genes to create the brain out of</param>
         public Brain(int inputCount, int outputCount, TrainingRoom trainingRoom, IEnumerable<ConnectionGene> genes) : this(inputCount, outputCount, trainingRoom)
         {
@@ -76,7 +74,7 @@ namespace Neuralm.Domain.Entities.NEAT
 
         /// <summary>
         /// Create a brain based on the genes of 2 parent brains. 
-        /// For each gene in parent1 we check if parent2 has a gene with the same innovation numer, if this is the case we randomly choose a parent to get the gene from.
+        /// For each gene in parent1 we check if parent2 has a gene with the same innovation number, if this is the case we randomly choose a parent to get the gene from.
         /// If a gene only exists in one parent we add it no matter what.
         /// </summary>
         /// <param name="parent2Brain">The other parent</param>
@@ -121,13 +119,13 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <returns></returns>
         public Node GetOrCreateNode(int id)
         {
-            return !_nodes.ContainsKey(id) ? _nodes[id] = new Node(id, NodeType.HIDDEN) : _nodes[id];
+            return !_nodes.ContainsKey(id) ? _nodes[id] = new Node(id, NodeType.Hidden) : _nodes[id];
         }
 
         /// <summary>
         /// Clone this brain to produce a brain that equals the other brain but is not the same instance.
         /// </summary>
-        /// <returns>A new brain with the same genes, trainingroom, inputcount and outputcount</returns>
+        /// <returns>A new brain with the same genes, training room, inputCount and outputCount</returns>
         public Brain Clone()
         {
             return new Brain(_inputCount, _outputCount, _trainingRoom, _genes.Select(pair => pair.Value.Clone()).ToList());
@@ -139,8 +137,6 @@ namespace Neuralm.Domain.Entities.NEAT
         /// </summary>
         private void RebuildStructure()
         {
-            _shouldRebuildStructure = false;
-
             foreach (ConnectionGene gene in _genes.Values)
             {
                 gene.LoadNodes(this);
@@ -167,7 +163,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// - Add a connection
         /// - Add a node
         /// - Change the weight of an existing gene, which can either randomly be reset to a random value or slightly change
-        /// These changes can all happen in one call, but the chance that this happens depends on the trainingroom settings
+        /// These changes can all happen in one call, but the chance that this happens depends on the training room settings
         /// </summary>
         public void Mutate()
         {
@@ -206,12 +202,12 @@ namespace Neuralm.Domain.Entities.NEAT
                 do
                 {
                     startNode = _nodes.ElementAt(_trainingRoom.Random.Next(_nodes.Count)).Value;
-                } while (startNode.NodeType == NodeType.OUTPUT);
+                } while (startNode.NodeType == NodeType.Output);
 
                 do
                 {
                     endNode = _nodes.ElementAt(_trainingRoom.Random.Next(_nodes.Count)).Value;
-                } while (endNode.Layer == startNode.Layer || (startNode.NodeType == NodeType.INPUT && endNode.NodeType == NodeType.INPUT));
+                } while (endNode.Layer == startNode.Layer || (startNode.NodeType == NodeType.Input && endNode.NodeType == NodeType.Input));
 
                 if (endNode.Layer > startNode.Layer)
                 {
@@ -231,7 +227,6 @@ namespace Neuralm.Domain.Entities.NEAT
                 ConnectionGene connection = new ConnectionGene(startNode.Id, endNode.Id, _trainingRoom.Random.NextDouble() * 2 - 1, _trainingRoom.GetInnovationNumber(startNode.Id, endNode.Id));
                 _genes.Add(connection.InnovationNumber, connection);
                 _maxInnovation = Math.Max(connection.InnovationNumber, _maxInnovation);
-                _shouldRebuildStructure = true;
                 break;
             }
         }
@@ -258,8 +253,6 @@ namespace Neuralm.Domain.Entities.NEAT
             if (_genes.Count == 0)
                 return;
 
-            _shouldRebuildStructure = true;
-
             // Choose a random connection to add a node into
             ConnectionGene theChosenOne = _genes.ElementAt(_trainingRoom.Random.Next(_genes.Count)).Value;
 
@@ -272,7 +265,7 @@ namespace Neuralm.Domain.Entities.NEAT
             int oldInId = theChosenOne.InId;
             int oldOutId = theChosenOne.OutId;
 
-            // Create a connectiongene from oldIn (a) to new (c) and from new (c) to oldOut (b) 
+            // Create a connectionGene from oldIn (a) to new (c) and from new (c) to oldOut (b) 
             ConnectionGene aToC = new ConnectionGene(oldInId, newNodeId, 1, _trainingRoom.GetInnovationNumber(oldInId, newNodeId));
             ConnectionGene cToB = new ConnectionGene(newNodeId, oldOutId, theChosenOne.Weight, _trainingRoom.GetInnovationNumber(newNodeId, oldOutId));
 
@@ -293,8 +286,7 @@ namespace Neuralm.Domain.Entities.NEAT
 
             if (other._genes.Any())
             {
-                // excess = other.Genes.Count(pair => pair.Key > _maxInnovation);
-                foreach (var pair in other.Genes)
+                foreach (KeyValuePair<int, ConnectionGene> pair in other.Genes)
                 {
                     if (pair.Key > _maxInnovation)
                     {
@@ -326,7 +318,10 @@ namespace Neuralm.Domain.Entities.NEAT
             if (genomeCount < 20)
                 genomeCount = 1;
 
-            return ((_trainingRoom.TrainingRoomSettings.C1 * excess) / genomeCount + (_trainingRoom.TrainingRoomSettings.C2 * disjoint) / genomeCount + _trainingRoom.TrainingRoomSettings.C3 * weightDiff) < _trainingRoom.TrainingRoomSettings.Threshold;
+            return ((_trainingRoom.TrainingRoomSettings.C1 * excess) / genomeCount +
+                    (_trainingRoom.TrainingRoomSettings.C2 * disjoint) / genomeCount +
+                    _trainingRoom.TrainingRoomSettings.C3 * weightDiff) <
+                   _trainingRoom.TrainingRoomSettings.Threshold;
         }
 
         /// <summary>
@@ -348,7 +343,11 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <returns>true if the brain is the same</returns>
         private bool Equals(Brain other)
         {
-            return Genes.SequenceEqual(other.Genes) && _outputNodes.SequenceEqual(other._outputNodes) && _inputNodes.SequenceEqual(other._inputNodes) && _inputCount == other._inputCount && _outputCount == other._outputCount;
+            return Genes.SequenceEqual(other.Genes) &&
+                   _outputNodes.SequenceEqual(other._outputNodes) &&
+                   _inputNodes.SequenceEqual(other._inputNodes) &&
+                   _inputCount == other._inputCount &&
+                   _outputCount == other._outputCount;
         }
     }
 }
