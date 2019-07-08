@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Neuralm.Application.Interfaces;
 using Neuralm.Application.Messages.Requests;
 using Neuralm.Application.Messages.Responses;
+using Neuralm.Domain.Entities;
 using Neuralm.Domain.Entities.NEAT;
 
 namespace Neuralm.Application.Services
@@ -10,18 +11,33 @@ namespace Neuralm.Application.Services
     public class TrainingRoomService : ITrainingRoomService
     {
         private readonly IRepository<TrainingRoom> _trainingRoomRepository;
+        private readonly IRepository<User> _userRepository;
 
-        public TrainingRoomService(IRepository<TrainingRoom> trainingRoomRepository)
+        public TrainingRoomService(
+            IRepository<TrainingRoom> trainingRoomRepository,
+            IRepository<User> userRepository)
         {
             _trainingRoomRepository = trainingRoomRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<CreateTrainingRoomResponse> CreateTrainingRoomAsync(CreateTrainingRoomRequest createTrainingRoomRequest)
         {
             if (createTrainingRoomRequest.OwnerId < 1 || string.IsNullOrWhiteSpace(createTrainingRoomRequest.TrainingRoomName))
-                return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, false);
-            // 
-            return null;
+                return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "Invalid request parameters.");
+            
+            if (await _trainingRoomRepository.ExistsAsync(tr => tr.Name.Equals(createTrainingRoomRequest.TrainingRoomName, StringComparison.CurrentCultureIgnoreCase)))
+                return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "A training room with the requested name already exists.");
+            
+            User owner = await _userRepository.FindSingleByExpressionAsync(user => user.Id == createTrainingRoomRequest.OwnerId);
+            if (owner == null)
+                return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "User not found.");
+
+            TrainingRoom trainingRoom = new TrainingRoom(owner, createTrainingRoomRequest.TrainingRoomName, createTrainingRoomRequest.TrainingRoomSettings);
+            if (!await _trainingRoomRepository.CreateAsync(trainingRoom))
+                return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "Failed to create training room.");
+
+            return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, trainingRoom.Id, "Successfully created a training room.", true);
         }
         public Task<DisableTrainingRoomResponse> DisableTrainingRoomAsync(DisableTrainingRoomRequest disableTrainingRoomRequest)
         {
