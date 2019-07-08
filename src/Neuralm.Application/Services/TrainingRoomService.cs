@@ -55,7 +55,7 @@ namespace Neuralm.Application.Services
         {
             throw new NotImplementedException();
         }
-        public Task<UpdateScoresResponse> UpdateScoresAsync(UpdateScoresRequest updateScoresRequest)
+        public Task<PostBrainScoresResponse> PostBrainScoresAsync(PostBrainScoresRequest postBrainScoresRequest)
         {
             throw new NotImplementedException();
         }
