@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,10 +13,12 @@ namespace Neuralm.Domain.Entities.NEAT
         private int _nodeId;
         private readonly List<Brain> _children;
         private int generation = 0;
-
+      
+        public Guid Id { get; }
         public int OwnerId { get; }
         public User Owner { get; }
         public TrainingRoomSettings TrainingRoomSettings { get; }
+        public string Name { get; }
 
         public Random Random { get; }
         public double HighestScore { get; private set; }
@@ -30,11 +32,14 @@ namespace Neuralm.Domain.Entities.NEAT
         /// The trainingroom manages all of the brains and the settings.
         /// </summary>
         /// <param name="owner">The user who created this trainingroom.</param>
+        /// <param name="name">The name for the room</param>
         /// <param name="trainingRoomSettings">The settings for this trainingroom</param>
-        public TrainingRoom(User owner, TrainingRoomSettings trainingRoomSettings)
+        public TrainingRoom(User owner, string name, TrainingRoomSettings trainingRoomSettings)
         {
+            Id = Guid.NewGuid();
             Owner = owner;
             OwnerId = Owner.Id;
+            Name = name;
             TrainingRoomSettings = trainingRoomSettings;
             Random = new Random(trainingRoomSettings.Seed);
             _speciesList = new List<Species>(trainingRoomSettings.BrainCount);
