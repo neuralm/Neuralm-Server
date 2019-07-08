@@ -19,6 +19,9 @@ namespace Neuralm.Presentation.CLI
 
         internal Task InitializeAsync(IConfiguration configuration)
         {
+            if (configuration == null)
+                throw new ArgumentNullException(nameof(configuration));
+
             _serviceProvider = new ServiceCollection()
                 .AddConfigurations(configuration)
                 .AddApplicationServices()
@@ -31,7 +34,7 @@ namespace Neuralm.Presentation.CLI
 
         internal IGenericServiceProvider GetServiceProvider()
         {
-            return _serviceProvider;
+            return _serviceProvider ?? throw new InitializationException("GenericServiceProvider is unset. Call InitializeAsync() first.");
         }
 
         private Task VerifyDatabaseConnection()
