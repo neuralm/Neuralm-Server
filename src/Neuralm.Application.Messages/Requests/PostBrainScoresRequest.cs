@@ -1,8 +1,8 @@
 ﻿namespace Neuralm.Application.Messages.Requests
 {
-    public class UpdateScoresRequest : Request
+    public class PostBrainScoresRequest : Request
     {
-        public UpdateScoresRequest()
+        public PostBrainScoresRequest()
         {
             
         }
