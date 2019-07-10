@@ -1,9 +1,11 @@
-﻿namespace Neuralm.Domain.Entities.Authentication
+﻿using System;
+
+namespace Neuralm.Domain.Entities.Authentication
 {
     public class Credential
     {
-        public int Id { get; set; }
-        public int UserId { get; set; }
+        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
         public int CredentialTypeId { get; set; }
         public string Identifier { get; set; }
         public string Secret { get; set; }

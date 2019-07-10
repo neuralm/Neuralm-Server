@@ -4,9 +4,11 @@ namespace Neuralm.Application.Messages.Responses
 {
     public class CreateTrainingRoomResponse : Response
     {
-        public CreateTrainingRoomResponse(Guid requestId, bool success) : base(requestId, success)
-        {
+        public Guid TrainingRoomId { get; }
 
+        public CreateTrainingRoomResponse(Guid requestId, Guid trainingRoomId, string message, bool success = false) : base(requestId, message, success)
+        {
+            TrainingRoomId = trainingRoomId;
         }
     }
 }

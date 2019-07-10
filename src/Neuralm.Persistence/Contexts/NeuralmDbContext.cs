@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Neuralm.Domain.Entities;
 using Neuralm.Domain.Entities.Authentication;
+using Neuralm.Domain.Entities.NEAT;
 using Neuralm.Persistence.Extensions;
 
 namespace Neuralm.Persistence.Contexts
@@ -14,6 +15,8 @@ namespace Neuralm.Persistence.Contexts
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
+        public DbSet<TrainingRoom> TrainingRooms { get; set; }
+        public DbSet<TrainingRoomSettings> TrainingRoomSettings { get; set; }
 
         public NeuralmDbContext(DbContextOptions<NeuralmDbContext> options) : base(options)
         {
