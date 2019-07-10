@@ -7,13 +7,15 @@ namespace Neuralm.Application.Messages
         public Guid Id { get; }
         public Guid RequestId { get; }
         public DateTime DateTime { get; }
+        public string Message { get; }
         public bool Success { get; }
 
-        protected Response(Guid requestId, bool success)
+        protected Response(Guid requestId, string message, bool success)
         {
             Id = Guid.NewGuid();
             RequestId = requestId;
             DateTime = DateTime.UtcNow;
+            Message = message;
             Success = success;
         }
     }

@@ -21,12 +21,11 @@
         public int Seed { get; }
 
         /// <summary>
-        /// The settings for the trainingroom.
+        /// The settings for the training room.
         /// </summary>
         /// <param name="brainCount">How many brains each generation has</param>
         /// <param name="inputCount">How many inputs each brain has</param>
         /// <param name="outputCount">How many outputs each brain has</param>
-        /// <param name="random">The random generator</param>
         /// <param name="c1">The importance of excess genes when checking the species. The higher this number the faster they will become a different species</param>
         /// <param name="c2">The importance of disjoint genes when checking the species. The higher this number the faster they will become a different species</param>
         /// <param name="c3">The average weight difference when checking the species. The higher this number the faster they will become a different species</param>

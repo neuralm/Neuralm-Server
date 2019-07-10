@@ -15,7 +15,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// Create a new species with the given brain as its first representative.
         /// </summary>
         /// <param name="brain">The brain which this species is created for</param>
-        /// <param name="trainingRoom">The trainingroom this species is part of</param>
+        /// <param name="trainingRoom">The training room this species is part of</param>
         public Species(Brain brain, TrainingRoom trainingRoom)
         {
             _trainingRoom = trainingRoom;
@@ -25,7 +25,7 @@ namespace Neuralm.Domain.Entities.NEAT
 
         /// <summary>
         /// Add the brain if it fits this species.
-        /// It compares the given brain to a randomly choosen brain from the species.
+        /// It compares the given brain to a randomly chosen brain from the species.
         /// </summary>
         /// <param name="brain">The brain to check</param>
         /// <returns>true if it is added, else false</returns>
@@ -39,7 +39,7 @@ namespace Neuralm.Domain.Entities.NEAT
 
         /// <summary>
         /// Generate a brain based on the brains from this species.
-        /// A random brain is choosen and based on chance it can be bred with a random brain from this species or from the global pool.
+        /// A random brain is chosen and based on chance it can be bred with a random brain from this species or from the global pool.
         /// The brain is also mutated.
         /// </summary>
         /// <returns>The new generated brain</returns>
@@ -91,7 +91,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <summary>
         /// Return a random brain from this species.
         /// </summary>
-        /// <returns>The randomly choosen brain</returns>
+        /// <returns>The randomly chosen brain</returns>
         public Brain GetRandomBrain()
         {
             return _lastGenerationBrains[_trainingRoom.Random.Next(_lastGenerationBrains.Count)];

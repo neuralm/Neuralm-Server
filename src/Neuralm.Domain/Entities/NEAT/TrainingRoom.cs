@@ -10,10 +10,14 @@ namespace Neuralm.Domain.Entities.NEAT
         private readonly List<Species> _speciesList;
         private int _nodeId;
         private readonly List<Brain> _children;
-        
+        private readonly List<User> _authorizedUsers;
+        private readonly List<TrainingSession> _trainingSessions;
+
         public Guid Id { get; }
         public Guid OwnerId { get; }
         public User Owner { get; }
+        public IReadOnlyList<User> AuthorizedUsers => _authorizedUsers;
+        public IReadOnlyList<TrainingSession> TrainingSessions => _trainingSessions;
         public TrainingRoomSettings TrainingRoomSettings { get; }
         public string Name { get; }
         public int Generation { get; private set; }
@@ -22,7 +26,6 @@ namespace Neuralm.Domain.Entities.NEAT
         public double HighestScore { get; private set; }
         public double LowestScore { get; private set; }
         public double AverageScore { get; private set; }
-        public int SpeciesCount => _speciesList.Count;
         public int InnovationId { get; private set; }
         public bool Enabled { get; private set; }
 
@@ -43,6 +46,8 @@ namespace Neuralm.Domain.Entities.NEAT
             Enabled = true;
             TrainingRoomSettings = trainingRoomSettings;
             Random = new Random(trainingRoomSettings.Seed);
+            _authorizedUsers = new List<User> { owner };
+            _trainingSessions = new List<TrainingSession>();
             _speciesList = new List<Species>(trainingRoomSettings.BrainCount);
             _children = new List<Brain>(trainingRoomSettings.BrainCount);
             _mutationToInnovation = new Dictionary<(int A, int B), int>();
@@ -209,6 +214,49 @@ namespace Neuralm.Domain.Entities.NEAT
         {
             // TODO: Is within re-enable period?
             Enabled = true;
+        }
+
+        /// <summary>
+        /// Authorize a user for the training room.
+        /// </summary>
+        /// <param name="user">The user to authorize.</param>
+        /// <returns>Returns true; if the user is added to the authorized users, else false.</returns>
+        public bool AuthorizeUser(User user)
+        {
+            if (_authorizedUsers.Exists(usr => usr.Id.Equals(user.Id)))
+                return false;
+            _authorizedUsers.Add(user);
+            return true;
+        }
+
+        /// <summary>
+        /// Deauthorize a user for the training room.
+        /// </summary>
+        /// <param name="userId">The user id.</param>
+        /// <returns>Returns true; if the user is removed from the authorized users, else false.</returns>
+        public bool DeauthorizeUser(Guid userId)
+        {
+            User possibleUser = _authorizedUsers.SingleOrDefault(usr => usr.Id.Equals(userId));
+            return possibleUser != default && _authorizedUsers.Remove(possibleUser);
+        }
+
+        /// <summary>
+        /// Checks if the given user id is authorized.
+        /// </summary>
+        /// <param name="userId">The user id to verify.</param>
+        /// <returns>Returns true; if the given user id is authorized, else false.</returns>
+        public bool IsUserAuthorized(Guid userId)
+        {
+            return _authorizedUsers.Exists(user => user.Id.Equals(userId));
+        }
+
+        public bool StartTrainingSession(Guid userId, out TrainingSession trainingSession)
+        {
+            trainingSession = new TrainingSession(this, userId);
+            if (_trainingSessions.Any(user => user.Id.Equals(userId)))
+                return false;
+            _trainingSessions.Add(trainingSession);
+            return true;
         }
     }
 }

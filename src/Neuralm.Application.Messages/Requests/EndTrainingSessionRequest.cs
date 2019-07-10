@@ -1,10 +1,14 @@
-﻿namespace Neuralm.Application.Messages.Requests
+﻿using System;
+
+namespace Neuralm.Application.Messages.Requests
 {
     public class EndTrainingSessionRequest : Request
     {
-        public EndTrainingSessionRequest()
+        public Guid TrainingSessionId { get; }
+
+        public EndTrainingSessionRequest(Guid trainingSessionId)
         {
-            
+            TrainingSessionId = trainingSessionId;
         }
     }
 }
