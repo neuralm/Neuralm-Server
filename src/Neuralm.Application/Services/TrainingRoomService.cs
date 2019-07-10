@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Neuralm.Application.Interfaces;
 using Neuralm.Application.Messages.Dtos;
@@ -15,13 +16,16 @@ namespace Neuralm.Application.Services
     {
         private readonly IRepository<TrainingRoom> _trainingRoomRepository;
         private readonly IRepository<User> _userRepository;
+        private readonly IRepository<TrainingSession> _trainingSessionRepository;
 
         public TrainingRoomService(
             IRepository<TrainingRoom> trainingRoomRepository,
-            IRepository<User> userRepository)
+            IRepository<User> userRepository,
+            IRepository<TrainingSession> trainingSessionRepository)
         {
             _trainingRoomRepository = trainingRoomRepository;
             _userRepository = userRepository;
+            _trainingSessionRepository = trainingSessionRepository;
         }
 
         public async Task<CreateTrainingRoomResponse> CreateTrainingRoomAsync(CreateTrainingRoomRequest createTrainingRoomRequest)
@@ -34,56 +38,47 @@ namespace Neuralm.Application.Services
 
             if (await _trainingRoomRepository.ExistsAsync(tr => tr.Name.Equals(createTrainingRoomRequest.TrainingRoomName, StringComparison.CurrentCultureIgnoreCase)))
                 return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "A training room with the requested name already exists.");
-            
-            User owner = await _userRepository.FindSingleByExpressionAsync(user => user.Id.Equals(createTrainingRoomRequest.OwnerId));
-            if (owner == null)
+
+            if (!await _userRepository.ExistsAsync(user => user.Id.Equals(createTrainingRoomRequest.OwnerId)))
                 return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "User not found.");
 
+            User owner = await _userRepository.FindSingleByExpressionAsync(user => user.Id.Equals(createTrainingRoomRequest.OwnerId));
             TrainingRoom trainingRoom = new TrainingRoom(owner, createTrainingRoomRequest.TrainingRoomName, createTrainingRoomRequest.TrainingRoomSettings);
             if (!await _trainingRoomRepository.CreateAsync(trainingRoom))
                 return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "Failed to create training room.");
 
             return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, trainingRoom.Id, "Successfully created a training room.", true);
         }
-        public Task<DisableTrainingRoomResponse> DisableTrainingRoomAsync(DisableTrainingRoomRequest disableTrainingRoomRequest)
+        public async Task<StartTrainingSessionResponse> StartTrainingSessionAsync(StartTrainingSessionRequest startTrainingSessionRequest)
         {
-            throw new NotImplementedException();
+            Expression<Func<TrainingRoom, bool>> predicate = tr => tr.Id.Equals(startTrainingSessionRequest.TrainingRoomId);
+            if (!await _trainingRoomRepository.ExistsAsync(predicate))
+                return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, null, "Training room does not exist.");
+            if (!await _userRepository.ExistsAsync(usr => usr.Id.Equals(startTrainingSessionRequest.UserId)))
+                return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, null, "User does not exist.");
+
+            TrainingRoom trainingRoom = await _trainingRoomRepository.FindSingleByExpressionAsync(predicate);
+            if (!trainingRoom.IsUserAuthorized(startTrainingSessionRequest.UserId))
+                return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, null, "User is not authorized");
+            if (!trainingRoom.StartTrainingSession(startTrainingSessionRequest.UserId, out TrainingSession trainingSession))
+                return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, null, "Failed to start a training session.");
+
+            await _trainingRoomRepository.UpdateAsync(trainingRoom);
+            return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, TrainingSessionToDto(trainingSession), "Successfully started a training session.", true);
         }
-        public Task<EnableTrainingRoomResponse> EnableTrainingRoomAsync(EnableTrainingRoomRequest enableTrainingRoomRequest)
+        public async Task<EndTrainingSessionResponse> EndTrainingSessionAsync(EndTrainingSessionRequest endTrainingSessionRequest)
         {
-            throw new NotImplementedException();
-        }
-        public Task<AuthorizeUserForTrainingRoomResponse> AuthorizeUserForTrainingRoomAsync(AuthorizeUserForTrainingRoomRequest authorizeUserForRoomRequest)
-        {
-            throw new NotImplementedException();
-        }
-        public Task<DeauthorizeUserForTrainingRoomResponse> DeauthorizeUserForTrainingRoomAsync(DeauthorizeUserForTrainingRoomRequest authorizeUserForRoomRequest)
-        {
-            throw new NotImplementedException();
-        }
-        public Task<PostBrainScoresResponse> PostBrainScoresAsync(PostBrainScoresRequest postBrainScoresRequest)
-        {
-            throw new NotImplementedException();
-        }
-        public Task<GetOrganismsResponse> GetOrganismsAsync(GetOrganismsRequest getOrganismsRequest)
-        {
-            throw new NotImplementedException();
-        }
-        public Task<GetBestOrganismsResponse> GetBestOrganismsAsync(GetBestOrganismsRequest getBestOrganismsRequest)
-        {
-            throw new NotImplementedException();
-        }
-        public Task<StartTrainingSessionResponse> StartTrainingSessionAsync(StartTrainingSessionRequest startTrainingSessionRequest)
-        {
-            throw new NotImplementedException();
-        }
-        public Task<EndTrainingSessionResponse> EndTrainingSessionAsync(EndTrainingSessionRequest endTrainingSessionRequest)
-        {
-            throw new NotImplementedException();
-        }
-        public Task<GetGenerationStatusResponse> GetGenerationStatusAsync(GetGenerationStatusRequest getGenerationStatusRequest)
-        {
-            throw new NotImplementedException();
+            Expression<Func<TrainingSession, bool>> predicate = trs => trs.Id.Equals(endTrainingSessionRequest.TrainingSessionId);
+            if (!await _trainingSessionRepository.ExistsAsync(predicate))
+                return new EndTrainingSessionResponse(endTrainingSessionRequest.Id, "Training session does not exist.");
+
+            TrainingSession trainingSession = await _trainingSessionRepository.FindSingleByExpressionAsync(predicate);
+            if (trainingSession.EndedTimestamp != default)
+                return new EndTrainingSessionResponse(endTrainingSessionRequest.Id, "Training session was already ended.");
+
+            trainingSession.EndTrainingSession();
+            await _trainingSessionRepository.UpdateAsync(trainingSession);
+            return new EndTrainingSessionResponse(endTrainingSessionRequest.Id, "Successfully ended the training session.", true);
         }
         public async Task<GetEnabledTrainingRoomsResponse> GetEnabledTrainingRoomsAsync(GetEnabledTrainingRoomsRequest getEnabledTrainingRoomsRequest)
         {
@@ -91,9 +86,20 @@ namespace Neuralm.Application.Services
             return new GetEnabledTrainingRoomsResponse(getEnabledTrainingRoomsRequest.Id, trainingRooms.Select(TrainingRoomToDto).ToList(), true);
         }
 
+        private static TrainingSessionDto TrainingSessionToDto(TrainingSession trainingSession)
+        {
+            return new TrainingSessionDto
+            {
+                Id = trainingSession.Id,
+                StartedTimestamp = trainingSession.StartedTimestamp,
+                EndedTimestamp = trainingSession.EndedTimestamp,
+                TrainingRoom = TrainingRoomToDto(trainingSession.TrainingRoom),
+                UserId = trainingSession.UserId
+            };
+        }
         private static TrainingRoomDto TrainingRoomToDto(TrainingRoom trainingRoom)
         {
-            return new TrainingRoomDto()
+            return new TrainingRoomDto
             {
                 Id = trainingRoom.Id,
                 Name = trainingRoom.Name,

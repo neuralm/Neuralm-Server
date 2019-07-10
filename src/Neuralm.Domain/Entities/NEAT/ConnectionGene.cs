@@ -92,7 +92,7 @@ namespace Neuralm.Domain.Entities.NEAT
 
         public override int GetHashCode()
         {
-            var hashCode = 1721005899;
+            int hashCode = 1721005899;
             hashCode = hashCode * -1521134295 + InId.GetHashCode();
             hashCode = hashCode * -1521134295 + OutId.GetHashCode();
             hashCode = hashCode * -1521134295 + InnovationNumber.GetHashCode();
