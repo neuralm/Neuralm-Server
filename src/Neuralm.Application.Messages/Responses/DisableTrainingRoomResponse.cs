@@ -4,7 +4,7 @@ namespace Neuralm.Application.Messages.Responses
 {
     public class DisableTrainingRoomResponse : Response
     {
-        public DisableTrainingRoomResponse(Guid requestId, bool success) : base(requestId, success)
+        public DisableTrainingRoomResponse(Guid requestId, string message = "", bool success = false) : base(requestId, message, success)
         {
 
         }

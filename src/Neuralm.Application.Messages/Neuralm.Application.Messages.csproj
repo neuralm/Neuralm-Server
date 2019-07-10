@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Neuralm.Domain\Neuralm.Domain.csproj" />
+    <ProjectReference Include="..\Neuralm.Infrastructure.Interfaces\Neuralm.Infrastructure.Interfaces.csproj" />
+    <ProjectReference Include="..\Neuralm.Utilities\Neuralm.Utilities.csproj" />
   </ItemGroup>
 
 </Project>

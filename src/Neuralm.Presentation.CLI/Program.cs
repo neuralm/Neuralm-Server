@@ -1,11 +1,15 @@
 ﻿using System;
-using System.Globalization;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Neuralm.Application.Configurations;
 using Neuralm.Application.Interfaces;
-using Neuralm.Application.Messages.Requests;
-using Neuralm.Application.Messages.Responses;
+using Neuralm.Infrastructure.Interfaces;
+using Neuralm.Infrastructure.MessageSerializers;
+using Neuralm.Infrastructure.Networking;
 using Neuralm.Mapping;
 using Neuralm.Utilities;
 
@@ -13,28 +17,38 @@ namespace Neuralm.Presentation.CLI
 {
     public class Program
     {
+        private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
         private IGenericServiceProvider _genericServiceProvider;
 
         public static async Task Main(string[] args)
         {
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            _ = new Program().RunAsync(cancellationTokenSource.Token);
+            _ = new Program().RunAsync(CancellationTokenSource.Token);
 
-            while (Console.ReadKey().Key != ConsoleKey.Q)
+            while (!CancellationTokenSource.IsCancellationRequested)
             {
-                Console.WriteLine();
-                Console.WriteLine("Press Q to shut down the server.");
+                if (Console.ReadKey().Key == ConsoleKey.Q)
+                    break;
+                Console.WriteLine("\nPress Q to shut down the server.");
             }
-            cancellationTokenSource.Cancel();
-            Console.WriteLine();
-            Console.WriteLine("Server has shut down");
+            CancellationTokenSource.Cancel();
+            Console.WriteLine("\nServer has shut down");
             Console.WriteLine("Press any key to continue..");
             Console.ReadKey();
         }
 
-        private async Task RunAsync(CancellationToken token)
+        private async Task RunAsync(CancellationToken cancellationToken)
         {
-            IConfiguration configuration = ConfigurationLoader.GetConfiguration("appSettings");
+            IConfiguration configuration = null;
+            try
+            {
+                configuration = ConfigurationLoader.GetConfiguration("appSettings");
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Please check if you have a valid appSettings.json!");
+                CancellationTokenSource.Cancel();
+                return;
+            }
 
             Startup startup = new Startup();
             Console.WriteLine("Initializing...");
@@ -42,17 +56,25 @@ namespace Neuralm.Presentation.CLI
             Console.WriteLine("Finished initializing!\n");
 
             _genericServiceProvider = startup.GetServiceProvider();
-            IUserService userService = _genericServiceProvider.GetService<IUserService>();
+            ServerConfiguration serverConfiguration = _genericServiceProvider.GetService<IOptions<ServerConfiguration>>().Value;
+            TcpListener tcpListener = new TcpListener(IPAddress.Loopback, serverConfiguration.Port);
+            tcpListener.Start();
+            Console.WriteLine($"Started listening for clients on port: {serverConfiguration.Port}.");
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                TcpClient tcpClient = await tcpListener.AcceptTcpClientAsync();
+                Console.WriteLine($"Accepted a new connection: \n\tLocalEndPoint: {tcpClient.Client.LocalEndPoint}\n\tRemoteEndPoint: {tcpClient.Client.RemoteEndPoint}");
+                _ = Task.Run(() =>
+                {
+                    IMessageProcessor messageProcessor = new ServerMessageProcessor(GetUserService(), GetTrainingRoomService());
+                    IMessageSerializer messageSerializer = new JsonMessageSerializer();
+                    INetworkConnector networkConnector = new TcpNetworkConnector(messageSerializer, messageProcessor, tcpClient);
+                    networkConnector.Start();
+                }, cancellationToken);
+            }
 
-            RegisterRequest registerRequest = new RegisterRequest(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "Name");
-            Console.WriteLine($"RegisterRequest:\n  Id: {registerRequest.Id}\n  CredentialTypeCode: {registerRequest.CredentialTypeCode}\n  Username: {registerRequest.Username}\n  Password: {registerRequest.Password}\n  DateTime: {registerRequest.DateTime.ToString("dd-MM-yyyy HH:mm:ss.fffff", CultureInfo.InvariantCulture)}\n");
-            RegisterResponse registerResponse = await userService.RegisterAsync(registerRequest);
-            Console.WriteLine($"RegisterResponse:\n  Id: {registerResponse.Id}\n  RequestId: {registerResponse.RequestId}\n  Error: {registerResponse.Error}\n  DateTime: {registerResponse.DateTime.ToString("dd-MM-yyyy HH:mm:ss.fffff", CultureInfo.InvariantCulture)}\n  Success: {registerResponse.Success}\n");
-
-            AuthenticateRequest authenticateRequest = new AuthenticateRequest(registerRequest.Username, registerRequest.Password, "Name");
-            Console.WriteLine($"AuthenticateRequest:\n  Id: {authenticateRequest.Id}\n  CredentialTypeCode: {authenticateRequest.CredentialTypeCode}\n  Username: {authenticateRequest.Username}\n  Password: {authenticateRequest.Password}\n  DateTime: {authenticateRequest.DateTime.ToString("dd-MM-yyyy HH:mm:ss.fffff", CultureInfo.InvariantCulture)}\n");
-            AuthenticateResponse authenticateResponse = await userService.AuthenticateAsync(authenticateRequest);
-            Console.WriteLine($"AuthenticateResponse:\n  Id: {authenticateResponse.Id}\n  RequestId: {authenticateResponse.RequestId}\n  AccessToken: {authenticateResponse.AccessToken.Substring(0, 16)}...\n  Error: {authenticateResponse.Error}\n  DateTime: {authenticateResponse.DateTime.ToString("dd-MM-yyyy HH:mm:ss.fffff", CultureInfo.InvariantCulture)}\n  Success: {authenticateResponse.Success}\n");
+            IUserService GetUserService() => _genericServiceProvider.GetService<IUserService>();
+            ITrainingRoomService GetTrainingRoomService() => _genericServiceProvider.GetService<ITrainingRoomService>();
         }
     }
 }

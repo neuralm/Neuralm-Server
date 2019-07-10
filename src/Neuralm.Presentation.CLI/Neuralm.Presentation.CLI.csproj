@@ -12,6 +12,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Neuralm.Application\Neuralm.Application.csproj" />
+    <ProjectReference Include="..\Neuralm.Infrastructure.MessageSerializers\Neuralm.Infrastructure.MessageSerializers.csproj" />
+    <ProjectReference Include="..\Neuralm.Infrastructure\Neuralm.Infrastructure.csproj" />
     <ProjectReference Include="..\Neuralm.Mapping\Neuralm.Mapping.csproj" />
   </ItemGroup>
 

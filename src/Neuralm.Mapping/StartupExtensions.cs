@@ -15,6 +15,7 @@ using Neuralm.Persistence.Infrastructure;
 using Neuralm.Persistence.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
+using Neuralm.Domain.Entities.NEAT;
 
 namespace Neuralm.Mapping
 {
@@ -37,6 +38,10 @@ namespace Neuralm.Mapping
             serviceCollection.AddTransient<IEntityValidator<Role>, RoleValidator>();
             serviceCollection.AddTransient<IEntityValidator<RolePermission>, RolePermissionValidator>();
             serviceCollection.AddTransient<IEntityValidator<Permission>, PermissionValidator>();
+            serviceCollection.AddTransient<IEntityValidator<Brain>, BrainValidator>();
+            serviceCollection.AddTransient<IEntityValidator<TrainingRoom>, TrainingRoomValidator>();
+            serviceCollection.AddTransient<IEntityValidator<TrainingSession>, TrainingSessionValidator>();
+            serviceCollection.AddTransient<IEntityValidator<TrainingRoomSettings>, TrainingRoomSettingsValidator>();
             #endregion Validators
 
             #region Repositories
@@ -82,11 +87,36 @@ namespace Neuralm.Mapping
                 IEntityValidator<Permission> entityValidator = serviceProvider.GetService<IEntityValidator<Permission>>();
                 return new PermissionRepository(neuralmDbFactory.Create(), entityValidator);
             });
+            serviceCollection.AddTransient<IRepository<Brain>, BrainRepository>(serviceProvider =>
+            {
+                IFactory<NeuralmDbContext> neuralmDbFactory = serviceProvider.GetService<IFactory<NeuralmDbContext>>();
+                IEntityValidator<Brain> entityValidator = serviceProvider.GetService<IEntityValidator<Brain>>();
+                return new BrainRepository(neuralmDbFactory.Create(), entityValidator);
+            });
+            serviceCollection.AddTransient<IRepository<TrainingRoom>, TrainingRoomRepository>(serviceProvider =>
+            {
+                IFactory<NeuralmDbContext> neuralmDbFactory = serviceProvider.GetService<IFactory<NeuralmDbContext>>();
+                IEntityValidator<TrainingRoom> entityValidator = serviceProvider.GetService<IEntityValidator<TrainingRoom>>();
+                return new TrainingRoomRepository(neuralmDbFactory.Create(), entityValidator);
+            });
+            serviceCollection.AddTransient<IRepository<TrainingSession>, TrainingSessionRepository>(serviceProvider =>
+            {
+                IFactory<NeuralmDbContext> neuralmDbFactory = serviceProvider.GetService<IFactory<NeuralmDbContext>>();
+                IEntityValidator<TrainingSession> entityValidator = serviceProvider.GetService<IEntityValidator<TrainingSession>>();
+                return new TrainingSessionRepository(neuralmDbFactory.Create(), entityValidator);
+            });
+            serviceCollection.AddTransient<IRepository<TrainingRoomSettings>, TrainingRoomSettingsRepository>(serviceProvider =>
+            {
+                IFactory<NeuralmDbContext> neuralmDbFactory = serviceProvider.GetService<IFactory<NeuralmDbContext>>();
+                IEntityValidator<TrainingRoomSettings> entityValidator = serviceProvider.GetService<IEntityValidator<TrainingRoomSettings>>();
+                return new TrainingRoomSettingsRepository(neuralmDbFactory.Create(), entityValidator);
+            });
             #endregion Repositories
 
             #region Services
             serviceCollection.AddSingleton<IAccessTokenService, JwtAccessTokenService>();
             serviceCollection.AddTransient<IUserService, UserService>();
+            serviceCollection.AddTransient<ITrainingRoomService, TrainingRoomService>();
             #endregion Services
 
             return serviceCollection;

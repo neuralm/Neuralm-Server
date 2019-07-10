@@ -2,9 +2,9 @@
 {
     public class TrainingRoomSettings
     {
-        public int BrainCount { get; }
-        public int InputCount { get; }
-        public int OutputCount { get; }
+        public uint BrainCount { get; }
+        public uint InputCount { get; }
+        public uint OutputCount { get; }
         public double C1 { get; }
         public double C2 { get; }
         public double C3 { get; }
@@ -41,7 +41,7 @@
         /// <param name="enableConnectionChance">The chance a disabled connection gets enabled when crossover happens [0,1]</param>
         /// <param name="seed">The seed for the pseudo-random generator</param>
         public TrainingRoomSettings(
-            int brainCount, int inputCount, int outputCount,
+            uint brainCount, uint inputCount, uint outputCount,
             double c1, double c2, double c3,
             double threshold, double addConnectionChance, double addNodeChance,
             double crossOverChance, double interSpeciesChance, double mutationChance,

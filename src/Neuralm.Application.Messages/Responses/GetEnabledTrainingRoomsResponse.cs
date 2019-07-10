@@ -8,7 +8,7 @@ namespace Neuralm.Application.Messages.Responses
     {
         public IList<TrainingRoomDto> TrainingRooms { get; }
 
-        public GetEnabledTrainingRoomsResponse(Guid requestId, IList<TrainingRoomDto> trainingRooms, bool success) : base(requestId, success)
+        public GetEnabledTrainingRoomsResponse(Guid requestId, IList<TrainingRoomDto> trainingRooms, string message = "", bool success = false) : base(requestId, message, success)
         {
             TrainingRooms = trainingRooms;
         }

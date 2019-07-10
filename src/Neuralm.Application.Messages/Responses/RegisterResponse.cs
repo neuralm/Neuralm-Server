@@ -7,7 +7,7 @@ namespace Neuralm.Application.Messages.Responses
     {
         public RegisterError Error { get; }
 
-        public RegisterResponse(Guid requestId, RegisterError error = RegisterError.None, bool success = false) : base(requestId, success)
+        public RegisterResponse(Guid requestId, RegisterError error = RegisterError.None, string message = "", bool success = false) : base(requestId, message, success)
         {
             Error = error;
         }

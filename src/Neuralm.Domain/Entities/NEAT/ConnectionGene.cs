@@ -4,9 +4,10 @@ namespace Neuralm.Domain.Entities.NEAT
 {
     public class ConnectionGene : IEquatable<ConnectionGene>
     {
-        public int InId { get; }
-        public int OutId { get; }
-        public int InnovationNumber { get; }
+        public Guid BrainId { get; }
+        public uint InId { get; }
+        public uint OutId { get; }
+        public uint InnovationNumber { get; }
         public double Weight { get; set; }
         public bool Enabled { get; set; }
         public Node InNode { get; private set; }
@@ -15,13 +16,15 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <summary>
         /// Create a connection gene going from the node with the given inID to the node with the given outID with a given weight.
         /// </summary>
+        /// <param name="brainId">The id of the brain</param>
         /// <param name="inId">The id of in node</param>
         /// <param name="outId">The id of the out node</param>
         /// <param name="weight">The weight</param>
         /// <param name="innovationNumber">The innovation number</param>
         /// <param name="enabled">Whether this gene is enabled or not. Default is true</param>
-        public ConnectionGene(int inId, int outId, double weight, int innovationNumber, bool enabled = true)
+        public ConnectionGene(Guid brainId, uint inId, uint outId, double weight, uint innovationNumber, bool enabled = true)
         {
+            BrainId = brainId;
             InId = inId;
             OutId = outId;
             Weight = weight;
@@ -48,7 +51,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <returns>A new gene with the same inID, outID, weight, innovation number and enabled</returns>
         public ConnectionGene Clone()
         {
-            return new ConnectionGene(InId, OutId, Weight, InnovationNumber, Enabled);
+            return new ConnectionGene(BrainId, InId, OutId, Weight, InnovationNumber, Enabled);
         }
 
         /// <summary>

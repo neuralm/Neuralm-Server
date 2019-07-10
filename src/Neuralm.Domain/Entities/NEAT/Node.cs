@@ -5,8 +5,8 @@ namespace Neuralm.Domain.Entities.NEAT
     public class Node
     {
         public List<ConnectionGene> Dependencies { get; }
-        public int Id { get; }
-        public int Layer { get; private set; }
+        public uint Id { get; }
+        public uint Layer { get; private set; }
 
         public NodeType NodeType { get; }
 
@@ -15,9 +15,9 @@ namespace Neuralm.Domain.Entities.NEAT
         /// </summary>
         /// <param name="id">The node's ID</param>
         /// <param name="type">The type of node</param>
-        public Node(int id, NodeType type)
+        public Node(uint id, NodeType type)
         {
-            Layer = int.MinValue;
+            Layer = uint.MinValue;
             Dependencies = new List<ConnectionGene>();
             Id = id;
             NodeType = type;
@@ -29,7 +29,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// </summary>
         /// <param name="layer">The new layer value</param>
         /// <param name="force">If true it will always set the new layer, else only if it is bigger than the current layer</param>
-        public void SetLayer(int layer, bool force = false)
+        public void SetLayer(uint layer, bool force = false)
         {
             Layer = force ? layer : (layer > Layer ? layer : Layer);
 

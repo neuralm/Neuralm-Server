@@ -6,9 +6,9 @@ namespace Neuralm.Domain.Entities.NEAT
 {
     public class TrainingRoom
     {
-        private readonly Dictionary<(int A, int B), int> _mutationToInnovation;
+        private readonly Dictionary<(uint A, uint B), uint> _mutationToInnovation;
         private readonly List<Species> _speciesList;
-        private int _nodeId;
+        private uint _nodeId;
         private readonly List<Brain> _children;
         private readonly List<User> _authorizedUsers;
         private readonly List<TrainingSession> _trainingSessions;
@@ -20,13 +20,13 @@ namespace Neuralm.Domain.Entities.NEAT
         public IReadOnlyList<TrainingSession> TrainingSessions => _trainingSessions;
         public TrainingRoomSettings TrainingRoomSettings { get; }
         public string Name { get; }
-        public int Generation { get; private set; }
+        public uint Generation { get; private set; }
 
         public Random Random { get; }
         public double HighestScore { get; private set; }
         public double LowestScore { get; private set; }
         public double AverageScore { get; private set; }
-        public int InnovationId { get; private set; }
+        public uint InnovationId { get; private set; }
         public bool Enabled { get; private set; }
 
         /// <summary>
@@ -48,9 +48,9 @@ namespace Neuralm.Domain.Entities.NEAT
             Random = new Random(trainingRoomSettings.Seed);
             _authorizedUsers = new List<User> { owner };
             _trainingSessions = new List<TrainingSession>();
-            _speciesList = new List<Species>(trainingRoomSettings.BrainCount);
-            _children = new List<Brain>(trainingRoomSettings.BrainCount);
-            _mutationToInnovation = new Dictionary<(int A, int B), int>();
+            _speciesList = new List<Species>((int)trainingRoomSettings.BrainCount);
+            _children = new List<Brain>((int)trainingRoomSettings.BrainCount);
+            _mutationToInnovation = new Dictionary<(uint A, uint B), uint>();
 
             for (int i = 0; i < trainingRoomSettings.BrainCount; i++)
             {
@@ -170,7 +170,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// Increase to the nodeID to the value passed in if the nodeId is lower than the value passed in.
         /// </summary>
         /// <param name="max">The minimum value the nodeId should be</param>
-        public void IncreaseNodeIdTo(int max)
+        public void IncreaseNodeIdTo(uint max)
         {
             _nodeId = Math.Max(_nodeId, max);
         }
@@ -179,7 +179,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// Get the node id and increase it.
         /// </summary>
         /// <returns>The old node id before increasing it</returns>
-        public int GetAndIncreaseNodeId()
+        public uint GetAndIncreaseNodeId()
         {
             return _nodeId++;
         }
@@ -190,7 +190,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <param name="inId">The inId of the new connection</param>
         /// <param name="outId">The outId of the new connection</param>
         /// <returns>The innovation number</returns>
-        public int GetInnovationNumber(int inId, int outId)
+        public uint GetInnovationNumber(uint inId, uint outId)
         {
             if (_mutationToInnovation.ContainsKey((inId, outId)))
                 return _mutationToInnovation[(inId, outId)];

@@ -8,7 +8,7 @@ namespace Neuralm.Application.Messages.Responses
         public AuthenticateError Error { get; }
         public string AccessToken { get; set; }
 
-        public AuthenticateResponse(Guid requestId, string accessToken = "", AuthenticateError error = AuthenticateError.None, bool success = false) : base(requestId, success)
+        public AuthenticateResponse(Guid requestId, string accessToken = "", string message = "", AuthenticateError error = AuthenticateError.None, bool success = false) : base(requestId, message, success)
         {
             AccessToken = accessToken;
             Error = error;

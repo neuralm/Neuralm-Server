@@ -21,6 +21,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Utilities", "Neural
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Tests", "Neuralm.Tests\Neuralm.Tests.csproj", "{1B596C42-A206-479D-9850-9A9019359816}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Infrastructure.Interfaces", "Neuralm.Infrastructure.Interfaces\Neuralm.Infrastructure.Interfaces.csproj", "{0866DAC4-FD53-4EB1-939F-CA19BF86DBA6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Infrastructure.MessageSerializers", "Neuralm.Infrastructure.MessageSerializers\Neuralm.Infrastructure.MessageSerializers.csproj", "{4C816069-C806-4597-B690-86572A8BC8BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -139,6 +143,30 @@ Global
 		{1B596C42-A206-479D-9850-9A9019359816}.Release|x64.Build.0 = Release|Any CPU
 		{1B596C42-A206-479D-9850-9A9019359816}.Release|x86.ActiveCfg = Release|Any CPU
 		{1B596C42-A206-479D-9850-9A9019359816}.Release|x86.Build.0 = Release|Any CPU
+		{0866DAC4-FD53-4EB1-939F-CA19BF86DBA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0866DAC4-FD53-4EB1-939F-CA19BF86DBA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0866DAC4-FD53-4EB1-939F-CA19BF86DBA6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0866DAC4-FD53-4EB1-939F-CA19BF86DBA6}.Debug|x64.Build.0 = Debug|Any CPU
+		{0866DAC4-FD53-4EB1-939F-CA19BF86DBA6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0866DAC4-FD53-4EB1-939F-CA19BF86DBA6}.Debug|x86.Build.0 = Debug|Any CPU
+		{0866DAC4-FD53-4EB1-939F-CA19BF86DBA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0866DAC4-FD53-4EB1-939F-CA19BF86DBA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0866DAC4-FD53-4EB1-939F-CA19BF86DBA6}.Release|x64.ActiveCfg = Release|Any CPU
+		{0866DAC4-FD53-4EB1-939F-CA19BF86DBA6}.Release|x64.Build.0 = Release|Any CPU
+		{0866DAC4-FD53-4EB1-939F-CA19BF86DBA6}.Release|x86.ActiveCfg = Release|Any CPU
+		{0866DAC4-FD53-4EB1-939F-CA19BF86DBA6}.Release|x86.Build.0 = Release|Any CPU
+		{4C816069-C806-4597-B690-86572A8BC8BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C816069-C806-4597-B690-86572A8BC8BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C816069-C806-4597-B690-86572A8BC8BE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4C816069-C806-4597-B690-86572A8BC8BE}.Debug|x64.Build.0 = Debug|Any CPU
+		{4C816069-C806-4597-B690-86572A8BC8BE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4C816069-C806-4597-B690-86572A8BC8BE}.Debug|x86.Build.0 = Debug|Any CPU
+		{4C816069-C806-4597-B690-86572A8BC8BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C816069-C806-4597-B690-86572A8BC8BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C816069-C806-4597-B690-86572A8BC8BE}.Release|x64.ActiveCfg = Release|Any CPU
+		{4C816069-C806-4597-B690-86572A8BC8BE}.Release|x64.Build.0 = Release|Any CPU
+		{4C816069-C806-4597-B690-86572A8BC8BE}.Release|x86.ActiveCfg = Release|Any CPU
+		{4C816069-C806-4597-B690-86572A8BC8BE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
