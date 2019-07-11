@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 
 [assembly: InternalsVisibleTo("Neuralm.Infrastructure", AllInternalsVisible = true)]
+[assembly: InternalsVisibleTo("Neuralm.Mapping", AllInternalsVisible = true)]
 namespace Neuralm.Application.Messages
 {
     internal readonly struct Message

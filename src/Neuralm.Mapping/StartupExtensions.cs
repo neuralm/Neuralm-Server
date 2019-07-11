@@ -119,6 +119,7 @@ namespace Neuralm.Mapping
             serviceCollection.AddTransient<ITrainingRoomService, TrainingRoomService>();
             #endregion Services
 
+            serviceCollection.AddSingleton(p => new MessageToServiceMapper(p));
             return serviceCollection;
         }
         public static IServiceCollection AddJwtBearerBasedAuthentication(this IServiceCollection serviceCollection)

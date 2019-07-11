@@ -1,26 +1,24 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Reflection;
 using System.Threading.Tasks;
 using Neuralm.Application.Interfaces;
 using Neuralm.Application.Messages;
-using Neuralm.Application.Messages.Requests;
 using Neuralm.Infrastructure.Interfaces;
+using Neuralm.Mapping;
 using Neuralm.Utilities.Observer;
 
 namespace Neuralm.Presentation.CLI
 {
     internal class ServerMessageProcessor : IMessageProcessor
     {
-        private readonly IUserService _userService;
-        private readonly ITrainingRoomService _trainingRoomService;
+        private readonly MessageToServiceMapper _messageToServiceMapper;
         private readonly ConcurrentDictionary<Type, ObserverCollection> _observers;
 
         public ServerMessageProcessor(
-            IUserService userService,
-            ITrainingRoomService trainingRoomService)
+            MessageToServiceMapper messageToServiceMapper)
         {
-            _userService = userService;
-            _trainingRoomService = trainingRoomService;
+            _messageToServiceMapper = messageToServiceMapper;
             _observers = new ConcurrentDictionary<Type, ObserverCollection>();
         }
 
@@ -38,29 +36,14 @@ namespace Neuralm.Presentation.CLI
         {
             object response;
             Console.WriteLine($"ProcessRequest: {request}");
-            switch (request)
+            if (_messageToServiceMapper.MessageToServiceMap.TryGetValue(type, out (object service, MethodInfo methodInfo) a))
             {
-                case AuthenticateRequest authenticateRequest:
-                    response = await _userService.AuthenticateAsync(authenticateRequest);
-                    break;
-                case RegisterRequest registerRequest:
-                    response = await _userService.RegisterAsync(registerRequest);
-                    break;
-                case CreateTrainingRoomRequest createTrainingRoomRequest:
-                    response = await _trainingRoomService.CreateTrainingRoomAsync(createTrainingRoomRequest);
-                    break;
-                case GetEnabledTrainingRoomsRequest getEnabledTrainingRoomsRequest:
-                    response = await _trainingRoomService.GetEnabledTrainingRoomsAsync(getEnabledTrainingRoomsRequest);
-                    break;
-                case StartTrainingSessionRequest startTrainingSessionRequest:
-                    response = await _trainingRoomService.StartTrainingSessionAsync(startTrainingSessionRequest);
-                    break;
-                case EndTrainingSessionRequest endTrainingSessionRequest:
-                    response = await _trainingRoomService.EndTrainingSessionAsync(endTrainingSessionRequest);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(request), $"Unknown Request message of type: {type.Name}");
+                dynamic task = a.methodInfo.Invoke(a.service, new object[] { request });
+                response = await task;
             }
+            else
+                throw new ArgumentOutOfRangeException(nameof(request), $"Unknown Request message of type: {type.Name}");
+
             Console.WriteLine($"ProcessRequest-Response: {response}");
             // ReSharper disable once PossibleInvalidCastException
             return (IResponse)response;
@@ -89,7 +72,7 @@ namespace Neuralm.Presentation.CLI
                 }
             });
         }
-        public Task ProcessEvent(Type type, IEvent @event, INetworkConnector baseNetworkConnector)
+        public Task ProcessEvent(Type type, IEvent @event, INetworkConnector networkConnector)
         {
             return Task.Run(() =>
             {
