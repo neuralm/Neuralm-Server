@@ -1,24 +1,35 @@
-﻿namespace Neuralm.Domain.Entities.NEAT
+﻿using System;
+
+namespace Neuralm.Domain.Entities.NEAT
 {
     public class TrainingRoomSettings
     {
-        public uint BrainCount { get; }
-        public uint InputCount { get; }
-        public uint OutputCount { get; }
-        public double C1 { get; }
-        public double C2 { get; }
-        public double C3 { get; }
-        public double Threshold { get; }
-        public double AddConnectionChance { get; }
-        public double AddNodeChance { get; }
-        public double CrossOverChance { get; }
-        public double InterSpeciesChance { get; }
-        public double MutationChance { get; }
-        public double MutateWeightChance { get; }
-        public double WeightReassignChance { get; }
-        public double TopAmountToSurvive { get; }
-        public double EnableConnectionChance { get; }
-        public int Seed { get; }
+        public Guid Id { get; private set; }
+        public uint BrainCount { get; private set; }
+        public uint InputCount { get; private set; }
+        public uint OutputCount { get; private set; }
+        public double C1 { get; private set; }
+        public double C2 { get; private set; }
+        public double C3 { get; private set; }
+        public double Threshold { get; private set; }
+        public double AddConnectionChance { get; private set; }
+        public double AddNodeChance { get; private set; }
+        public double CrossOverChance { get; private set; }
+        public double InterSpeciesChance { get; private set; }
+        public double MutationChance { get; private set; }
+        public double MutateWeightChance { get; private set; }
+        public double WeightReassignChance { get; private set; }
+        public double TopAmountToSurvive { get; private set; }
+        public double EnableConnectionChance { get; private set; }
+        public int Seed { get; private set; }
+        
+        /// <summary>
+        /// EFCore entity constructor IGNORE!
+        /// </summary>
+        private TrainingRoomSettings()
+        {
+            
+        }
 
         /// <summary>
         /// The settings for the training room.
@@ -47,6 +58,7 @@
             double crossOverChance, double interSpeciesChance, double mutationChance,
             double mutateWeightChance, double weightReassignChance, double topAmountToSurvive, double enableConnectionChance, int seed)
         {
+            Id = Guid.NewGuid();
             BrainCount = brainCount;
             InputCount = inputCount;
             OutputCount = outputCount;

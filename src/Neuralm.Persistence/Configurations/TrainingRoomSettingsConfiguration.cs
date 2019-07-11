@@ -4,12 +4,11 @@ using Neuralm.Domain.Entities.NEAT;
 
 namespace Neuralm.Persistence.Configurations
 {
-    internal class BrainConfiguration : IEntityTypeConfiguration<Brain>
+    internal class TrainingRoomSettingsConfiguration : IEntityTypeConfiguration<TrainingRoomSettings>
     {
-        public void Configure(EntityTypeBuilder<Brain> builder)
+        public void Configure(EntityTypeBuilder<TrainingRoomSettings> builder)
         {
             builder.HasKey(p => p.Id);
-            builder.OwnsMany(p => p.Genes, c => c.HasForeignKey(child => child.BrainId));
         }
     }
 }

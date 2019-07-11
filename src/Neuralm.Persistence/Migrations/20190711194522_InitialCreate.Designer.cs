@@ -10,7 +10,7 @@ using Neuralm.Persistence.Contexts;
 namespace Neuralm.Persistence.Migrations
 {
     [DbContext(typeof(NeuralmDbContext))]
-    [Migration("20190628204009_InitialCreate")]
+    [Migration("20190711194522_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,9 +23,8 @@ namespace Neuralm.Persistence.Migrations
 
             modelBuilder.Entity("Neuralm.Domain.Entities.Authentication.Credential", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("CredentialTypeId");
 
@@ -38,7 +37,7 @@ namespace Neuralm.Persistence.Migrations
                     b.Property<string>("Secret")
                         .HasMaxLength(1024);
 
-                    b.Property<int>("UserId");
+                    b.Property<Guid>("UserId");
 
                     b.HasKey("Id");
 
@@ -140,28 +139,147 @@ namespace Neuralm.Persistence.Migrations
 
                     b.Property<int>("RoleId");
 
+                    b.Property<Guid?>("UserId1");
+
                     b.HasKey("UserId", "RoleId");
 
                     b.HasIndex("RoleId");
 
+                    b.HasIndex("UserId1");
+
                     b.ToTable("UserRoles");
+                });
+
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.Brain", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<double>("Score");
+
+                    b.Property<Guid?>("TrainingRoomId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TrainingRoomId");
+
+                    b.ToTable("Brain");
+                });
+
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.TrainingRoom", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<double>("AverageScore");
+
+                    b.Property<bool>("Enabled");
+
+                    b.Property<long>("Generation");
+
+                    b.Property<double>("HighestScore");
+
+                    b.Property<long>("InnovationId");
+
+                    b.Property<double>("LowestScore");
+
+                    b.Property<string>("Name");
+
+                    b.Property<Guid>("OwnerId");
+
+                    b.Property<Guid?>("TrainingRoomSettingsId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
+
+                    b.HasIndex("TrainingRoomSettingsId");
+
+                    b.ToTable("TrainingRooms");
+                });
+
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.TrainingRoomSettings", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<double>("AddConnectionChance");
+
+                    b.Property<double>("AddNodeChance");
+
+                    b.Property<long>("BrainCount");
+
+                    b.Property<double>("C1");
+
+                    b.Property<double>("C2");
+
+                    b.Property<double>("C3");
+
+                    b.Property<double>("CrossOverChance");
+
+                    b.Property<double>("EnableConnectionChance");
+
+                    b.Property<long>("InputCount");
+
+                    b.Property<double>("InterSpeciesChance");
+
+                    b.Property<double>("MutateWeightChance");
+
+                    b.Property<double>("MutationChance");
+
+                    b.Property<long>("OutputCount");
+
+                    b.Property<int>("Seed");
+
+                    b.Property<double>("Threshold");
+
+                    b.Property<double>("TopAmountToSurvive");
+
+                    b.Property<double>("WeightReassignChance");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TrainingRoomSettings");
+                });
+
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.TrainingSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("EndedTimestamp");
+
+                    b.Property<DateTime>("StartedTimestamp");
+
+                    b.Property<Guid>("TrainingRoomId");
+
+                    b.Property<Guid>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TrainingRoomId");
+
+                    b.ToTable("TrainingSession");
                 });
 
             modelBuilder.Entity("Neuralm.Domain.Entities.User", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("TimestampCreated")
                         .ValueGeneratedOnAdd()
                         .HasDefaultValueSql("GetDate()");
+
+                    b.Property<Guid?>("TrainingRoomId");
 
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TrainingRoomId");
 
                     b.ToTable("Users");
                 });
@@ -201,8 +319,70 @@ namespace Neuralm.Persistence.Migrations
 
                     b.HasOne("Neuralm.Domain.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UserId1");
+                });
+
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.Brain", b =>
+                {
+                    b.HasOne("Neuralm.Domain.Entities.NEAT.TrainingRoom", "TrainingRoom")
+                        .WithMany()
+                        .HasForeignKey("TrainingRoomId");
+
+                    b.OwnsMany("Neuralm.Domain.Entities.NEAT.ConnectionGene", "Genes", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd();
+
+                            b1.Property<Guid>("BrainId");
+
+                            b1.Property<bool>("Enabled");
+
+                            b1.Property<long>("InId");
+
+                            b1.Property<long>("InnovationNumber");
+
+                            b1.Property<long>("OutId");
+
+                            b1.Property<double>("Weight");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("BrainId");
+
+                            b1.ToTable("ConnectionGene");
+
+                            b1.HasOne("Neuralm.Domain.Entities.NEAT.Brain")
+                                .WithMany("Genes")
+                                .HasForeignKey("BrainId")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
+                });
+
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.TrainingRoom", b =>
+                {
+                    b.HasOne("Neuralm.Domain.Entities.User", "Owner")
+                        .WithMany("TrainingRooms")
+                        .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Neuralm.Domain.Entities.NEAT.TrainingRoomSettings", "TrainingRoomSettings")
+                        .WithMany()
+                        .HasForeignKey("TrainingRoomSettingsId");
+                });
+
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.TrainingSession", b =>
+                {
+                    b.HasOne("Neuralm.Domain.Entities.NEAT.TrainingRoom", "TrainingRoom")
+                        .WithMany("TrainingSessions")
+                        .HasForeignKey("TrainingRoomId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Neuralm.Domain.Entities.User", b =>
+                {
+                    b.HasOne("Neuralm.Domain.Entities.NEAT.TrainingRoom")
+                        .WithMany("AuthorizedUsers")
+                        .HasForeignKey("TrainingRoomId");
                 });
 #pragma warning restore 612, 618
         }
