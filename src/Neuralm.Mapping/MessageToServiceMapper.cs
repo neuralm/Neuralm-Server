@@ -26,7 +26,7 @@ namespace Neuralm.Mapping
                         serviceMethods: type
                             .GetMethods(BindingFlags.Instance | BindingFlags.Public)
                             .Where(method => method.IsFinal)))
-                .SelectMany(tuple => tuple.serviceMethods.Select(methodInfo => (tuple.serviceType, methodInfo,
+                .SelectMany(tuple => tuple.serviceMethods.Select(methodInfo => (tuple.serviceType.GetInterfaces()[0], methodInfo,
                     parameterType: methodInfo.GetParameters()[0].ParameterType)))
                 .ToList();
             foreach ((Type serviceType, MethodInfo methodInfo, Type parameterType) in x)

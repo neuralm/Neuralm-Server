@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Neuralm.Application.Interfaces;
 using Neuralm.Application.Messages;
-using Neuralm.Application.Messages.Requests;
 using Neuralm.Infrastructure.Interfaces;
 using Neuralm.Mapping;
 using Neuralm.Utilities.Observer;
@@ -13,18 +12,12 @@ namespace Neuralm.Presentation.CLI
 {
     internal class ServerMessageProcessor : IMessageProcessor
     {
-        private readonly IUserService _userService;
-        private readonly ITrainingRoomService _trainingRoomService;
         private readonly MessageToServiceMapper _messageToServiceMapper;
         private readonly ConcurrentDictionary<Type, ObserverCollection> _observers;
 
         public ServerMessageProcessor(
-            IUserService userService,
-            ITrainingRoomService trainingRoomService,
             MessageToServiceMapper messageToServiceMapper)
         {
-            _userService = userService;
-            _trainingRoomService = trainingRoomService;
             _messageToServiceMapper = messageToServiceMapper;
             _observers = new ConcurrentDictionary<Type, ObserverCollection>();
         }
@@ -79,7 +72,7 @@ namespace Neuralm.Presentation.CLI
                 }
             });
         }
-        public Task ProcessEvent(Type type, IEvent @event, INetworkConnector baseNetworkConnector)
+        public Task ProcessEvent(Type type, IEvent @event, INetworkConnector networkConnector)
         {
             return Task.Run(() =>
             {
