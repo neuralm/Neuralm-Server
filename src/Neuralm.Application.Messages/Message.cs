@@ -37,7 +37,7 @@ namespace Neuralm.Application.Messages
         internal long GetHeaderSize()
         {
             byte[] bodySizeBytes = BitConverter.GetBytes(BodySize);
-            byte[] typeNameBytes = Encoding.Default.GetBytes(TypeName);
+            byte[] typeNameBytes = Encoding.UTF8.GetBytes(TypeName);
             return 4 + bodySizeBytes.Length + typeNameBytes.Length;
         }
 
@@ -45,10 +45,11 @@ namespace Neuralm.Application.Messages
         {
             int headerSize = BitConverter.ToInt32(buffer, 0);
             int bodySize = BitConverter.ToInt32(buffer, 4);
-            return new MessageHeader(bodySize)
+            MessageHeader header = new MessageHeader(bodySize)
             {
-                TypeName = Encoding.Default.GetString(buffer, 8, headerSize - 8)
+                TypeName = Encoding.UTF8.GetString(buffer, 8, headerSize - 8)
             };
+            return header;
         }
         internal static bool TryParseHeader(ReadOnlySequence<byte> sequence, out MessageHeader? header)
         {

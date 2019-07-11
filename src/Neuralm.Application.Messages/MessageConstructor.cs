@@ -18,7 +18,7 @@ namespace Neuralm.Application.Messages
         {
             ReadOnlyMemory<byte> body = _messageSerializer.Serialize(messageBody);
             byte[] bodySizeBytes = BitConverter.GetBytes(body.Length);
-            byte[] typeNameBytes = Encoding.Default.GetBytes(messageBody.GetType().FullName ?? throw new InvalidOperationException("The FullName of the type cannot be null"));
+            byte[] typeNameBytes = Encoding.UTF8.GetBytes(messageBody.GetType().FullName ?? throw new InvalidOperationException("The FullName of the type cannot be null"));
             byte[] headerSizeBytes = BitConverter.GetBytes(4 + bodySizeBytes.Length + typeNameBytes.Length);
             ReadOnlyMemory<byte> header = headerSizeBytes.Concat(bodySizeBytes).Concat(typeNameBytes).ToArray();
             return new Message(header, body);

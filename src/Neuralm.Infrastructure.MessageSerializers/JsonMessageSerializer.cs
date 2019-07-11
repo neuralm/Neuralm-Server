@@ -9,17 +9,17 @@ namespace Neuralm.Infrastructure.MessageSerializers
     {
         public Memory<byte> Serialize(object message)
         {
-            return new Memory<byte>(Encoding.Default.GetBytes(JsonConvert.SerializeObject(message)));
+            return new Memory<byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)));
         }
 
         public T Deserialize<T>(Memory<byte> message)
         {
-            return JsonConvert.DeserializeObject<T>(Encoding.Default.GetString(message.ToArray()));
+            return JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(message.ToArray()));
         }
 
         public object Deserialize(Memory<byte> message, Type type)
         {
-            return JsonConvert.DeserializeObject(Encoding.Default.GetString(message.ToArray()), type);
+            return JsonConvert.DeserializeObject(Encoding.UTF8.GetString(message.ToArray()), type);
         }
     }
 }
