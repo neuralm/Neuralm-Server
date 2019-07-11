@@ -66,7 +66,7 @@ namespace Neuralm.Presentation.CLI
                 Console.WriteLine($"Accepted a new connection: \n\tLocalEndPoint: {tcpClient.Client.LocalEndPoint}\n\tRemoteEndPoint: {tcpClient.Client.RemoteEndPoint}");
                 _ = Task.Run(() =>
                 {
-                    IMessageProcessor messageProcessor = new ServerMessageProcessor(GetUserService(), GetTrainingRoomService());
+                    IMessageProcessor messageProcessor = new ServerMessageProcessor(GetUserService(), GetTrainingRoomService(), GetMessageToServiceMapper());
                     IMessageSerializer messageSerializer = new JsonMessageSerializer();
                     INetworkConnector networkConnector = new TcpNetworkConnector(messageSerializer, messageProcessor, tcpClient);
                     networkConnector.Start();
@@ -75,6 +75,7 @@ namespace Neuralm.Presentation.CLI
 
             IUserService GetUserService() => _genericServiceProvider.GetService<IUserService>();
             ITrainingRoomService GetTrainingRoomService() => _genericServiceProvider.GetService<ITrainingRoomService>();
+            MessageToServiceMapper GetMessageToServiceMapper() => _genericServiceProvider.GetService<MessageToServiceMapper>();
         }
     }
 }

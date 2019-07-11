@@ -29,14 +29,17 @@ namespace Neuralm.Presentation.CLI
                 .BuildServiceProvider()
                 .ToGenericServiceProvider();
 
-            return VerifyDatabaseConnection();
+            List<Task> tasks = new List<Task>
+            {
+                Task.Run(VerifyDatabaseConnection),
+                Task.Run(MapMessagesToServices)
+            };
+            return Task.WhenAll(tasks);
         }
-
         internal IGenericServiceProvider GetServiceProvider()
         {
             return _serviceProvider ?? throw new InitializationException("GenericServiceProvider is unset. Call InitializeAsync() first.");
         }
-
         private Task VerifyDatabaseConnection()
         {
             Console.WriteLine("Starting database verification..");
@@ -63,6 +66,12 @@ namespace Neuralm.Presentation.CLI
                 Console.WriteLine("Applied the pending migrations to the database.");
             }
             Console.WriteLine("Finished database verification!");
+            return Task.CompletedTask;
+        }
+        private Task MapMessagesToServices()
+        {
+            // NOTE: Create the singleton once to map the services.
+            _ = _serviceProvider.GetService<MessageToServiceMapper>();
             return Task.CompletedTask;
         }
     }
