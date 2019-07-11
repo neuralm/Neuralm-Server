@@ -4,10 +4,11 @@ namespace Neuralm.Domain.Entities.NEAT
 {
     public class ConnectionGene : IEquatable<ConnectionGene>
     {
-        public Guid BrainId { get; }
-        public uint InId { get; }
-        public uint OutId { get; }
-        public uint InnovationNumber { get; }
+        public Guid Id { get; private set; }
+        public Guid BrainId { get; private set; }
+        public uint InId { get; private set; }
+        public uint OutId { get; private set; }
+        public uint InnovationNumber { get; private set; }
         public double Weight { get; set; }
         public bool Enabled { get; set; }
         public Node InNode { get; private set; }
@@ -24,6 +25,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <param name="enabled">Whether this gene is enabled or not. Default is true</param>
         public ConnectionGene(Guid brainId, uint inId, uint outId, double weight, uint innovationNumber, bool enabled = true)
         {
+            Id = Guid.NewGuid();
             BrainId = brainId;
             InId = inId;
             OutId = outId;

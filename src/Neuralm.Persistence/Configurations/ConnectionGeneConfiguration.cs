@@ -8,6 +8,7 @@ namespace Neuralm.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<ConnectionGene> builder)
         {
+            builder.HasKey(p => p.Id);
             builder.Ignore(p => p.InNode);
             builder.Ignore(p => p.OutNode);
         }

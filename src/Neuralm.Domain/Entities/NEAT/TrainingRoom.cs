@@ -13,21 +13,29 @@ namespace Neuralm.Domain.Entities.NEAT
         private readonly List<User> _authorizedUsers;
         private readonly List<TrainingSession> _trainingSessions;
 
-        public Guid Id { get; }
-        public Guid OwnerId { get; }
-        public User Owner { get; }
-        public IReadOnlyList<User> AuthorizedUsers => _authorizedUsers;
-        public IReadOnlyList<TrainingSession> TrainingSessions => _trainingSessions;
-        public TrainingRoomSettings TrainingRoomSettings { get; }
-        public string Name { get; }
+        public Guid Id { get; private set; }
+        public Guid OwnerId { get; private set; }
+        public virtual User Owner { get; private set; }
+        public virtual IReadOnlyList<User> AuthorizedUsers => _authorizedUsers;
+        public virtual IReadOnlyList<TrainingSession> TrainingSessions => _trainingSessions;
+        public virtual TrainingRoomSettings TrainingRoomSettings { get; private set; }
+        public string Name { get; private set; }
         public uint Generation { get; private set; }
 
-        public Random Random { get; }
+        public Random Random { get; private set; }
         public double HighestScore { get; private set; }
         public double LowestScore { get; private set; }
         public double AverageScore { get; private set; }
         public uint InnovationId { get; private set; }
         public bool Enabled { get; private set; }
+
+        /// <summary>
+        /// EFCore entity constructor IGNORE!
+        /// </summary>
+        private TrainingRoom()
+        {
+            
+        }
 
         /// <summary>
         /// Create a training room with the given settings.
