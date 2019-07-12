@@ -16,7 +16,6 @@ namespace Neuralm.Infrastructure.Networking
         private readonly IMessageProcessor _messageProcessor;
         private readonly MessageConstructor _messageConstructor;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        private static readonly ConcurrentDictionary<string, Type> TypeCache = new ConcurrentDictionary<string, Type>();
         private const int MinimumBufferSize = 512;
 
         public bool IsRunning { get; private set; }
@@ -26,6 +25,7 @@ namespace Neuralm.Infrastructure.Networking
         {
             _messageConstructor = new MessageConstructor(messageSerializer);
             _messageProcessor = messageProcessor ?? throw new ArgumentNullException(nameof(messageProcessor));
+            MessageTypeCache.LoadMessageTypeCache();
         }
 
         public void Start()
@@ -149,7 +149,7 @@ namespace Neuralm.Infrastructure.Networking
         {
             return Task.Run(async () =>
             {
-                if (GetType(typeName, out Type type))
+                if (MessageTypeCache.TryGetMessageType(typeName, out Type type))
                 {
                     object obj = _messageConstructor.DeconstructMessageBody(bodyBufferMemory, type);
 
@@ -207,34 +207,6 @@ namespace Neuralm.Infrastructure.Networking
             return position is null
                 ? buffer.GetPosition(offset)
                 : buffer.GetPosition(offset, position.Value);
-        }
-        private static bool GetType(string typeName, out Type type)
-        {
-            if (TypeCache.TryGetValue(typeName, out type))
-            {
-                return true;
-            }
-            type = Type.GetType(typeName);
-            if (string.IsNullOrWhiteSpace(typeName))
-            {
-                return false;
-            }
-            if (!(type is null))
-            {
-                TypeCache.TryAdd(typeName, type);
-                return true;
-            }
-
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                type = assembly.GetType(typeName);
-
-                if (type is null) continue;
-                TypeCache.TryAdd(typeName, type);
-                return true;
-            }
-
-            return false;
         }
         private static bool TryCopyBodyBuffer(in ReadOnlySequence<byte> buffer, int bodySize, Span<byte> destination)
         {
