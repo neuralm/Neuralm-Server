@@ -7,7 +7,6 @@ using Neuralm.Application.Messages.Requests;
 using Neuralm.Application.Messages.Responses;
 using Neuralm.Domain.Entities;
 using Neuralm.Domain.Entities.Authentication;
-using Neuralm.Domain.Enumerations;
 
 namespace Neuralm.Application.Services
 {
@@ -39,18 +38,18 @@ namespace Neuralm.Application.Services
         public async Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest authenticateRequest)
         {
             if (string.IsNullOrWhiteSpace(authenticateRequest.Username) || string.IsNullOrWhiteSpace(authenticateRequest.Password))
-                return new AuthenticateResponse(authenticateRequest.Id, error: AuthenticateError.CredentialsAreNullOrEmpty);
+                return new AuthenticateResponse(authenticateRequest.Id, message: "Credentials are null or empty.");
 
             if (!await _credentialTypeRepository.ExistsAsync(ct => CredentialTypeCodePredicate(ct, authenticateRequest.CredentialTypeCode)))
-                return new AuthenticateResponse(authenticateRequest.Id, error: AuthenticateError.CredentialTypeNotFound);
+                return new AuthenticateResponse(authenticateRequest.Id, message: "CredentialType not found.");
 
             CredentialType credentialType = await _credentialTypeRepository.FindSingleByExpressionAsync(ct => CredentialTypeCodePredicate(ct, authenticateRequest.CredentialTypeCode));
             if (!await _credentialRepository.ExistsAsync(cred => CredentialPredicate(credentialType, cred, authenticateRequest.Username)))
-                return new AuthenticateResponse(authenticateRequest.Id, error: AuthenticateError.CredentialNotFound);
+                return new AuthenticateResponse(authenticateRequest.Id, message: "Credentials not found.");
 
             Credential credential = await _credentialRepository.FindSingleByExpressionAsync(cred => CredentialPredicate(credentialType, cred, authenticateRequest.Username));
             if (!_hasher.VerifyHash(credential.Secret, credential.Extra, authenticateRequest.Password))
-                return new AuthenticateResponse(authenticateRequest.Id, error: AuthenticateError.SecretNotValid);
+                return new AuthenticateResponse(authenticateRequest.Id, message: "Secret not valid.");
 
             List<Claim> claims = new List<Claim>
             {
@@ -62,20 +61,20 @@ namespace Neuralm.Application.Services
         public async Task<RegisterResponse> RegisterAsync(RegisterRequest registerRequest)
         {
             if (string.IsNullOrEmpty(registerRequest.Password))
-                return new RegisterResponse(registerRequest.Id, RegisterError.CredentialsAreNullOrEmpty);
+                return new RegisterResponse(registerRequest.Id, message: "Credentials are null or empty.");
 
             if (await _userRepository.ExistsAsync(anyUser => anyUser.Username.Equals(registerRequest.Username, StringComparison.OrdinalIgnoreCase)))
-                return new RegisterResponse(registerRequest.Id, RegisterError.UsernameAlreadyExists);
+                return new RegisterResponse(registerRequest.Id, message: "Username already exists.");
 
             if (!await _credentialTypeRepository.ExistsAsync(ct => CredentialTypeCodePredicate(ct, registerRequest.CredentialTypeCode)))
-                return new RegisterResponse(registerRequest.Id, RegisterError.CredentialTypeNotFound);
+                return new RegisterResponse(registerRequest.Id, message: "CredentialType not found.");
 
             User user = new User
             {
                 Username = registerRequest.Username
             };
             if (!await _userRepository.CreateAsync(user))
-                return new RegisterResponse(registerRequest.Id, RegisterError.PersistenceError);
+                return new RegisterResponse(registerRequest.Id, "Failed to persist data.");
 
             CredentialType credentialType = await _credentialTypeRepository.FindSingleByExpressionAsync(ct => CredentialTypeCodePredicate(ct, registerRequest.CredentialTypeCode));
             byte[] salt = _saltGenerator.GenerateSalt();
