@@ -15,6 +15,14 @@ namespace Neuralm.Domain.Entities.NEAT
         public Node OutNode { get; private set; }
 
         /// <summary>
+        /// EFCore entity constructor IGNORE!
+        /// </summary>
+        protected ConnectionGene()
+        {
+
+        }
+
+        /// <summary>
         /// Create a connection gene going from the node with the given inID to the node with the given outID with a given weight.
         /// </summary>
         /// <param name="brainId">The id of the brain</param>

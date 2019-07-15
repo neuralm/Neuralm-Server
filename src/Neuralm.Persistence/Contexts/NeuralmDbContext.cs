@@ -20,7 +20,7 @@ namespace Neuralm.Persistence.Contexts
 
         public NeuralmDbContext(DbContextOptions<NeuralmDbContext> options) : base(options)
         {
-
+            
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

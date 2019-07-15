@@ -9,7 +9,11 @@ namespace Neuralm.Persistence.Configurations
         public void Configure(EntityTypeBuilder<Brain> builder)
         {
             builder.HasKey(p => p.Id);
-            builder.OwnsMany(p => p.Genes, c => c.HasForeignKey(child => child.BrainId));
+            builder.OwnsMany(p => p.Genes)
+                .HasForeignKey(cg => cg.BrainId);
+            builder.Metadata.FindNavigation(nameof(Brain.Genes))
+                .SetPropertyAccessMode(PropertyAccessMode.Field);
+            builder.Ignore(p => p.Genes);
         }
     }
 }

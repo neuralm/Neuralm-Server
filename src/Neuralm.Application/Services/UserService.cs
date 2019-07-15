@@ -38,25 +38,26 @@ namespace Neuralm.Application.Services
         public async Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest authenticateRequest)
         {
             if (string.IsNullOrWhiteSpace(authenticateRequest.Username) || string.IsNullOrWhiteSpace(authenticateRequest.Password))
-                return new AuthenticateResponse(authenticateRequest.Id, message: "Credentials are null or empty.");
+                return new AuthenticateResponse(authenticateRequest.Id, Guid.Empty, message: "Credentials are null or empty.");
 
             if (!await _credentialTypeRepository.ExistsAsync(ct => CredentialTypeCodePredicate(ct, authenticateRequest.CredentialTypeCode)))
-                return new AuthenticateResponse(authenticateRequest.Id, message: "CredentialType not found.");
+                return new AuthenticateResponse(authenticateRequest.Id, Guid.Empty, message: "CredentialType not found.");
 
             CredentialType credentialType = await _credentialTypeRepository.FindSingleByExpressionAsync(ct => CredentialTypeCodePredicate(ct, authenticateRequest.CredentialTypeCode));
             if (!await _credentialRepository.ExistsAsync(cred => CredentialPredicate(credentialType, cred, authenticateRequest.Username)))
-                return new AuthenticateResponse(authenticateRequest.Id, message: "Credentials not found.");
+                return new AuthenticateResponse(authenticateRequest.Id, Guid.Empty, message: "Credentials not found.");
 
             Credential credential = await _credentialRepository.FindSingleByExpressionAsync(cred => CredentialPredicate(credentialType, cred, authenticateRequest.Username));
             if (!_hasher.VerifyHash(credential.Secret, credential.Extra, authenticateRequest.Password))
-                return new AuthenticateResponse(authenticateRequest.Id, message: "Secret not valid.");
+                return new AuthenticateResponse(authenticateRequest.Id, Guid.Empty, message: "Secret not valid.");
 
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, authenticateRequest.Username)
             };
+            User user = await _userRepository.FindSingleByExpressionAsync(usr => string.Equals(usr.Username, authenticateRequest.Username, StringComparison.OrdinalIgnoreCase));
             string accessToken = _accessTokenService.GenerateAccessToken(claims, DateTime.Now.AddHours(2));
-            return new AuthenticateResponse(authenticateRequest.Id, accessToken, success: true);
+            return new AuthenticateResponse(authenticateRequest.Id, user.Id, accessToken, success: true);
         }
         public async Task<RegisterResponse> RegisterAsync(RegisterRequest registerRequest)
         {
