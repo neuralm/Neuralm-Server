@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Neuralm.Application.Converters;
 using Neuralm.Application.Interfaces;
 using Neuralm.Application.Messages.Dtos;
 using Neuralm.Application.Messages.Requests;
@@ -64,7 +65,7 @@ namespace Neuralm.Application.Services
                 return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, null, "Failed to start a training session.");
 
             await _trainingRoomRepository.UpdateAsync(trainingRoom);
-            return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, TrainingSessionToDto(trainingSession), "Successfully started a training session.", true);
+            return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, EntityToDtoConverter.Convert<TrainingSessionDto, TrainingSession>(trainingSession), "Successfully started a training session.", true);
         }
         public async Task<EndTrainingSessionResponse> EndTrainingSessionAsync(EndTrainingSessionRequest endTrainingSessionRequest)
         {
@@ -83,42 +84,7 @@ namespace Neuralm.Application.Services
         public async Task<GetEnabledTrainingRoomsResponse> GetEnabledTrainingRoomsAsync(GetEnabledTrainingRoomsRequest getEnabledTrainingRoomsRequest)
         {
             IEnumerable<TrainingRoom> trainingRooms = await _trainingRoomRepository.FindManyByExpressionAsync(trainingRoom => trainingRoom.Enabled);
-            return new GetEnabledTrainingRoomsResponse(getEnabledTrainingRoomsRequest.Id, trainingRooms.Select(TrainingRoomToDto).ToList(), success: true);
-        }
-
-        private static TrainingSessionDto TrainingSessionToDto(TrainingSession trainingSession)
-        {
-            return new TrainingSessionDto
-            {
-                Id = trainingSession.Id,
-                StartedTimestamp = trainingSession.StartedTimestamp,
-                EndedTimestamp = trainingSession.EndedTimestamp,
-                TrainingRoom = TrainingRoomToDto(trainingSession.TrainingRoom),
-                UserId = trainingSession.UserId
-            };
-        }
-        private static TrainingRoomDto TrainingRoomToDto(TrainingRoom trainingRoom)
-        {
-            return new TrainingRoomDto
-            {
-                Id = trainingRoom.Id,
-                Name = trainingRoom.Name,
-                Owner = UserToDto(trainingRoom.Owner),
-                Generation = trainingRoom.Generation,
-                HighestScore = trainingRoom.HighestScore,
-                LowestScore = trainingRoom.LowestScore,
-                AverageScore = trainingRoom.AverageScore,
-                TrainingRoomSettings = trainingRoom.TrainingRoomSettings
-            };
-        }
-        private static UserDto UserToDto(User user)
-        {
-            return new UserDto()
-            {
-                Id = user.Id,
-                Name = user.Username,
-                TimestampCreated = user.TimestampCreated
-            };
+            return new GetEnabledTrainingRoomsResponse(getEnabledTrainingRoomsRequest.Id, trainingRooms.Select(EntityToDtoConverter.Convert<TrainingRoomDto, TrainingRoom>).ToList(), success: true);
         }
     }
 }

@@ -7,6 +7,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Neuralm.Application.Configurations;
 using Neuralm.Application.Interfaces;
+using Neuralm.Application.Messages.Dtos;
+using Neuralm.Application.Messages.Requests;
+using Neuralm.Application.Messages.Responses;
 using Neuralm.Infrastructure.Interfaces;
 using Neuralm.Infrastructure.MessageSerializers;
 using Neuralm.Infrastructure.Networking;
@@ -56,6 +59,10 @@ namespace Neuralm.Presentation.CLI
             Console.WriteLine("Finished initializing!\n");
 
             _genericServiceProvider = startup.GetServiceProvider();
+            GetEnabledTrainingRoomsResponse getEnabledTrainingRoomsResponse = await _genericServiceProvider.GetService<ITrainingRoomService>()
+                .GetEnabledTrainingRoomsAsync(new GetEnabledTrainingRoomsRequest());
+            foreach (TrainingRoomDto trainingRoomDto in getEnabledTrainingRoomsResponse.TrainingRooms)
+                Console.WriteLine($"TrainingRoom:\n\tId: {trainingRoomDto.Id}\n\tName: {trainingRoomDto.Name}\n\tOwner: {trainingRoomDto.Owner.Username}");
             ServerConfiguration serverConfiguration = _genericServiceProvider.GetService<IOptions<ServerConfiguration>>().Value;
             TcpListener tcpListener = new TcpListener(IPAddress.Loopback, serverConfiguration.Port);
             tcpListener.Start();

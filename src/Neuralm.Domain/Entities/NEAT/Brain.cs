@@ -6,7 +6,7 @@ namespace Neuralm.Domain.Entities.NEAT
 {
     public class Brain
     {
-        private readonly List<ConnectionGene> _genes;
+        private List<ConnectionGene> _genes;
         private readonly Dictionary<uint, Node> _nodes;
         private readonly List<Node> _outputNodes;
         private readonly List<Node> _inputNodes;
@@ -18,12 +18,13 @@ namespace Neuralm.Domain.Entities.NEAT
         public double Score { get; set; }
         public virtual IReadOnlyList<ConnectionGene> Genes => _genes;
         public Guid Id { get; private set; }
+        public Guid TrainingRoomId { get; private set; }
         public virtual TrainingRoom TrainingRoom { get; private set; }
 
         /// <summary>
         /// EFCore entity constructor IGNORE!
         /// </summary>
-        private Brain()
+        protected Brain()
         {
             
         }
@@ -36,6 +37,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <param name="trainingRoom">The training room this brain is a part of</param>
         public Brain(uint inputCount, uint outputCount, TrainingRoom trainingRoom)
         {
+            TrainingRoomId = trainingRoom.Id;
             TrainingRoom = trainingRoom;
             _genes = new List<ConnectionGene>();
             _nodes = new Dictionary<uint, Node>();
@@ -45,7 +47,8 @@ namespace Neuralm.Domain.Entities.NEAT
             _outputCount = outputCount;
             _childGenes = new List<ConnectionGene>();
 
-            Id = Guid.NewGuid();
+            if (Id == Guid.Empty)
+                Id = Guid.NewGuid();
 
             for (uint i = 0; i < inputCount; i++)
             {

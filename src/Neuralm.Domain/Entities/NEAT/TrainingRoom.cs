@@ -9,15 +9,16 @@ namespace Neuralm.Domain.Entities.NEAT
         private readonly Dictionary<(uint A, uint B), uint> _mutationToInnovation;
         private readonly List<Species> _speciesList;
         private uint _nodeId;
-        private readonly List<Brain> _children;
-        private readonly List<User> _authorizedUsers;
-        private readonly List<TrainingSession> _trainingSessions;
+        private List<Brain> _brains;
+        private List<User> _authorizedUsers;
+        private List<TrainingSession> _trainingSessions;
 
         public Guid Id { get; private set; }
         public Guid OwnerId { get; private set; }
         public virtual User Owner { get; private set; }
         public virtual IReadOnlyList<User> AuthorizedUsers => _authorizedUsers;
         public virtual IReadOnlyList<TrainingSession> TrainingSessions => _trainingSessions;
+        public virtual IReadOnlyList<Brain> Brains => _brains;
         public virtual TrainingRoomSettings TrainingRoomSettings { get; private set; }
         public string Name { get; private set; }
         public uint Generation { get; private set; }
@@ -32,7 +33,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <summary>
         /// EFCore entity constructor IGNORE!
         /// </summary>
-        private TrainingRoom()
+        protected TrainingRoom()
         {
             
         }
@@ -57,7 +58,7 @@ namespace Neuralm.Domain.Entities.NEAT
             _authorizedUsers = new List<User> { owner };
             _trainingSessions = new List<TrainingSession>();
             _speciesList = new List<Species>((int)trainingRoomSettings.BrainCount);
-            _children = new List<Brain>((int)trainingRoomSettings.BrainCount);
+            _brains = new List<Brain>((int)trainingRoomSettings.BrainCount);
             _mutationToInnovation = new Dictionary<(uint A, uint B), uint>();
 
             for (int i = 0; i < trainingRoomSettings.BrainCount; i++)
@@ -138,7 +139,7 @@ namespace Neuralm.Domain.Entities.NEAT
                 totalScore = 1; // TODO: Think about what this really does lol, if the total score is 0 should they have the right to reproduce?
 
             double rest = 0;
-            _children.Clear();
+            _brains.Clear();
             foreach (Species species in _speciesList)
             {
                 double fraction = species.SpeciesScore / totalScore;
@@ -154,16 +155,16 @@ namespace Neuralm.Domain.Entities.NEAT
                 amountOfBrains = Math.Floor(amountOfBrains);
                 for (int i = 0; i < amountOfBrains; i++)
                 {
-                    _children.Add(species.ProduceBrain());
+                    _brains.Add(species.ProduceBrain());
                 }
             }
 
-            while (_children.Count < TrainingRoomSettings.BrainCount)
+            while (_brains.Count < TrainingRoomSettings.BrainCount)
             {
-                _children.Add(new Brain(TrainingRoomSettings.InputCount, TrainingRoomSettings.OutputCount, this));
+                _brains.Add(new Brain(TrainingRoomSettings.InputCount, TrainingRoomSettings.OutputCount, this));
             }
 
-            foreach (Brain brain in _children)
+            foreach (Brain brain in _brains)
             {
                 AddBrain(brain);
             }

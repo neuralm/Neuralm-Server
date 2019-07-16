@@ -26,7 +26,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <summary>
         /// EFCore entity constructor IGNORE!
         /// </summary>
-        private TrainingRoomSettings()
+        protected TrainingRoomSettings()
         {
             
         }
