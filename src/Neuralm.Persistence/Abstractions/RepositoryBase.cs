@@ -11,23 +11,23 @@ namespace Neuralm.Persistence.Abstractions
 {
     public abstract class RepositoryBase<TEntity, TDbContext> : IRepository<TEntity> where TDbContext : DbContext where TEntity : class
     {
-        private readonly TDbContext _dbContext;
-        private readonly IEntityValidator<TEntity> _entityValidator;
+        protected readonly TDbContext DbContext;
+        protected readonly IEntityValidator<TEntity> EntityValidator;
 
         protected RepositoryBase(TDbContext dbContext, IEntityValidator<TEntity> entityValidator)
         {
-            _dbContext = dbContext;
-            _entityValidator = entityValidator;
+            DbContext = dbContext;
+            EntityValidator = entityValidator;
         }
 
         public virtual async Task<bool> CreateAsync(TEntity entity)
         {
-            _entityValidator.Validate(entity);
-            _dbContext.Set<TEntity>().Add(entity);
-            int saveResult = await _dbContext.SaveChangesAsync();
+            EntityValidator.Validate(entity);
+            DbContext.Set<TEntity>().Add(entity);
             bool saveSuccess;
             try
             {
+                int saveResult = await DbContext.SaveChangesAsync();
                 saveSuccess = Convert.ToBoolean(saveResult);
             }
             catch (Exception ex)
@@ -38,13 +38,14 @@ namespace Neuralm.Persistence.Abstractions
         }
         public virtual async Task<bool> DeleteAsync(TEntity entity)
         {
-            if (!await _dbContext.Set<TEntity>().ContainsAsync(entity))
+            if (!await DbContext.Set<TEntity>().ContainsAsync(entity))
                 throw new EntityNotFoundException($"The entity of type {typeof(TEntity).Name} could not be found.");
-            _dbContext.Set<TEntity>().Remove(entity);
-            int saveResult = await _dbContext.SaveChangesAsync();
+            DbContext.Set<TEntity>().Remove(entity);
+            
             bool saveSuccess;
             try
             {
+                int saveResult = await DbContext.SaveChangesAsync();
                 saveSuccess = Convert.ToBoolean(saveResult);
             }
             catch (Exception ex)
@@ -55,30 +56,31 @@ namespace Neuralm.Persistence.Abstractions
         }
         public virtual async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            return await _dbContext.Set<TEntity>().AnyAsync(predicate);
+            return await DbContext.Set<TEntity>().AnyAsync(predicate);
         }
         public virtual async Task<IEnumerable<TEntity>> FindManyByExpressionAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            return await _dbContext.Set<TEntity>().Where(predicate).ToListAsync();
+            return await DbContext.Set<TEntity>().Where(predicate).ToListAsync();
         }
         public virtual async Task<TEntity> FindSingleByExpressionAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            TEntity entity = await _dbContext.Set<TEntity>().SingleOrDefaultAsync(predicate);
+            TEntity entity = await DbContext.Set<TEntity>().SingleOrDefaultAsync(predicate);
             if (entity == default)
                 throw new EntityNotFoundException($"The entity of type {typeof(TEntity).Name} could not be found by the predicate.");
             return entity;
         }
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
         {
-            return await _dbContext.Set<TEntity>().ToListAsync();
+            return await DbContext.Set<TEntity>().ToListAsync();
         }
         public virtual async Task<bool> UpdateAsync(TEntity entity)
         {
-            _dbContext.Update(entity);
-            int saveResult = await _dbContext.SaveChangesAsync();
+            DbContext.Update(entity);
+            
             bool saveSuccess;
             try
             {
+                int saveResult = await DbContext.SaveChangesAsync();
                 saveSuccess = Convert.ToBoolean(saveResult);
             }
             catch (Exception ex)
