@@ -60,18 +60,7 @@ namespace Neuralm.Persistence.Abstractions
         }
         public virtual async Task<IEnumerable<TEntity>> FindManyByExpressionAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            IEnumerable<TEntity> x;
-            try
-            {
-                x = await DbContext.Set<TEntity>().Where(predicate).ToListAsync();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-
-            return x;
+            return await DbContext.Set<TEntity>().Where(predicate).ToListAsync();
         }
         public virtual async Task<TEntity> FindSingleByExpressionAsync(Expression<Func<TEntity, bool>> predicate)
         {
