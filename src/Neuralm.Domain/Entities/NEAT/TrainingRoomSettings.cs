@@ -28,19 +28,22 @@ namespace Neuralm.Domain.Entities.NEAT
         public uint OutputCount { get; private set; }
 
         /// <summary>
-        /// Gets and sets c1.
+        /// Gets and sets SpeciesExcessGeneWeight.
+        /// The higher this value the more important the amount of excess genes is, and thus the faster that causes new species to be created
         /// </summary>
-        public double C1 { get; private set; }
+        public double SpeciesExcessGeneWeight { get; private set; }
 
         /// <summary>
-        /// Gets and sets c2.
+        /// Gets and sets SpeciesDisjointGeneWeight.
+        /// The higher this value the more important the amount of disjoint genes is, and thus the faster that causes new species to be created
         /// </summary>
-        public double C2 { get; private set; }
+        public double SpeciesDisjointGeneWeight { get; private set; }
 
         /// <summary>
-        /// Gets and sets c3.
+        /// Gets and sets SpeciesAverageWeightDiffWeight.
+        /// The higher this value the more important the difference between weights is, and thus the faster that causes new species to be created
         /// </summary>
-        public double C3 { get; private set; }
+        public double SpeciesAverageWeightDiffWeight { get; private set; }
 
         /// <summary>
         /// Gets and sets the threshold.
@@ -136,9 +139,9 @@ namespace Neuralm.Domain.Entities.NEAT
             BrainCount = brainCount;
             InputCount = inputCount;
             OutputCount = outputCount;
-            C1 = c1;
-            C2 = c2;
-            C3 = c3;
+            SpeciesExcessGeneWeight = c1;
+            SpeciesDisjointGeneWeight = c2;
+            SpeciesAverageWeightDiffWeight = c3;
             Threshold = threshold;
             AddConnectionChance = addConnectionChance;
             AddNodeChance = addNodeChance;

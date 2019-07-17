@@ -20,13 +20,13 @@ namespace Neuralm.Application.Messages.Dtos
         /// <inheritdoc cref="TrainingRoomSettings.OutputCount"/>
         public uint OutputCount { get; set; }
 
-        /// <inheritdoc cref="TrainingRoomSettings.C1"/>
+        /// <inheritdoc cref="TrainingRoomSettings.SpeciesExcessGeneWeight"/>
         public double C1 { get; set; }
 
-        /// <inheritdoc cref="TrainingRoomSettings.C2"/>
+        /// <inheritdoc cref="TrainingRoomSettings.SpeciesDisjointGeneWeight"/>
         public double C2 { get; set; }
 
-        /// <inheritdoc cref="TrainingRoomSettings.C3"/>
+        /// <inheritdoc cref="TrainingRoomSettings.SpeciesAverageWeightDiffWeight"/>
         public double C3 { get; set; }
 
         /// <inheritdoc cref="TrainingRoomSettings.Threshold"/>
