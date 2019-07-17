@@ -13,11 +13,11 @@ namespace Neuralm.Utilities.Observer
         /// <summary>
         /// Initializes an instance of the <see cref="ObserverUnsubscriber"/> class.
         /// </summary>
-        /// <param name="observers"></param>
-        /// <param name="observer"></param>
-        public ObserverUnsubscriber(ObserverCollection observers, IObserver observer)
+        /// <param name="observerCollection">The observer collection.</param>
+        /// <param name="observer">The observer.</param>
+        public ObserverUnsubscriber(ObserverCollection observerCollection, IObserver observer)
         {
-            _observers = observers;
+            _observers = observerCollection;
             _observer = observer;
         }
 
