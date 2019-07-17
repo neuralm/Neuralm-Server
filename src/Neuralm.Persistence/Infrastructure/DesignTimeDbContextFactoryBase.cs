@@ -8,27 +8,45 @@ using Neuralm.Utilities;
 
 namespace Neuralm.Persistence.Infrastructure
 {
+    /// <summary>
+    /// Represents the <see cref="DesignTimeDbContextFactoryBase{TContext}"/> class.
+    /// </summary>
+    /// <typeparam name="TContext"></typeparam>
     public abstract class DesignTimeDbContextFactoryBase<TContext> : IDesignTimeDbContextFactory<TContext> where TContext : DbContext
     {
-        private readonly string _uniqueDbName;
-        protected readonly DbConfiguration DbConfiguration;
         private DbContextOptionsBuilder<TContext> _dbContextOptionsBuilder;
+        protected readonly DbConfiguration DbConfiguration;
 
+        /// <summary>
+        /// Initializes an instance of the <see cref="DesignTimeDbContextFactoryBase{TContext}"/> class.
+        /// </summary>
+        /// <param name="dbConfigurationOptions">The options.</param>
         protected DesignTimeDbContextFactoryBase(IOptions<DbConfiguration> dbConfigurationOptions)
         {
             DbConfiguration = dbConfigurationOptions == null 
                 ? GetDbConfiguration() 
                 : dbConfigurationOptions.Value;
-            _uniqueDbName = Guid.NewGuid().ToString();
         }
 
+        /// <summary>
+        /// Creates a new DbContext instance using options.
+        /// </summary>
+        /// <param name="dbContextOptions">The options.</param>
+        /// <returns>Returns a new DbContext instance.</returns>
         protected abstract TContext CreateNewInstance(DbContextOptions<TContext> dbContextOptions);
+
+        /// <summary>
+        /// Creates a new DbContext instance using string arguments.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
+        /// <returns>Returns a new DbContext instance.</returns>
         public virtual TContext CreateDbContext(string[] args)
         {
             if (_dbContextOptionsBuilder == null)
                 SetDbContextOptionsBuilder(DbConfiguration.ConnectionString);
             return CreateNewInstance(_dbContextOptionsBuilder.Options);
         }
+
         private void SetDbContextOptionsBuilder(string connectionString)
         {
             if (string.IsNullOrEmpty(connectionString))
@@ -36,11 +54,12 @@ namespace Neuralm.Persistence.Infrastructure
             DbContextOptionsBuilder<TContext> optionsBuilder = new DbContextOptionsBuilder<TContext>();
             optionsBuilder.UseLazyLoadingProxies();
             if (connectionString.Equals("InMemoryDatabase"))
-                optionsBuilder.UseInMemoryDatabase(_uniqueDbName); // NOTE: connectionString
+                optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString());
             else
                 optionsBuilder.UseSqlServer(connectionString);
             _dbContextOptionsBuilder = optionsBuilder;
         }
+
         private static DbConfiguration GetDbConfiguration()
         {
             DbConfiguration dbConfiguration = new DbConfiguration();

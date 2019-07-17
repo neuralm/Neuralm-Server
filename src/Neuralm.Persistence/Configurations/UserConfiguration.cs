@@ -4,8 +4,12 @@ using Neuralm.Domain.Entities;
 
 namespace Neuralm.Persistence.Configurations
 {
+    /// <summary>
+    /// The UserConfiguration class; used to configure the relations and columns in the <see cref="DbSet{TEntity}"/> for <see cref="User"/> in the DbContext.
+    /// </summary>
     internal class UserConfiguration : IEntityTypeConfiguration<User>
     {
+        /// <inheritdoc cref="IEntityTypeConfiguration{TEntity}.Configure"/>
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.HasKey(user => user.Id);
@@ -14,10 +18,6 @@ namespace Neuralm.Persistence.Configurations
             builder.Property(p => p.TimestampCreated).HasDefaultValueSql("GetDate()");
             builder.OwnsMany(tr => tr.TrainingRooms)
                 .HasForeignKey(room => room.OwnerId);
-
-            //builder.HasMany(tr => tr.TrainingRooms)
-            //    .WithOne(room => room.Owner)
-            //    .HasForeignKey(room => room.OwnerId);
         }
     }
 }

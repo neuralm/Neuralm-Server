@@ -1,26 +1,44 @@
 ﻿using Neuralm.Application.Interfaces;
 using System;
 using System.Buffers;
-using System.Collections.Concurrent;
 using System.IO.Pipelines;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Neuralm.Application.Exceptions;
 using Neuralm.Application.Messages;
 using Neuralm.Infrastructure.Interfaces;
 
 namespace Neuralm.Infrastructure.Networking
 {
+    /// <summary>
+    /// Represents the <see cref="BaseNetworkConnector"/> class; an abstraction of the <see cref="INetworkConnector"/> interface.
+    /// </summary>
     public abstract class BaseNetworkConnector : INetworkConnector
     {
         private readonly IMessageProcessor _messageProcessor;
         private readonly MessageConstructor _messageConstructor;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        private const int MinimumBufferSize = 512;
-
+        private const int MinimumBufferSizeHint = 512;
+        
+        /// <summary>
+        /// Gets and sets a value indicating whether <see cref="Start"/> has ran.
+        /// </summary>
         public bool IsRunning { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether <see cref="ConnectAsync"/> has ran.
+        /// </summary>
         public abstract bool IsConnected { get; }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="BaseNetworkConnector"/> class.
+        /// </summary>
+        /// <remarks>
+        /// Also loads the <see cref="MessageTypeCache"/> on the first <see cref="BaseNetworkConnector"/> instance creation.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">If the messageProcessor is null; an argument exception is thrown.</exception>
+        /// <param name="messageSerializer">The message processor.</param>
+        /// <param name="messageProcessor">The message serializer.</param>
         protected BaseNetworkConnector(IMessageSerializer messageSerializer, IMessageProcessor messageProcessor)
         {
             _messageConstructor = new MessageConstructor(messageSerializer);
@@ -28,10 +46,14 @@ namespace Neuralm.Infrastructure.Networking
             MessageTypeCache.LoadMessageTypeCache();
         }
 
+        /// <summary>
+        /// Starts the <see cref="StartReadingTask"/> and <see cref="StartWritingTask"/>, and sets <see cref="IsRunning"/> to <c>true</c>.
+        /// </summary>
+        /// <exception cref="NetworkConnectorIsNotYetConnectedException">If <see cref="IsConnected"/> is <c>false</c>.</exception>
         public void Start()
         {
             if (!IsConnected)
-                throw new Exception("NetworkConnector has not connected yet. Call ConnectAsync() first.");
+                throw new NetworkConnectorIsNotYetConnectedException("NetworkConnector has not connected yet. Call ConnectAsync() first.");
 
             Pipe pipe = new Pipe();
 
@@ -40,11 +62,57 @@ namespace Neuralm.Infrastructure.Networking
 
             IsRunning = true;
         }
+
+        /// <summary>
+        /// Stops the network connector and sets <see cref="IsRunning"/> to <c>false</c>.
+        /// </summary>
         public void Stop()
         {
             _cancellationTokenSource.Cancel();
             IsRunning = false;
         }
+
+        /// <summary>
+        /// Sends a message through the pipeline asynchronously.
+        /// </summary>
+        /// <typeparam name="TMessage">The message type.</typeparam>
+        /// <param name="message">The message.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="NetworkConnectorIsNotYetStartedException">If <see cref="IsRunning"/> is <c>false</c>.</exception>
+        /// <returns>Returns a <see cref="Task"/> to await.</returns>
+        public async Task SendMessageAsync<TMessage>(TMessage message, CancellationToken cancellationToken)
+        {
+            if (!IsRunning)
+                throw new NetworkConnectorIsNotYetStartedException("NetworkConnector has not started yet. Call Start() first");
+
+            Message constructedMessage = _messageConstructor.ConstructMessage(message);
+            await SendPacketAsync(constructedMessage.Header, cancellationToken);
+            await SendPacketAsync(constructedMessage.Body, cancellationToken);
+        }
+
+        /// <summary>
+        /// Connect asynchronously.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Returns a <see cref="ValueTask"/>.</returns>
+        public abstract ValueTask ConnectAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Send a packet asynchronously.
+        /// </summary>
+        /// <param name="packet">The packet.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/> with <see cref="int"/> as type parameter; with the bytes count sent.</returns>
+        protected abstract Task<int> SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Receive a packet asynchronously.
+        /// </summary>
+        /// <param name="memory">The memory.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/> with <see cref="int"/> as type parameter; with the bytes count received.</returns>
+        protected abstract Task<int> ReceivePacketAsync(Memory<byte> memory, CancellationToken cancellationToken);
+
         private Task StartReadingTask(PipeReader pipeReader)
         {
             return Task.Run(async () =>
@@ -81,21 +149,12 @@ namespace Neuralm.Infrastructure.Networking
                 }
             });
         }
-        public async Task SendMessageAsync<TMessage>(TMessage message, CancellationToken cancellationToken)
-        {
-            if (!IsRunning)
-                throw new Exception("NetworkConnector has not started yet. Call ConnectAsync() first");
-
-            Message constructedMessage = _messageConstructor.ConstructMessage(message);
-            await SendPacketAsync(constructedMessage.Header, cancellationToken);
-            await SendPacketAsync(constructedMessage.Body, cancellationToken);
-        }
         private async Task FillPipeAsync(PipeWriter pipeWriter, CancellationToken cancellationToken)
         {
             while (true)
             {
                 // Allocate at least 512 bytes from the PipeWriter
-                Memory<byte> memory = pipeWriter.GetMemory(MinimumBufferSize);
+                Memory<byte> memory = pipeWriter.GetMemory(MinimumBufferSizeHint);
                 try
                 {
                     int bytesReceived = await ReceivePacketAsync(memory, cancellationToken);
@@ -215,8 +274,5 @@ namespace Neuralm.Infrastructure.Networking
             buffer.Slice(buffer.Start, bodySize).CopyTo(destination);
             return true;
         }
-        public abstract ValueTask ConnectAsync(CancellationToken cancellationToken);
-        protected abstract Task<int> SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken);
-        protected abstract Task<int> ReceivePacketAsync(Memory<byte> memory, CancellationToken cancellationToken);
     }
 }

@@ -5,10 +5,19 @@ using Neuralm.Persistence.Contexts;
 
 namespace Neuralm.Persistence.Repositories
 {
+    /// <summary>
+    /// Represents the <see cref="CredentialTypeRepository"/> class.
+    /// </summary>
     public class CredentialTypeRepository : RepositoryBase<CredentialType, NeuralmDbContext>
     {
+        /// <summary>
+        /// Initializes an instance of the <see cref="CredentialTypeRepository"/> class.
+        /// </summary>
+        /// <param name="dbContext">The database context.</param>
+        /// <param name="entityValidator">The entity validator.</param>
         public CredentialTypeRepository(NeuralmDbContext dbContext, IEntityValidator<CredentialType> entityValidator) : base(dbContext, entityValidator)
         {
+
         }
     }
 }

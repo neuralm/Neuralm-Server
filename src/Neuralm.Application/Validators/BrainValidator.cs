@@ -5,7 +5,8 @@ using Neuralm.Domain.Entities.NEAT;
 
 namespace Neuralm.Application.Validators
 {
-    public sealed class BrainValidator : IEntityValidator<Brain>
+   /// <inheritdoc cref="IEntityValidator{T}"/>
+   public sealed class BrainValidator : IEntityValidator<Brain>
     {
         public bool Validate(Brain entity)
         {

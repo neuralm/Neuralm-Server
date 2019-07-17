@@ -10,6 +10,9 @@ using Neuralm.Domain.Entities.Authentication;
 
 namespace Neuralm.Application.Services
 {
+    /// <summary>
+    /// The implementation of the <see cref="IUserService"/> interface.
+    /// </summary>
     public class UserService : IUserService
     {
         private readonly IRepository<User> _userRepository;
@@ -35,6 +38,11 @@ namespace Neuralm.Application.Services
             _accessTokenService = accessTokenService;
         }
 
+        /// <summary>
+        /// Authenticates a user.
+        /// </summary>
+        /// <param name="authenticateRequest">The authenticate request.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="AuthenticateResponse"/>.</returns>
         public async Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest authenticateRequest)
         {
             if (string.IsNullOrWhiteSpace(authenticateRequest.Username) || string.IsNullOrWhiteSpace(authenticateRequest.Password))
@@ -59,6 +67,12 @@ namespace Neuralm.Application.Services
             string accessToken = _accessTokenService.GenerateAccessToken(claims, DateTime.Now.AddHours(2));
             return new AuthenticateResponse(authenticateRequest.Id, user.Id, accessToken, success: true);
         }
+
+        /// <summary>
+        /// Registers a user.
+        /// </summary>
+        /// <param name="registerRequest">The register request.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="RegisterResponse"/>.</returns>
         public async Task<RegisterResponse> RegisterAsync(RegisterRequest registerRequest)
         {
             if (string.IsNullOrEmpty(registerRequest.Password))
