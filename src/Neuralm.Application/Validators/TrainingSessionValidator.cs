@@ -5,9 +5,12 @@ using Neuralm.Domain.Entities.NEAT;
 
 namespace Neuralm.Application.Validators
 {
-    /// <inheritdoc cref="IEntityValidator{T}"/>
+    /// <summary>
+    /// Represents the <see cref="TrainingSessionValidator"/> class.
+    /// </summary>
     public sealed class TrainingSessionValidator : IEntityValidator<TrainingSession>
     {
+        /// <inheritdoc cref="IEntityValidator{T}.Validate(T)"/>
         public bool Validate(TrainingSession entity)
         {
             if (entity.Id.Equals(Guid.Empty))

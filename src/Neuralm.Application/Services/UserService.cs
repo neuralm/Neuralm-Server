@@ -11,7 +11,7 @@ using Neuralm.Domain.Entities.Authentication;
 namespace Neuralm.Application.Services
 {
     /// <summary>
-    /// The implementation of the <see cref="IUserService"/> interface.
+    /// Represents the <see cref="UserService"/> class.
     /// </summary>
     public class UserService : IUserService
     {
@@ -22,6 +22,15 @@ namespace Neuralm.Application.Services
         private readonly ISaltGenerator _saltGenerator;
         private readonly IAccessTokenService _accessTokenService;
 
+        /// <summary>
+        /// Initializes an instance of the <see cref="UserService"/> class.
+        /// </summary>
+        /// <param name="userRepository">The user repository.</param>
+        /// <param name="credentialRepository">The credential repository.</param>
+        /// <param name="credentialTypeRepository">The credential type repository.</param>
+        /// <param name="hasher">The hasher.</param>
+        /// <param name="saltGenerator">The salt generator.</param>
+        /// <param name="accessTokenService">The access token service.</param>
         public UserService(
             IRepository<User> userRepository,
             IRepository<Credential> credentialRepository,
@@ -38,11 +47,7 @@ namespace Neuralm.Application.Services
             _accessTokenService = accessTokenService;
         }
 
-        /// <summary>
-        /// Authenticates a user.
-        /// </summary>
-        /// <param name="authenticateRequest">The authenticate request.</param>
-        /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="AuthenticateResponse"/>.</returns>
+        /// <inheritdoc cref="IUserService.AuthenticateAsync(AuthenticateRequest)"/>
         public async Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest authenticateRequest)
         {
             if (string.IsNullOrWhiteSpace(authenticateRequest.Username) || string.IsNullOrWhiteSpace(authenticateRequest.Password))
@@ -68,11 +73,7 @@ namespace Neuralm.Application.Services
             return new AuthenticateResponse(authenticateRequest.Id, user.Id, accessToken, success: true);
         }
 
-        /// <summary>
-        /// Registers a user.
-        /// </summary>
-        /// <param name="registerRequest">The register request.</param>
-        /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="RegisterResponse"/>.</returns>
+        /// <inheritdoc cref="IUserService.RegisterAsync(RegisterRequest)"/>
         public async Task<RegisterResponse> RegisterAsync(RegisterRequest registerRequest)
         {
             if (string.IsNullOrEmpty(registerRequest.Password))

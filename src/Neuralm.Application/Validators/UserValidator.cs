@@ -4,9 +4,12 @@ using Neuralm.Domain.Entities;
 
 namespace Neuralm.Application.Validators
 {
-    /// <inheritdoc cref="IEntityValidator{T}"/>
+    /// <summary>
+    /// Represents the <see cref="UserValidator"/> class.
+    /// </summary>
     public class UserValidator : IEntityValidator<User>
     {
+        /// <inheritdoc cref="IEntityValidator{T}.Validate(T)"/>
         public bool Validate(User entity)
         {
             if (entity == null)

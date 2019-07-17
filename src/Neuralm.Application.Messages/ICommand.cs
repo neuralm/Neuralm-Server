@@ -3,10 +3,18 @@
 namespace Neuralm.Application.Messages
 {
     /// <summary>
-    /// The interface for a Command.
+    /// Represents the <see cref="ICommand"/> interface.
     /// </summary>
     public interface ICommand
     {
+        /// <summary>
+        /// Gets the id.
+        /// </summary>
         Guid Id { get; }
+
+        /// <summary>
+        /// Gets the date time.
+        /// </summary>
+        DateTime DateTime { get; }
     }
 }

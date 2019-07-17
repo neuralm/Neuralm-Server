@@ -1,7 +1,7 @@
 ﻿namespace Neuralm.Application.Interfaces
 {
     /// <summary>
-    /// The interface for the Factory pattern.
+    /// Represents the <see cref="IFactory{TResult}"/> interface for the Factory pattern.
     /// </summary>
     /// <typeparam name="TResult">Factory output result.</typeparam>
     public interface IFactory<out TResult>
@@ -14,7 +14,7 @@
     }
 
     /// <summary>
-    /// The interface for the Factory pattern with an argument.
+    /// Represents the <see cref="IFactory{TResult, TParameter}"/> interface for the Factory pattern with an argument.
     /// </summary>
     /// <typeparam name="TResult">Factory output result.</typeparam>
     /// <typeparam name="TParameter">Factory argument.</typeparam>
@@ -29,7 +29,7 @@
     }
 
     /// <summary>
-    /// The interface for the Factory pattern with two arguments.
+    /// Represents the <see cref="IFactory{TResult, TParameter1, TParameter2}"/> interface for the Factory pattern with two arguments.
     /// </summary>
     /// <typeparam name="TResult">Factory output result.</typeparam>
     /// <typeparam name="TParameter1">Factory argument 1.</typeparam>

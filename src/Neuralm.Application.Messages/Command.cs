@@ -5,7 +5,7 @@ namespace Neuralm.Application.Messages
     /// <summary>
     /// Represents the <see cref="Command"/> class.
     /// </summary>
-    public abstract class Command : IEvent
+    public abstract class Command : ICommand
     {
         /// <summary>
         /// Gets the id.

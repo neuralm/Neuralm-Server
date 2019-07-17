@@ -1,7 +1,7 @@
 ﻿namespace Neuralm.Application.Interfaces
 {
     /// <summary>
-    /// Marker interface for services.
+    /// Represents the <see cref="IService"/> interface used to mark services.
     /// </summary>
     public interface IService
     {
