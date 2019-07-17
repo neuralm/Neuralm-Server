@@ -7,6 +7,11 @@ namespace Neuralm.Utilities.Observer
         private readonly ObserverCollection _observers;
         private readonly IObserver _observer;
 
+        /// <summary>
+        /// Initializes an instance of the <see cref="ObserverUnsubscriber"/> class.
+        /// </summary>
+        /// <param name="observerCollection">The observer collection.</param>
+        /// <param name="observer">The observer.</param>
         public ObserverUnsubscriber(ObserverCollection observers, IObserver observer)
         {
             _observers = observers;
