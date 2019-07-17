@@ -18,11 +18,19 @@ using Neuralm.Utilities;
 
 namespace Neuralm.Presentation.CLI
 {
+    /// <summary>
+    /// Represents the <see cref="Program"/> class.
+    /// </summary>
     public class Program
     {
         private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
         private IGenericServiceProvider _genericServiceProvider;
 
+        /// <summary>
+        /// Initializes the <see cref="Program"/> class.
+        /// </summary>
+        /// <param name="args">The args.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         public static async Task Main(string[] args)
         {
             _ = new Program().RunAsync(CancellationTokenSource.Token);
@@ -39,6 +47,11 @@ namespace Neuralm.Presentation.CLI
             Console.ReadKey();
         }
 
+        /// <summary>
+        /// Runs the <see cref="Program"/> asynchronously.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         private async Task RunAsync(CancellationToken cancellationToken)
         {
             IConfiguration configuration = null;
@@ -58,7 +71,7 @@ namespace Neuralm.Presentation.CLI
             await startup.InitializeAsync(configuration);
             Console.WriteLine("Finished initializing!\n");
 
-            _genericServiceProvider = startup.GetServiceProvider();
+            _genericServiceProvider = startup.GetGenericServiceProvider();
             GetEnabledTrainingRoomsResponse getEnabledTrainingRoomsResponse = await _genericServiceProvider.GetService<ITrainingRoomService>()
                 .GetEnabledTrainingRoomsAsync(new GetEnabledTrainingRoomsRequest());
             foreach (TrainingRoomDto trainingRoomDto in getEnabledTrainingRoomsResponse.TrainingRooms)

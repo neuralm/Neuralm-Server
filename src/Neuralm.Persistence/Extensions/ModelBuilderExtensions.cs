@@ -6,8 +6,16 @@ using Neuralm.Persistence.Contexts;
 
 namespace Neuralm.Persistence.Extensions
 {
+    /// <summary>
+    /// Represents the extensions for the <see cref="ModelBuilder"/> class.
+    /// </summary>
     public static class ModelBuilderExtensions
     {
+        /// <summary>
+        /// Applies all configurations found in the <see cref="NeuralmDbContext"/> assembly that use the <see cref="IEntityTypeConfiguration{TEntity}"/> interface.
+        /// </summary>
+        /// <remarks>finds all the configurations and applies them, then discards the instances.</remarks>
+        /// <param name="modelBuilder">the model builder.</param>
         public static void ApplyAllConfigurations(this ModelBuilder modelBuilder)
         {
             MethodInfo applyConfigurationMethodInfo = modelBuilder

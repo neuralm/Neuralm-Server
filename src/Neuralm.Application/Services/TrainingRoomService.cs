@@ -13,12 +13,21 @@ using Neuralm.Domain.Entities.NEAT;
 
 namespace Neuralm.Application.Services
 {
+    /// <summary>
+    /// Represents the implementation of the <see cref="ITrainingRoomService"/> interface.
+    /// </summary>
     public class TrainingRoomService : ITrainingRoomService
     {
         private readonly IRepository<TrainingRoom> _trainingRoomRepository;
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<TrainingSession> _trainingSessionRepository;
 
+        /// <summary>
+        /// Initializes an instance of the <see cref="TrainingRoomService"/> class.
+        /// </summary>
+        /// <param name="trainingRoomRepository">The training room repository.</param>
+        /// <param name="userRepository">The user repository.</param>
+        /// <param name="trainingSessionRepository">The training session repository.</param>
         public TrainingRoomService(
             IRepository<TrainingRoom> trainingRoomRepository,
             IRepository<User> userRepository,
@@ -29,6 +38,11 @@ namespace Neuralm.Application.Services
             _trainingSessionRepository = trainingSessionRepository;
         }
 
+        /// <summary>
+        /// Creates a training room asynchronously.
+        /// </summary>
+        /// <param name="createTrainingRoomRequest">The create training room request.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="CreateTrainingRoomResponse"/>.</returns>
         public async Task<CreateTrainingRoomResponse> CreateTrainingRoomAsync(CreateTrainingRoomRequest createTrainingRoomRequest)
         {
             if (createTrainingRoomRequest.OwnerId.Equals(Guid.Empty))
@@ -50,6 +64,12 @@ namespace Neuralm.Application.Services
 
             return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, trainingRoom.Id, "Successfully created a training room.", true);
         }
+
+        /// <summary>
+        /// Starts a training session asynchronously.
+        /// </summary>
+        /// <param name="startTrainingSessionRequest">The start training session request.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="StartTrainingSessionResponse"/>.</returns>
         public async Task<StartTrainingSessionResponse> StartTrainingSessionAsync(StartTrainingSessionRequest startTrainingSessionRequest)
         {
             Expression<Func<TrainingRoom, bool>> predicate = tr => tr.Id.Equals(startTrainingSessionRequest.TrainingRoomId);
@@ -67,6 +87,12 @@ namespace Neuralm.Application.Services
             await _trainingRoomRepository.UpdateAsync(trainingRoom);
             return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, EntityToDtoConverter.Convert<TrainingSessionDto, TrainingSession>(trainingSession), "Successfully started a training session.", true);
         }
+
+        /// <summary>
+        /// Ends a training session asynchronously.
+        /// </summary>
+        /// <param name="endTrainingSessionRequest"></param>
+        /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="EndTrainingSessionResponse"/>.</returns>
         public async Task<EndTrainingSessionResponse> EndTrainingSessionAsync(EndTrainingSessionRequest endTrainingSessionRequest)
         {
             Expression<Func<TrainingSession, bool>> predicate = trs => trs.Id.Equals(endTrainingSessionRequest.TrainingSessionId);
@@ -81,6 +107,12 @@ namespace Neuralm.Application.Services
             await _trainingSessionRepository.UpdateAsync(trainingSession);
             return new EndTrainingSessionResponse(endTrainingSessionRequest.Id, "Successfully ended the training session.", true);
         }
+
+        /// <summary>
+        /// Gets the enabled training rooms asynchronously.
+        /// </summary>
+        /// <param name="getEnabledTrainingRoomsRequest">The get enabled training rooms request.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="GetEnabledTrainingRoomsResponse"/>.</returns>
         public async Task<GetEnabledTrainingRoomsResponse> GetEnabledTrainingRoomsAsync(GetEnabledTrainingRoomsRequest getEnabledTrainingRoomsRequest)
         {
             IEnumerable<TrainingRoom> trainingRooms = await _trainingRoomRepository.FindManyByExpressionAsync(trainingRoom => trainingRoom.Enabled);

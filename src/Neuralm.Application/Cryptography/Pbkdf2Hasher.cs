@@ -4,6 +4,9 @@ using Neuralm.Application.Interfaces;
 
 namespace Neuralm.Application.Cryptography
 {
+    /// <summary>
+    /// Provides a Pbkd2f hashing implementation of the <see cref="IHasher"/> interface.
+    /// </summary>
     public class Pbkdf2Hasher : IHasher
     {
         public string Hash(string secret, byte[] saltBytes)

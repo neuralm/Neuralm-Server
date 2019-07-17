@@ -4,6 +4,9 @@ using Neuralm.Application.Messages.Responses;
 
 namespace Neuralm.Application.Interfaces
 {
+    /// <summary>
+    /// The interface for the training room service.
+    /// </summary>
     public interface ITrainingRoomService : IService
     {
         Task<CreateTrainingRoomResponse> CreateTrainingRoomAsync(CreateTrainingRoomRequest createTrainingRoomRequest);

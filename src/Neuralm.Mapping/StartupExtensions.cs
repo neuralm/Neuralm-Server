@@ -19,8 +19,16 @@ using Neuralm.Domain.Entities.NEAT;
 
 namespace Neuralm.Mapping
 {
+    /// <summary>
+    /// Represents the <see cref="StartupExtensions"/> class.
+    /// </summary>
     public static class StartupExtensions
     {
+        /// <summary>
+        /// Adds services from the <see cref="Neuralm.Application.Interfaces"/> assembly into the <see cref="serviceCollection"/>.
+        /// </summary>
+        /// <param name="serviceCollection">The service collection.</param>
+        /// <returns>Returns the service collection to chain further upon.</returns>
         public static IServiceCollection AddApplicationServices(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<IFactory<NeuralmDbContext>, NeuralmDbFactory>();
@@ -122,6 +130,12 @@ namespace Neuralm.Mapping
             serviceCollection.AddSingleton(p => new MessageToServiceMapper(p));
             return serviceCollection;
         }
+
+        /// <summary>
+        /// Adds the Jwt bearer based authentication into the <see cref="serviceCollection"/>.
+        /// </summary>
+        /// <param name="serviceCollection">The service collection.</param>
+        /// <returns>Returns the service collection to chain further upon.</returns>
         public static IServiceCollection AddJwtBearerBasedAuthentication(this IServiceCollection serviceCollection)
         {
             JwtConfiguration jwtConfiguration = serviceCollection.BuildServiceProvider().GetService<IOptions<JwtConfiguration>>().Value;
@@ -144,6 +158,13 @@ namespace Neuralm.Mapping
             });
             return serviceCollection;
         }
+
+        /// <summary>
+        /// Adds and binds configurations into the <see cref="serviceCollection"/>.
+        /// </summary>
+        /// <param name="serviceCollection">The service collection.</param>
+        /// <param name="configuration">The configuration.</param>
+        /// <returns>Returns the service collection to chain further upon.</returns>
         public static IServiceCollection AddConfigurations(this IServiceCollection serviceCollection, IConfiguration configuration)
         {
             serviceCollection.AddOptions();
@@ -152,6 +173,12 @@ namespace Neuralm.Mapping
             serviceCollection.Configure<JwtConfiguration>(configuration.GetSection("Jwt").Bind);
             return serviceCollection;
         }
+
+        /// <summary>
+        /// Converts an <see cref="IServiceProvider"/> to an <see cref="IGenericServiceProvider"/>.
+        /// </summary>
+        /// <param name="serviceProvider">The service provider.</param>
+        /// <returns>Returns a <see cref="IGenericServiceProvider"/> implementation.</returns>
         public static IGenericServiceProvider ToGenericServiceProvider(this IServiceProvider serviceProvider)
         {
             return new GenericServiceProvider(serviceProvider);

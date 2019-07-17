@@ -5,6 +5,10 @@ using System.Threading.Tasks;
 
 namespace Neuralm.Application.Interfaces
 {
+    /// <summary>
+    /// The interface for a generic repository.
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
     public interface IRepository<TEntity> where TEntity : class
     {
         Task<TEntity> FindSingleByExpressionAsync(Expression<Func<TEntity, bool>> predicate);

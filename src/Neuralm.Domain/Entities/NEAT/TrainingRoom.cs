@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace Neuralm.Domain.Entities.NEAT
 {
+    /// <summary>
+    /// Represents the <see cref="TrainingRoom"/> class; provides methods for managing training sessions.
+    /// </summary>
     public class TrainingRoom
     {
         private readonly Dictionary<(uint A, uint B), uint> _mutationToInnovation;
@@ -13,21 +16,79 @@ namespace Neuralm.Domain.Entities.NEAT
         private List<User> _authorizedUsers;
         private List<TrainingSession> _trainingSessions;
 
+        /// <summary>
+        /// Gets and sets the id.
+        /// </summary>
         public Guid Id { get; private set; }
+
+        /// <summary>
+        /// Gets and sets the owner id.
+        /// </summary>
         public Guid OwnerId { get; private set; }
+
+        /// <summary>
+        /// Gets and sets the owner.
+        /// </summary>
         public virtual User Owner { get; private set; }
+
+        /// <summary>
+        /// Gets the list of authorized users.
+        /// </summary>
         public virtual IReadOnlyList<User> AuthorizedUsers => _authorizedUsers;
+
+        /// <summary>
+        /// Gets the list of training sessions.
+        /// </summary>
         public virtual IReadOnlyList<TrainingSession> TrainingSessions => _trainingSessions;
+
+        /// <summary>
+        /// Gets the list of brains.
+        /// </summary>
         public virtual IReadOnlyList<Brain> Brains => _brains;
+
+        /// <summary>
+        /// Gets and sets the training room settings.
+        /// </summary>
         public virtual TrainingRoomSettings TrainingRoomSettings { get; private set; }
+
+        /// <summary>
+        /// Gets and sets the name.
+        /// </summary>
         public string Name { get; private set; }
+
+        /// <summary>
+        /// Gets and sets the generation.
+        /// </summary>
         public uint Generation { get; private set; }
 
+        /// <summary>
+        /// Gets and sets the random.
+        /// </summary>
         public Random Random { get; private set; }
+
+        /// <summary>
+        /// Gets and sets the highest score.
+        /// </summary>
         public double HighestScore { get; private set; }
+
+        /// <summary>
+        /// Gets and sets the lowest score.
+        /// </summary>
         public double LowestScore { get; private set; }
+
+        /// <summary>
+        /// Gets and sets the average score.
+        /// </summary>
         public double AverageScore { get; private set; }
+        
+        /// <summary>
+        /// Gets and sets the innovation id.
+        /// </summary>
         public uint InnovationId { get; private set; }
+        
+        /// <summary>
+        /// Gets a value indicating whether the training room is enabled.
+        /// </summary>
         public bool Enabled { get; private set; }
 
         /// <summary>
@@ -39,12 +100,12 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Create a training room with the given settings.
+        /// Initializes an instance of the <see cref="TrainingRoom"/> class with the given settings.
         /// The training room manages all of the brains and the settings.
         /// </summary>
         /// <param name="owner">The user who created this training room.</param>
-        /// <param name="name">The name for the room</param>
-        /// <param name="trainingRoomSettings">The settings for this training room</param>
+        /// <param name="name">The name for the room.</param>
+        /// <param name="trainingRoomSettings">The settings for this training room.</param>
         public TrainingRoom(User owner, string name, TrainingRoomSettings trainingRoomSettings)
         {
             Id = Guid.NewGuid();
@@ -68,10 +129,10 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Add a brain to the training room
+        /// Adds a brain to the training room.
         /// Checks each species and creates a new species if no species matches.
         /// </summary>
-        /// <param name="brain">The brain to add</param>
+        /// <param name="brain">The brain to add.</param>
         public void AddBrain(Brain brain)
         {
             foreach (Species species in _speciesList)
@@ -86,27 +147,27 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Get a random brain from a random species
+        /// Gets a random brain from a random species.
         /// </summary>
-        /// <returns>A randomly chosen brain</returns>
+        /// <returns>A randomly chosen <see cref="Brain"/>.</returns>
         public Brain GetRandomBrain()
         {
             return _speciesList[Random.Next(_speciesList.Count)].GetRandomBrain();
         }
 
         /// <summary>
-        /// Set the brain's scores to what the client send.
+        /// Sets the brain's scores to what the client sends.
         /// </summary>
-        /// <param name="brain"></param>
-        /// <param name="score"></param>
+        /// <param name="brain">The brain.</param>
+        /// <param name="score">The score.</param>
         public void PostScore(Brain brain, double score)
         {
             brain.Score = score;
         }
 
         /// <summary>
-        /// Do 1 generation.
-        /// kill the worst ones, mutate and breed and make the system ready for a new generation.
+        /// Does 1 generation.
+        /// kills the worst ones, mutate and breed and make the system ready for a new generation.
         /// </summary>
         public void EndGeneration()
         {
@@ -176,29 +237,29 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Increase to the nodeID to the value passed in if the nodeId is lower than the value passed in.
+        /// Increases the nodeID to the value passed in; If the nodeId is lower than the value passed in.
         /// </summary>
-        /// <param name="max">The minimum value the nodeId should be</param>
-        public void IncreaseNodeIdTo(uint max)
+        /// <param name="min">The minimum value the nodeId should be.</param>
+        public void IncreaseNodeIdTo(uint min)
         {
-            _nodeId = Math.Max(_nodeId, max);
+            _nodeId = Math.Max(_nodeId, min);
         }
 
         /// <summary>
-        /// Get the node id and increase it.
+        /// Gets the node id and increases it.
         /// </summary>
-        /// <returns>The old node id before increasing it</returns>
+        /// <returns>Returns the old node id before increasing it.</returns>
         public uint GetAndIncreaseNodeId()
         {
             return _nodeId++;
         }
 
         /// <summary>
-        /// Get the innovation number that corresponds with the given in and out node id.
+        /// Gets the innovation number that corresponds with the given in and out node id.
         /// </summary>
-        /// <param name="inId">The inId of the new connection</param>
-        /// <param name="outId">The outId of the new connection</param>
-        /// <returns>The innovation number</returns>
+        /// <param name="inId">The inId of the new connection.</param>
+        /// <param name="outId">The outId of the new connection.</param>
+        /// <returns>Returns the innovation number.</returns>
         public uint GetInnovationNumber(uint inId, uint outId)
         {
             if (_mutationToInnovation.ContainsKey((inId, outId)))
@@ -209,7 +270,7 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Sets Enabled to false.
+        /// Sets Enabled to <c>false</c>.
         /// </summary>
         public void Disable()
         {
@@ -217,7 +278,7 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Sets Enabled to true.
+        /// Sets Enabled to <c>true</c>.
         /// </summary>
         public void Enable()
         {
@@ -226,10 +287,10 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Authorize a user for the training room.
+        /// Authorizes a user for the training room.
         /// </summary>
         /// <param name="user">The user to authorize.</param>
-        /// <returns>Returns true; if the user is added to the authorized users, else false.</returns>
+        /// <returns>Returns <c>true</c> if the user is added to the authorized users; otherwise, <c>false</c>.</returns>
         public bool AuthorizeUser(User user)
         {
             if (_authorizedUsers.Exists(usr => usr.Id.Equals(user.Id)))
@@ -239,10 +300,10 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Deauthorize a user for the training room.
+        /// Deauthorizes a user for the training room.
         /// </summary>
         /// <param name="userId">The user id.</param>
-        /// <returns>Returns true; if the user is removed from the authorized users, else false.</returns>
+        /// <returns>Returns <c>true</c> if the user is removed from the authorized users; otherwise, <c>false</c>.</returns>
         public bool DeauthorizeUser(Guid userId)
         {
             User possibleUser = _authorizedUsers.SingleOrDefault(usr => usr.Id.Equals(userId));
@@ -253,12 +314,18 @@ namespace Neuralm.Domain.Entities.NEAT
         /// Checks if the given user id is authorized.
         /// </summary>
         /// <param name="userId">The user id to verify.</param>
-        /// <returns>Returns true; if the given user id is authorized, else false.</returns>
+        /// <returns>Returns <c>true</c> if the given user id is authorized; otherwise, <c>false</c>.</returns>
         public bool IsUserAuthorized(Guid userId)
         {
             return _authorizedUsers.Exists(user => user.Id.Equals(userId));
         }
 
+        /// <summary>
+        /// Starts the training session for the given user id.
+        /// </summary>
+        /// <param name="userId">The user id.</param>
+        /// <param name="trainingSession">The training session.</param>
+        /// <returns>Returns <c>true</c> if the training session is started; otherwise, <c>false</c>.</returns>
         public bool StartTrainingSession(Guid userId, out TrainingSession trainingSession)
         {
             trainingSession = new TrainingSession(this, userId);

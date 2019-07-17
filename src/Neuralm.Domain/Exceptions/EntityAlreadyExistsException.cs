@@ -3,6 +3,9 @@ using System.Runtime.Serialization;
 
 namespace Neuralm.Domain.Exceptions
 {
+    /// <summary>
+    /// Represents the <see cref="EntityAlreadyExistsException"/> used to throw an Exception when a predicate returns with a duplicate exception.
+    /// </summary>
     [Serializable]
     public class EntityAlreadyExistsException : Exception
     {

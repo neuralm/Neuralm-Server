@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace Neuralm.Domain.Entities.NEAT
 {
+    /// <summary>
+    /// Represents the <see cref="Brain"/> class; provides methods to crossover, mutate and add connection genes.
+    /// </summary>
     public class Brain
     {
         private List<ConnectionGene> _genes;
@@ -15,10 +18,29 @@ namespace Neuralm.Domain.Entities.NEAT
         private readonly List<ConnectionGene> _childGenes;
         private uint _maxInnovation;
 
+        /// <summary>
+        /// Gets and sets the score.
+        /// </summary>
         public double Score { get; set; }
+
+        /// <summary>
+        /// Gets the list of genes.
+        /// </summary>
         public virtual IReadOnlyList<ConnectionGene> Genes => _genes;
+
+        /// <summary>
+        /// Gets and sets the id.
+        /// </summary>
         public Guid Id { get; private set; }
+
+        /// <summary>
+        /// Gets and sets the training room id.
+        /// </summary>
         public Guid TrainingRoomId { get; private set; }
+
+        /// <summary>
+        /// Gets and sets the training room.
+        /// </summary>
         public virtual TrainingRoom TrainingRoom { get; private set; }
 
         /// <summary>
@@ -30,11 +52,11 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Create a new brain with a set amount of input and output nodes
+        /// Initializes an instance of the <see cref="Brain"/> class with a set amount of input and output nodes.
         /// </summary>
-        /// <param name="inputCount">The amount of input nodes</param>
-        /// <param name="outputCount">The amount of output nodes</param>
-        /// <param name="trainingRoom">The training room this brain is a part of</param>
+        /// <param name="inputCount">The amount of input nodes.</param>
+        /// <param name="outputCount">The amount of output nodes.</param>
+        /// <param name="trainingRoom">The training room this brain is a part of.</param>
         public Brain(uint inputCount, uint outputCount, TrainingRoom trainingRoom)
         {
             TrainingRoomId = trainingRoom.Id;
@@ -68,13 +90,13 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Create a brain with the passed in genes with a set amount of input and output nodes
+        /// Initializes an instance of the <see cref="Brain"/> class with a set amount of input and output nodes and provided genes.
         /// </summary>
-        /// <param name="id">The id for the brain</param>
-        /// <param name="inputCount">The amount of input nodes</param>
-        /// <param name="outputCount">The amount of output nodes</param>
-        /// <param name="trainingRoom">The training room this brain is a part of</param>
-        /// <param name="genes">The genes to create the brain out of</param>
+        /// <param name="id">The id for the brain.</param>
+        /// <param name="inputCount">The amount of input nodes.</param>
+        /// <param name="outputCount">The amount of output nodes.</param>
+        /// <param name="trainingRoom">The training room this brain is a part of.</param>
+        /// <param name="genes">The genes to create the brain out of.</param>
         public Brain(Guid id, uint inputCount, uint outputCount, TrainingRoom trainingRoom, IEnumerable<ConnectionGene> genes) : this(inputCount, outputCount, trainingRoom)
         {
             Id = id;
@@ -86,12 +108,12 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Create a brain based on the genes of 2 parent brains. 
+        /// Creates a brain based on the genes of 2 parent brains. 
         /// For each gene in parent1 we check if parent2 has a gene with the same innovation number, if this is the case we randomly choose a parent to get the gene from.
         /// If a gene only exists in one parent we add it no matter what.
         /// </summary>
-        /// <param name="parent2Brain">The other parent</param>
-        /// <returns>A child brain based on the genes of this brain and the passed brain</returns>
+        /// <param name="parent2Brain">The other parent.</param>
+        /// <returns>A child brain based on the genes of this brain and the passed brain.</returns>
         public Brain Crossover(Brain parent2Brain)
         {
             _childGenes.Clear();
@@ -137,10 +159,10 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Clone this brain to produce a brain that equals the other brain but is not the same instance.
+        /// Clones this brain to produce a brain that equals the other brain but is not the same instance.
         /// </summary>
         /// <param name="newId">Determines whether a new Id should be generated for the clone.</param>
-        /// <returns>A new brain with the same genes, training room, inputCount and outputCount</returns>
+        /// <returns>A new brain with the same genes, training room, inputCount and outputCount.</returns>
         public Brain Clone(bool newId = false)
         {
             return new Brain(newId ? Guid.NewGuid() : Id, _inputCount, _outputCount, TrainingRoom, _genes.Select(gene => gene.Clone()).ToList());
@@ -174,11 +196,11 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Mutate the brain, each time this is called there is a chance to:
+        /// Mutates the brain, each time this is called there is a chance to:
         /// - Add a connection
         /// - Add a node
         /// - Change the weight of an existing gene, which can either randomly be reset to a random value or slightly change
-        /// These changes can all happen in one call, but the chance that this happens depends on the training room settings
+        /// These changes can all happen in one call, but the chance that this happens depends on the training room settings.
         /// </summary>
         public void Mutate()
         {
@@ -200,8 +222,8 @@ namespace Neuralm.Domain.Entities.NEAT
 
         /// <summary>
         /// Adds a new connection between 2 randomly chosen nodes.
-        /// The first node can not be an output
-        /// The second node cannot be an input node if the first node is an input node, and the layer cannot be the same as the first node
+        /// The first node can not be an output.
+        /// The second node cannot be an input node if the first node is an input node, and the layer cannot be the same as the first node.
         /// 
         /// If the connection that is going to be created already exists, there will be a maximum of 5 attempts to create a new one.
         /// </summary>
@@ -247,21 +269,21 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Check if a connection between 2 nodes already exists.
+        /// Checks if a connection between 2 nodes already exists.
         /// This check is directional, this means that ConnectionExists(a,b) is not the same as ConnectionExists(b,a).
         /// </summary>
-        /// <param name="startNode">The start node</param>
-        /// <param name="endNode">The end node</param>
-        /// <returns>Returns true; if there is a connection that goes from the start node to the end node</returns>
+        /// <param name="startNode">The start node.</param>
+        /// <param name="endNode">The end node.</param>
+        /// <returns>Returns <c>true</c> if there is a connection that goes from the start node to the end node; otherwise, <c>false</c>.</returns>
         private bool ConnectionExists(Node startNode, Node endNode)
         {
             return _genes.Any(gene => gene.InId == startNode.Id && gene.OutId == endNode.Id);
         }
 
         /// <summary>
-        /// Add a node by selecting a random connection, disabling it and replacing it by 2 genes.
+        /// Adds a node by selecting a random connection, disabling it and replacing it by 2 genes.
         /// The first gene goes from the original input node, to the new node with a weight of 1.
-        /// The second gene goes from the the new node to the old output node with the same weight as the original connection
+        /// The second gene goes from the the new node to the old output node with the same weight as the original connection.
         /// </summary>
         private void AddNodeMutation()
         {
@@ -290,10 +312,10 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Check if the other brain is the same species as this brain
+        /// Checks if the other brain is the same species as this brain.
         /// </summary>
-        /// <param name="other">The other brain</param>
-        /// <returns>Returns true; if the other brain is the same species as this brain, else false</returns>
+        /// <param name="other">The other brain.</param>
+        /// <returns>Returns <c>true</c> if the other brain is the same species as this brain; otherwise, <c>false</c>.</returns>
         public bool IsSameSpecies(Brain other)
         {
             // TODO: Redo this method and optimize it
@@ -328,29 +350,29 @@ namespace Neuralm.Domain.Entities.NEAT
             if (genomeCount < 20)
                 genomeCount = 1;
 
-            return ((TrainingRoom.TrainingRoomSettings.C1 * excess) / genomeCount +
-                    (TrainingRoom.TrainingRoomSettings.C2 * disjoint) / genomeCount +
-                    TrainingRoom.TrainingRoomSettings.C3 * weightDiff) <
+            return ((TrainingRoom.TrainingRoomSettings.SpeciesExcessGeneWeight * excess) / genomeCount +
+                    (TrainingRoom.TrainingRoomSettings.SpeciesDisjointGeneWeight * disjoint) / genomeCount +
+                    TrainingRoom.TrainingRoomSettings.SpeciesAverageWeightDiffWeight * weightDiff) <
                    TrainingRoom.TrainingRoomSettings.Threshold;
         }
 
         /// <summary>
-        /// Check if an object is the same as this brain.
-        /// An object is the same if it is a brain, and if the Brain specific equals method returns true
+        /// Checks if an object is the same as this brain.
+        /// An object is the same if it is a brain, and if the Brain specific equals method returns true.
         /// </summary>
-        /// <param name="obj">The object to compare to</param>
-        /// <returns>true if it is the same</returns>
+        /// <param name="obj">The object to compare to.</param>
+        /// <returns>Returns <c>true</c> if it is the same; otherwise, <c>false</c>.</returns>
         public override bool Equals(object obj)
         {
             return obj is Brain brain && Equals(brain);
         }
 
         /// <summary>
-        /// Check if a brain is the same as this brain
-        /// 2 brains are the same if all of their genes match, their outputNodes match, their inputNodes match and the input and output counts match
+        /// Checks if a brain is the same as this brain.
+        /// 2 brains are the same if all of their genes match, their outputNodes match, their inputNodes match and the input and output counts match.
         /// </summary>
-        /// <param name="other">The brain to compare against</param>
-        /// <returns>true if the brain is the same</returns>
+        /// <param name="other">The brain to compare against.</param>
+        /// <returns>Returns <c>true</c> if the brain is the same; otherwise, <c>false</c>.</returns>
         private bool Equals(Brain other)
         {
             return Genes.SequenceEqual(other.Genes) &&
