@@ -38,11 +38,7 @@ namespace Neuralm.Application.Services
             _trainingSessionRepository = trainingSessionRepository;
         }
 
-        /// <summary>
-        /// Creates a training room asynchronously.
-        /// </summary>
-        /// <param name="createTrainingRoomRequest">The create training room request.</param>
-        /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="CreateTrainingRoomResponse"/>.</returns>
+        /// <inheritdoc cref="ITrainingRoomService.CreateTrainingRoomAsync(CreateTrainingRoomRequest)"/>
         public async Task<CreateTrainingRoomResponse> CreateTrainingRoomAsync(CreateTrainingRoomRequest createTrainingRoomRequest)
         {
             if (createTrainingRoomRequest.OwnerId.Equals(Guid.Empty))
@@ -65,11 +61,7 @@ namespace Neuralm.Application.Services
             return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, trainingRoom.Id, "Successfully created a training room.", true);
         }
 
-        /// <summary>
-        /// Starts a training session asynchronously.
-        /// </summary>
-        /// <param name="startTrainingSessionRequest">The start training session request.</param>
-        /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="StartTrainingSessionResponse"/>.</returns>
+        /// <inheritdoc cref="ITrainingRoomService.StartTrainingSessionAsync(StartTrainingSessionRequest)"/>
         public async Task<StartTrainingSessionResponse> StartTrainingSessionAsync(StartTrainingSessionRequest startTrainingSessionRequest)
         {
             Expression<Func<TrainingRoom, bool>> predicate = tr => tr.Id.Equals(startTrainingSessionRequest.TrainingRoomId);
@@ -88,11 +80,7 @@ namespace Neuralm.Application.Services
             return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, EntityToDtoConverter.Convert<TrainingSessionDto, TrainingSession>(trainingSession), "Successfully started a training session.", true);
         }
 
-        /// <summary>
-        /// Ends a training session asynchronously.
-        /// </summary>
-        /// <param name="endTrainingSessionRequest"></param>
-        /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="EndTrainingSessionResponse"/>.</returns>
+        /// <inheritdoc cref="ITrainingRoomService.EndTrainingSessionAsync(EndTrainingSessionRequest)"/>
         public async Task<EndTrainingSessionResponse> EndTrainingSessionAsync(EndTrainingSessionRequest endTrainingSessionRequest)
         {
             Expression<Func<TrainingSession, bool>> predicate = trs => trs.Id.Equals(endTrainingSessionRequest.TrainingSessionId);
@@ -108,11 +96,7 @@ namespace Neuralm.Application.Services
             return new EndTrainingSessionResponse(endTrainingSessionRequest.Id, "Successfully ended the training session.", true);
         }
 
-        /// <summary>
-        /// Gets the enabled training rooms asynchronously.
-        /// </summary>
-        /// <param name="getEnabledTrainingRoomsRequest">The get enabled training rooms request.</param>
-        /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="GetEnabledTrainingRoomsResponse"/>.</returns>
+        /// <inheritdoc cref="ITrainingRoomService.GetEnabledTrainingRoomsAsync(GetEnabledTrainingRoomsRequest)"/>
         public async Task<GetEnabledTrainingRoomsResponse> GetEnabledTrainingRoomsAsync(GetEnabledTrainingRoomsRequest getEnabledTrainingRoomsRequest)
         {
             IEnumerable<TrainingRoom> trainingRooms = await _trainingRoomRepository.FindManyByExpressionAsync(trainingRoom => trainingRoom.Enabled);

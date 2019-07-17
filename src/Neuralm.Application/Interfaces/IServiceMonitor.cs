@@ -4,13 +4,27 @@ using Neuralm.Application.Messages.Events;
 namespace Neuralm.Application.Interfaces
 {
     /// <summary>
-    /// The interface for monitoring a service.
+    /// Represents the <see cref="IServiceMonitor{TService}"/> interface.
     /// </summary>
-    /// <typeparam name="TService">The service type to monitor</typeparam>
+    /// <typeparam name="TService">The service type to monitor.</typeparam>
     public interface IServiceMonitor<TService> where TService : IService
     {
+        /// <summary>
+        /// Starts monitoring the service asynchronously.
+        /// </summary>
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         Task StartMonitoringAsync();
-        Task<MonitorEvent> UpdateAsync();
+
+        /// <summary>
+        /// Gets the status update from the service.
+        /// </summary>
+        /// <returns>Returns an awaitable <see cref="Task"/> with type parameter <see cref="MonitorEvent"/>.</returns>
+        Task<MonitorEvent> GetStatusUpdateAsync();
+
+        /// <summary>
+        /// Ends monitoring the service asynchronously.
+        /// </summary>
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         Task EndMonitoringAsync();
     }
 }
