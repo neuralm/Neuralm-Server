@@ -8,6 +8,9 @@ using Neuralm.Utilities.Observer;
 
 namespace Neuralm.Client
 {
+    /// <summary>
+    /// Client implementation of the <see cref="IMessageProcessor"/> interface.
+    /// </summary>
     internal class ClientMessageProcessor : IMessageProcessor
     {
         private readonly ConcurrentDictionary<Type, ObserverCollection> _observers;

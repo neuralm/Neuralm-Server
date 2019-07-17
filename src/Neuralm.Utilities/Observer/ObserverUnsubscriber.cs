@@ -2,17 +2,28 @@
 
 namespace Neuralm.Utilities.Observer
 {
+    /// <summary>
+    /// Represents the <see cref="ObserverUnsubscriber"/> class.
+    /// </summary>
     public sealed class ObserverUnsubscriber : IDisposable
     {
         private readonly ObserverCollection _observers;
         private readonly IObserver _observer;
 
+        /// <summary>
+        /// Initializes an instance of the <see cref="ObserverUnsubscriber"/> class.
+        /// </summary>
+        /// <param name="observers"></param>
+        /// <param name="observer"></param>
         public ObserverUnsubscriber(ObserverCollection observers, IObserver observer)
         {
             _observers = observers;
             _observer = observer;
         }
 
+        /// <summary>
+        /// Disposes the <see cref="_observer"/> from the <see cref="_observers"/>.
+        /// </summary>
         public void Dispose()
         {
             if (_observer != null)

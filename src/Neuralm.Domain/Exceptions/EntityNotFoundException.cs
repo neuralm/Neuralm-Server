@@ -3,6 +3,9 @@ using System.Runtime.Serialization;
 
 namespace Neuralm.Domain.Exceptions
 {
+    /// <summary>
+    /// Represents the <see cref="EntityNotFoundException"/> used to throw an Exception when the predicate returns without results.
+    /// </summary>
     [Serializable]
     public class EntityNotFoundException : Exception
     {

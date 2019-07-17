@@ -13,10 +13,19 @@ using Neuralm.Persistence.Contexts;
 
 namespace Neuralm.Presentation.CLI
 {
+    /// <summary>
+    /// Represents the <see cref="Startup"/> class.
+    /// </summary>
     internal class Startup
     {
         private IGenericServiceProvider _serviceProvider;
 
+        /// <summary>
+        /// Initializes the <see cref="Startup"/> class.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        /// <exception cref="ArgumentNullException">If configuration is null.</exception>
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         internal Task InitializeAsync(IConfiguration configuration)
         {
             if (configuration == null)
@@ -36,10 +45,20 @@ namespace Neuralm.Presentation.CLI
             };
             return Task.WhenAll(tasks);
         }
-        internal IGenericServiceProvider GetServiceProvider()
+        /// <summary>
+        /// Gets the generic service provider.
+        /// </summary>
+        /// <exception cref="InitializationException">If <see cref="_serviceProvider"/> is <c>null</c>.</exception>
+        /// <returns>Returns the generic service provider.</returns>
+        internal IGenericServiceProvider GetGenericServiceProvider()
         {
             return _serviceProvider ?? throw new InitializationException("GenericServiceProvider is unset. Call InitializeAsync() first.");
         }
+
+        /// <summary>
+        /// Verifies the database connection.
+        /// </summary>
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         private Task VerifyDatabaseConnection()
         {
             Console.WriteLine("Starting database verification..");
@@ -68,6 +87,11 @@ namespace Neuralm.Presentation.CLI
             Console.WriteLine("Finished database verification!");
             return Task.CompletedTask;
         }
+
+        /// <summary>
+        /// Maps messages to services.
+        /// </summary>
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         private Task MapMessagesToServices()
         {
             // NOTE: Create the singleton once to map the services.

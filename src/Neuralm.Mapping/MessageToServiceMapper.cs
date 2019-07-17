@@ -8,12 +8,23 @@ using MethodInfo = System.Reflection.MethodInfo;
 
 namespace Neuralm.Mapping
 {
+    /// <summary>
+    /// Represents the <see cref="MessageToServiceMap"/> class.
+    /// </summary>
     public class MessageToServiceMapper
     {
         private readonly ConcurrentDictionary<Type, (object, MethodInfo)> _messageToServiceMap = new ConcurrentDictionary<Type, (object, MethodInfo)>();
-        public IReadOnlyDictionary<Type, (object, MethodInfo)> MessageToServiceMap => _messageToServiceMap;
         private readonly ConcurrentDictionary<Type, object> _services = new ConcurrentDictionary<Type, object>();
 
+        /// <summary>
+        /// Gets the message to service map dictionary.
+        /// </summary>
+        public IReadOnlyDictionary<Type, (object, MethodInfo)> MessageToServiceMap => _messageToServiceMap;
+
+        /// <summary>
+        /// Initializes an instance of the <see cref="MessageToServiceMap"/> class.
+        /// </summary>
+        /// <param name="serviceProvider"></param>
         public MessageToServiceMapper(IServiceProvider serviceProvider)
         {
             Console.WriteLine("Mapping messages to services...");

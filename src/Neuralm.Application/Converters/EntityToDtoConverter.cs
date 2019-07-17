@@ -9,6 +9,9 @@ using Neuralm.Domain.Entities;
 
 namespace Neuralm.Application.Converters
 {
+    /// <summary>
+    /// Provides methods to convert Entities to Dto's.
+    /// </summary>
     public static class EntityToDtoConverter
     {
         public static TDto Convert<TDto, TEntity>(TEntity entity) where TDto : class, new()

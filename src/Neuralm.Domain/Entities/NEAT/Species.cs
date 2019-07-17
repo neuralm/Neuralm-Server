@@ -4,18 +4,29 @@ using System.Linq;
 
 namespace Neuralm.Domain.Entities.NEAT
 {
+    /// <summary>
+    /// Represents the <see cref="Species"/> class used for generating <see cref="Brain"/>s.
+    /// </summary>
     public class Species
     {
         private List<Brain> _lastGenerationBrains;
         private readonly TrainingRoom _trainingRoom;
+
+        /// <summary>
+        /// Gets the list of brains.
+        /// </summary>
         public List<Brain> Brains { get; }
+
+        /// <summary>
+        /// Gets and sets the species score.
+        /// </summary>
         public double SpeciesScore { get; private set; }
 
         /// <summary>
-        /// Create a new species with the given brain as its first representative.
+        /// Initializes an instance of the <see cref="Species"/> class with the given brain as its first representative.
         /// </summary>
-        /// <param name="brain">The brain which this species is created for</param>
-        /// <param name="trainingRoom">The training room this species is part of</param>
+        /// <param name="brain">The brain which this species is created for.</param>
+        /// <param name="trainingRoom">The training room this species is part of.</param>
         public Species(Brain brain, TrainingRoom trainingRoom)
         {
             _trainingRoom = trainingRoom;
@@ -24,11 +35,11 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Add the brain if it fits this species.
+        /// Adds the brain if it fits this species.
         /// It compares the given brain to a randomly chosen brain from the species.
         /// </summary>
-        /// <param name="brain">The brain to check</param>
-        /// <returns>true if it is added, else false</returns>
+        /// <param name="brain">The brain to check.</param>
+        /// <returns>Returns <c>true</c> if it is added; otherwise, <c>false</c>.</returns>
         public bool AddBrainIfSameSpecies(Brain brain)
         {
             if (!GetRandomBrain().IsSameSpecies(brain))
@@ -38,11 +49,11 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Generate a brain based on the brains from this species.
+        /// Generates a brain based on the brains from this species.
         /// A random brain is chosen and based on chance it can be bred with a random brain from this species or from the global pool.
         /// The brain is also mutated.
         /// </summary>
-        /// <returns>The new generated brain</returns>
+        /// <returns>Returns a generated <see cref="Brain"/>.</returns>
         public Brain ProduceBrain()
         {
             Brain child = GetRandomBrain();
@@ -64,7 +75,7 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Kill the worst scoring brains and get the species ready for the next generation
+        /// Kills the worst scoring brains and gets the species ready for the next generation.
         /// </summary>
         public void PostGeneration()
         {
@@ -89,9 +100,9 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Return a random brain from this species.
+        /// Gets a random brain from this species.
         /// </summary>
-        /// <returns>The randomly chosen brain</returns>
+        /// <returns>Returns a randomly chosen <see cref="Brain"/>.</returns>
         public Brain GetRandomBrain()
         {
             return _lastGenerationBrains[_trainingRoom.Random.Next(_lastGenerationBrains.Count)];

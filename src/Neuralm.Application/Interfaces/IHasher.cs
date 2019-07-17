@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Neuralm.Application.Interfaces
+﻿namespace Neuralm.Application.Interfaces
 {
+    /// <summary>
+    /// The interface for a hashing algorithm.
+    /// </summary>
     public interface IHasher
     {
         bool VerifyHash(string storedHash, string storedSalt, string secret);

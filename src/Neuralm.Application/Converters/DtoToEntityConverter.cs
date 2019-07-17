@@ -4,6 +4,9 @@ using System.Reflection;
 
 namespace Neuralm.Application.Converters
 {
+    /// <summary>
+    /// Provides methods to convert Dto's to Entities.
+    /// </summary>
     public static class DtoToEntityConverter
     {
         public static TEntity Convert<TEntity, TDto>(TDto dto) where TEntity : class, new()

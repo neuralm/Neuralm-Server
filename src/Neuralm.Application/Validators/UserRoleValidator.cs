@@ -4,6 +4,7 @@ using Neuralm.Domain.Entities.Authentication;
 
 namespace Neuralm.Application.Validators
 {
+    /// <inheritdoc cref="IEntityValidator{T}"/>
     public class UserRoleValidator : IEntityValidator<UserRole>
     {
         public bool Validate(UserRole entity)

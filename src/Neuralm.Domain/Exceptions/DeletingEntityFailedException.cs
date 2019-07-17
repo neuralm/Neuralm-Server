@@ -3,6 +3,9 @@ using System.Runtime.Serialization;
 
 namespace Neuralm.Domain.Exceptions
 {
+    /// <summary>
+    /// Represents the <see cref="DeletingEntityFailedException"/> used to throw an Exception when deleting an Entity goes wrong.
+    /// </summary>
     [Serializable]
     public class DeletingEntityFailedException : Exception
     {
