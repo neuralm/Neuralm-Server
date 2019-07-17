@@ -350,9 +350,9 @@ namespace Neuralm.Domain.Entities.NEAT
             if (genomeCount < 20)
                 genomeCount = 1;
 
-            return ((TrainingRoom.TrainingRoomSettings.C1 * excess) / genomeCount +
-                    (TrainingRoom.TrainingRoomSettings.C2 * disjoint) / genomeCount +
-                    TrainingRoom.TrainingRoomSettings.C3 * weightDiff) <
+            return ((TrainingRoom.TrainingRoomSettings.SpeciesExcessGeneWeight * excess) / genomeCount +
+                    (TrainingRoom.TrainingRoomSettings.SpeciesDisjointGeneWeight * disjoint) / genomeCount +
+                    TrainingRoom.TrainingRoomSettings.SpeciesAverageWeightDiffWeight * weightDiff) <
                    TrainingRoom.TrainingRoomSettings.Threshold;
         }
 
