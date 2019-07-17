@@ -12,9 +12,9 @@ namespace Neuralm.Utilities.Observer
         /// </summary>
         /// <param name="observerCollection">The observer collection.</param>
         /// <param name="observer">The observer.</param>
-        public ObserverUnsubscriber(ObserverCollection observers, IObserver observer)
+        public ObserverUnsubscriber(ObserverCollection observerCollection, IObserver observer)
         {
-            _observers = observers;
+            _observers = observerCollection;
             _observer = observer;
         }
 
