@@ -19,7 +19,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <summary>
         /// Gets and sets the score.
         /// </summary>
-        public double Score { get; set; }
+        //public double Score { get; set; }
 
         /// <summary>
         /// Gets the list of genes.
@@ -32,19 +32,9 @@ namespace Neuralm.Domain.Entities.NEAT
         public Guid Id { get; private set; }
 
         /// <summary>
-        /// Gets and sets the training room id.
-        /// </summary>
-        public Guid TrainingRoomId { get; private set; }
-
-        /// <summary>
         /// Gets and sets the training room.
         /// </summary>
         public virtual TrainingRoom TrainingRoom { get; private set; }
-
-        /// <summary>
-        /// Gets and sets the species id.
-        /// </summary>
-        public Guid SpeciesId { get; set; }
 
         /// <summary>
         /// EFCore entity constructor IGNORE!
@@ -60,7 +50,6 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <param name="trainingRoom">The training room this brain is a part of.</param>
         public Brain(TrainingRoom trainingRoom)
         {
-            TrainingRoomId = trainingRoom.Id;
             TrainingRoom = trainingRoom;
             _genes = new List<ConnectionGene>();
             _nodes = new Dictionary<uint, Node>();

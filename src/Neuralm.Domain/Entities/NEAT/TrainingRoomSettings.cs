@@ -15,7 +15,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <summary>
         /// Gets and sets the brain count.
         /// </summary>
-        public uint BrainCount { get; private set; }
+        public uint OrganismCount { get; private set; }
 
         /// <summary>
         /// Gets and sets the input count.
@@ -136,7 +136,7 @@ namespace Neuralm.Domain.Entities.NEAT
             double mutateWeightChance, double weightReassignChance, double topAmountToSurvive, double enableConnectionChance, int seed)
         {
             Id = Guid.NewGuid();
-            BrainCount = brainCount;
+            OrganismCount = brainCount;
             InputCount = inputCount;
             OutputCount = outputCount;
             SpeciesExcessGeneWeight = c1;

@@ -15,7 +15,7 @@ namespace Neuralm.Application.Messages.Requests
         /// <summary>
         /// Initializes an instance of the <see cref="GetOrganismsRequest"/> class.
         /// </summary>
-        public GetOrganismsRequest(Guid trainingRoomId, )
+        public GetOrganismsRequest(Guid trainingRoomId)
         {
             TrainingRoomId = trainingRoomId;
         }

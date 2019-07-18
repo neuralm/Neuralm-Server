@@ -11,7 +11,7 @@ namespace Neuralm.Application.Messages.Dtos
         /// <inheritdoc cref="TrainingRoomSettings.Id"/>
         public Guid Id { get; set; }
 
-        /// <inheritdoc cref="TrainingRoomSettings.BrainCount"/>
+        /// <inheritdoc cref="TrainingRoomSettings.OrganismCount"/>
         public uint BrainCount { get; set; }
 
         /// <inheritdoc cref="TrainingRoomSettings.InputCount"/>

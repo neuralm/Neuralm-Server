@@ -13,9 +13,9 @@ namespace Neuralm.Persistence.Configurations
         public void Configure(EntityTypeBuilder<TrainingRoom> builder)
         {
             builder.HasKey(p => p.Id);
-            builder.OwnsMany(p => p.Brains)
+            builder.OwnsMany(p => p.Organisms)
                 .HasForeignKey(p => p.TrainingRoomId);
-            builder.Metadata.FindNavigation(nameof(TrainingRoom.Brains))
+            builder.Metadata.FindNavigation(nameof(TrainingRoom.Organisms))
                 .SetPropertyAccessMode(PropertyAccessMode.Field);
 
             builder.OwnsMany(p => p.TrainingSessions)

@@ -13,7 +13,7 @@ namespace Neuralm.Domain.Entities.NEAT
         private uint _nodeId;
         private List<User> _authorizedUsers;
         private List<TrainingSession> _trainingSessions;
-        private List<Brain> _brains;
+        private List<Organism> _organisms;
         private List<Species> _species;
 
         /// <summary>
@@ -42,9 +42,9 @@ namespace Neuralm.Domain.Entities.NEAT
         public virtual IReadOnlyList<TrainingSession> TrainingSessions => _trainingSessions;
 
         /// <summary>
-        /// Gets the list of brains.
+        /// Gets the list of organisms.
         /// </summary>
-        public virtual IReadOnlyList<Brain> Brains => _brains;
+        public virtual IReadOnlyList<Organism> Organisms => _organisms;
 
         /// <summary>
         /// Gets the list of species.
@@ -106,7 +106,7 @@ namespace Neuralm.Domain.Entities.NEAT
 
         /// <summary>
         /// Initializes an instance of the <see cref="TrainingRoom"/> class with the given settings.
-        /// The training room manages all of the brains and the settings.
+        /// The training room manages all of the organisms and the settings.
         /// </summary>
         /// <param name="owner">The user who created this training room.</param>
         /// <param name="name">The name for the room.</param>
@@ -123,51 +123,51 @@ namespace Neuralm.Domain.Entities.NEAT
             Random = new Random(trainingRoomSettings.Seed);
             _authorizedUsers = new List<User> { owner };
             _trainingSessions = new List<TrainingSession>();
-            _species = new List<Species>((int)trainingRoomSettings.BrainCount);
-            _brains = new List<Brain>((int)trainingRoomSettings.BrainCount);
+            _species = new List<Species>((int)trainingRoomSettings.OrganismCount);
+            _organisms = new List<Organism>((int)trainingRoomSettings.OrganismCount);
             _mutationToInnovation = new Dictionary<(uint A, uint B), uint>();
 
-            for (int i = 0; i < trainingRoomSettings.BrainCount; i++)
+            for (int i = 0; i < trainingRoomSettings.OrganismCount; i++)
             {
-                AddBrain(new Brain(this));
+                AddOrganism(new Organism(this));
             }
         }
 
         /// <summary>
-        /// Adds a brain to the training room.
+        /// Adds a organism to the training room.
         /// Checks each species and creates a new species if no species matches.
         /// </summary>
-        /// <param name="brain">The brain to add.</param>
-        public void AddBrain(Brain brain)
+        /// <param name="organism">The organism to add.</param>
+        public void AddOrganism(Organism organism)
         {
             foreach (Species species in _species)
             {
-                if (species.AddBrainIfSameSpecies(brain, Random.Next))
+                if (species.AddOrganismIfSameSpecies(organism, Random.Next))
                 {
                     return;
                 }
             }
 
-            _species.Add(new Species(brain, Id));
+            _species.Add(new Species(organism, Id));
         }
 
         /// <summary>
-        /// Gets a random brain from a random species.
+        /// Gets a random organism from a random species.
         /// </summary>
-        /// <returns>A randomly chosen <see cref="Brain"/>.</returns>
-        public Brain GetRandomBrain()
+        /// <returns>A randomly chosen <see cref="Organism"/>.</returns>
+        public Organism GetRandomOrganism()
         {
-            return _species[Random.Next(_species.Count)].GetRandomBrain(Random.Next);
+            return _species[Random.Next(_species.Count)].GetRandomOrganism(Random.Next);
         }
 
         /// <summary>
-        /// Sets the brain's scores to what the client sends.
+        /// Sets the organism's scores to what the client sends.
         /// </summary>
-        /// <param name="brain">The brain.</param>
+        /// <param name="organism">The organism.</param>
         /// <param name="score">The score.</param>
-        public void PostScore(Brain brain, double score)
+        public void PostScore(Organism organism, double score)
         {
-            brain.Score = score;
+            organism.Score = score;
         }
 
         /// <summary>
@@ -182,16 +182,16 @@ namespace Neuralm.Domain.Entities.NEAT
 
             foreach (Species species in _species)
             {
-                foreach (Brain brain in species.Brains)
+                foreach (Organism organism in species.Organisms)
                 {
-                    brain.Score /= _species.Count;
-                    HighestScore = Math.Max(brain.Score, HighestScore);
-                    LowestScore = Math.Min(brain.Score, LowestScore);
-                    totalFullScore += brain.Score;
+                    organism.Score /= _species.Count;
+                    HighestScore = Math.Max(organism.Score, HighestScore);
+                    LowestScore = Math.Min(organism.Score, LowestScore);
+                    totalFullScore += organism.Score;
                 }
             }
 
-            AverageScore = totalFullScore / TrainingRoomSettings.BrainCount;
+            AverageScore = totalFullScore / TrainingRoomSettings.OrganismCount;
 
             // Reproduce!
             foreach (Species species in _species)
@@ -205,57 +205,57 @@ namespace Neuralm.Domain.Entities.NEAT
                 totalScore = 1; // TODO: Think about what this really does lol, if the total score is 0 should they have the right to reproduce?
 
             double rest = 0;
-            _brains.Clear();
+            _organisms.Clear();
             foreach (Species species in _species)
             {
                 double fraction = species.SpeciesScore / totalScore;
-                double amountOfBrains = TrainingRoomSettings.BrainCount * fraction;
-                rest += amountOfBrains % 1;
+                double amountOfOrganisms = TrainingRoomSettings.OrganismCount * fraction;
+                rest += amountOfOrganisms % 1;
 
                 if (rest >= 1)
                 {
-                    amountOfBrains++;
+                    amountOfOrganisms++;
                     rest--;
                 }
 
-                amountOfBrains = Math.Floor(amountOfBrains);
-                for (int i = 0; i < amountOfBrains; i++)
+                amountOfOrganisms = Math.Floor(amountOfOrganisms);
+                for (int i = 0; i < amountOfOrganisms; i++)
                 {
-                    _brains.Add(ProduceBrain(species));
+                    _organisms.Add(ProduceOrganism(species));
                 }
             }
 
-            while (_brains.Count < TrainingRoomSettings.BrainCount)
+            while (_organisms.Count < TrainingRoomSettings.OrganismCount)
             {
-                _brains.Add(new Brain(this));
+                _organisms.Add(new Organism(this));
             }
 
-            foreach (Brain brain in _brains)
+            foreach (Organism organism in _organisms)
             {
-                AddBrain(brain);
+                AddOrganism(organism);
             }
 
-            _species.RemoveAll(species => !species.Brains.Any());
+            _species.RemoveAll(species => !species.Organisms.Any());
 
             _mutationToInnovation.Clear();
             Generation++;
         }
 
         /// <summary>
-        /// Generates a brain based on the brains from this species.
-        /// A random brain is chosen and based on chance it can be bred with a random brain from this species or from the global pool.
-        /// The brain is also mutated.
+        /// Generates a organism based on the organisms from this species.
+        /// A random organism is chosen and based on chance it can be bred with a random organism from this species or from the global pool.
+        /// The organism is also mutated.
         /// </summary>
         /// <param name="species">The species.</param>
-        /// <returns>Returns a generated <see cref="Brain"/>.</returns>
-        private Brain ProduceBrain(Species species)
+        /// <returns>Returns a generated <see cref="Organism"/>.</returns>
+        private Organism ProduceOrganism(Species species)
         {
-            Brain child = species.GetRandomBrain(Random.Next);
+            Organism child = species.GetRandomOrganism(Random.Next);
             if (Random.NextDouble() < TrainingRoomSettings.CrossOverChance)
             {
-                Brain parent2 = Random.NextDouble() < TrainingRoomSettings.InterSpeciesChance
-                    ? GetRandomBrain()
-                    : species.GetRandomBrain(Random.Next);
+                Organism parent2 = Random.NextDouble() < TrainingRoomSettings.InterSpeciesChance
+                    ? GetRandomOrganism()
+                    : species.GetRandomOrganism(Random.Next);
 
                 child = child.Crossover(parent2);
             }

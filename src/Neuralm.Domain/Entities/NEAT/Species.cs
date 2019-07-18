@@ -5,12 +5,12 @@ using System.Linq;
 namespace Neuralm.Domain.Entities.NEAT
 {
     /// <summary>
-    /// Represents the <see cref="Species"/> class used for generating <see cref="Brain"/>s.
+    /// Represents the <see cref="Species"/> class used for generating <see cref="Organism"/>s.
     /// </summary>
     public class Species
     {
-        private List<Brain> _lastGenerationBrains;
-        private List<Brain> _brains;
+        private List<Organism> _lastGenerationOrganisms;
+        private List<Organism> _organisms;
 
         /// <summary>
         /// Gets and sets the id.
@@ -18,14 +18,14 @@ namespace Neuralm.Domain.Entities.NEAT
         public Guid Id { get; private set; }
 
         /// <summary>
-        /// Gets the list of brains.
+        /// Gets the list of organisms.
         /// </summary>
-        public virtual IReadOnlyList<Brain> Brains => _brains;
+        public virtual IReadOnlyList<Organism> Organisms => _organisms;
 
         /// <summary>
-        /// Gets the list of brains from the last generation.
+        /// Gets the list of organisms from the last generation.
         /// </summary>
-        public virtual IReadOnlyList<Brain> LastGenerationBrains => _lastGenerationBrains;
+        public virtual IReadOnlyList<Organism> LastGenerationOrganisms => _lastGenerationOrganisms;
 
         /// <summary>
         /// Gets and sets the species score.
@@ -46,44 +46,44 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Initializes an instance of the <see cref="Species"/> class with the given brain as its first representative.
+        /// Initializes an instance of the <see cref="Species"/> class with the given organism as its first representative.
         /// </summary>
-        /// <param name="brain">The brain which this species is created for.</param>
+        /// <param name="organism">The organism which this species is created for.</param>
         /// <param name="trainingRoomId">The training room id.</param>
-        public Species(Brain brain, Guid trainingRoomId)
+        public Species(Organism organism, Guid trainingRoomId)
         {
             Id = Guid.NewGuid();
-            brain.SpeciesId = Id;
-            _brains = new List<Brain> { brain };
-            _lastGenerationBrains = new List<Brain> { brain };
+            organism.SpeciesId = Id;
+            _organisms = new List<Organism> { organism };
+            _lastGenerationOrganisms = new List<Organism> { organism };
             TrainingRoomId = trainingRoomId;
         }
 
         /// <summary>
-        /// Adds the brain if it fits this species.
-        /// It compares the given brain to a randomly chosen brain from the species.
+        /// Adds the organism if it fits this species.
+        /// It compares the given organism to a randomly chosen organism from the species.
         /// </summary>
-        /// <param name="brain">The brain to check.</param>
+        /// <param name="organism">The organism to check.</param>
         /// <param name="randomNext">The random next.</param>
         /// <returns>Returns <c>true</c> if it is added; otherwise, <c>false</c>.</returns>
-        public bool AddBrainIfSameSpecies(Brain brain, Func<int, int> randomNext)
+        public bool AddOrganismIfSameSpecies(Organism organism, Func<int, int> randomNext)
         {
-            if (!GetRandomBrain(randomNext).IsSameSpecies(brain))
+            if (!GetRandomOrganism(randomNext).IsSameSpecies(organism))
                 return false;
-            brain.SpeciesId = Id;
-            _brains.Add(brain);
+            organism.SpeciesId = Id;
+            _organisms.Add(organism);
             return true;
         }
 
         /// <summary>
-        /// Kills the worst scoring brains and gets the species ready for the next generation.
+        /// Kills the worst scoring organisms and gets the species ready for the next generation.
         /// </summary>
-        /// <param name="topAmountToSurvive">The top amount to survive.</param>
+        /// <param name="topAmountToSurvive">The top amount percentage to survive.</param>
         public void PostGeneration(double topAmountToSurvive)
         {
-            SpeciesScore = Brains.Sum(brain => brain.Score);
+            SpeciesScore = Organisms.Sum(organism => organism.Score);
 
-            _brains.Sort((a, b) =>
+            _organisms.Sort((a, b) =>
             {
                 if (a.Score < b.Score)
                     return 1;
@@ -94,21 +94,21 @@ namespace Neuralm.Domain.Entities.NEAT
                 return 0;
             });
 
-            int brainsToSurvive = (int)Math.Ceiling(Brains.Count * topAmountToSurvive);
+            int organismsToSurvive = (int)Math.Ceiling(Organisms.Count * topAmountToSurvive);
 
-            _lastGenerationBrains = Brains.Take(brainsToSurvive).Select(brain => brain.Clone()).ToList();
+            _lastGenerationOrganisms = Organisms.Take(organismsToSurvive).Select(organism => organism.Clone()).ToList();
             // TODO: Check if clone is needed, may just be useless instance creation
-            _brains.Clear();
+            _organisms.Clear();
         }
 
         /// <summary>
-        /// Gets a random brain from this species.
+        /// Gets a random organism from this species.
         /// </summary>
         /// <param name="randomNext">The random next.</param>
-        /// <returns>Returns a randomly chosen <see cref="Brain"/>.</returns>
-        public Brain GetRandomBrain(Func<int, int> randomNext)
+        /// <returns>Returns a randomly chosen <see cref="Organism"/>.</returns>
+        public Organism GetRandomOrganism(Func<int, int> randomNext)
         {
-            return _lastGenerationBrains[randomNext(_lastGenerationBrains.Count)];
+            return _lastGenerationOrganisms[randomNext(_lastGenerationOrganisms.Count)];
         }
     }
 }
