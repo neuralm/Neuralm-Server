@@ -167,7 +167,7 @@ namespace Neuralm.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ConnectionGene");
+                    b.ToTable("ConnectionGenes");
                 });
 
             modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.TrainingRoomSettings", b =>
@@ -180,12 +180,6 @@ namespace Neuralm.Persistence.Migrations
                     b.Property<double>("AddNodeChance");
 
                     b.Property<long>("BrainCount");
-
-                    b.Property<double>("C1");
-
-                    b.Property<double>("C2");
-
-                    b.Property<double>("C3");
 
                     b.Property<double>("CrossOverChance");
 
@@ -202,6 +196,12 @@ namespace Neuralm.Persistence.Migrations
                     b.Property<long>("OutputCount");
 
                     b.Property<int>("Seed");
+
+                    b.Property<double>("SpeciesAverageWeightDiffWeight");
+
+                    b.Property<double>("SpeciesDisjointGeneWeight");
+
+                    b.Property<double>("SpeciesExcessGeneWeight");
 
                     b.Property<double>("Threshold");
 
@@ -319,16 +319,39 @@ namespace Neuralm.Persistence.Migrations
 
                                     b2.Property<double>("Score");
 
+                                    b2.Property<Guid>("SpeciesId");
+
                                     b2.Property<Guid>("TrainingRoomId");
 
                                     b2.HasKey("Id");
 
                                     b2.HasIndex("TrainingRoomId");
 
-                                    b2.ToTable("Brain");
+                                    b2.ToTable("Brains");
 
                                     b2.HasOne("Neuralm.Domain.Entities.NEAT.TrainingRoom", "TrainingRoom")
                                         .WithMany("Brains")
+                                        .HasForeignKey("TrainingRoomId")
+                                        .OnDelete(DeleteBehavior.Cascade);
+                                });
+
+                            b1.OwnsMany("Neuralm.Domain.Entities.NEAT.Species", "Species", b2 =>
+                                {
+                                    b2.Property<Guid>("Id")
+                                        .ValueGeneratedOnAdd();
+
+                                    b2.Property<double>("SpeciesScore");
+
+                                    b2.Property<Guid>("TrainingRoomId");
+
+                                    b2.HasKey("Id");
+
+                                    b2.HasIndex("TrainingRoomId");
+
+                                    b2.ToTable("Species");
+
+                                    b2.HasOne("Neuralm.Domain.Entities.NEAT.TrainingRoom")
+                                        .WithMany("Species")
                                         .HasForeignKey("TrainingRoomId")
                                         .OnDelete(DeleteBehavior.Cascade);
                                 });
@@ -350,7 +373,7 @@ namespace Neuralm.Persistence.Migrations
 
                                     b2.HasIndex("TrainingRoomId");
 
-                                    b2.ToTable("TrainingSession");
+                                    b2.ToTable("TrainingSessions");
 
                                     b2.HasOne("Neuralm.Domain.Entities.NEAT.TrainingRoom", "TrainingRoom")
                                         .WithMany("TrainingSessions")

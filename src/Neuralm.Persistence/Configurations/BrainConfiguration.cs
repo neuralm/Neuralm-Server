@@ -5,7 +5,7 @@ using Neuralm.Domain.Entities.NEAT;
 namespace Neuralm.Persistence.Configurations
 {
     /// <summary>
-    /// The BrainConfiguration class; used to configure the relations and columns in the <see cref="DbSet{TEntity}"/> for <see cref="Brain"/> in the DbContext.
+    /// Represents the <see cref="BrainConfiguration"/> class used to configure the relations and columns in the <see cref="DbSet{TEntity}"/> for <see cref="Brain"/> in the DbContext.
     /// </summary>
     internal class BrainConfiguration : IEntityTypeConfiguration<Brain>
     {

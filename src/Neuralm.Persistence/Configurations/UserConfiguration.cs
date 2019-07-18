@@ -5,7 +5,7 @@ using Neuralm.Domain.Entities;
 namespace Neuralm.Persistence.Configurations
 {
     /// <summary>
-    /// The UserConfiguration class; used to configure the relations and columns in the <see cref="DbSet{TEntity}"/> for <see cref="User"/> in the DbContext.
+    /// Represents the <see cref="UserConfiguration"/> class used to configure the relations and columns in the <see cref="DbSet{TEntity}"/> for <see cref="User"/> in the DbContext.
     /// </summary>
     internal class UserConfiguration : IEntityTypeConfiguration<User>
     {

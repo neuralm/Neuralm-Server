@@ -10,7 +10,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Neuralm.Persistence.Abstractions
 {
     /// <summary>
-    /// Represents the <see cref="RepositoryBase{TEntity, TDbContext}"/> class; a base implementation of a Repository pattern using the <see cref="Microsoft.EntityFrameworkCore.DbContext"/> from EntityFramework.
+    /// Represents the <see cref="RepositoryBase{TEntity, TDbContext}"/> class.
+    /// A base implementation of a Repository pattern using the <see cref="Microsoft.EntityFrameworkCore.DbContext"/> from EntityFramework.
     /// </summary>
     /// <typeparam name="TEntity">The entity the repository pattern is used with.</typeparam>
     /// <typeparam name="TDbContext">The DbContext the repository pattern is used with.</typeparam>

@@ -57,6 +57,21 @@ namespace Neuralm.Persistence.Contexts
         public DbSet<TrainingRoomSettings> TrainingRoomSettings { get; set; }
 
         /// <summary>
+        /// Gets and sets connection genes.
+        /// </summary>
+        public DbSet<ConnectionGene> ConnectionGenes { get; set; }
+
+        /// <summary>
+        /// Gets and sets brains.
+        /// </summary>
+        public DbSet<Brain> Brains { get; set; }
+
+        /// <summary>
+        /// Gets and sets training sessions.
+        /// </summary>
+        public DbSet<TrainingSession> TrainingSessions { get; set; }
+
+        /// <summary>
         /// Initializes an instance of the <see cref="NeuralmDbContext"/> class.
         /// </summary>
         /// <param name="options">The options.</param>

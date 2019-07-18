@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Neuralm.Application.Interfaces;
 using Neuralm.Domain.Entities.NEAT;

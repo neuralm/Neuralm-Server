@@ -25,6 +25,7 @@ namespace Neuralm.Presentation.CLI
     {
         private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
         private IGenericServiceProvider _genericServiceProvider;
+        public static int CanReadConsole = 0;
 
         /// <summary>
         /// Initializes the <see cref="Program"/> class.
@@ -37,6 +38,11 @@ namespace Neuralm.Presentation.CLI
 
             while (!CancellationTokenSource.IsCancellationRequested)
             {
+                if (Interlocked.CompareExchange(ref CanReadConsole, 0, 0) == 0)
+                {
+                    await Task.Delay(500);
+                    continue;
+                }
                 if (Console.ReadKey().Key == ConsoleKey.Q)
                     break;
                 Console.WriteLine("\nPress Q to shut down the server.");
@@ -70,6 +76,8 @@ namespace Neuralm.Presentation.CLI
             Console.WriteLine("Initializing...");
             await startup.InitializeAsync(configuration);
             Console.WriteLine("Finished initializing!\n");
+
+            Interlocked.Increment(ref CanReadConsole);
 
             _genericServiceProvider = startup.GetGenericServiceProvider();
             GetEnabledTrainingRoomsResponse getEnabledTrainingRoomsResponse = await _genericServiceProvider.GetService<ITrainingRoomService>()
