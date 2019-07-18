@@ -77,12 +77,27 @@ namespace Neuralm.Presentation.CLI
             Console.WriteLine($"Database {(hasPendingMigrations ? "has" : "does not have")} pending migrations.");
             if (hasPendingMigrations)
             {
-                foreach (string pendingMigration in pendingMigrations)
+                Console.WriteLine("Would you like to clear the database using EnsureDeleted. And, afterwards reapply all migrations? y/n");
+                ConsoleKeyInfo key = Console.ReadKey(false);
+                if (key.KeyChar == 'y')
                 {
-                    Console.WriteLine($"\tPending migration: {pendingMigration}");
+                    neuralmDbContext.Database.EnsureDeleted();
+                    
+                    foreach (string migration in neuralmDbContext.Database.GetMigrations())
+                    {
+                        Console.WriteLine($"\tMigration: {migration}");
+                    }
                 }
+                else
+                {
+                    foreach (string pendingMigration in pendingMigrations)
+                    {
+                        Console.WriteLine($"\tPending migration: {pendingMigration}");
+                    }
+                }
+                
                 neuralmDbContext.Database.Migrate();
-                Console.WriteLine("Applied the pending migrations to the database.");
+                Console.WriteLine("Applied the migrations to the database.");
             }
             Console.WriteLine("Finished database verification!");
             return Task.CompletedTask;

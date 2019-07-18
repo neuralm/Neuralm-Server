@@ -24,7 +24,8 @@ namespace Neuralm.Tests.NEAT
         public void CrossOverTest()
         {
             Guid id = Guid.NewGuid();
-            Brain expectedBrain = new Brain(id, 3, 1, _trainingRoom, new List<ConnectionGene>() {
+            _trainingRoom = new TrainingRoom(_fakeUser, "FakeRoom", new TrainingRoomSettings(0, 2, 3, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
+            Brain expectedBrain = new Brain(id, _trainingRoom, new List<ConnectionGene>() {
                 new ConnectionGene(id, 0, 3, 1, 1),
                 new ConnectionGene(id, 1, 3, 1, 2, false),
                 new ConnectionGene(id, 2, 3, 1, 3),
@@ -38,7 +39,7 @@ namespace Neuralm.Tests.NEAT
             });
             List<ConnectionGene> expectedGenes = expectedBrain.Genes.OrderBy(x => x.InnovationNumber).ToList();
             Guid id2 = Guid.NewGuid();
-            Brain brain1 = new Brain(id2, 3, 1, _trainingRoom, new List<ConnectionGene>()
+            Brain brain1 = new Brain(id2, _trainingRoom, new List<ConnectionGene>()
             {
                 new ConnectionGene(id2, 0, 3, -1, 1),
                 new ConnectionGene(id2, 1, 3, -1, 2, false),
@@ -48,7 +49,7 @@ namespace Neuralm.Tests.NEAT
                 new ConnectionGene(id2, 0, 4, -1, 8)
             });
             Guid id3 = Guid.NewGuid();
-            Brain brain2 = new Brain(id3, 3, 1, _trainingRoom, new List<ConnectionGene>()
+            Brain brain2 = new Brain(id3, _trainingRoom, new List<ConnectionGene>()
             {
                 new ConnectionGene(id3, 0, 3, 1, 1),
                 new ConnectionGene(id3, 1, 3, 1, 2, false),
@@ -79,9 +80,9 @@ namespace Neuralm.Tests.NEAT
             public void Initialize()
             {
                 _fakeUser = new User();
-                _trainingRoom = new TrainingRoom(_fakeUser, "FakeRoom", new TrainingRoomSettings(0, 2, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
+                _trainingRoom = new TrainingRoom(_fakeUser, "FakeRoom", new TrainingRoomSettings(0, 2, 3, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
                 Guid id = Guid.NewGuid();
-                _original = new Brain(id, 3, 1, _trainingRoom, new List<ConnectionGene>()
+                _original = new Brain(id, _trainingRoom, new List<ConnectionGene>()
                 {
                     new ConnectionGene(id, 0, 3, 1, 1),
                     new ConnectionGene(id, 1, 3, 1, 2, false),
@@ -141,14 +142,14 @@ namespace Neuralm.Tests.NEAT
             public void Initialize()
             {
                 _fakeUser = new User();
-                _trainingRoom = new TrainingRoom(_fakeUser, "FakeRoom", new TrainingRoomSettings(0, 2, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
+                _trainingRoom = new TrainingRoom(_fakeUser, "FakeRoom", new TrainingRoomSettings(0, 3, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
             }
 
             [TestMethod]
             public void AreEqualTest()
             {
                 Guid id1 = Guid.NewGuid();
-                Brain brain1 = new Brain(id1, 3, 1, _trainingRoom, new List<ConnectionGene>() {
+                Brain brain1 = new Brain(id1, _trainingRoom, new List<ConnectionGene>() {
                     new ConnectionGene(id1, 0, 3, 1, 1),
                     new ConnectionGene(id1, 1, 3, 1, 2, false),
                     new ConnectionGene(id1, 2, 3, 1, 3),
@@ -157,7 +158,7 @@ namespace Neuralm.Tests.NEAT
                     new ConnectionGene(id1, 0, 4, 1, 8)
                 });
                 Guid id2 = Guid.NewGuid();
-                Brain brain2 = new Brain(id2, 3, 1, _trainingRoom, new List<ConnectionGene>() {
+                Brain brain2 = new Brain(id2, _trainingRoom, new List<ConnectionGene>() {
                     new ConnectionGene(id2, 0, 3, 1, 1),
                     new ConnectionGene(id2, 1, 3, 1, 2, false),
                     new ConnectionGene(id2, 2, 3, 1, 3),
@@ -173,7 +174,7 @@ namespace Neuralm.Tests.NEAT
             public void MissingGeneTest()
             {
                 Guid id1 = Guid.NewGuid();
-                Brain brain1 = new Brain(id1, 3, 1, _trainingRoom, new List<ConnectionGene>() {
+                Brain brain1 = new Brain(id1, _trainingRoom, new List<ConnectionGene>() {
                     new ConnectionGene(id1, 0, 3, 1, 1),
                     new ConnectionGene(id1, 1, 3, 1, 2, false),
                     new ConnectionGene(id1, 2, 3, 1, 3),
@@ -182,7 +183,7 @@ namespace Neuralm.Tests.NEAT
                     new ConnectionGene(id1, 0, 4, 1, 8)
                 });
                 Guid id2 = Guid.NewGuid();
-                Brain brain2 = new Brain(id2, 3, 1, _trainingRoom, new List<ConnectionGene>() {
+                Brain brain2 = new Brain(id2, _trainingRoom, new List<ConnectionGene>() {
                     new ConnectionGene(id2, 0, 3, 1, 1),
                     new ConnectionGene(id2, 1, 3, 1, 2, false),
                     new ConnectionGene(id2, 2, 3, 1, 3),
@@ -197,7 +198,7 @@ namespace Neuralm.Tests.NEAT
             public void ExtraGeneTest()
             {
                 Guid id1 = Guid.NewGuid();
-                Brain brain1 = new Brain(id1, 3, 1, _trainingRoom, new List<ConnectionGene>() {
+                Brain brain1 = new Brain(id1, _trainingRoom, new List<ConnectionGene>() {
                     new ConnectionGene(id1, 0, 3, 1, 1),
                     new ConnectionGene(id1, 1, 3, 1, 2, false),
                     new ConnectionGene(id1, 2, 3, 1, 3),
@@ -206,7 +207,7 @@ namespace Neuralm.Tests.NEAT
                     new ConnectionGene(id1, 0, 4, 1, 8)
                 });
                 Guid id2 = Guid.NewGuid();
-                Brain brain2 = new Brain(id2, 3, 1, _trainingRoom, new List<ConnectionGene>() {
+                Brain brain2 = new Brain(id2, _trainingRoom, new List<ConnectionGene>() {
                     new ConnectionGene(id2, 0, 3, 1, 1),
                     new ConnectionGene(id2, 1, 3, 1, 2, false),
                     new ConnectionGene(id2, 2, 3, 1, 3),
@@ -223,7 +224,7 @@ namespace Neuralm.Tests.NEAT
             public void DifferentInputSizeTest()
             {
                 Guid id1 = Guid.NewGuid();
-                Brain brain1 = new Brain(id1, 3, 1, _trainingRoom, new List<ConnectionGene>() {
+                Brain brain1 = new Brain(id1, _trainingRoom, new List<ConnectionGene>() {
                     new ConnectionGene(id1, 0, 3, 1, 1),
                     new ConnectionGene(id1, 1, 3, 1, 2, false),
                     new ConnectionGene(id1, 2, 3, 1, 3),
@@ -231,8 +232,10 @@ namespace Neuralm.Tests.NEAT
                     new ConnectionGene(id1, 4, 3, 1, 5),
                     new ConnectionGene(id1, 0, 4, 1, 8)
                 });
+                TrainingRoom trainingRoom = new TrainingRoom(_fakeUser, "FakeRoom", new TrainingRoomSettings(0, 4, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
+
                 Guid id2 = Guid.NewGuid();
-                Brain brain2 = new Brain(id2, 4, 1, _trainingRoom, new List<ConnectionGene>() {
+                Brain brain2 = new Brain(id2, trainingRoom, new List<ConnectionGene>() {
                     new ConnectionGene(id2, 0, 3, 1, 1),
                     new ConnectionGene(id2, 1, 3, 1, 2, false),
                     new ConnectionGene(id2, 2, 3, 1, 3),
@@ -248,7 +251,7 @@ namespace Neuralm.Tests.NEAT
             public void DifferentOutputSizeTest()
             {
                 Guid id1 = Guid.NewGuid();
-                Brain brain1 = new Brain(id1, 3, 1, _trainingRoom, new List<ConnectionGene>() {
+                Brain brain1 = new Brain(id1, _trainingRoom, new List<ConnectionGene>() {
                     new ConnectionGene(id1, 0, 3, 1, 1),
                     new ConnectionGene(id1, 1, 3, 1, 2, false),
                     new ConnectionGene(id1, 2, 3, 1, 3),
@@ -258,7 +261,9 @@ namespace Neuralm.Tests.NEAT
                 });
 
                 Guid id2 = Guid.NewGuid();
-                Brain brain2 = new Brain(id2, 3, 2, _trainingRoom, new List<ConnectionGene>() {
+                TrainingRoom trainingRoom = new TrainingRoom(_fakeUser, "FakeRoom", new TrainingRoomSettings(0, 3, 2, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
+
+                Brain brain2 = new Brain(id2, trainingRoom, new List<ConnectionGene>() {
                     new ConnectionGene(id2, 0, 3, 1, 1),
                     new ConnectionGene(id2, 1, 3, 1, 2, false),
                     new ConnectionGene(id2, 2, 3, 1, 3),
@@ -279,7 +284,7 @@ namespace Neuralm.Tests.NEAT
             public void DifferentTypeTest(object other)
             {
                 Guid id = Guid.NewGuid();
-                Brain brain1 = new Brain(id, 3, 1, _trainingRoom, new List<ConnectionGene>() {
+                Brain brain1 = new Brain(id, _trainingRoom, new List<ConnectionGene>() {
                     new ConnectionGene(id, 0, 3, 1, 1),
                     new ConnectionGene(id, 1, 3, 1, 2, false),
                     new ConnectionGene(id, 2, 3, 1, 3),

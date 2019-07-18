@@ -10,12 +10,22 @@ namespace Neuralm.Domain.Entities.NEAT
     public class Species
     {
         private List<Brain> _lastGenerationBrains;
-        private readonly TrainingRoom _trainingRoom;
+        private List<Brain> _brains;
+
+        /// <summary>
+        /// Gets and sets the id.
+        /// </summary>
+        public Guid Id { get; private set; }
 
         /// <summary>
         /// Gets the list of brains.
         /// </summary>
-        public List<Brain> Brains { get; }
+        public virtual IReadOnlyList<Brain> Brains => _brains;
+
+        /// <summary>
+        /// Gets the list of brains from the last generation.
+        /// </summary>
+        public virtual IReadOnlyList<Brain> LastGenerationBrains => _lastGenerationBrains;
 
         /// <summary>
         /// Gets and sets the species score.
@@ -23,15 +33,30 @@ namespace Neuralm.Domain.Entities.NEAT
         public double SpeciesScore { get; private set; }
 
         /// <summary>
+        /// Gets and sets the training room id.
+        /// </summary>
+        public Guid TrainingRoomId { get; private set; }
+
+        /// <summary>
+        /// EFCore entity constructor IGNORE!
+        /// </summary>
+        protected Species()
+        {
+
+        }
+
+        /// <summary>
         /// Initializes an instance of the <see cref="Species"/> class with the given brain as its first representative.
         /// </summary>
         /// <param name="brain">The brain which this species is created for.</param>
-        /// <param name="trainingRoom">The training room this species is part of.</param>
-        public Species(Brain brain, TrainingRoom trainingRoom)
+        /// <param name="trainingRoomId">The training room id.</param>
+        public Species(Brain brain, Guid trainingRoomId)
         {
-            _trainingRoom = trainingRoom;
-            Brains = new List<Brain> { brain };
+            Id = Guid.NewGuid();
+            brain.SpeciesId = Id;
+            _brains = new List<Brain> { brain };
             _lastGenerationBrains = new List<Brain> { brain };
+            TrainingRoomId = trainingRoomId;
         }
 
         /// <summary>
@@ -39,49 +64,26 @@ namespace Neuralm.Domain.Entities.NEAT
         /// It compares the given brain to a randomly chosen brain from the species.
         /// </summary>
         /// <param name="brain">The brain to check.</param>
+        /// <param name="randomNext">The random next.</param>
         /// <returns>Returns <c>true</c> if it is added; otherwise, <c>false</c>.</returns>
-        public bool AddBrainIfSameSpecies(Brain brain)
+        public bool AddBrainIfSameSpecies(Brain brain, Func<int, int> randomNext)
         {
-            if (!GetRandomBrain().IsSameSpecies(brain))
+            if (!GetRandomBrain(randomNext).IsSameSpecies(brain))
                 return false;
-            Brains.Add(brain);
+            brain.SpeciesId = Id;
+            _brains.Add(brain);
             return true;
-        }
-
-        /// <summary>
-        /// Generates a brain based on the brains from this species.
-        /// A random brain is chosen and based on chance it can be bred with a random brain from this species or from the global pool.
-        /// The brain is also mutated.
-        /// </summary>
-        /// <returns>Returns a generated <see cref="Brain"/>.</returns>
-        public Brain ProduceBrain()
-        {
-            Brain child = GetRandomBrain();
-            if (_trainingRoom.Random.NextDouble() < _trainingRoom.TrainingRoomSettings.CrossOverChance)
-            {
-                Brain parent2 = _trainingRoom.Random.NextDouble() < _trainingRoom.TrainingRoomSettings.InterSpeciesChance 
-                    ? _trainingRoom.GetRandomBrain() 
-                    : GetRandomBrain();
-
-                child = child.Crossover(parent2);
-            }
-            else
-                child = child.Clone();
-
-            if(_trainingRoom.Random.NextDouble() < _trainingRoom.TrainingRoomSettings.MutationChance)
-                child.Mutate();
-
-            return child;
         }
 
         /// <summary>
         /// Kills the worst scoring brains and gets the species ready for the next generation.
         /// </summary>
-        public void PostGeneration()
+        /// <param name="topAmountToSurvive">The top amount to survive.</param>
+        public void PostGeneration(double topAmountToSurvive)
         {
             SpeciesScore = Brains.Sum(brain => brain.Score);
 
-            Brains.Sort((a, b) =>
+            _brains.Sort((a, b) =>
             {
                 if (a.Score < b.Score)
                     return 1;
@@ -92,20 +94,21 @@ namespace Neuralm.Domain.Entities.NEAT
                 return 0;
             });
 
-            int brainsToSurvive = (int)Math.Ceiling(Brains.Count * _trainingRoom.TrainingRoomSettings.TopAmountToSurvive);
+            int brainsToSurvive = (int)Math.Ceiling(Brains.Count * topAmountToSurvive);
 
             _lastGenerationBrains = Brains.Take(brainsToSurvive).Select(brain => brain.Clone()).ToList();
-             // TODO: Check if clone is needed, may just be useless instance creation
-            Brains.Clear();
+            // TODO: Check if clone is needed, may just be useless instance creation
+            _brains.Clear();
         }
 
         /// <summary>
         /// Gets a random brain from this species.
         /// </summary>
+        /// <param name="randomNext">The random next.</param>
         /// <returns>Returns a randomly chosen <see cref="Brain"/>.</returns>
-        public Brain GetRandomBrain()
+        public Brain GetRandomBrain(Func<int, int> randomNext)
         {
-            return _lastGenerationBrains[_trainingRoom.Random.Next(_lastGenerationBrains.Count)];
+            return _lastGenerationBrains[randomNext(_lastGenerationBrains.Count)];
         }
     }
 }

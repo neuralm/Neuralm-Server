@@ -13,8 +13,6 @@ namespace Neuralm.Domain.Entities.NEAT
         private readonly Dictionary<uint, Node> _nodes;
         private readonly List<Node> _outputNodes;
         private readonly List<Node> _inputNodes;
-        private readonly uint _outputCount;
-        private readonly uint _inputCount;
         private readonly List<ConnectionGene> _childGenes;
         private uint _maxInnovation;
 
@@ -44,6 +42,11 @@ namespace Neuralm.Domain.Entities.NEAT
         public virtual TrainingRoom TrainingRoom { get; private set; }
 
         /// <summary>
+        /// Gets and sets the species id.
+        /// </summary>
+        public Guid SpeciesId { get; set; }
+
+        /// <summary>
         /// EFCore entity constructor IGNORE!
         /// </summary>
         protected Brain()
@@ -54,10 +57,8 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <summary>
         /// Initializes an instance of the <see cref="Brain"/> class with a set amount of input and output nodes.
         /// </summary>
-        /// <param name="inputCount">The amount of input nodes.</param>
-        /// <param name="outputCount">The amount of output nodes.</param>
         /// <param name="trainingRoom">The training room this brain is a part of.</param>
-        public Brain(uint inputCount, uint outputCount, TrainingRoom trainingRoom)
+        public Brain(TrainingRoom trainingRoom)
         {
             TrainingRoomId = trainingRoom.Id;
             TrainingRoom = trainingRoom;
@@ -65,39 +66,35 @@ namespace Neuralm.Domain.Entities.NEAT
             _nodes = new Dictionary<uint, Node>();
             _outputNodes = new List<Node>();
             _inputNodes = new List<Node>();
-            _inputCount = inputCount;
-            _outputCount = outputCount;
             _childGenes = new List<ConnectionGene>();
 
             if (Id == Guid.Empty)
                 Id = Guid.NewGuid();
 
-            for (uint i = 0; i < inputCount; i++)
+            for (uint i = 0; i < TrainingRoom.TrainingRoomSettings.InputCount; i++)
             {
                 Node node = new Node(i, NodeType.Input);
                 _inputNodes.Add(node);
                 _nodes[i] = node;
             }
 
-            for (uint i = 0; i < outputCount; i++)
+            for (uint i = 0; i < TrainingRoom.TrainingRoomSettings.OutputCount; i++)
             {
-                Node node = new Node(inputCount + i, NodeType.Output);
+                Node node = new Node(TrainingRoom.TrainingRoomSettings.InputCount + i, NodeType.Output);
                 _outputNodes.Add(node);
-                _nodes[inputCount + i] = node;
+                _nodes[TrainingRoom.TrainingRoomSettings.InputCount + i] = node;
             }
 
-            trainingRoom.IncreaseNodeIdTo(inputCount + outputCount);
+            trainingRoom.IncreaseNodeIdTo(TrainingRoom.TrainingRoomSettings.InputCount + TrainingRoom.TrainingRoomSettings.OutputCount);
         }
 
         /// <summary>
         /// Initializes an instance of the <see cref="Brain"/> class with a set amount of input and output nodes and provided genes.
         /// </summary>
         /// <param name="id">The id for the brain.</param>
-        /// <param name="inputCount">The amount of input nodes.</param>
-        /// <param name="outputCount">The amount of output nodes.</param>
         /// <param name="trainingRoom">The training room this brain is a part of.</param>
         /// <param name="genes">The genes to create the brain out of.</param>
-        public Brain(Guid id, uint inputCount, uint outputCount, TrainingRoom trainingRoom, IEnumerable<ConnectionGene> genes) : this(inputCount, outputCount, trainingRoom)
+        public Brain(Guid id, TrainingRoom trainingRoom, IEnumerable<ConnectionGene> genes) : this(trainingRoom)
         {
             Id = id;
             foreach (ConnectionGene gene in genes)
@@ -145,7 +142,7 @@ namespace Neuralm.Domain.Entities.NEAT
             }
 
             _childGenes.AddRange(parent2);
-            return new Brain(Guid.NewGuid(), _inputCount, _outputCount, TrainingRoom, _childGenes);
+            return new Brain(Guid.NewGuid(), TrainingRoom, _childGenes);
         }
 
         /// <summary>
@@ -165,7 +162,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <returns>A new brain with the same genes, training room, inputCount and outputCount.</returns>
         public Brain Clone(bool newId = false)
         {
-            return new Brain(newId ? Guid.NewGuid() : Id, _inputCount, _outputCount, TrainingRoom, _genes.Select(gene => gene.Clone()).ToList());
+            return new Brain(newId ? Guid.NewGuid() : Id, TrainingRoom, _genes.Select(gene => gene.Clone()).ToList());
         }
 
         /// <summary>
@@ -232,7 +229,8 @@ namespace Neuralm.Domain.Entities.NEAT
             int attemptsDone = 0;
             while (true)
             {
-                RebuildStructure(); //Rebuild structure so we get layer information to make sure we don't get circle dependencies
+                // NOTE: Rebuild structure so we get layer information to make sure we don't get circle dependencies
+                RebuildStructure(); 
 
                 Node startNode;
                 Node endNode;
@@ -378,8 +376,8 @@ namespace Neuralm.Domain.Entities.NEAT
             return Genes.SequenceEqual(other.Genes) &&
                    _outputNodes.SequenceEqual(other._outputNodes) &&
                    _inputNodes.SequenceEqual(other._inputNodes) &&
-                   _inputCount == other._inputCount &&
-                   _outputCount == other._outputCount;
+                   TrainingRoom.TrainingRoomSettings.InputCount == other.TrainingRoom.TrainingRoomSettings.InputCount &&
+                   TrainingRoom.TrainingRoomSettings.OutputCount == other.TrainingRoom.TrainingRoomSettings.OutputCount;
         }
     }
 }

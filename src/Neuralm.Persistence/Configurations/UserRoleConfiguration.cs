@@ -5,7 +5,7 @@ using Neuralm.Domain.Entities.Authentication;
 namespace Neuralm.Persistence.Configurations
 {
     /// <summary>
-    /// The UserRoleConfiguration class; used to configure the relations and columns in the <see cref="DbSet{TEntity}"/> for <see cref="UserRole"/> in the DbContext.
+    /// Represents the <see cref="UserRoleConfiguration"/> class used to configure the relations and columns in the <see cref="DbSet{TEntity}"/> for <see cref="UserRole"/> in the DbContext.
     /// </summary>
     public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
     {

@@ -9,7 +9,7 @@ using MethodInfo = System.Reflection.MethodInfo;
 namespace Neuralm.Mapping
 {
     /// <summary>
-    /// Represents the <see cref="MessageToServiceMap"/> class.
+    /// Represents the <see cref="MessageToServiceMapper"/> class.
     /// </summary>
     public class MessageToServiceMapper
     {
@@ -22,9 +22,9 @@ namespace Neuralm.Mapping
         public IReadOnlyDictionary<Type, (object, MethodInfo)> MessageToServiceMap => _messageToServiceMap;
 
         /// <summary>
-        /// Initializes an instance of the <see cref="MessageToServiceMap"/> class.
+        /// Initializes an instance of the <see cref="MessageToServiceMapper"/> class.
         /// </summary>
-        /// <param name="serviceProvider"></param>
+        /// <param name="serviceProvider">The service provider.</param>
         public MessageToServiceMapper(IServiceProvider serviceProvider)
         {
             Console.WriteLine("Mapping messages to services...");
