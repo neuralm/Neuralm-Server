@@ -36,5 +36,19 @@ namespace Neuralm.Application.Interfaces
         /// <param name="getEnabledTrainingRoomsRequest">The get enabled training rooms request.</param>
         /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="GetEnabledTrainingRoomsResponse"/>.</returns>
         Task<GetEnabledTrainingRoomsResponse> GetEnabledTrainingRoomsAsync(GetEnabledTrainingRoomsRequest getEnabledTrainingRoomsRequest);
+
+        /// <summary>
+        /// Gets the organisms for a training session asynchronously.
+        /// </summary>
+        /// <param name="getOrganismsRequest">The get organism request.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="GetOrganismsResponse"/>.</returns>
+        Task<GetOrganismsResponse> GetOrganismsAsync(GetOrganismsRequest getOrganismsRequest);
+
+        /// <summary>
+        /// Posts the scores of the organisms for a training session asynchronously.
+        /// </summary>
+        /// <param name="postOrganismsScoreRequest">The post organisms score request.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="PostOrganismsScoreResponse"/>.</returns>
+        Task<PostOrganismsScoreResponse> PostOrganismsScoreAsync(PostOrganismsScoreRequest postOrganismsScoreRequest);
     }
 }

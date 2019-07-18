@@ -102,5 +102,17 @@ namespace Neuralm.Application.Services
             IEnumerable<TrainingRoom> trainingRooms = await _trainingRoomRepository.FindManyByExpressionAsync(trainingRoom => trainingRoom.Enabled);
             return new GetEnabledTrainingRoomsResponse(getEnabledTrainingRoomsRequest.Id, trainingRooms.Select(EntityToDtoConverter.Convert<TrainingRoomDto, TrainingRoom>).ToList(), success: true);
         }
+
+        /// <inheritdoc cref="ITrainingRoomService.GetOrganismsAsync(GetOrganismsRequest)"/>
+        public async Task<GetOrganismsResponse> GetOrganismsAsync(GetOrganismsRequest getOrganismsRequest)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc cref="ITrainingRoomService.PostOrganismsScoreAsync(PostOrganismsScoreRequest)"/>
+        public async Task<PostOrganismsScoreResponse> PostOrganismsScoreAsync(PostOrganismsScoreRequest postOrganismsScoreRequest)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
