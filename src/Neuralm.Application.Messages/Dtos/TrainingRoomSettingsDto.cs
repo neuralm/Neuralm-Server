@@ -12,7 +12,7 @@ namespace Neuralm.Application.Messages.Dtos
         public Guid Id { get; set; }
 
         /// <inheritdoc cref="TrainingRoomSettings.OrganismCount"/>
-        public uint BrainCount { get; set; }
+        public uint OrganismCount { get; set; }
 
         /// <inheritdoc cref="TrainingRoomSettings.InputCount"/>
         public uint InputCount { get; set; }

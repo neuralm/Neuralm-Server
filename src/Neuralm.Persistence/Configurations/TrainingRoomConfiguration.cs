@@ -14,7 +14,7 @@ namespace Neuralm.Persistence.Configurations
         {
             builder.HasKey(p => p.Id);
             builder.OwnsMany(p => p.Organisms)
-                .HasForeignKey(p => p.TrainingRoomId);
+                .HasOne(p => p.TrainingRoom);
             builder.Metadata.FindNavigation(nameof(TrainingRoom.Organisms))
                 .SetPropertyAccessMode(PropertyAccessMode.Field);
 

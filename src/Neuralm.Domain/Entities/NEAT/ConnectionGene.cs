@@ -3,7 +3,7 @@
 namespace Neuralm.Domain.Entities.NEAT
 {
     /// <summary>
-    /// The ConnectionGene class; used for connecting <see cref="Node"/>s in a <see cref="Brain"/>.
+    /// Represents the <see cref="ConnectionGene"/> class used for connecting <see cref="Node"/>s in a <see cref="Brain"/>.
     /// </summary>
     public class ConnectionGene : IEquatable<ConnectionGene>
     {
@@ -126,7 +126,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// Checks if an object is the same as this gene.
         /// </summary>
         /// <param name="obj">The other object.</param>
-        /// <returns>Returns <c>true</c> if obj is of type <see cref="ConnectionGene"/>and <see cref="Equals(Neuralm.Domain.Entities.NEAT.ConnectionGene)"/> returns <c>true</c>, otherwise, <c>false</c>.</returns>
+        /// <returns>Returns <c>true</c> if obj is of type <see cref="ConnectionGene"/> and if <see cref="Equals(ConnectionGene)"/> returns <c>true</c>, otherwise, <c>false</c>.</returns>
         public override bool Equals(object obj)
         {
             return obj is ConnectionGene other && Equals(other);

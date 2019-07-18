@@ -5,7 +5,7 @@ using System.Linq;
 namespace Neuralm.Domain.Entities.NEAT
 {
     /// <summary>
-    /// Represents the <see cref="Brain"/> class; provides methods to crossover, mutate and add connection genes.
+    /// Represents the <see cref="Brain"/> class provides methods to crossover, mutate and add connection genes.
     /// </summary>
     public class Brain
     {
@@ -17,11 +17,6 @@ namespace Neuralm.Domain.Entities.NEAT
         private uint _maxInnovation;
 
         /// <summary>
-        /// Gets and sets the score.
-        /// </summary>
-        //public double Score { get; set; }
-
-        /// <summary>
         /// Gets the list of genes.
         /// </summary>
         public virtual IReadOnlyList<ConnectionGene> Genes => _genes;
@@ -30,6 +25,11 @@ namespace Neuralm.Domain.Entities.NEAT
         /// Gets and sets the id.
         /// </summary>
         public Guid Id { get; private set; }
+
+        /// <summary>
+        /// Gets and sets the training room id.
+        /// </summary>
+        public Guid TrainingRoomId { get; private set; }
 
         /// <summary>
         /// Gets and sets the training room.
@@ -51,6 +51,7 @@ namespace Neuralm.Domain.Entities.NEAT
         public Brain(TrainingRoom trainingRoom)
         {
             TrainingRoom = trainingRoom;
+            TrainingRoomId = TrainingRoom.Id;
             _genes = new List<ConnectionGene>();
             _nodes = new Dictionary<uint, Node>();
             _outputNodes = new List<Node>();
@@ -122,7 +123,7 @@ namespace Neuralm.Domain.Entities.NEAT
                 if (geneToRemove != default)
                     parent2.Remove(geneToRemove);
 
-                if(!geneToAdd.Enabled && TrainingRoom.Random.NextDouble() < TrainingRoom.TrainingRoomSettings.EnableConnectionChance)
+                if (!geneToAdd.Enabled && TrainingRoom.Random.NextDouble() < TrainingRoom.TrainingRoomSettings.EnableConnectionChance)
                 {
                     geneToAdd.Enabled = true;
                 }
@@ -138,7 +139,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// Get the node with the given id, or create it if there is no node with this id.
         /// </summary>
         /// <param name="id">The node's ID</param>
-        /// <returns></returns>
+        /// <returns>Returns the node.</returns>
         public Node GetOrCreateNode(uint id)
         {
             return !_nodes.ContainsKey(id) ? _nodes[id] = new Node(id, NodeType.Hidden) : _nodes[id];

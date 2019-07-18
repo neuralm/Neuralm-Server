@@ -75,7 +75,7 @@ namespace Neuralm.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    BrainCount = table.Column<long>(nullable: false),
+                    OrganismCount = table.Column<long>(nullable: false),
                     InputCount = table.Column<long>(nullable: false),
                     OutputCount = table.Column<long>(nullable: false),
                     SpeciesExcessGeneWeight = table.Column<double>(nullable: false),
@@ -221,19 +221,21 @@ namespace Neuralm.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Brains",
+                name: "Organisms",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    Score = table.Column<double>(nullable: false),
+                    SpeciesId = table.Column<Guid>(nullable: false),
+                    BrainId = table.Column<Guid>(nullable: false),
                     TrainingRoomId = table.Column<Guid>(nullable: false),
-                    SpeciesId = table.Column<Guid>(nullable: false)
+                    Brain_TrainingRoomId = table.Column<Guid>(nullable: false),
+                    Score = table.Column<double>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Brains", x => x.Id);
+                    table.PrimaryKey("PK_Organisms", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Brains_TrainingRooms_TrainingRoomId",
+                        name: "FK_Organisms_TrainingRooms_TrainingRoomId",
                         column: x => x.TrainingRoomId,
                         principalTable: "TrainingRooms",
                         principalColumn: "Id",
@@ -286,11 +288,6 @@ namespace Neuralm.Persistence.Migrations
                 values: new object[] { 1, "Name", "Name", 1 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Brains_TrainingRoomId",
-                table: "Brains",
-                column: "TrainingRoomId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Credentials_CredentialTypeId",
                 table: "Credentials",
                 column: "CredentialTypeId");
@@ -299,6 +296,11 @@ namespace Neuralm.Persistence.Migrations
                 name: "IX_Credentials_UserId",
                 table: "Credentials",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Organisms_TrainingRoomId",
+                table: "Organisms",
+                column: "TrainingRoomId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RolePermissions_PermissionId",
@@ -339,13 +341,13 @@ namespace Neuralm.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Brains");
-
-            migrationBuilder.DropTable(
                 name: "ConnectionGenes");
 
             migrationBuilder.DropTable(
                 name: "Credentials");
+
+            migrationBuilder.DropTable(
+                name: "Organisms");
 
             migrationBuilder.DropTable(
                 name: "RolePermissions");
