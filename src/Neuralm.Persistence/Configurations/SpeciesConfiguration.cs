@@ -14,17 +14,12 @@ namespace Neuralm.Persistence.Configurations
         {
             builder.HasKey(p => p.Id);
 
-            //builder.OwnsMany(p => p.Organisms)
-            //    .HasForeignKey(p => p.SpeciesId);
-            //builder.Metadata.FindNavigation(nameof(Species.Organisms))
-            //    .SetPropertyAccessMode(PropertyAccessMode.Field);
-
             builder.OwnsMany(p => p.LastGenerationOrganisms)
-                .HasForeignKey(p => p.SpeciesId);
+                .HasForeignKey(p => p.SpeciesId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
             builder.Metadata.FindNavigation(nameof(Species.LastGenerationOrganisms))
                 .SetPropertyAccessMode(PropertyAccessMode.Field);
 
-            builder.Ignore(p => p.LastGenerationOrganisms);
             builder.Ignore(p => p.Organisms);
         }
     }

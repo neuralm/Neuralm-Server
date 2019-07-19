@@ -18,6 +18,11 @@ namespace Neuralm.Domain.Entities.NEAT
         public Guid Id { get; private set; }
 
         /// <summary>
+        /// Gets and sets the training room id.
+        /// </summary>
+        public Guid TrainingRoomId { get; private set; }
+
+        /// <summary>
         /// Gets the list of organisms.
         /// </summary>
         public virtual IReadOnlyList<Organism> Organisms => _organisms;
@@ -31,11 +36,6 @@ namespace Neuralm.Domain.Entities.NEAT
         /// Gets and sets the species score.
         /// </summary>
         public double SpeciesScore { get; private set; }
-
-        /// <summary>
-        /// Gets and sets the training room id.
-        /// </summary>
-        public Guid TrainingRoomId { get; private set; }
 
         /// <summary>
         /// EFCore entity constructor IGNORE!
@@ -95,8 +95,13 @@ namespace Neuralm.Domain.Entities.NEAT
             });
 
             int organismsToSurvive = (int)Math.Ceiling(Organisms.Count * topAmountToSurvive);
-
-            _lastGenerationOrganisms = Organisms.Take(organismsToSurvive).Select(organism => organism.Clone()).ToList();
+            _lastGenerationOrganisms.Clear();
+            _lastGenerationOrganisms = Organisms.Take(organismsToSurvive).Select(organism =>
+            {
+                Organism org = organism.Clone();
+                org.Generation++;
+                return org;
+            }).ToList();
             // TODO: Check if clone is needed, may just be useless instance creation
             _organisms.Clear();
         }

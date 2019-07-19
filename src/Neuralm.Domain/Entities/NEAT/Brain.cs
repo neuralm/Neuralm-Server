@@ -32,6 +32,11 @@ namespace Neuralm.Domain.Entities.NEAT
         public Guid TrainingRoomId { get; private set; }
 
         /// <summary>
+        /// Gets and sets the organism id.
+        /// </summary>
+        public Guid OrganismId { get; set; }
+
+        /// <summary>
         /// Gets and sets the training room.
         /// </summary>
         public virtual TrainingRoom TrainingRoom { get; private set; }
@@ -100,7 +105,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// If a gene only exists in one parent we add it no matter what.
         /// </summary>
         /// <param name="parent2Brain">The other parent.</param>
-        /// <returns>A child brain based on the genes of this brain and the passed brain.</returns>
+        /// <returns>Returns a child brain based on the genes of this brain and the passed brain.</returns>
         public Brain Crossover(Brain parent2Brain)
         {
             _childGenes.Clear();
@@ -149,7 +154,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// Clones this brain to produce a brain that equals the other brain but is not the same instance.
         /// </summary>
         /// <param name="newId">Determines whether a new Id should be generated for the clone.</param>
-        /// <returns>A new brain with the same genes, training room, inputCount and outputCount.</returns>
+        /// <returns>Returns a new brain with the same genes, training room, inputCount and outputCount.</returns>
         public Brain Clone(bool newId = false)
         {
             return new Brain(newId ? Guid.NewGuid() : Id, TrainingRoom, _connectionGenes.Select(gene => gene.Clone()).ToList());

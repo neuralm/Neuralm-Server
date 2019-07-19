@@ -9,12 +9,12 @@ namespace Neuralm.Domain.Entities.NEAT
     /// </summary>
     public class TrainingRoom
     {
-        private readonly Dictionary<(uint A, uint B), uint> _mutationToInnovation;
+        private readonly Dictionary<(uint A, uint B), uint> _mutationToInnovation = new Dictionary<(uint A, uint B), uint>();
         private uint _nodeId;
-        private List<User> _authorizedUsers;
-        private List<TrainingSession> _trainingSessions;
-        private List<Organism> _organisms;
-        private List<Species> _species;
+        private List<User> _authorizedUsers = new List<User>();
+        private List<TrainingSession> _trainingSessions = new List<TrainingSession>();
+        private List<Organism> _organisms = new List<Organism>();
+        private List<Species> _species = new List<Species>();
 
         /// <summary>
         /// Gets and sets the id.
@@ -50,6 +50,11 @@ namespace Neuralm.Domain.Entities.NEAT
         /// Gets the list of species.
         /// </summary>
         public virtual IReadOnlyList<Species> Species => _species;
+
+        /// <summary>
+        /// Gets and sets the collection of brains.
+        /// </summary>
+        public virtual ICollection<Brain> Brains { get; private set; }
 
         /// <summary>
         /// Gets and sets the training room settings.
@@ -121,11 +126,7 @@ namespace Neuralm.Domain.Entities.NEAT
             Enabled = true;
             TrainingRoomSettings = trainingRoomSettings;
             Random = new Random(trainingRoomSettings.Seed);
-            _authorizedUsers = new List<User> { owner };
-            _trainingSessions = new List<TrainingSession>();
-            _species = new List<Species>((int)trainingRoomSettings.OrganismCount);
-            _organisms = new List<Organism>((int)trainingRoomSettings.OrganismCount);
-            _mutationToInnovation = new Dictionary<(uint A, uint B), uint>();
+            _authorizedUsers.Add(owner);
 
             for (int i = 0; i < trainingRoomSettings.OrganismCount; i++)
             {

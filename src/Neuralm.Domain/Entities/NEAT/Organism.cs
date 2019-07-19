@@ -49,7 +49,12 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <summary>
         /// Gets and sets the name.
         /// </summary>
-        public String Name { get; internal set; }
+        public string Name { get; internal set; }
+
+        /// <summary>
+        /// Gets and sets the generation.
+        /// </summary>
+        public uint Generation { get; set; }
 
         /// <summary>
         /// EFCore entity constructor IGNORE!
@@ -68,7 +73,11 @@ namespace Neuralm.Domain.Entities.NEAT
             Id = Guid.NewGuid();
             TrainingRoomId = trainingRoom.Id;
             TrainingRoom = trainingRoom;
-            Brain = new Brain(trainingRoom);
+            Generation = trainingRoom.Generation;
+            Brain = new Brain(trainingRoom)
+            {
+                OrganismId = Id
+            };
             BrainId = Brain.Id;
             Name = GenerateName(trainingRoom.Random.Next);
         }
@@ -83,7 +92,9 @@ namespace Neuralm.Domain.Entities.NEAT
             Id = Guid.NewGuid();
             TrainingRoomId = trainingRoom.Id;
             TrainingRoom = trainingRoom;
+            Generation = trainingRoom.Generation;
             Brain = brain;
+            Brain.OrganismId = Id;
             BrainId = brain.Id;
             Name = GenerateName(trainingRoom.Random.Next);
         }

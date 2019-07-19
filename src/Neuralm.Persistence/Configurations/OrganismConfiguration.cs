@@ -13,8 +13,6 @@ namespace Neuralm.Persistence.Configurations
         public void Configure(EntityTypeBuilder<Organism> builder)
         {
             builder.HasKey(p => p.Id);
-            //builder.OwnsOne(p => p.Brain)
-            //    .HasForeignKey(p => p.Id);
         }
     }
 }
