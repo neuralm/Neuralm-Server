@@ -13,13 +13,13 @@ namespace Neuralm.Persistence.Configurations
         public void Configure(EntityTypeBuilder<Brain> builder)
         {
             builder.HasKey(p => p.Id);
-            builder.OwnsMany(p => p.Genes)
+            builder.OwnsMany(p => p.ConnectionGenes)
                 .HasForeignKey(cg => cg.BrainId);
-            builder.Metadata.FindNavigation(nameof(Brain.Genes))
+            builder.Metadata.FindNavigation(nameof(Brain.ConnectionGenes))
                 .SetPropertyAccessMode(PropertyAccessMode.Field);
 
             builder.Ignore(p => p.TrainingRoom);
-            builder.Ignore(p => p.Genes);
+            builder.Ignore(p => p.ConnectionGenes);
         }
     }
 }

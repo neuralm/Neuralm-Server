@@ -37,7 +37,7 @@ namespace Neuralm.Tests.NEAT
                 new ConnectionGene(id, 2, 4, 1, 9),
                 new ConnectionGene(id, 0, 5, 1, 10)
             });
-            List<ConnectionGene> expectedGenes = expectedBrain.Genes.OrderBy(x => x.InnovationNumber).ToList();
+            List<ConnectionGene> expectedGenes = expectedBrain.ConnectionGenes.OrderBy(x => x.InnovationNumber).ToList();
             Guid id2 = Guid.NewGuid();
             Brain brain1 = new Brain(id2, _trainingRoom, new List<ConnectionGene>()
             {
@@ -64,7 +64,7 @@ namespace Neuralm.Tests.NEAT
 
             Brain child = brain1.Crossover(brain2);
 
-            List<ConnectionGene> childGenes = child.Genes.OrderBy(a => a.InnovationNumber).ToList();
+            List<ConnectionGene> childGenes = child.ConnectionGenes.OrderBy(a => a.InnovationNumber).ToList();
 
             CollectionAssert.AreEqual(childGenes, expectedGenes);
         }
@@ -115,7 +115,7 @@ namespace Neuralm.Tests.NEAT
             [TestMethod]
             public void CloneDoesNotAffectOriginalGeneTest()
             {
-                List<ConnectionGene> originalGenes = new List<ConnectionGene>(_original.Genes);
+                List<ConnectionGene> originalGenes = new List<ConnectionGene>(_original.ConnectionGenes);
                 foreach (ConnectionGene gene in originalGenes)
                 {
                     _trainingRoom.GetInnovationNumber(gene.InId, gene.OutId);
@@ -128,7 +128,7 @@ namespace Neuralm.Tests.NEAT
                     clone.Mutate();
                 }
 
-                CollectionAssert.AreEqual(_original.Genes.ToList(), originalGenes);
+                CollectionAssert.AreEqual(_original.ConnectionGenes.ToList(), originalGenes);
             }
         }
 

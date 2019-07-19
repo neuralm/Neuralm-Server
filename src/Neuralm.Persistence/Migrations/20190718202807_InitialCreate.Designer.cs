@@ -150,27 +150,7 @@ namespace Neuralm.Persistence.Migrations
                     b.ToTable("UserRoles");
                 });
 
-            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.ConnectionGene", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<Guid>("BrainId");
-
-                    b.Property<bool>("Enabled");
-
-                    b.Property<long>("InId");
-
-                    b.Property<long>("InnovationNumber");
-
-                    b.Property<long>("OutId");
-
-                    b.Property<double>("Weight");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ConnectionGenes");
-                });
+            
 
             modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.TrainingRoomSettings", b =>
                 {
@@ -327,6 +307,8 @@ namespace Neuralm.Persistence.Migrations
 
                                     b2.Property<Guid>("TrainingRoomId");
 
+                                    b2.Property<string>("Name");
+
                                     b2.HasKey("Id");
 
                                     b2.HasIndex("TrainingRoomId");
@@ -346,7 +328,7 @@ namespace Neuralm.Persistence.Migrations
 
                                             b3.HasKey("Id");
 
-                                            b3.ToTable("Organisms");
+                                            b3.ToTable("Brains");
 
                                             b3.HasOne("Neuralm.Domain.Entities.NEAT.Organism")
                                                 .WithOne("Brain")
@@ -402,6 +384,33 @@ namespace Neuralm.Persistence.Migrations
                                 });
                         });
                 });
+
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.ConnectionGene", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd();
+
+                b.Property<Guid>("BrainId");
+
+                b.Property<bool>("Enabled");
+
+                b.Property<long>("InId");
+
+                b.Property<long>("InnovationNumber");
+
+                b.Property<long>("OutId");
+
+                b.Property<double>("Weight");
+
+                b.HasKey("Id");
+
+                b.ToTable("ConnectionGenes");
+
+                b.HasOne("Neuralm.Domain.Entities.NEAT.Brain", "Brain")
+                    .WithMany("ConnectionGenes")
+                    .HasForeignKey("BrainId")
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
 #pragma warning restore 612, 618
         }
     }

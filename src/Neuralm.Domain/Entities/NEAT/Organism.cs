@@ -7,8 +7,8 @@ namespace Neuralm.Domain.Entities.NEAT
     /// </summary>
     public class Organism
     {
-        private static readonly string[] vowels = new string[] { "a", "e", "i", "o", "u", "y", "aa", "ee", "ie", "oo", "ou", "au" };
-        private static readonly string[] consonants = new string[] { "b", "c", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "z" };
+        private static readonly string[] Vowels = { "a", "e", "i", "o", "u", "y", "aa", "ee", "ie", "oo", "ou", "au" };
+        private static readonly string[] Consonants = { "b", "c", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "z" };
 
 
         /// <summary>
@@ -46,6 +46,9 @@ namespace Neuralm.Domain.Entities.NEAT
         /// </summary>
         public double Score { get; internal set; }
 
+        /// <summary>
+        /// Gets and sets the name.
+        /// </summary>
         public String Name { get; internal set; }
 
         /// <summary>
@@ -86,24 +89,19 @@ namespace Neuralm.Domain.Entities.NEAT
         }
 
         /// <summary>
-        /// Generate a random name
+        /// Generates a random name.
         /// </summary>
-        /// <param name="randomNext">The function that generates a random number between 0 and x</param>
-        /// <returns>A random string</returns>
-        public static string GenerateName(Func<int, int> randomNext)
+        /// <param name="randomNext">The function that generates a random number between 0 and x.</param>
+        /// <returns>Returns a random generated name.</returns>
+        private static string GenerateName(Func<int, int> randomNext)
         {
-            string name = consonants[randomNext(consonants.Length)];
+            string name = Consonants[randomNext(Consonants.Length)];
 
-            name += vowels[randomNext(vowels.Length)];
+            name += Vowels[randomNext(Vowels.Length)];
 
-            if(randomNext(name.Length)==0)
-            {
-                return name + GenerateName(randomNext);
-            } else
-            {
-                return name + consonants[randomNext(consonants.Length)]; 
-            }
-       
+            return randomNext(name.Length) == 0
+                ? name + GenerateName(randomNext)
+                : name + Consonants[randomNext(Consonants.Length)];
         }
 
         /// <summary>
