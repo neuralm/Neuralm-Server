@@ -26,7 +26,7 @@ namespace Neuralm.Application.Converters
             foreach (PropertyInfo property in joinedProperties)
             {
                 Type propertyType = property.PropertyType;
-                if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
+                if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition().GetInterfaces().Contains(typeof(IEnumerable)))
                 {
                     Type dtoItemType = propertyType.GetGenericArguments()[0];
                     IList genericListInstance = CreateGenericListOfType(dtoItemType);
@@ -45,18 +45,10 @@ namespace Neuralm.Application.Converters
                     continue;
                 }
 
-                // TODO: Verify if the current "Entity" type has a DTO type. if not throw!
-
-                if (typeof(UserDto).Assembly.GetTypes().Any(t => t.Name.Equals(propertyType.Name)))
-                {
-                    Type newEntityType = typeof(User).Assembly.GetTypes().First(t => t.Name.Equals(propertyType.Name.Replace("Dto", "")));
-                    object entityObject = typeof(TEntity).GetProperty(property.Name).GetValue(entity, null);
-                    object result = Convert(propertyType, newEntityType, entityObject);
-                    property.SetValue(dto, result);
+                Type entityType = entity.GetType();
+                if (GetValue(entityType, entity, property, dto))
                     continue;
-                }
-
-                object value = entity.GetType().GetProperty(property.Name).GetValue(entity);
+                object value = entityType.GetProperty(property.Name).GetValue(entity);
                 property.SetValue(dto, value);
             }
             return dto;
@@ -76,7 +68,8 @@ namespace Neuralm.Application.Converters
             foreach (PropertyInfo property in dtoProperties)
             {
                 Type type = property.PropertyType;
-                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+                //  type.GetGenericTypeDefinition() == typeof(List<>)
+                if (type.IsGenericType && type.GetGenericTypeDefinition().GetInterfaces().Contains(typeof(IEnumerable)))
                 {
                     Type newDtoItemType = type.GetGenericArguments()[0];
                     IList genericListInstance = CreateGenericListOfType(newDtoItemType);
@@ -95,20 +88,28 @@ namespace Neuralm.Application.Converters
                     continue;
                 }
 
-                // TODO: also check if the property name is not equal to an Entity by chance... so maybe try to check for standard types?
-                if (typeof(EntityToDtoConverter).Assembly.GetTypes().Any(t => t.Name.Equals(property.Name + "Dto")))
-                {
-                    Type newEntityType = typeof(User).Assembly.GetTypes().First(t => t.Name.Equals(property.Name.Replace("Dto", "")));
-                    object entityObject = entityType.GetProperty(property.Name).GetValue(entity, null);
-                    object result = Convert(property.PropertyType, newEntityType, entityObject);
-                    property.SetValue(dto, result);
+                if (GetValue(entityType, entity, property, dto))
                     continue;
-                }
                 object value = entityType.GetProperty(property.Name).GetValue(entity);
                 property.SetValue(dto, value);
             }
 
             return dto;
+        }
+
+        private static bool GetValue(Type entityType, object entity, PropertyInfo property, dynamic dto)
+        {
+            string propertyTypeName = property.PropertyType.Name.Replace("Proxy", "").Replace("Dto", "");
+
+            // TODO: Verify if the current "Entity" type has a DTO type. if not throw!
+            // TODO: also check if the property name is not equal to an Entity by chance... so maybe try to check for standard types?
+            if (!typeof(UserDto).Assembly.GetTypes().Any(t => t.Name.Equals(propertyTypeName + "Dto")))
+                return false;
+            Type newEntityType = typeof(User).Assembly.GetTypes().First(t => t.Name.Equals(propertyTypeName));
+            object entityObject = entityType.GetProperty(property.Name).GetValue(entity, null);
+            object result = Convert(property.PropertyType, newEntityType, entityObject);
+            property.SetValue(dto, result);
+            return true;
         }
     }
 }

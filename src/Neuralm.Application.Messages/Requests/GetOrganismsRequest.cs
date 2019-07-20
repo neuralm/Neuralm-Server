@@ -8,16 +8,16 @@ namespace Neuralm.Application.Messages.Requests
     public class GetOrganismsRequest : Request
     {
         /// <summary>
-        /// Gets the training room id.
+        /// Gets the training session id.
         /// </summary>
-        public Guid TrainingRoomId { get; }
+        public Guid TrainingSessionId { get; }
 
         /// <summary>
         /// Initializes an instance of the <see cref="GetOrganismsRequest"/> class.
         /// </summary>
-        public GetOrganismsRequest(Guid trainingRoomId)
+        public GetOrganismsRequest(Guid trainingSessionId)
         {
-            TrainingRoomId = trainingRoomId;
+            TrainingSessionId = trainingSessionId;
         }
     }
 }

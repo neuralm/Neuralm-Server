@@ -55,6 +55,19 @@ namespace Neuralm.Application.Services
 
             User owner = await _userRepository.FindSingleByExpressionAsync(user => user.Id.Equals(createTrainingRoomRequest.OwnerId));
             TrainingRoom trainingRoom = new TrainingRoom(owner, createTrainingRoomRequest.TrainingRoomName, createTrainingRoomRequest.TrainingRoomSettings);
+            Random random = new Random(trainingRoom.TrainingRoomSettings.Seed);
+            for (int i = 0; i < 100; i++)
+            {
+                foreach (Species species in trainingRoom.Species)
+                {
+                    foreach (Organism organism in species.Organisms)
+                    {
+                        trainingRoom.PostScore(organism, random.NextDouble() + 0.001);
+                    }
+                }
+                trainingRoom.EndGeneration();
+                Console.WriteLine("generation " + i);
+            }
             if (!await _trainingRoomRepository.CreateAsync(trainingRoom))
                 return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "Failed to create training room.");
 
@@ -106,7 +119,19 @@ namespace Neuralm.Application.Services
         /// <inheritdoc cref="ITrainingRoomService.GetOrganismsAsync(GetOrganismsRequest)"/>
         public async Task<GetOrganismsResponse> GetOrganismsAsync(GetOrganismsRequest getOrganismsRequest)
         {
-            throw new NotImplementedException();
+            Expression<Func<TrainingSession, bool>> predicate = ts => ts.Id.Equals(getOrganismsRequest.TrainingSessionId);
+            if (getOrganismsRequest.TrainingSessionId.Equals(Guid.Empty))
+                return new GetOrganismsResponse(getOrganismsRequest.Id, null, "Training room id cannot be an empty guid.");
+
+            if (!await _trainingSessionRepository.ExistsAsync(predicate))
+                return new GetOrganismsResponse(getOrganismsRequest.Id, null, "Training session does not exist.");
+
+            TrainingSession trainingSession = await _trainingSessionRepository.FindSingleByExpressionAsync(predicate);
+            TrainingRoom trainingRoom = trainingSession.TrainingRoom;
+            List<OrganismDto> organisms = trainingRoom.Species.SelectMany(sp =>
+                    sp.LastGenerationOrganisms.Select(EntityToDtoConverter.Convert<OrganismDto, Organism>).ToList())
+                .ToList();
+            return new GetOrganismsResponse(getOrganismsRequest.Id, organisms, "Successfully fetched the organisms.", true);
         }
 
         /// <inheritdoc cref="ITrainingRoomService.PostOrganismsScoreAsync(PostOrganismsScoreRequest)"/>

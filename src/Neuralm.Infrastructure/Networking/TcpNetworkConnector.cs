@@ -59,19 +59,15 @@ namespace Neuralm.Infrastructure.Networking
         }
 
         /// <inheritdoc cref="BaseNetworkConnector.ReceivePacketAsync"/>
-        protected override Task<int> ReceivePacketAsync(Memory<byte> memory, CancellationToken cancellationToken)
+        protected override ValueTask<int> ReceivePacketAsync(Memory<byte> memory, CancellationToken cancellationToken)
         {
-            if (!MemoryMarshal.TryGetArray(memory, out ArraySegment<byte> segment))
-                throw new ArgumentException("Cannot get ArraySegment<byte> from Memory<byte> memory.");
-            return _tcpClient.Client.ReceiveAsync(segment, SocketFlags.None);
+            return _tcpClient.Client.ReceiveAsync(memory, SocketFlags.None, cancellationToken);
         }
 
         /// <inheritdoc cref="BaseNetworkConnector.SendPacketAsync"/>
-        protected override Task<int> SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken)
+        protected override ValueTask<int> SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken)
         {
-            if (!MemoryMarshal.TryGetArray(packet, out ArraySegment<byte> segment))
-                throw new ArgumentException("Cannot get ArraySegment<byte> from ReadOnlyMemory<byte> packet.");
-            return _tcpClient.Client.SendAsync(segment, SocketFlags.None);
+            return _tcpClient.Client.SendAsync(packet, SocketFlags.None, cancellationToken);
         }
 
         /// <summary>
