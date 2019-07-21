@@ -56,7 +56,7 @@ namespace Neuralm.Application.Services
             User owner = await _userRepository.FindSingleByExpressionAsync(user => user.Id.Equals(createTrainingRoomRequest.OwnerId));
             TrainingRoom trainingRoom = new TrainingRoom(owner, createTrainingRoomRequest.TrainingRoomName, createTrainingRoomRequest.TrainingRoomSettings);
             Random random = new Random(trainingRoom.TrainingRoomSettings.Seed);
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 300; i++)
             {
                 foreach (Species species in trainingRoom.Species)
                 {

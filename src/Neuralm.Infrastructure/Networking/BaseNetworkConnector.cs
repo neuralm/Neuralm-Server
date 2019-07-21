@@ -19,7 +19,10 @@ namespace Neuralm.Infrastructure.Networking
         private readonly IMessageProcessor _messageProcessor;
         private readonly MessageConstructor _messageConstructor;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        private const int MinimumBufferSizeHint = 512;
+        private int _minimumBufferSizeHint = 512;
+        private const int AbsoluteMinimumBufferSizeHint = 512;
+        private int _expectingHeader = 1;
+        private int _bytesReceived = 0;
 
         /// <summary>
         /// Gets and sets a value indicating whether <see cref="Start"/> has ran.
@@ -132,6 +135,47 @@ namespace Neuralm.Infrastructure.Networking
                 }
             });
         }
+
+        private async Task FillPipeAsync(PipeWriter pipeWriter, CancellationToken cancellationToken)
+        {
+            while (true)
+            {
+                while (_bytesReceived < _minimumBufferSizeHint)
+                {
+                    if (_expectingHeader == 1 && _bytesReceived > 0)
+                        break;
+                    if (_expectingHeader == 0 && _bytesReceived == _minimumBufferSizeHint)
+                        break;
+                    try
+                    {
+                        int bytesRent = _minimumBufferSizeHint - _bytesReceived;
+                        if (bytesRent <= 0)
+                            break;
+                        Memory<byte> memory = pipeWriter.GetMemory(bytesRent);
+                        int bytesReceived = await ReceivePacketAsync(memory, cancellationToken);
+                        Interlocked.Add(ref _bytesReceived, bytesReceived);
+                        if (bytesReceived == 0)
+                            break;
+                        pipeWriter.Advance(bytesReceived);
+                        Debug.WriteLine($"FillPipe bytes received: {_bytesReceived} out of allotted {_minimumBufferSizeHint}, expecting header: {_expectingHeader}");
+                    }
+                    catch (Exception exception)
+                    {
+                        Debug.WriteLine(exception.Message);
+                        break;
+                    }
+                }
+
+
+                FlushResult flushResult = await pipeWriter.FlushAsync(cancellationToken);
+                Interlocked.Exchange(ref _bytesReceived, 0);
+                if (flushResult.IsCompleted)
+                    break;
+            }
+
+            pipeWriter.Complete();
+        }
+
         private Task StartWritingTask(PipeWriter pipeWriter)
         {
             return Task.Run(async () =>
@@ -150,30 +194,7 @@ namespace Neuralm.Infrastructure.Networking
                 }
             });
         }
-        private async Task FillPipeAsync(PipeWriter pipeWriter, CancellationToken cancellationToken)
-        {
-            while (true)
-            {
-                try
-                {
-                    Memory<byte> memory = pipeWriter.GetMemory(MinimumBufferSizeHint);
-                    int bytesReceived = await ReceivePacketAsync(memory, cancellationToken);
-                    if (bytesReceived == 0)
-                        break;
-                    pipeWriter.Advance(bytesReceived);
-                }
-                catch (Exception exception)
-                {
-                    Debug.WriteLine(exception.Message);
-                    break;
-                }
 
-                FlushResult flushResult = await pipeWriter.FlushAsync(cancellationToken);
-                if (flushResult.IsCompleted)
-                    break;
-            }
-            pipeWriter.Complete();
-        }
         private async Task ReadPipeAsync(PipeReader pipeReader, CancellationToken cancellationToken)
         {
             MessageHeader? header = null;
@@ -182,6 +203,7 @@ namespace Neuralm.Infrastructure.Networking
                 ReadResult result = await pipeReader.ReadAsync(cancellationToken);
                 ReadOnlySequence<byte> buffer = result.Buffer;
                 SequencePosition? position = null;
+                
                 while (true)
                 {
                     if (header is null)
@@ -192,6 +214,10 @@ namespace Neuralm.Infrastructure.Networking
                         buffer = buffer.Slice(position.Value);
                     }
 
+                    // Increase read buffer for body size
+                    Interlocked.Exchange(ref _expectingHeader, 0);
+                    Interlocked.Exchange(ref _minimumBufferSizeHint, header.Value.BodySize);
+                    Debug.WriteLine($"Type: {header.Value.TypeName}, BodySize: {_minimumBufferSizeHint}");
                     byte[] bodyBufferSource = ArrayPool<byte>.Shared.Rent(header.Value.BodySize);
                     Memory<byte> bodyBufferMemory = bodyBufferSource.AsMemory(0, header.Value.BodySize);
                     if (!TryCopyBodyBuffer(buffer, header.Value.BodySize, bodyBufferMemory.Span))
@@ -202,26 +228,21 @@ namespace Neuralm.Infrastructure.Networking
 
                     position = Position(position, header.Value.BodySize, buffer);
                     buffer = buffer.Slice(position.Value);
+
+                    // Reset read buffer to minimum buffer size
+                    Interlocked.Exchange(ref _expectingHeader, 1);
+                    Interlocked.Exchange(ref _minimumBufferSizeHint, AbsoluteMinimumBufferSizeHint);
                     _ = ProcessMessageTask(cancellationToken, header.Value.TypeName, bodyBufferMemory, bodyBufferSource);
                     // Clear header
                     header = null;
                 }
 
-                try
-                {
-                    pipeReader.AdvanceTo(buffer.Start, buffer.End);
-
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
+                pipeReader.AdvanceTo(buffer.Start, buffer.End);
                 // Stop reading if there's no more data coming
                 if (result.IsCompleted)
                     break;
             }
-            
+
             // Mark the PipeReader as complete
             pipeReader.Complete();
         }
