@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Neuralm.Infrastructure.Interfaces
@@ -6,7 +7,7 @@ namespace Neuralm.Infrastructure.Interfaces
     /// <summary>
     /// Represents the <see cref="INetworkConnector"/> interface.
     /// </summary>
-    public interface INetworkConnector
+    public interface INetworkConnector : IDisposable
     {
         /// <summary>
         /// Gets a value indicating whether the network connector is connected.
@@ -22,8 +23,8 @@ namespace Neuralm.Infrastructure.Interfaces
         /// Connects the network connector asynchronously.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Returns an awaitable <see cref="ValueTask"/>.</returns>
-        ValueTask ConnectAsync(CancellationToken cancellationToken);
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
+        Task ConnectAsync(CancellationToken cancellationToken);
 
         /// <summary>
         /// Sends a message asynchronously.

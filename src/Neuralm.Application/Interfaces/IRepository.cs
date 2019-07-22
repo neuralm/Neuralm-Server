@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Neuralm.Domain.Exceptions;
 
 namespace Neuralm.Application.Interfaces
 {

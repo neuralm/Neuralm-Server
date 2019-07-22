@@ -11,16 +11,18 @@ namespace Neuralm.Infrastructure.Networking
     /// <summary>
     /// Represents the <see cref="TcpNetworkConnector"/> class; an implementation of the abstract <see cref="BaseNetworkConnector"/> class.
     /// </summary>
-    public sealed class TcpNetworkConnector : BaseNetworkConnector, IDisposable
+    public sealed class TcpNetworkConnector : BaseNetworkConnector
     {
         private readonly TcpClient _tcpClient;
         private readonly string _host;
         private readonly int _port;
+        private NetworkStream _networkStream;
 
-        /// <summary>
-        /// Gets a value indicating whether the connector is connected.
-        /// </summary>
+        /// <inheritdoc cref="BaseNetworkConnector.IsConnected"/>
         public override bool IsConnected => _tcpClient.Connected;
+
+        /// <inheritdoc cref="BaseNetworkConnector.IsDataAvailable"/>
+        protected override bool IsDataAvailable => _networkStream.DataAvailable;
 
         /// <summary>
         /// Initializes an instance of the <see cref="TcpNetworkConnector"/> class.
@@ -50,12 +52,16 @@ namespace Neuralm.Infrastructure.Networking
             _host = hostEntry.HostName;
             _port = endPoint.Port;
             _tcpClient.Client.NoDelay = true;
+            _networkStream = _tcpClient.GetStream();
         }
 
         /// <inheritdoc cref="BaseNetworkConnector.ConnectAsync"/>
-        public override ValueTask ConnectAsync(CancellationToken cancellationToken)
+        public override async Task ConnectAsync(CancellationToken cancellationToken)
         {
-            return IsConnected ? new ValueTask() : new ValueTask(Task.Run(async () => await _tcpClient.ConnectAsync(_host, _port), cancellationToken));
+            if (IsConnected)
+                return;
+            await _tcpClient.ConnectAsync(_host, _port);
+            _networkStream = _tcpClient.GetStream();
         }
 
         /// <inheritdoc cref="BaseNetworkConnector.ReceivePacketAsync"/>
@@ -71,32 +77,12 @@ namespace Neuralm.Infrastructure.Networking
         }
 
         /// <summary>
-        /// Disposes the tcp client.
-        /// </summary>
-        /// <param name="disposing">The disposing flag.</param>
-        private void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _tcpClient?.Dispose();
-            }
-        }
-
-        /// <summary>
         /// Disposes the tcp client and suppresses the garbage collector.
         /// </summary>
-        public void Dispose()
+        public new void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Deconstructs the class.
-        /// </summary>
-        ~TcpNetworkConnector()
-        {
-            Dispose(false);
+            _tcpClient?.Dispose();
+            base.Dispose(true);
         }
     }
 }

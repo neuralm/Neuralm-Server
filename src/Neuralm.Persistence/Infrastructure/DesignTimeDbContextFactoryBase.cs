@@ -15,7 +15,7 @@ namespace Neuralm.Persistence.Infrastructure
     public abstract class DesignTimeDbContextFactoryBase<TContext> : IDesignTimeDbContextFactory<TContext> where TContext : DbContext
     {
         private DbContextOptionsBuilder<TContext> _dbContextOptionsBuilder;
-        protected readonly DbConfiguration DbConfiguration;
+        private readonly DbConfiguration _dbConfiguration;
 
         /// <summary>
         /// Initializes an instance of the <see cref="DesignTimeDbContextFactoryBase{TContext}"/> class.
@@ -23,7 +23,7 @@ namespace Neuralm.Persistence.Infrastructure
         /// <param name="dbConfigurationOptions">The options.</param>
         protected DesignTimeDbContextFactoryBase(IOptions<DbConfiguration> dbConfigurationOptions)
         {
-            DbConfiguration = dbConfigurationOptions == null 
+            _dbConfiguration = dbConfigurationOptions == null 
                 ? GetDbConfiguration() 
                 : dbConfigurationOptions.Value;
         }
@@ -43,7 +43,7 @@ namespace Neuralm.Persistence.Infrastructure
         public virtual TContext CreateDbContext(string[] args)
         {
             if (_dbContextOptionsBuilder == null)
-                SetDbContextOptionsBuilder(DbConfiguration.ConnectionString);
+                SetDbContextOptionsBuilder(_dbConfiguration.ConnectionString);
             return CreateNewInstance(_dbContextOptionsBuilder.Options);
         }
 

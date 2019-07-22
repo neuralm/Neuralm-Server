@@ -11,13 +11,13 @@ namespace Neuralm.Tests.NEAT
         public class CloneTest
         {
             private ConnectionGene _original;
-            private Guid id;
+            private Guid _id;
 
             [TestInitialize]
             public void Initialize()
             {
-                id = Guid.NewGuid();
-                _original = new ConnectionGene(id, 0, 2, 0.5, 1, true);
+                _id = Guid.NewGuid();
+                _original = new ConnectionGene(_id, 0, 2, 0.5, 1, true);
             }
 
             [TestMethod]

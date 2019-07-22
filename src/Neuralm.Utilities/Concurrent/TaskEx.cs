@@ -18,15 +18,13 @@ namespace Neuralm.Utilities.Concurrent
         /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         public static async Task WaitWhile(Func<bool> condition, int frequency = 25, int timeout = -1)
         {
-            using (Task waitTask = Task.Run(async () =>
+            using Task waitTask = Task.Run(async () =>
             {
                 while (condition())
                     await Task.Delay(frequency);
-            }))
-            {
-                if (waitTask != await Task.WhenAny(waitTask, Task.Delay(timeout)))
-                    throw new TimeoutException();
-            }
+            });
+            if (waitTask != await Task.WhenAny(waitTask, Task.Delay(timeout)))
+                throw new TimeoutException();
         }
 
         /// <summary>
@@ -38,15 +36,13 @@ namespace Neuralm.Utilities.Concurrent
         /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         public static async Task WaitUntil(Func<bool> condition, int frequency = 25, int timeout = -1)
         {
-            using (Task waitTask = Task.Run(async () =>
+            using Task waitTask = Task.Run(async () =>
             {
                 while (!condition())
                     await Task.Delay(frequency);
-            }))
-            {
-                if (waitTask != await Task.WhenAny(waitTask, Task.Delay(timeout)))
-                    throw new TimeoutException();
-            }
+            });
+            if (waitTask != await Task.WhenAny(waitTask, Task.Delay(timeout)))
+                throw new TimeoutException();
         }
     }
 }

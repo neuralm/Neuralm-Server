@@ -12,8 +12,8 @@ namespace Neuralm.Infrastructure
     internal static class MessageTypeCache
     {
         private static readonly ConcurrentDictionary<string, Type> TypeCache = new ConcurrentDictionary<string, Type>();
-        private static int _isLoaded = 0;
-        private static int _isLoading = 0;
+        private static int _isLoaded;
+        private static int _isLoading;
 
         /// <summary>
         /// Tries to get a message type with the given type name.
