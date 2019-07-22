@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Neuralm.Domain;
 
 namespace Neuralm.Persistence.Abstractions
 {
@@ -34,7 +35,8 @@ namespace Neuralm.Persistence.Abstractions
         /// <inheritdoc cref="IRepository{TEntity}.CreateAsync(TEntity)"/>
         public virtual async Task<bool> CreateAsync(TEntity entity)
         {
-            bool saveSuccess;
+            bool saveSuccess = false;
+            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
             try
             {
                 EntityValidator.Validate(entity);
@@ -44,62 +46,71 @@ namespace Neuralm.Persistence.Abstractions
             }
             catch (Exception ex)
             {
-                throw new CreatingEntityFailedException($"The entity of type {typeof(TEntity).Name} could not be created.", ex);
+                Console.WriteLine(new CreatingEntityFailedException($"The entity of type {typeof(TEntity).Name} could not be created.", ex));
             }
+
             return saveSuccess;
         }
 
         /// <inheritdoc cref="IRepository{TEntity}.DeleteAsync(TEntity)"/>
         public virtual async Task<bool> DeleteAsync(TEntity entity)
         {
-            if (!await DbContext.Set<TEntity>().ContainsAsync(entity))
-                throw new EntityNotFoundException($"The entity of type {typeof(TEntity).Name} could not be found.");
-            DbContext.Set<TEntity>().Remove(entity);
-            bool saveSuccess;
+            bool saveSuccess = false;
+            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
             try
             {
+                if (!await DbContext.Set<TEntity>().ContainsAsync(entity))
+                    throw new EntityNotFoundException($"The entity of type {typeof(TEntity).Name} could not be found.");
+
+                DbContext.Set<TEntity>().Remove(entity);
                 int saveResult = await DbContext.SaveChangesAsync();
                 saveSuccess = Convert.ToBoolean(saveResult);
             }
             catch (Exception ex)
             {
-                throw new DeletingEntityFailedException($"The entity of type {typeof(TEntity).Name} could not be deleted.", ex);
+                Console.WriteLine(new DeletingEntityFailedException($"The entity of type {typeof(TEntity).Name} could not be deleted.", ex));
             }
+
             return saveSuccess;
         }
 
         /// <inheritdoc cref="IRepository{TEntity}.ExistsAsync(Expression{Func{TEntity, bool}})"/>
         public virtual async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
         {
+            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
             return await DbContext.Set<TEntity>().AnyAsync(predicate);
         }
 
         /// <inheritdoc cref="IRepository{TEntity}.FindManyByExpressionAsync(Expression{Func{TEntity, bool}})"/>
         public virtual async Task<IEnumerable<TEntity>> FindManyByExpressionAsync(Expression<Func<TEntity, bool>> predicate)
         {
+            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
             return await DbContext.Set<TEntity>().Where(predicate).ToListAsync();
         }
 
         /// <inheritdoc cref="IRepository{TEntity}.FindSingleByExpressionAsync(Expression{Func{TEntity, bool}})"/>
         public virtual async Task<TEntity> FindSingleByExpressionAsync(Expression<Func<TEntity, bool>> predicate)
         {
+            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
             TEntity entity = await DbContext.Set<TEntity>().SingleOrDefaultAsync(predicate);
             if (entity == default)
-                throw new EntityNotFoundException($"The entity of type {typeof(TEntity).Name} could not be found by the predicate.");
+                Console.WriteLine(new EntityNotFoundException($"The entity of type {typeof(TEntity).Name} could not be found by the predicate."));
             return entity;
         }
 
         /// <inheritdoc cref="IRepository{TEntity}.GetAllAsync"/>
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
         {
+            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
             return await DbContext.Set<TEntity>().ToListAsync();
         }
 
         /// <inheritdoc cref="IRepository{TEntity}.UpdateAsync(TEntity)"/>
         public virtual async Task<bool> UpdateAsync(TEntity entity)
         {
+            bool saveSuccess = false;
+            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
             DbContext.Update(entity);
-            bool saveSuccess;
             try
             {
                 int saveResult = await DbContext.SaveChangesAsync();
@@ -107,7 +118,7 @@ namespace Neuralm.Persistence.Abstractions
             }
             catch (Exception ex)
             {
-                throw new UpdatingEntityFailedException($"The entity of type {typeof(TEntity).Name} failed to update.", ex);
+                Console.WriteLine(new UpdatingEntityFailedException($"The entity of type {typeof(TEntity).Name} failed to update.", ex));
             }
             return saveSuccess;
         }

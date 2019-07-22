@@ -45,6 +45,7 @@ namespace Neuralm.Presentation.CLI
             };
             return Task.WhenAll(tasks);
         }
+
         /// <summary>
         /// Gets the generic service provider.
         /// </summary>

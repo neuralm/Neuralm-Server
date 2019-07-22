@@ -5,15 +5,23 @@ using System.Linq;
 using System.Reflection;
 using Castle.DynamicProxy;
 using Neuralm.Application.Messages.Dtos;
+using Neuralm.Domain;
 using Neuralm.Domain.Entities;
 
 namespace Neuralm.Application.Converters
 {
     /// <summary>
-    /// Provides methods to convert Entities to Dto's.
+    /// Represents the <see cref="EntityToDtoConverter"/> class.
     /// </summary>
     public static class EntityToDtoConverter
     {
+        /// <summary>
+        /// Converts the given Entity into the given Dto type.
+        /// </summary>
+        /// <typeparam name="TDto">The dto type.</typeparam>
+        /// <typeparam name="TEntity">The Entity type.</typeparam>
+        /// <param name="entity">The entity.</param>
+        /// <returns>Returns the converted entity as dto.</returns>
         public static TDto Convert<TDto, TEntity>(TEntity entity) where TDto : class, new()
         {
             TDto dto = new TDto();
@@ -68,7 +76,6 @@ namespace Neuralm.Application.Converters
             foreach (PropertyInfo property in dtoProperties)
             {
                 Type type = property.PropertyType;
-                //  type.GetGenericTypeDefinition() == typeof(List<>)
                 if (type.IsGenericType && type.GetGenericTypeDefinition().GetInterfaces().Contains(typeof(IEnumerable)))
                 {
                     Type newDtoItemType = type.GetGenericArguments()[0];
@@ -106,7 +113,19 @@ namespace Neuralm.Application.Converters
             if (!typeof(UserDto).Assembly.GetTypes().Any(t => t.Name.Equals(propertyTypeName + "Dto")))
                 return false;
             Type newEntityType = typeof(User).Assembly.GetTypes().First(t => t.Name.Equals(propertyTypeName));
-            object entityObject = entityType.GetProperty(property.Name).GetValue(entity, null);
+            object entityObject;
+            // NOTE: Because of lazy loading the database will need to be locked to ensure no parallel queries are running (which will throw errors).
+            // This will use the shared globally shared LoadLock.
+            if (property.PropertyType.Name.Contains("Proxy"))
+            {
+                using EntityLoadLock.Releaser lazyLoadLock = EntityLoadLock.Shared.Lock();
+                entityObject = entityType.GetProperty(property.Name).GetValue(entity, null);
+            }
+            else
+            {
+                entityObject = entityType.GetProperty(property.Name).GetValue(entity, null);
+            }
+
             object result = Convert(property.PropertyType, newEntityType, entityObject);
             property.SetValue(dto, result);
             return true;

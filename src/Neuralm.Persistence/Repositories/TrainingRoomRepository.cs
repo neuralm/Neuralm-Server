@@ -1,7 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Neuralm.Application.Interfaces;
+using Neuralm.Domain;
 using Neuralm.Domain.Entities.NEAT;
+using Neuralm.Domain.Exceptions;
 using Neuralm.Persistence.Abstractions;
 using Neuralm.Persistence.Contexts;
 
@@ -23,10 +26,24 @@ namespace Neuralm.Persistence.Repositories
         }
 
         /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.CreateAsync"/>
-        public override Task<bool> CreateAsync(TrainingRoom entity)
+        public override async Task<bool> CreateAsync(TrainingRoom entity)
         {
-            DbContext.Entry(entity.Owner).State = EntityState.Unchanged;
-            return base.CreateAsync(entity);
+            bool saveSuccess = false;
+            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
+            try
+            {
+                DbContext.Entry(entity.Owner).State = EntityState.Unchanged;
+                EntityValidator.Validate(entity);
+                DbContext.Set<TrainingRoom>().Add(entity);
+                int saveResult = await DbContext.SaveChangesAsync();
+                saveSuccess = Convert.ToBoolean(saveResult);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(new CreatingEntityFailedException($"The entity of type {typeof(TrainingRoom).Name} could not be created.", ex));
+            }
+
+            return saveSuccess;
         }
     }
 }

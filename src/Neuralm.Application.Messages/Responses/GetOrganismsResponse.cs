@@ -23,7 +23,7 @@ namespace Neuralm.Application.Messages.Responses
         /// <param name="success">The success flag.</param>
         public GetOrganismsResponse(Guid requestId, IEnumerable<OrganismDto> organisms, string message = "", bool success = false) : base(requestId, message, success)
         {
-            Organisms = organisms;
+            Organisms = organisms ?? new List<OrganismDto>();
         }
     }
 }

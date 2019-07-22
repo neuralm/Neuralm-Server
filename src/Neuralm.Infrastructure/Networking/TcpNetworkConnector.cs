@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Neuralm.Application.Interfaces;
@@ -34,7 +33,7 @@ namespace Neuralm.Infrastructure.Networking
         {
             _host = host;
             _port = port;
-            _tcpClient = new TcpClient();
+            _tcpClient = new TcpClient {Client = {NoDelay = true}};
         }
 
         /// <summary>
@@ -50,6 +49,7 @@ namespace Neuralm.Infrastructure.Networking
             IPHostEntry hostEntry = Dns.GetHostEntry(endPoint.Address);
             _host = hostEntry.HostName;
             _port = endPoint.Port;
+            _tcpClient.Client.NoDelay = true;
         }
 
         /// <inheritdoc cref="BaseNetworkConnector.ConnectAsync"/>
