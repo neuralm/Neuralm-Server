@@ -1,6 +1,7 @@
 ﻿using Neuralm.Application.Interfaces;
 using System;
 using System.Buffers;
+using System.Diagnostics;
 using System.IO.Pipelines;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,8 +19,11 @@ namespace Neuralm.Infrastructure.Networking
         private readonly IMessageProcessor _messageProcessor;
         private readonly MessageConstructor _messageConstructor;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        private const int MinimumBufferSizeHint = 512;
-        
+        private int _minimumBufferSizeHint = 512;
+        private const int AbsoluteMinimumBufferSizeHint = 512;
+        private int _expectingHeader = 1;
+        private int _bytesReceived = 0;
+
         /// <summary>
         /// Gets and sets a value indicating whether <see cref="Start"/> has ran.
         /// </summary>
@@ -37,8 +41,8 @@ namespace Neuralm.Infrastructure.Networking
         /// Also loads the <see cref="MessageTypeCache"/> on the first <see cref="BaseNetworkConnector"/> instance creation.
         /// </remarks>
         /// <exception cref="ArgumentNullException">If the messageProcessor is null; an argument exception is thrown.</exception>
-        /// <param name="messageSerializer">The message processor.</param>
-        /// <param name="messageProcessor">The message serializer.</param>
+        /// <param name="messageSerializer">The message serializer.</param>
+        /// <param name="messageProcessor">The message processor.</param>
         protected BaseNetworkConnector(IMessageSerializer messageSerializer, IMessageProcessor messageProcessor)
         {
             _messageConstructor = new MessageConstructor(messageSerializer);
@@ -94,7 +98,7 @@ namespace Neuralm.Infrastructure.Networking
         /// Connect asynchronously.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Returns a <see cref="ValueTask"/>.</returns>
+        /// <returns>Returns an awaitable <see cref="ValueTask"/>.</returns>
         public abstract ValueTask ConnectAsync(CancellationToken cancellationToken);
 
         /// <summary>
@@ -102,16 +106,16 @@ namespace Neuralm.Infrastructure.Networking
         /// </summary>
         /// <param name="packet">The packet.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Returns an awaitable <see cref="Task"/> with <see cref="int"/> as type parameter; with the bytes count sent.</returns>
-        protected abstract Task<int> SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken);
+        /// <returns>Returns an awaitable <see cref="ValueTask"/> with <see cref="int"/> as type parameter; with the bytes count sent.</returns>
+        protected abstract ValueTask<int> SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken);
 
         /// <summary>
         /// Receive a packet asynchronously.
         /// </summary>
         /// <param name="memory">The memory.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Returns an awaitable <see cref="Task"/> with <see cref="int"/> as type parameter; with the bytes count received.</returns>
-        protected abstract Task<int> ReceivePacketAsync(Memory<byte> memory, CancellationToken cancellationToken);
+        /// <returns>Returns an awaitable <see cref="ValueTask"/> with <see cref="int"/> as type parameter; with the bytes count received.</returns>
+        protected abstract ValueTask<int> ReceivePacketAsync(Memory<byte> memory, CancellationToken cancellationToken);
 
         private Task StartReadingTask(PipeReader pipeReader)
         {
@@ -153,29 +157,38 @@ namespace Neuralm.Infrastructure.Networking
         {
             while (true)
             {
-                // Allocate at least 512 bytes from the PipeWriter
-                Memory<byte> memory = pipeWriter.GetMemory(MinimumBufferSizeHint);
-                try
+                while (Interlocked.CompareExchange(ref _bytesReceived, 0, 0) < Interlocked.CompareExchange(ref _minimumBufferSizeHint, 0, 0))
                 {
-                    int bytesReceived = await ReceivePacketAsync(memory, cancellationToken);
-                    if (bytesReceived == 0)
+                    if (Interlocked.CompareExchange(ref _expectingHeader, 0, 0) == 1 && Interlocked.CompareExchange(ref _bytesReceived, 0, 0) > 0)
                         break;
-                    // Tell the PipeWriter how much was read from the Socket
-                    pipeWriter.Advance(bytesReceived);
-                }
-                catch (Exception exception)
-                {
-                    Console.WriteLine(exception);
-                    break;
+                    if (Interlocked.CompareExchange(ref _expectingHeader, 0, 0) == 0 && Interlocked.CompareExchange(ref _bytesReceived, 0, 0) == Interlocked.CompareExchange(ref _minimumBufferSizeHint, 0, 0))
+                        break;
+                    try
+                    {
+                        if (Interlocked.CompareExchange(ref _minimumBufferSizeHint, 0, 0) - Interlocked.CompareExchange(ref _bytesReceived, 0, 0) <= 0)
+                            break;
+                        Memory<byte> memory = pipeWriter.GetMemory(Interlocked.CompareExchange(ref _minimumBufferSizeHint, 0, 0) - Interlocked.CompareExchange(ref _bytesReceived, 0, 0));
+                        int bytesReceived = await ReceivePacketAsync(memory, cancellationToken);
+                        Interlocked.Add(ref _bytesReceived, bytesReceived);
+                        if (bytesReceived == 0)
+                            break;
+                        pipeWriter.Advance(bytesReceived);
+                        Debug.WriteLine($"FillPipe bytes received: {Interlocked.CompareExchange(ref _bytesReceived, 0, 0)} out of allotted size hint {Interlocked.CompareExchange(ref _minimumBufferSizeHint, 0, 0)}, expecting header: {Interlocked.CompareExchange(ref _expectingHeader, 0, 0)}");
+                    }
+                    catch (Exception exception)
+                    {
+                        Debug.WriteLine(exception.Message);
+                        break;
+                    }
                 }
 
-                // Make the data available to the PipeReader
                 FlushResult flushResult = await pipeWriter.FlushAsync(cancellationToken);
+                Interlocked.Exchange(ref _bytesReceived, 0);
 
                 if (flushResult.IsCompleted)
                     break;
             }
-            // Tell the PipeReader that there's no more data coming
+
             pipeWriter.Complete();
         }
         private async Task ReadPipeAsync(PipeReader pipeReader, CancellationToken cancellationToken)
@@ -186,21 +199,48 @@ namespace Neuralm.Infrastructure.Networking
                 ReadResult result = await pipeReader.ReadAsync(cancellationToken);
                 ReadOnlySequence<byte> buffer = result.Buffer;
                 SequencePosition? position = null;
+                
                 while (true)
                 {
-                    if (TryReadHeader(ref header, ref buffer, ref position))
+                    if (header is null)
+                    {
+                        if (!MessageHeader.TryParseHeader(buffer, out header) || header is null)
+                            break;
+                        position = Position(position, header.Value.GetHeaderSize(), buffer);
+                        buffer = buffer.Slice(position.Value);
+                        // Increase read buffer for body size
+                        Interlocked.Exchange(ref _expectingHeader, 0);
+                        Interlocked.Exchange(ref _minimumBufferSizeHint, header.Value.BodySize);
+                        Debug.WriteLine($"MessageHeader: {header.Value.TypeName}, BodySize: {Interlocked.CompareExchange(ref _minimumBufferSizeHint, 0, 0)}");
+                    }
+
+                    byte[] bodyBufferSource = ArrayPool<byte>.Shared.Rent(header.Value.BodySize);
+                    Memory<byte> bodyBufferMemory = bodyBufferSource.AsMemory(0, header.Value.BodySize);
+                    if (!TryCopyBodyBuffer(buffer, header.Value.BodySize, bodyBufferMemory.Span))
+                    {
+                        ArrayPool<byte>.Shared.Return(bodyBufferSource);
                         break;
-                    if (TryReadBody(header.Value.BodySize, out byte[] bodyBufferSource, out Memory<byte> bodyBufferMemory, ref buffer, ref position))
-                        break;
+                    }
+
+                    position = Position(position, header.Value.BodySize, buffer);
+                    buffer = buffer.Slice(position.Value);
+                    Debug.WriteLine("Body read!");
+
+                    // Reset read buffer to minimum buffer size
+                    Interlocked.Exchange(ref _expectingHeader, 1);
+                    Interlocked.Exchange(ref _minimumBufferSizeHint, AbsoluteMinimumBufferSizeHint);
+
                     _ = ProcessMessageTask(cancellationToken, header.Value.TypeName, bodyBufferMemory, bodyBufferSource);
                     // Clear header
                     header = null;
                 }
+
                 pipeReader.AdvanceTo(buffer.Start, buffer.End);
                 // Stop reading if there's no more data coming
                 if (result.IsCompleted)
                     break;
             }
+
             // Mark the PipeReader as complete
             pipeReader.Complete();
         }

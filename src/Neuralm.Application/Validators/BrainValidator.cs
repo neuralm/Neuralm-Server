@@ -15,7 +15,7 @@ namespace Neuralm.Application.Validators
         {
             if (entity.Id.Equals(Guid.Empty))
                 throw new EntityValidationException("Id cannot be empty guid.");
-            if (entity.Genes == null)
+            if (entity.ConnectionGenes == null)
                 throw new EntityValidationException("Genes cannot be null");
             return true;
         }

@@ -15,7 +15,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <summary>
         /// Gets and sets the brain count.
         /// </summary>
-        public uint BrainCount { get; private set; }
+        public uint OrganismCount { get; private set; }
 
         /// <summary>
         /// Gets and sets the input count.
@@ -111,7 +111,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <summary>
         /// Initializes an instance of the <see cref="TrainingRoomSettings"/> class
         /// </summary>
-        /// <param name="brainCount">How many brains each generation has.</param>
+        /// <param name="organismCount">How many organisms each generation has.</param>
         /// <param name="inputCount">How many inputs each brain has.</param>
         /// <param name="outputCount">How many outputs each brain has.</param>
         /// <param name="c1">The importance of excess genes when checking the species. The higher this number the faster they will become a different species.</param>
@@ -129,14 +129,14 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <param name="enableConnectionChance">The chance a disabled connection gets enabled when crossover happens [0,1].</param>
         /// <param name="seed">The seed for the pseudo-random generator.</param>
         public TrainingRoomSettings(
-            uint brainCount, uint inputCount, uint outputCount,
+            uint organismCount, uint inputCount, uint outputCount,
             double c1, double c2, double c3,
             double threshold, double addConnectionChance, double addNodeChance,
             double crossOverChance, double interSpeciesChance, double mutationChance,
             double mutateWeightChance, double weightReassignChance, double topAmountToSurvive, double enableConnectionChance, int seed)
         {
             Id = Guid.NewGuid();
-            BrainCount = brainCount;
+            OrganismCount = organismCount;
             InputCount = inputCount;
             OutputCount = outputCount;
             SpeciesExcessGeneWeight = c1;

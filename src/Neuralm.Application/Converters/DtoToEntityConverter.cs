@@ -5,10 +5,17 @@ using System.Reflection;
 namespace Neuralm.Application.Converters
 {
     /// <summary>
-    /// Provides methods to convert Dto's to Entities.
+    /// Represents the <see cref="DtoToEntityConverter"/> class.
     /// </summary>
     public static class DtoToEntityConverter
     {
+        /// <summary>
+        /// Converts the given Dto into the given Entity type.
+        /// </summary>
+        /// <typeparam name="TEntity">The entity type.</typeparam>
+        /// <typeparam name="TDto">The dto type.</typeparam>
+        /// <param name="dto">The dto.</param>
+        /// <returns>Returns the converted dto as entity.</returns>
         public static TEntity Convert<TEntity, TDto>(TDto dto) where TEntity : class, new()
         {
             TEntity entity = new TEntity();

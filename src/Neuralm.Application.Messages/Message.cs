@@ -76,7 +76,7 @@ namespace Neuralm.Application.Messages
         /// </summary>
         /// <param name="buffer">The buffer bytes.</param>
         /// <returns>Returns a <see cref="MessageHeader"/> struct.</returns>
-        internal static MessageHeader ParseHeader(byte[] buffer)
+        private static MessageHeader ParseHeader(byte[] buffer)
         {
             int headerSize = BitConverter.ToInt32(buffer, 0);
             int bodySize = BitConverter.ToInt32(buffer, 4);
@@ -95,21 +95,25 @@ namespace Neuralm.Application.Messages
         /// <returns>Returns <c>true</c> If the sequence of bytes is successfully parsed into a <see cref="MessageHeader"/> struct; otherwise, <c>false</c>.</returns>
         internal static bool TryParseHeader(ReadOnlySequence<byte> sequence, out MessageHeader? messageHeader)
         {
-            if (!TryParseHeaderSize(sequence, out int headerSize))
+            if (!TryParseHeaderSize(sequence, out int headerSize) || headerSize == 0 || sequence.Length < headerSize)
             {
                 messageHeader = null;
                 return false;
             }
 
-            if (sequence.Length < headerSize)
+            try
             {
+                byte[] buffer = ArrayPool<byte>.Shared.Rent(headerSize);
+                sequence.Slice(sequence.Start, headerSize).CopyTo(buffer);
+                messageHeader = ParseHeader(buffer);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
                 messageHeader = null;
                 return false;
             }
-
-            byte[] buffer = ArrayPool<byte>.Shared.Rent(headerSize);
-            sequence.Slice(sequence.Start, headerSize).CopyTo(buffer);
-            messageHeader = ParseHeader(buffer);
+            
             return true;
         }
 
@@ -119,7 +123,7 @@ namespace Neuralm.Application.Messages
         /// <param name="buffer">The bytes.</param>
         /// <param name="headerSize">The header size.</param>
         /// <returns>Returns <c>true</c> If the buffer is successfully parsed into an <see cref="int"/>; otherwise, <c>false</c>.</returns>
-        internal static bool TryParseHeaderSize(in ReadOnlySequence<byte> buffer, out int headerSize)
+        private static bool TryParseHeaderSize(in ReadOnlySequence<byte> buffer, out int headerSize)
         {
             if (buffer.Length < 4)
             {
@@ -127,10 +131,20 @@ namespace Neuralm.Application.Messages
                 return false;
             }
 
-            byte[] headerSizeBuffer = ArrayPool<byte>.Shared.Rent(4);
-            buffer.Slice(buffer.Start, 4).CopyTo(headerSizeBuffer);
-            headerSize = BitConverter.ToInt32(headerSizeBuffer, 0);
-            ArrayPool<byte>.Shared.Return(headerSizeBuffer);
+            try
+            {
+                byte[] headerSizeBuffer = ArrayPool<byte>.Shared.Rent(4);
+                buffer.Slice(buffer.Start, 4).CopyTo(headerSizeBuffer);
+                headerSize = BitConverter.ToInt32(headerSizeBuffer, 0);
+                ArrayPool<byte>.Shared.Return(headerSizeBuffer);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                headerSize = -1;
+                return false;
+            }
+            
             return true;
         }
     }

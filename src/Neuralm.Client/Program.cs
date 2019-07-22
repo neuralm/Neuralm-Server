@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Neuralm.Application.Interfaces;
@@ -43,19 +44,23 @@ namespace Neuralm.Client
                     MessageListener<RegisterResponse> registerMessageListener = new MessageListener<RegisterResponse>();
                     MessageListener<CreateTrainingRoomResponse> createTrainingRoomResponseListener = new MessageListener<CreateTrainingRoomResponse>();
                     MessageListener<GetEnabledTrainingRoomsResponse> getEnabledTrainingRoomsResponseListener = new MessageListener<GetEnabledTrainingRoomsResponse>();
+                    MessageListener<StartTrainingSessionResponse> startTrainingSessionResponseListener = new MessageListener<StartTrainingSessionResponse>();
+                    MessageListener<GetOrganismsResponse> getOrganismsResponseListener = new MessageListener<GetOrganismsResponse>();
                     loginResponseListener.Subscribe(messageProcessor);
                     createTrainingRoomResponseListener.Subscribe(messageProcessor);
                     registerMessageListener.Subscribe(messageProcessor);
                     getEnabledTrainingRoomsResponseListener.Subscribe(messageProcessor);
-
+                    startTrainingSessionResponseListener.Subscribe(messageProcessor);
+                    getOrganismsResponseListener.Subscribe(messageProcessor);
                     for (int i = 0; i < MessageCount; i++)
                     {
-                        RegisterRequest registerRequest = new RegisterRequest("Mario3", "password", "Name");
+                        Guid name = Guid.NewGuid();
+                        RegisterRequest registerRequest = new RegisterRequest(name.ToString(), "password", "Name");
                         await networkConnector.SendMessageAsync(registerRequest, CancellationToken.None);
                         RegisterResponse registerResponse = await registerMessageListener.ReceiveMessageAsync(CancellationToken.None);
                         Console.WriteLine($"RegisterResponse: \n\tSuccess: {registerResponse.Success}, \n\tRequestId: {registerResponse.RequestId}, \n\tResponseId: {registerResponse.Id}, \n\tMessage:{registerResponse.Message}");
 
-                        AuthenticateRequest loginRequest = new AuthenticateRequest("Mario3", "password", "Name");
+                        AuthenticateRequest loginRequest = new AuthenticateRequest(name.ToString(), "password", "Name");
                         await networkConnector.SendMessageAsync(loginRequest, CancellationToken.None);
                         AuthenticateResponse loginResponse = await loginResponseListener.ReceiveMessageAsync(CancellationToken.None);
                         Console.WriteLine($"AuthenticateResponse: \n\tSuccess: {loginResponse.Success}, \n\tAccessToken: {loginResponse.AccessToken}, \n\tRequestId: {loginResponse.RequestId}, \n\tResponseId: {loginResponse.Id}, \n\tMessage:{loginResponse.Message}");
@@ -64,7 +69,17 @@ namespace Neuralm.Client
                         CreateTrainingRoomRequest createTrainingRoomRequest = new CreateTrainingRoomRequest(loginResponse.UserId, Guid.NewGuid().ToString(), trainingRoomSettings);
                         await networkConnector.SendMessageAsync(createTrainingRoomRequest, CancellationToken.None);
                         CreateTrainingRoomResponse createTrainingRoomResponse = await createTrainingRoomResponseListener.ReceiveMessageAsync(CancellationToken.None);
-                        Console.WriteLine($"CreateTrainingRoomRequest: \n\tId: {createTrainingRoomResponse.Id}\n\tRequestId: {createTrainingRoomResponse.RequestId}\n\tDateTime: {createTrainingRoomResponse.DateTime}\n\tMessage: {createTrainingRoomResponse.Message}\n\tSuccess: {createTrainingRoomResponse.Success}\n\tTrainingRoomId: {createTrainingRoomResponse.TrainingRoomId}");
+                        Console.WriteLine($"CreateTrainingRoomResponse: \n\tId: {createTrainingRoomResponse.Id}\n\tRequestId: {createTrainingRoomResponse.RequestId}\n\tDateTime: {createTrainingRoomResponse.DateTime}\n\tMessage: {createTrainingRoomResponse.Message}\n\tSuccess: {createTrainingRoomResponse.Success}\n\tTrainingRoomId: {createTrainingRoomResponse.TrainingRoomId}");
+
+                        StartTrainingSessionRequest startTrainingSessionRequest = new StartTrainingSessionRequest(loginResponse.UserId, createTrainingRoomResponse.TrainingRoomId);
+                        await networkConnector.SendMessageAsync(startTrainingSessionRequest, CancellationToken.None);
+                        StartTrainingSessionResponse startTrainingSessionResponse = await startTrainingSessionResponseListener.ReceiveMessageAsync(CancellationToken.None);
+                        Console.WriteLine($"StartTrainingSessionResponse: \n\tId: {startTrainingSessionResponse.Id}\n\tRequestId: {startTrainingSessionResponse.RequestId}\n\tDateTime: {startTrainingSessionResponse.DateTime}\n\tMessage: {startTrainingSessionResponse.Message}\n\tSuccess: {startTrainingSessionResponse.Success}\n\tTrainingSessionId: {startTrainingSessionResponse.TrainingSession.Id}");
+
+                        GetOrganismsRequest getOrganismsRequest = new GetOrganismsRequest(startTrainingSessionResponse.TrainingSession.Id);
+                        await networkConnector.SendMessageAsync(getOrganismsRequest, CancellationToken.None);
+                        GetOrganismsResponse getOrganismsResponse = await getOrganismsResponseListener.ReceiveMessageAsync(CancellationToken.None);
+                        Console.WriteLine($"GetOrganismsResponse: \n\tId: {getOrganismsResponse.Id}\n\tRequestId: {getOrganismsResponse.RequestId}\n\tDateTime: {getOrganismsResponse.DateTime}\n\tMessage: {getOrganismsResponse.Message}\n\tSuccess: {getOrganismsResponse.Success}\n\tOrganismsCount: {getOrganismsResponse.Organisms.Count()}\n\tConnectionGenesCount: {getOrganismsResponse.Organisms.Sum(o => o.Brain.ConnectionGenes.Count)}");
 
                         GetEnabledTrainingRoomsRequest getEnabledTrainingRoomsRequest = new GetEnabledTrainingRoomsRequest();
                         await networkConnector.SendMessageAsync(getEnabledTrainingRoomsRequest, CancellationToken.None);

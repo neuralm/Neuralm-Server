@@ -8,6 +8,7 @@ using Neuralm.Application.Interfaces;
 using Neuralm.Application.Messages.Dtos;
 using Neuralm.Application.Messages.Requests;
 using Neuralm.Application.Messages.Responses;
+using Neuralm.Domain;
 using Neuralm.Domain.Entities;
 using Neuralm.Domain.Entities.NEAT;
 
@@ -77,7 +78,13 @@ namespace Neuralm.Application.Services
                 return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, null, "Failed to start a training session.");
 
             await _trainingRoomRepository.UpdateAsync(trainingRoom);
-            return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, EntityToDtoConverter.Convert<TrainingSessionDto, TrainingSession>(trainingSession), "Successfully started a training session.", true);
+            TrainingSessionDto trainingSessionDto;
+            using (EntityLoadLock.Releaser lazyLoadLock = EntityLoadLock.Shared.Lock())
+            {
+                trainingSessionDto = EntityToDtoConverter.Convert<TrainingSessionDto, TrainingSession>(trainingSession);
+            }
+
+            return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, trainingSessionDto, "Successfully started a training session.", true);
         }
 
         /// <inheritdoc cref="ITrainingRoomService.EndTrainingSessionAsync(EndTrainingSessionRequest)"/>
@@ -100,7 +107,40 @@ namespace Neuralm.Application.Services
         public async Task<GetEnabledTrainingRoomsResponse> GetEnabledTrainingRoomsAsync(GetEnabledTrainingRoomsRequest getEnabledTrainingRoomsRequest)
         {
             IEnumerable<TrainingRoom> trainingRooms = await _trainingRoomRepository.FindManyByExpressionAsync(trainingRoom => trainingRoom.Enabled);
-            return new GetEnabledTrainingRoomsResponse(getEnabledTrainingRoomsRequest.Id, trainingRooms.Select(EntityToDtoConverter.Convert<TrainingRoomDto, TrainingRoom>).ToList(), success: true);
+            List<TrainingRoomDto> trainingRoomDtos;
+            using (EntityLoadLock.Releaser lazyLoadLock = EntityLoadLock.Shared.Lock())
+            {
+                trainingRoomDtos = trainingRooms.Select(EntityToDtoConverter.Convert<TrainingRoomDto, TrainingRoom>).ToList();
+            }
+
+            return new GetEnabledTrainingRoomsResponse(getEnabledTrainingRoomsRequest.Id, trainingRoomDtos, success: true);
+        }
+
+        /// <inheritdoc cref="ITrainingRoomService.GetOrganismsAsync(GetOrganismsRequest)"/>
+        public async Task<GetOrganismsResponse> GetOrganismsAsync(GetOrganismsRequest getOrganismsRequest)
+        {
+            Expression<Func<TrainingSession, bool>> predicate = ts => ts.Id.Equals(getOrganismsRequest.TrainingSessionId);
+            if (getOrganismsRequest.TrainingSessionId.Equals(Guid.Empty))
+                return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training room id cannot be an empty guid.");
+
+            if (!await _trainingSessionRepository.ExistsAsync(predicate))
+                return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training session does not exist.");
+
+            TrainingSession trainingSession = await _trainingSessionRepository.FindSingleByExpressionAsync(predicate);
+            List<OrganismDto> organisms;
+            using (EntityLoadLock.Releaser lazyLoadLock = EntityLoadLock.Shared.Lock())
+            {
+                TrainingRoom trainingRoom = trainingSession.TrainingRoom;
+                organisms = trainingRoom.Species.SelectMany(sp => sp.LastGenerationOrganisms.Select(EntityToDtoConverter.Convert<OrganismDto, Organism>).ToList()).ToList();
+            }
+                
+            return new GetOrganismsResponse(getOrganismsRequest.Id, organisms, "Successfully fetched the organisms.", true);
+        }
+
+        /// <inheritdoc cref="ITrainingRoomService.PostOrganismsScoreAsync(PostOrganismsScoreRequest)"/>
+        public async Task<PostOrganismsScoreResponse> PostOrganismsScoreAsync(PostOrganismsScoreRequest postOrganismsScoreRequest)
+        {
+            throw new NotImplementedException();
         }
     }
 }
