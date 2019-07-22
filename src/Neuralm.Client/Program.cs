@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Neuralm.Application.Interfaces;
 using Neuralm.Application.Messages;
-using Neuralm.Application.Messages.Dtos;
 using Neuralm.Application.Messages.Requests;
 using Neuralm.Application.Messages.Responses;
 using Neuralm.Domain.Entities.NEAT;
@@ -20,7 +19,7 @@ namespace Neuralm.Client
     {
         private const int Port = 9999;
         private const string Host = "localhost";
-        private const int MessageCount = 1;
+        private const int MessageCount = 1000;
         private const int ClientCount = 1;
         private const int TotalMessages = MessageCount * ClientCount;
 
@@ -85,8 +84,10 @@ namespace Neuralm.Client
                         await networkConnector.SendMessageAsync(getEnabledTrainingRoomsRequest, CancellationToken.None);
                         GetEnabledTrainingRoomsResponse getEnabledTrainingRoomsResponse = await getEnabledTrainingRoomsResponseListener.ReceiveMessageAsync(CancellationToken.None);
                         Console.WriteLine($"GetEnabledTrainingRoomsResponse: \n\tId: {getEnabledTrainingRoomsResponse.Id}\n\tRequestId: {getEnabledTrainingRoomsResponse.RequestId}\n\tDateTime: {getEnabledTrainingRoomsResponse.DateTime}\n\tMessage: {getEnabledTrainingRoomsResponse.Message}\n\tSuccess: {getEnabledTrainingRoomsResponse.Success}");
-                        foreach (TrainingRoomDto trainingRoomDto in getEnabledTrainingRoomsResponse.TrainingRooms)
-                            Console.WriteLine($"TrainingRoom:\n\tId: {trainingRoomDto.Id}\n\tName: {trainingRoomDto.Name}\n\tOwner: {trainingRoomDto.Owner.Username}");
+
+
+                        //foreach (TrainingRoomDto trainingRoomDto in getEnabledTrainingRoomsResponse.TrainingRooms)
+                        //    Console.WriteLine($"TrainingRoom:\n\tId: {trainingRoomDto.Id}\n\tName: {trainingRoomDto.Name}\n\tOwner: {trainingRoomDto.Owner.Username}");
                     }
                     loginResponseListener.Unsubscribe();
                 });

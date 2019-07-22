@@ -18,12 +18,12 @@ namespace Neuralm.Domain
         /// <summary>
         /// Gets the shared <see cref="EntityLoadLock"/> instance.
         /// </summary>
-        public static EntityLoadLock Shared => (_sharedLoadLock ?? (_sharedLoadLock = new EntityLoadLock()));
+        public static EntityLoadLock Shared => (_sharedLoadLock ??= new EntityLoadLock());
 
         /// <summary>
         /// Initializes an instance of the <see cref="EntityLoadLock"/> class.
         /// </summary>
-        public EntityLoadLock()
+        private EntityLoadLock()
         {
             _releaser = new Releaser(this);
             _releaserTask = Task.FromResult(_releaser);

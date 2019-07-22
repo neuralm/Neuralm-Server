@@ -25,7 +25,7 @@ namespace Neuralm.Presentation.CLI
     {
         private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
         private IGenericServiceProvider _genericServiceProvider;
-        public static int CanReadConsole = 0;
+        private static int _canReadConsole = 0;
 
         /// <summary>
         /// Initializes the <see cref="Program"/> class.
@@ -38,7 +38,7 @@ namespace Neuralm.Presentation.CLI
 
             while (!CancellationTokenSource.IsCancellationRequested)
             {
-                if (Interlocked.CompareExchange(ref CanReadConsole, 0, 0) == 0)
+                if (Interlocked.CompareExchange(ref _canReadConsole, 0, 0) == 0)
                 {
                     await Task.Delay(500);
                     continue;
@@ -60,7 +60,7 @@ namespace Neuralm.Presentation.CLI
         /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         private async Task RunAsync(CancellationToken cancellationToken)
         {
-            IConfiguration configuration = null;
+            IConfiguration configuration;
             try
             {
                 configuration = ConfigurationLoader.GetConfiguration("appSettings");
@@ -77,7 +77,7 @@ namespace Neuralm.Presentation.CLI
             await startup.InitializeAsync(configuration);
             Console.WriteLine("Finished initializing!\n");
 
-            Interlocked.Increment(ref CanReadConsole);
+            Interlocked.Increment(ref _canReadConsole);
 
             _genericServiceProvider = startup.GetGenericServiceProvider();
             GetEnabledTrainingRoomsResponse getEnabledTrainingRoomsResponse = await _genericServiceProvider.GetService<ITrainingRoomService>()
