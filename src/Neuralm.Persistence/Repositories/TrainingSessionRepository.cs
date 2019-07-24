@@ -45,7 +45,6 @@ namespace Neuralm.Persistence.Repositories
                 .Include("TrainingRoom.Organisms.Brain")
                 .Include("TrainingRoom.Species.LastGenerationOrganisms.Brain")
                 .Include("TrainingRoom.Species.LastGenerationOrganisms.TrainingRoom");
-            ;
         }
     }
 }
