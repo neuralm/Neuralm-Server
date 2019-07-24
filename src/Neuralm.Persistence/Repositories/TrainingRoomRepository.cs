@@ -82,6 +82,7 @@ namespace Neuralm.Persistence.Repositories
                 .Include("Owner.Credentials.CredentialType")
                 .Include("Species.LastGenerationOrganisms.Brain")
                 .Include("Species.LastGenerationOrganisms.TrainingRoom")
+                .Include("AuthorizedTrainers")
                 .Include("TrainingSessions");
         }
     }

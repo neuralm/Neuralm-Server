@@ -78,11 +78,11 @@ namespace Neuralm.Presentation.CLI
             Console.WriteLine($"Database {(hasPendingMigrations ? "has" : "does not have")} pending migrations.");
             if (hasPendingMigrations)
             {
-                Console.WriteLine("Would you like to clear the database using EnsureDeleted. And, afterwards reapply all migrations? y/n\n");
+                Console.WriteLine("Would you like to clear the database using EnsureDeleted. And, afterwards reapply all migrations? y/n");
                 ConsoleKeyInfo key = Console.ReadKey(false);
                 if (key.KeyChar == 'y')
                 {
-                    Console.WriteLine("Ensuring that the database is deleted...");
+                    Console.WriteLine("\nEnsuring that the database is deleted...");
                     neuralmDbContext.Database.EnsureDeleted();
                     Console.WriteLine("Deleted.");
 

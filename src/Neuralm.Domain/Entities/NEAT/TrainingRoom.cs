@@ -30,9 +30,9 @@ namespace Neuralm.Domain.Entities.NEAT
         public virtual User Owner { get; private set; }
 
         /// <summary>
-        /// Gets the list of authorized users.
+        /// Gets the list of authorized trainers.
         /// </summary>
-        public virtual List<User> AuthorizedUsers { get; private set; }
+        public virtual List<Trainer> AuthorizedTrainers { get; private set; }
 
         /// <summary>
         /// Gets the list of training sessions.
@@ -129,7 +129,7 @@ namespace Neuralm.Domain.Entities.NEAT
             Enabled = true;
             TrainingRoomSettings = trainingRoomSettings;
             Random = new Random(trainingRoomSettings.Seed);
-            AuthorizedUsers = new List<User> {owner};
+            AuthorizedTrainers = new List<Trainer> {new Trainer(owner, this)};
             Brains = new List<Brain>();
             Species = new List<Species>();
             Organisms = new List<Organism>();
@@ -328,9 +328,9 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <returns>Returns <c>true</c> if the user is added to the authorized users; otherwise, <c>false</c>.</returns>
         public bool AuthorizeUser(User user)
         {
-            if (AuthorizedUsers.Exists(usr => usr.Id.Equals(user.Id)))
+            if (AuthorizedTrainers.Exists(usr => usr.UserId.Equals(user.Id)))
                 return false;
-            AuthorizedUsers.Add(user);
+            AuthorizedTrainers.Add(new Trainer(user, this));
             return true;
         }
 
@@ -341,8 +341,8 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <returns>Returns <c>true</c> if the user is removed from the authorized users; otherwise, <c>false</c>.</returns>
         public bool DeauthorizeUser(Guid userId)
         {
-            User possibleUser = AuthorizedUsers.SingleOrDefault(usr => usr.Id.Equals(userId));
-            return possibleUser != default && AuthorizedUsers.Remove(possibleUser);
+            Trainer possibleUser = AuthorizedTrainers.SingleOrDefault(usr => usr.UserId.Equals(userId));
+            return possibleUser != default && AuthorizedTrainers.Remove(possibleUser);
         }
 
         /// <summary>
@@ -352,7 +352,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <returns>Returns <c>true</c> if the given user id is authorized; otherwise, <c>false</c>.</returns>
         public bool IsUserAuthorized(Guid userId)
         {
-            return AuthorizedUsers.Exists(user => user.Id.Equals(userId));
+            return AuthorizedTrainers.Exists(user => user.UserId.Equals(userId));
         }
 
         /// <summary>

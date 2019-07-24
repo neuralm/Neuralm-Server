@@ -20,6 +20,14 @@
     <Compile Remove="Migrations\20190724150309_InitialCreate.Designer.cs" />
     <Compile Remove="Migrations\20190724153030_InitialCreate.cs" />
     <Compile Remove="Migrations\20190724153030_InitialCreate.Designer.cs" />
+    <Compile Remove="Migrations\20190724185836_Trainer.cs" />
+    <Compile Remove="Migrations\20190724185836_Trainer.Designer.cs" />
+    <Compile Remove="Migrations\20190724190726_Trainer.cs" />
+    <Compile Remove="Migrations\20190724190726_Trainer.Designer.cs" />
+    <Compile Remove="Migrations\20190724190802_Trainer.cs" />
+    <Compile Remove="Migrations\20190724190802_Trainer.Designer.cs" />
+    <Compile Remove="Migrations\20190724194109_Trainer.cs" />
+    <Compile Remove="Migrations\20190724194109_Trainer.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
