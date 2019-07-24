@@ -9,9 +9,6 @@ namespace Neuralm.Domain.Entities.NEAT
     /// </summary>
     public class Species
     {
-        private List<Organism> _lastGenerationOrganisms;
-        private List<Organism> _organisms;
-
         /// <summary>
         /// Gets and sets the id.
         /// </summary>
@@ -25,12 +22,12 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <summary>
         /// Gets the list of organisms.
         /// </summary>
-        public virtual IReadOnlyList<Organism> Organisms => _organisms;
+        public virtual List<Organism> Organisms { get; private set; }
 
         /// <summary>
         /// Gets the list of organisms from the last generation.
         /// </summary>
-        public virtual IReadOnlyList<Organism> LastGenerationOrganisms => _lastGenerationOrganisms;
+        public virtual List<Organism> LastGenerationOrganisms { get; private set; }
 
         /// <summary>
         /// Gets and sets the species score.
@@ -54,8 +51,8 @@ namespace Neuralm.Domain.Entities.NEAT
         {
             Id = Guid.NewGuid();
             organism.SpeciesId = Id;
-            _organisms = new List<Organism> { organism };
-            _lastGenerationOrganisms = new List<Organism> { organism };
+            Organisms = new List<Organism> { organism };
+            LastGenerationOrganisms = new List<Organism> { organism };
             TrainingRoomId = trainingRoomId;
         }
 
@@ -71,7 +68,7 @@ namespace Neuralm.Domain.Entities.NEAT
             if (!GetRandomOrganism(randomNext).IsSameSpecies(organism))
                 return false;
             organism.SpeciesId = Id;
-            _organisms.Add(organism);
+            Organisms.Add(organism);
             return true;
         }
 
@@ -83,7 +80,7 @@ namespace Neuralm.Domain.Entities.NEAT
         {
             SpeciesScore = Organisms.Sum(organism => organism.Score);
 
-            _organisms.Sort((a, b) =>
+            Organisms.Sort((a, b) =>
             {
                 if (a.Score < b.Score)
                     return 1;
@@ -95,15 +92,15 @@ namespace Neuralm.Domain.Entities.NEAT
             });
 
             int organismsToSurvive = (int)Math.Ceiling(Organisms.Count * topAmountToSurvive);
-            _lastGenerationOrganisms.Clear();
-            _lastGenerationOrganisms = Organisms.Take(organismsToSurvive).Select(organism =>
+            LastGenerationOrganisms.Clear();
+            LastGenerationOrganisms = Organisms.Take(organismsToSurvive).Select(organism =>
             {
                 Organism org = organism.Clone();
                 org.Generation++;
                 return org;
             }).ToList();
             // TODO: Check if clone is needed, may just be useless instance creation
-            _organisms.Clear();
+            Organisms.Clear();
         }
 
         /// <summary>
@@ -113,7 +110,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <returns>Returns a randomly chosen <see cref="Organism"/>.</returns>
         public Organism GetRandomOrganism(Func<int, int> randomNext)
         {
-            return _lastGenerationOrganisms[randomNext(_lastGenerationOrganisms.Count)];
+            return LastGenerationOrganisms[randomNext(LastGenerationOrganisms.Count)];
         }
     }
 }

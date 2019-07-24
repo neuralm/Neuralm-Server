@@ -9,7 +9,6 @@ namespace Neuralm.Domain.Entities.NEAT
     /// </summary>
     public class Brain
     {
-        private List<ConnectionGene> _connectionGenes;
         private readonly Dictionary<uint, Node> _nodes;
         private readonly List<Node> _outputNodes;
         private readonly List<Node> _inputNodes;
@@ -19,7 +18,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <summary>
         /// Gets the list of genes.
         /// </summary>
-        public virtual IReadOnlyList<ConnectionGene> ConnectionGenes => _connectionGenes;
+        public virtual List<ConnectionGene> ConnectionGenes { get; private set; }
 
         /// <summary>
         /// Gets and sets the id.
@@ -57,7 +56,7 @@ namespace Neuralm.Domain.Entities.NEAT
         {
             TrainingRoom = trainingRoom;
             TrainingRoomId = TrainingRoom.Id;
-            _connectionGenes = new List<ConnectionGene>();
+            ConnectionGenes = new List<ConnectionGene>();
             _nodes = new Dictionary<uint, Node>();
             _outputNodes = new List<Node>();
             _inputNodes = new List<Node>();
@@ -94,7 +93,7 @@ namespace Neuralm.Domain.Entities.NEAT
             Id = id;
             foreach (ConnectionGene gene in genes)
             {
-                _connectionGenes.Add(gene.Clone());
+                ConnectionGenes.Add(gene.Clone());
                 _maxInnovation = Math.Max(gene.InnovationNumber, _maxInnovation);
             }
         }
@@ -109,9 +108,9 @@ namespace Neuralm.Domain.Entities.NEAT
         public Brain Crossover(Brain parent2Brain)
         {
             _childGenes.Clear();
-            List<ConnectionGene> parent2 = new List<ConnectionGene>(parent2Brain._connectionGenes);
+            List<ConnectionGene> parent2 = new List<ConnectionGene>(parent2Brain.ConnectionGenes);
 
-            foreach (ConnectionGene gene in _connectionGenes)
+            foreach (ConnectionGene gene in ConnectionGenes)
             {
                 ConnectionGene geneToRemove = default;
                 ConnectionGene geneToAdd = gene;
@@ -157,7 +156,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <returns>Returns a new brain with the same genes, training room, inputCount and outputCount.</returns>
         public Brain Clone(bool newId = false)
         {
-            return new Brain(newId ? Guid.NewGuid() : Id, TrainingRoom, _connectionGenes.Select(gene => gene.Clone()).ToList());
+            return new Brain(newId ? Guid.NewGuid() : Id, TrainingRoom, ConnectionGenes.Select(gene => gene.Clone()).ToList());
         }
 
         /// <summary>
@@ -166,7 +165,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// </summary>
         private void RebuildStructure()
         {
-            foreach (ConnectionGene gene in _connectionGenes)
+            foreach (ConnectionGene gene in ConnectionGenes)
             {
                 gene.LoadNodes(this);
             }
@@ -202,9 +201,9 @@ namespace Neuralm.Domain.Entities.NEAT
             if (TrainingRoom.Random.NextDouble() < TrainingRoom.TrainingRoomSettings.AddNodeChance)
                 AddNodeMutation();
 
-            if ((TrainingRoom.Random.NextDouble() < TrainingRoom.TrainingRoomSettings.MutateWeightChance) && _connectionGenes.Count > 0)
+            if ((TrainingRoom.Random.NextDouble() < TrainingRoom.TrainingRoomSettings.MutateWeightChance) && ConnectionGenes.Count > 0)
             {
-                ConnectionGene connectionGene = _connectionGenes.ElementAt(TrainingRoom.Random.Next(_connectionGenes.Count));
+                ConnectionGene connectionGene = ConnectionGenes.ElementAt(TrainingRoom.Random.Next(ConnectionGenes.Count));
                 if (TrainingRoom.Random.NextDouble() < TrainingRoom.TrainingRoomSettings.WeightReassignChance)
                     connectionGene.Weight = TrainingRoom.Random.NextDouble() * 2 - 1;
                 else
@@ -255,7 +254,7 @@ namespace Neuralm.Domain.Entities.NEAT
                 }
 
                 ConnectionGene connection = new ConnectionGene(Id, startNode.Id, endNode.Id, TrainingRoom.Random.NextDouble() * 2 - 1, TrainingRoom.GetInnovationNumber(startNode.Id, endNode.Id));
-                _connectionGenes.Add(connection);
+                ConnectionGenes.Add(connection);
                 _maxInnovation = Math.Max(connection.InnovationNumber, _maxInnovation);
                 break;
             }
@@ -270,7 +269,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <returns>Returns <c>true</c> if there is a connection that goes from the start node to the end node; otherwise, <c>false</c>.</returns>
         private bool ConnectionExists(Node startNode, Node endNode)
         {
-            return _connectionGenes.Any(gene => gene.InId == startNode.Id && gene.OutId == endNode.Id);
+            return ConnectionGenes.Any(gene => gene.InId == startNode.Id && gene.OutId == endNode.Id);
         }
 
         /// <summary>
@@ -280,11 +279,11 @@ namespace Neuralm.Domain.Entities.NEAT
         /// </summary>
         private void AddNodeMutation()
         {
-            if (_connectionGenes.Count == 0)
+            if (ConnectionGenes.Count == 0)
                 return;
 
             // Choose a random connection to add a node into
-            ConnectionGene theChosenOne = _connectionGenes.ElementAt(TrainingRoom.Random.Next(_connectionGenes.Count));
+            ConnectionGene theChosenOne = ConnectionGenes.ElementAt(TrainingRoom.Random.Next(ConnectionGenes.Count));
 
             // Disable it
             theChosenOne.Enabled = false;
@@ -299,8 +298,8 @@ namespace Neuralm.Domain.Entities.NEAT
             ConnectionGene aToC = new ConnectionGene(Id, oldInId, newNodeId, 1, TrainingRoom.GetInnovationNumber(oldInId, newNodeId));
             ConnectionGene cToB = new ConnectionGene(Id, newNodeId, oldOutId, theChosenOne.Weight, TrainingRoom.GetInnovationNumber(newNodeId, oldOutId));
 
-            _connectionGenes.Add(aToC);
-            _connectionGenes.Add(cToB);
+            ConnectionGenes.Add(aToC);
+            ConnectionGenes.Add(cToB);
             _maxInnovation = Math.Max(Math.Max(cToB.InnovationNumber, aToC.InnovationNumber), _maxInnovation);
         }
 
@@ -314,7 +313,7 @@ namespace Neuralm.Domain.Entities.NEAT
             // TODO: Redo this method and optimize it
             int excess = 0;
 
-            if (other._connectionGenes.Any())
+            if (other.ConnectionGenes.Any())
             {
                 excess += other.ConnectionGenes.Count(gene => gene.InnovationNumber > _maxInnovation);
             }
@@ -323,7 +322,7 @@ namespace Neuralm.Domain.Entities.NEAT
             int disjoint = 0;
             int weightDiffCount = 0;
 
-            foreach (ConnectionGene gene in _connectionGenes)
+            foreach (ConnectionGene gene in ConnectionGenes)
             {
                 ConnectionGene otherGene = other.ConnectionGenes.SingleOrDefault(gen => gen.InnovationNumber == gene.InnovationNumber);
                 if (otherGene != default)
@@ -339,7 +338,7 @@ namespace Neuralm.Domain.Entities.NEAT
 
             weightDiff = weightDiffCount == 0 ? 0 : weightDiff / weightDiffCount;
 
-            int genomeCount = Math.Max(_connectionGenes.Count, other.ConnectionGenes.Count);
+            int genomeCount = Math.Max(ConnectionGenes.Count, other.ConnectionGenes.Count);
             if (genomeCount < 20)
                 genomeCount = 1;
 

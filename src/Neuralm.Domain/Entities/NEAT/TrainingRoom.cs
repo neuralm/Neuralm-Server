@@ -11,10 +11,7 @@ namespace Neuralm.Domain.Entities.NEAT
     {
         private readonly Dictionary<(uint A, uint B), uint> _mutationToInnovation = new Dictionary<(uint A, uint B), uint>();
         private uint _nodeId;
-        private List<User> _authorizedUsers = new List<User>();
-        private List<TrainingSession> _trainingSessions = new List<TrainingSession>();
-        private List<Organism> _organisms = new List<Organism>();
-        private List<Species> _species = new List<Species>();
+        private Random _random;
 
         /// <summary>
         /// Gets and sets the id.
@@ -26,6 +23,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// </summary>
         public Guid OwnerId { get; private set; }
 
+
         /// <summary>
         /// Gets and sets the owner.
         /// </summary>
@@ -34,27 +32,27 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <summary>
         /// Gets the list of authorized users.
         /// </summary>
-        public virtual IReadOnlyList<User> AuthorizedUsers => _authorizedUsers;
+        public virtual List<User> AuthorizedUsers { get; private set; }
 
         /// <summary>
         /// Gets the list of training sessions.
         /// </summary>
-        public virtual IReadOnlyList<TrainingSession> TrainingSessions => _trainingSessions;
+        public virtual List<TrainingSession> TrainingSessions { get; private set; }
 
         /// <summary>
         /// Gets the list of organisms.
         /// </summary>
-        public virtual IReadOnlyList<Organism> Organisms => _organisms;
+        public virtual List<Organism> Organisms { get; private set; }
 
         /// <summary>
         /// Gets the list of species.
         /// </summary>
-        public virtual IReadOnlyList<Species> Species => _species;
+        public virtual List<Species> Species { get; private set; }
 
         /// <summary>
         /// Gets and sets the collection of brains.
         /// </summary>
-        public virtual ICollection<Brain> Brains { get; private set; }
+        public virtual List<Brain> Brains { get; private set; }
 
         /// <summary>
         /// Gets and sets the training room settings.
@@ -71,10 +69,15 @@ namespace Neuralm.Domain.Entities.NEAT
         /// </summary>
         public uint Generation { get; private set; }
 
+        
         /// <summary>
         /// Gets and sets the random.
         /// </summary>
-        public Random Random { get; private set; }
+        public Random Random
+        {
+            get => _random ??= _random = new Random(TrainingRoomSettings.Seed);
+            private set => _random = value;
+        }
 
         /// <summary>
         /// Gets and sets the highest score.
@@ -126,12 +129,11 @@ namespace Neuralm.Domain.Entities.NEAT
             Enabled = true;
             TrainingRoomSettings = trainingRoomSettings;
             Random = new Random(trainingRoomSettings.Seed);
-            _authorizedUsers.Add(owner);
-
-            for (int i = 0; i < trainingRoomSettings.OrganismCount; i++)
-            {
-                AddOrganism(new Organism(this));
-            }
+            AuthorizedUsers = new List<User> {owner};
+            Brains = new List<Brain>();
+            Species = new List<Species>();
+            Organisms = new List<Organism>();
+            TrainingSessions = new List<TrainingSession>();
         }
 
         /// <summary>
@@ -141,7 +143,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <param name="organism">The organism to add.</param>
         public void AddOrganism(Organism organism)
         {
-            foreach (Species species in _species)
+            foreach (Species species in Species)
             {
                 if (species.AddOrganismIfSameSpecies(organism, Random.Next))
                 {
@@ -149,7 +151,7 @@ namespace Neuralm.Domain.Entities.NEAT
                 }
             }
 
-            _species.Add(new Species(organism, Id));
+            Species.Add(new Species(organism, Id));
         }
 
         /// <summary>
@@ -158,7 +160,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <returns>A randomly chosen <see cref="Organism"/>.</returns>
         public Organism GetRandomOrganism()
         {
-            return _species[Random.Next(_species.Count)].GetRandomOrganism(Random.Next);
+            return Species[Random.Next(Species.Count)].GetRandomOrganism(Random.Next);
         }
 
         /// <summary>
@@ -181,11 +183,11 @@ namespace Neuralm.Domain.Entities.NEAT
             LowestScore = double.MaxValue;
             double totalFullScore = 0;
 
-            foreach (Species species in _species)
+            foreach (Species species in Species)
             {
                 foreach (Organism organism in species.Organisms)
                 {
-                    organism.Score /= _species.Count;
+                    organism.Score /= Species.Count;
                     HighestScore = Math.Max(organism.Score, HighestScore);
                     LowestScore = Math.Min(organism.Score, LowestScore);
                     totalFullScore += organism.Score;
@@ -195,19 +197,19 @@ namespace Neuralm.Domain.Entities.NEAT
             AverageScore = totalFullScore / TrainingRoomSettings.OrganismCount;
 
             // Reproduce!
-            foreach (Species species in _species)
+            foreach (Species species in Species)
             {
                 species.PostGeneration(TrainingRoomSettings.TopAmountToSurvive);
             }
 
-            double totalScore = _species.Sum(species => species.SpeciesScore);
+            double totalScore = Species.Sum(species => species.SpeciesScore);
 
             if ((int)totalScore == 0)
                 totalScore = 1; // TODO: Think about what this really does lol, if the total score is 0 should they have the right to reproduce?
 
             double rest = 0;
-            _organisms.Clear();
-            foreach (Species species in _species)
+            Organisms.Clear();
+            foreach (Species species in Species)
             {
                 double fraction = species.SpeciesScore / totalScore;
                 double amountOfOrganisms = TrainingRoomSettings.OrganismCount * fraction;
@@ -222,21 +224,21 @@ namespace Neuralm.Domain.Entities.NEAT
                 amountOfOrganisms = Math.Floor(amountOfOrganisms);
                 for (int i = 0; i < amountOfOrganisms; i++)
                 {
-                    _organisms.Add(ProduceOrganism(species));
+                    Organisms.Add(ProduceOrganism(species));
                 }
             }
 
-            while (_organisms.Count < TrainingRoomSettings.OrganismCount)
+            while (Organisms.Count < TrainingRoomSettings.OrganismCount)
             {
-                _organisms.Add(new Organism(this));
+                Organisms.Add(new Organism(this));
             }
 
-            foreach (Organism organism in _organisms)
+            foreach (Organism organism in Organisms)
             {
                 AddOrganism(organism);
             }
 
-            _species.RemoveAll(species => !species.Organisms.Any());
+            Species.RemoveAll(species => !species.Organisms.Any());
 
             _mutationToInnovation.Clear();
             Generation++;
@@ -326,9 +328,9 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <returns>Returns <c>true</c> if the user is added to the authorized users; otherwise, <c>false</c>.</returns>
         public bool AuthorizeUser(User user)
         {
-            if (_authorizedUsers.Exists(usr => usr.Id.Equals(user.Id)))
+            if (AuthorizedUsers.Exists(usr => usr.Id.Equals(user.Id)))
                 return false;
-            _authorizedUsers.Add(user);
+            AuthorizedUsers.Add(user);
             return true;
         }
 
@@ -339,8 +341,8 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <returns>Returns <c>true</c> if the user is removed from the authorized users; otherwise, <c>false</c>.</returns>
         public bool DeauthorizeUser(Guid userId)
         {
-            User possibleUser = _authorizedUsers.SingleOrDefault(usr => usr.Id.Equals(userId));
-            return possibleUser != default && _authorizedUsers.Remove(possibleUser);
+            User possibleUser = AuthorizedUsers.SingleOrDefault(usr => usr.Id.Equals(userId));
+            return possibleUser != default && AuthorizedUsers.Remove(possibleUser);
         }
 
         /// <summary>
@@ -350,7 +352,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <returns>Returns <c>true</c> if the given user id is authorized; otherwise, <c>false</c>.</returns>
         public bool IsUserAuthorized(Guid userId)
         {
-            return _authorizedUsers.Exists(user => user.Id.Equals(userId));
+            return AuthorizedUsers.Exists(user => user.Id.Equals(userId));
         }
 
         /// <summary>
@@ -362,9 +364,9 @@ namespace Neuralm.Domain.Entities.NEAT
         public bool StartTrainingSession(Guid userId, out TrainingSession trainingSession)
         {
             trainingSession = new TrainingSession(this, userId);
-            if (_trainingSessions.Any(user => user.Id.Equals(userId)))
+            if (TrainingSessions.Any(user => user.Id.Equals(userId)))
                 return false;
-            _trainingSessions.Add(trainingSession);
+            TrainingSessions.Add(trainingSession);
             return true;
         }
     }

@@ -31,10 +31,12 @@ Follow these steps to get your development environment set up:
             "Port": 9999
           },
           "NeuralmDb": {
-            "ConnectionString": "Server=(LocalDb)\\MSSQLLocalDB;Database=NeuralmDbContext;Trusted_Connection=True;MultipleActiveResultSets=true"
+            "ConnectionString": "Server=(LocalDb)\\MSSQLLocalDB;Database=NeuralmDbContext;Trusted_Connection=True;MultipleActiveResultSets=true",
+			"UseLazyLoading": false
           } 
       }
      ```
+	 NOTE: Keep `UseLazyLoading` on false for now!
   3. Next, go to `Tools > NuGet Package Manager > Package Manager Console` in visual studio, To restore all dependencies:
      ```
      dotnet restore

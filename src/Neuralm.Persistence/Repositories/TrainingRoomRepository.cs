@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Neuralm.Application.Interfaces;
@@ -44,6 +47,42 @@ namespace Neuralm.Persistence.Repositories
             }
 
             return saveSuccess;
+        }
+
+        /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.FindSingleByExpressionAsync"/>
+        public override async Task<TrainingRoom> FindSingleByExpressionAsync(Expression<Func<TrainingRoom, bool>> predicate)
+        {
+            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
+            TrainingRoom entity = await TrainingRoomSetWithInclude().Where(predicate).SingleOrDefaultAsync();
+            if (entity == default)
+                Console.WriteLine(new EntityNotFoundException($"The entity of type {typeof(TrainingRoom).Name} could not be found by the predicate."));
+            return entity;
+        }
+
+        /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.FindManyByExpressionAsync"/>
+        public override async Task<IEnumerable<TrainingRoom>> FindManyByExpressionAsync(Expression<Func<TrainingRoom, bool>> predicate)
+        {
+            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
+            return await TrainingRoomSetWithInclude().Where(predicate).ToListAsync();
+        }
+
+        /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.GetAllAsync"/>
+        public override async Task<IEnumerable<TrainingRoom>> GetAllAsync()
+        {
+            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
+            return await TrainingRoomSetWithInclude().ToListAsync();
+        }
+
+        private IQueryable<TrainingRoom> TrainingRoomSetWithInclude()
+        {
+            return DbContext.Set<TrainingRoom>()
+                .Include("TrainingRoomSettings")
+                .Include("Brains.ConnectionGenes")
+                .Include("Organisms.Brain")
+                .Include("Owner.Credentials.CredentialType")
+                .Include("Species.LastGenerationOrganisms.Brain")
+                .Include("Species.LastGenerationOrganisms.TrainingRoom")
+                .Include("TrainingSessions");
         }
     }
 }

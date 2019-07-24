@@ -12,6 +12,14 @@
     <Compile Remove="Migrations\20190718194600_InitialCreate.Designer.cs" />
     <Compile Remove="Migrations\20190718201514_InitialCreate.cs" />
     <Compile Remove="Migrations\20190718201514_InitialCreate.Designer.cs" />
+    <Compile Remove="Migrations\20190724150104_InitialCrete.cs" />
+    <Compile Remove="Migrations\20190724150104_InitialCrete.Designer.cs" />
+    <Compile Remove="Migrations\20190724150137_InitialCreate.cs" />
+    <Compile Remove="Migrations\20190724150137_InitialCreate.Designer.cs" />
+    <Compile Remove="Migrations\20190724150309_InitialCreate.cs" />
+    <Compile Remove="Migrations\20190724150309_InitialCreate.Designer.cs" />
+    <Compile Remove="Migrations\20190724153030_InitialCreate.cs" />
+    <Compile Remove="Migrations\20190724153030_InitialCreate.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +38,10 @@
     <ProjectReference Include="..\Neuralm.Application\Neuralm.Application.csproj" />
     <ProjectReference Include="..\Neuralm.Domain\Neuralm.Domain.csproj" />
     <ProjectReference Include="..\Neuralm.Utilities\Neuralm.Utilities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Infrastructure\" />
   </ItemGroup>
 
 </Project>

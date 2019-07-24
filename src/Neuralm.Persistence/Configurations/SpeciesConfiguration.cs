@@ -17,8 +17,6 @@ namespace Neuralm.Persistence.Configurations
             builder.OwnsMany(p => p.LastGenerationOrganisms)
                 .HasForeignKey(p => p.SpeciesId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
-            builder.Metadata.FindNavigation(nameof(Species.LastGenerationOrganisms))
-                .SetPropertyAccessMode(PropertyAccessMode.Field);
 
             builder.Ignore(p => p.Organisms);
         }
