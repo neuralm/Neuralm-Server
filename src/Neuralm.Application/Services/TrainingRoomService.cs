@@ -156,7 +156,15 @@ namespace Neuralm.Application.Services
                         return queue;
                     });
             }
-            List<OrganismDto> organismDtos = organisms.Take(getOrganismsRequest.Amount).Select(EntityToDtoConverter.Convert<OrganismDto, Organism>).ToList();
+
+            List<OrganismDto> organismDtos = new List<OrganismDto>();
+            for (int i = 0; i < getOrganismsRequest.Amount; i++)
+            {
+                if (organisms.TryDequeue(out Organism org))
+                    organismDtos.Add(EntityToDtoConverter.Convert<OrganismDto, Organism>(org));
+                else
+                    break;
+            }
             return organismDtos.Any() 
                 ? new GetOrganismsResponse(getOrganismsRequest.Id, organismDtos, "Successfully fetched the organisms.", true) 
                 : new GetOrganismsResponse(getOrganismsRequest.Id, organismDtos, "The organism queue is empty.", false);
