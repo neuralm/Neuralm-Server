@@ -122,7 +122,8 @@ namespace Neuralm.Application.Services
             Expression<Func<TrainingSession, bool>> predicate = ts => ts.Id.Equals(getOrganismsRequest.TrainingSessionId);
             if (getOrganismsRequest.TrainingSessionId.Equals(Guid.Empty))
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training room id cannot be an empty guid.");
-
+            if (getOrganismsRequest.Amount < 1)
+                return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Amount cannot be smaller than 1.");
             if (!await _trainingSessionRepository.ExistsAsync(predicate))
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training session does not exist.");
 
@@ -143,18 +144,20 @@ namespace Neuralm.Application.Services
                     }
                     await _trainingSessionRepository.UpdateAsync(trainingSession);
                 }
-
-                organisms = _trainingSessionOrganismsDictionary.AddOrUpdate(
-                    trainingSession.Id,
-                    new ConcurrentQueue<Organism>(SelectManyOrganismsFromTrainingRoom(trainingRoom)),
-                    (guid, queue) =>
-                    {
-                        foreach (Organism organism in SelectManyOrganismsFromTrainingRoom(trainingRoom))
+                else
+                {
+                    organisms = _trainingSessionOrganismsDictionary.AddOrUpdate(
+                        trainingSession.Id,
+                        new ConcurrentQueue<Organism>(SelectManyOrganismsFromTrainingRoom(trainingRoom)),
+                        (guid, queue) =>
                         {
-                            queue.Enqueue(organism);
-                        }
-                        return queue;
-                    });
+                            foreach (Organism organism in SelectManyOrganismsFromTrainingRoom(trainingRoom))
+                            {
+                                queue.Enqueue(organism);
+                            }
+                            return queue;
+                        });
+                }
             }
 
             List<OrganismDto> organismDtos = new List<OrganismDto>();
