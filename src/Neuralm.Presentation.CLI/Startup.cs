@@ -82,8 +82,11 @@ namespace Neuralm.Presentation.CLI
                 ConsoleKeyInfo key = Console.ReadKey(false);
                 if (key.KeyChar == 'y')
                 {
+                    Console.WriteLine("\nEnsuring that the database is deleted...");
                     neuralmDbContext.Database.EnsureDeleted();
-                    
+                    Console.WriteLine("Deleted.");
+
+                    Console.WriteLine("Applying migrations:");
                     foreach (string migration in neuralmDbContext.Database.GetMigrations())
                     {
                         Console.WriteLine($"\tMigration: {migration}");

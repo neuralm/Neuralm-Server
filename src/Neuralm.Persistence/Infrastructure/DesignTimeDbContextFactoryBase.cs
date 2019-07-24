@@ -52,7 +52,10 @@ namespace Neuralm.Persistence.Infrastructure
             if (string.IsNullOrEmpty(connectionString))
                 throw new ArgumentException($"Connection string '{connectionString}' is null or empty.", nameof(connectionString));
             DbContextOptionsBuilder<TContext> optionsBuilder = new DbContextOptionsBuilder<TContext>();
-            optionsBuilder.UseLazyLoadingProxies();
+            if (_dbConfiguration.UseLazyLoading)
+            {
+                optionsBuilder.UseLazyLoadingProxies();
+            }
             if (connectionString.Equals("InMemoryDatabase"))
                 optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString());
             else

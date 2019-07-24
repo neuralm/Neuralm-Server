@@ -6,5 +6,6 @@
     public class DbConfiguration
     {
         public string ConnectionString { get; set; }
+        public bool UseLazyLoading { get; set; }
     }
 }

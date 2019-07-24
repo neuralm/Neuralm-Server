@@ -13,6 +13,10 @@ namespace Neuralm.Persistence.Configurations
         public void Configure(EntityTypeBuilder<TrainingSession> builder)
         {
             builder.HasKey(p => p.Id);
+
+            builder.HasOne(p => p.TrainingRoom)
+                .WithMany(p => p.TrainingSessions)
+                .HasForeignKey(p => p.TrainingRoomId);
         }
     }
 }
