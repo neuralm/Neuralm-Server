@@ -167,12 +167,11 @@ namespace Neuralm.Presentation.CLI
         /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         private Task CreateServerCertificate(CancellationToken cancellationToken)
         {
-            string certificateName = _serviceProvider.GetService<IOptions<ServerConfiguration>>().Value.CertificateName;
             ServerConfiguration configuration = _serviceProvider.GetService<IOptions<ServerConfiguration>>().Value;
 
             try
             {
-                X509Certificate certificate = X509Certificate2.CreateFromCertFile(certificateName);
+                X509Certificate certificate = new X509Certificate(configuration.CertificateName, configuration.Password);
                 cancellationToken.ThrowIfCancellationRequested();
                 configuration.Certificate = certificate;
             }

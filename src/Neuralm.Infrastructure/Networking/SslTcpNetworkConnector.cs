@@ -10,6 +10,10 @@ using Neuralm.Infrastructure.Interfaces;
 
 namespace Neuralm.Infrastructure.Networking
 {
+    /// <summary>
+    /// Represents the <see cref="SslTcpNetworkConnector"/> class; an implementation of the abstract <see cref="BaseNetworkConnector"/> class.
+    /// The <see cref="SslStream"/> version of the <see cref="TcpNetworkConnector"/>.
+    /// </summary>
     public sealed class SslTcpNetworkConnector : BaseNetworkConnector
     {
         private readonly TcpClient _tcpClient;
@@ -17,9 +21,19 @@ namespace Neuralm.Infrastructure.Networking
         private readonly int _port;
         private SslStream _sslStream;
 
+        /// <inheritdoc cref="BaseNetworkConnector.IsConnected"/>
         public override bool IsConnected => _tcpClient.Connected;
+
+        /// <inheritdoc cref="BaseNetworkConnector.IsDataAvailable"/>
         protected override bool IsDataAvailable => _tcpClient.Available > 0;
 
+        /// <summary>
+        /// Initializes an instance of the <see cref="SslTcpNetworkConnector"/> class.
+        /// </summary>
+        /// <param name="messageSerializer">The message serializer.</param>
+        /// <param name="messageProcessor">The message processor.</param>
+        /// <param name="host">The host string.</param>
+        /// <param name="port">The port.</param>
         public SslTcpNetworkConnector(IMessageSerializer messageSerializer, IMessageProcessor messageProcessor, string host, int port) : base(messageSerializer, messageProcessor)
         {
             _tcpClient = new TcpClient();
@@ -27,23 +41,19 @@ namespace Neuralm.Infrastructure.Networking
             _port = port;
         }
 
+        /// <summary>
+        /// Initializes an instance of the <see cref="SslTcpNetworkConnector"/> class.
+        /// </summary>
+        /// <param name="messageSerializer">The message serializer.</param>
+        /// <param name="messageProcessor">The message processor.</param>
+        /// <param name="tcpClient">The tcp client.</param>
         public SslTcpNetworkConnector(IMessageSerializer messageSerializer, IMessageProcessor messageProcessor, TcpClient tcpClient) : base(messageSerializer, messageProcessor)
         {
             _tcpClient = tcpClient;
             _sslStream = new SslStream(_tcpClient.GetStream(), false);
         }
 
-        private static bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
-        {
-            if (sslPolicyErrors == SslPolicyErrors.None)
-                return true;
-
-            Console.WriteLine("Certificate error: {0}", sslPolicyErrors);
-
-            // Do not allow this client to communicate with unauthenticated servers.
-            return false;
-        }
-
+        /// <inheritdoc cref="BaseNetworkConnector.ConnectAsync"/>
         public override async Task ConnectAsync(CancellationToken cancellationToken)
         {
             if (IsConnected)
@@ -52,11 +62,16 @@ namespace Neuralm.Infrastructure.Networking
             _sslStream = new SslStream(_tcpClient.GetStream(), false, ValidateServerCertificate, null);
         }
 
+        /// <summary>
+        /// Authenticates as client.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         public async Task AuthenticateAsClient(CancellationToken cancellationToken)
         {
             try
             {
-                await _sslStream.AuthenticateAsClientAsync(_host);
+                await _sslStream.AuthenticateAsClientAsync("SelfSignedNeuralm");
             }
             catch (AuthenticationException e)
             {
@@ -68,11 +83,17 @@ namespace Neuralm.Infrastructure.Networking
             }
         }
 
+        /// <summary>
+        /// Authenticates as server.
+        /// </summary>
+        /// <param name="certificate">The certificate.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         public async Task AuthenticateAsServer(X509Certificate certificate, CancellationToken cancellationToken)
         {
             try
             {
-                await _sslStream.AuthenticateAsServerAsync(certificate, false, SslProtocols.Tls, false);
+                await _sslStream.AuthenticateAsServerAsync(certificate, false, SslProtocols.Tls12, false);
             }
             catch (Exception e)
             {
@@ -83,73 +104,43 @@ namespace Neuralm.Infrastructure.Networking
                 await Task.FromCanceled(cancellationToken);
                 return;
             }
-            
-            DisplaySecurityLevel(_sslStream);
-            DisplaySecurityServices(_sslStream);
-            DisplayCertificateInformation(_sslStream);
-            DisplayStreamProperties(_sslStream);
         }
 
+        /// <inheritdoc cref="BaseNetworkConnector.SendPacketAsync"/>
         protected override async ValueTask<int> SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken)
         {
             await _sslStream.WriteAsync(packet, cancellationToken);
             return packet.Length;
         }
 
+        /// <inheritdoc cref="BaseNetworkConnector.ReceivePacketAsync"/>
         protected override ValueTask<int> ReceivePacketAsync(Memory<byte> memory, CancellationToken cancellationToken)
         {
             return _sslStream.ReadAsync(memory, cancellationToken);
         }
 
-        private static void DisplaySecurityLevel(SslStream stream)
+        /// <summary>
+        /// Validates server certificate.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="certificate">The certificate.</param>
+        /// <param name="chain">The x509 chain.</param>
+        /// <param name="sslPolicyErrors">The ssl policy errors.</param>
+        /// <returns>Returns <c>true</c> if <paramref name="sslPolicyErrors"/> equals <see cref="SslPolicyErrors.None"/>; otherwise, <c>false</c>.</returns>
+        private static bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
-            Console.WriteLine("Cipher: {0} strength {1}", stream.CipherAlgorithm, stream.CipherStrength);
-            Console.WriteLine("Hash: {0} strength {1}", stream.HashAlgorithm, stream.HashStrength);
-            Console.WriteLine("Key exchange: {0} strength {1}", stream.KeyExchangeAlgorithm, stream.KeyExchangeStrength);
-            Console.WriteLine("Protocol: {0}", stream.SslProtocol);
-        }
-        private static void DisplaySecurityServices(SslStream stream)
-        {
-            Console.WriteLine("Is authenticated: {0} as server? {1}", stream.IsAuthenticated, stream.IsServer);
-            Console.WriteLine("IsSigned: {0}", stream.IsSigned);
-            Console.WriteLine("Is Encrypted: {0}", stream.IsEncrypted);
-        }
-        private static void DisplayStreamProperties(SslStream stream)
-        {
-            Console.WriteLine("Can read: {0}, write {1}", stream.CanRead, stream.CanWrite);
-            Console.WriteLine("Can timeout: {0}", stream.CanTimeout);
-        }
-        private static void DisplayCertificateInformation(SslStream stream)
-        {
-            Console.WriteLine("Certificate revocation list checked: {0}", stream.CheckCertRevocationStatus);
+            if (sslPolicyErrors == SslPolicyErrors.None)
+                return true;
 
-            X509Certificate localCertificate = stream.LocalCertificate;
-            if (stream.LocalCertificate != null)
-            {
-                Console.WriteLine("Local cert was issued to {0} and is valid from {1} until {2}.",
-                    localCertificate.Subject,
-                    localCertificate.GetEffectiveDateString(),
-                    localCertificate.GetExpirationDateString());
-            }
-            else
-            {
-                Console.WriteLine("Local certificate is null.");
-            }
-            // Display the properties of the client's certificate.
-            X509Certificate remoteCertificate = stream.RemoteCertificate;
-            if (stream.RemoteCertificate != null)
-            {
-                Console.WriteLine("Remote cert was issued to {0} and is valid from {1} until {2}.",
-                    remoteCertificate.Subject,
-                    remoteCertificate.GetEffectiveDateString(),
-                    remoteCertificate.GetExpirationDateString());
-            }
-            else
-            {
-                Console.WriteLine("Remote certificate is null.");
-            }
+            Console.WriteLine("Certificate error: {0}", sslPolicyErrors);
+
+            // Do not allow this client to communicate with unauthenticated servers.
+            return false;
         }
 
+        /// <summary>
+        /// Disposes the tcp client and suppresses the garbage collector.
+        /// </summary>
         protected override void Dispose(bool disposing)
         {
             if (disposing)

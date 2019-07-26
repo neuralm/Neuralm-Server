@@ -17,6 +17,9 @@ namespace Neuralm.Application.Configurations
         [RegexStringValidator("^([a-zA-Z0-9-_/]*).cer$")]
         public string CertificateName { get; set; }
 
+        [ConfigurationProperty("Password", IsRequired = true)]
+        public string Password { get; set; }
+
         [IgnoreDataMember]
         public X509Certificate Certificate { get; set; }
     }

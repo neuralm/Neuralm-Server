@@ -19,7 +19,7 @@ namespace Neuralm.Client
     {
         private const int Port = 9999;
         private const string Host = "localhost";
-        private const int MessageCount = 1000;
+        private const int MessageCount = 1;
         private const int ClientCount = 1;
         private const int TotalMessages = MessageCount * ClientCount;
 

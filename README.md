@@ -28,26 +28,21 @@ Follow these steps to get your development environment set up:
         "Secret": "{YOUR SECRET KEY, MINIMUM LENGTH OF 17!}" 
         },
         "Server": {
-        "Port": 9999
+        "Port": 9999,
+		"CertificateName": "NeuralmCert.pfx",
+		"Password": "test123"
         },
         "NeuralmDb": {
         "ConnectionString": "Server=(LocalDb)\\MSSQLLocalDB;Database=NeuralmDbContext;Trusted_Connection=True;MultipleActiveResultSets=true",
-		"CertificateName": "NeuralmCert.cer"
         } 
     }
     ```
-3. Afterwards generate a self signed certificate using this command in powershell:
+3. Afterwards generate a self signed certificate using the script in powershell (Administrator mode!), when asked for a password use the one from the appSettings.Server.Password:
 	```powershell
-	New-SelfSignedCertificate -DnsName "localhost" -CertStoreLocation "cert:\LocalMachine\My" -FriendlyName "NeuralmCert"
+	.\docs\GenerateSelfSignedCertificate.ps1
 	```
-4. Followed by this script to export the certificate:
-	```powershell
-	$cert = Get-ChildItem -Path 'Cert:\localmachine\My' |
-	Where-Object { $_.FriendlyName -eq "NeuralmCert" }
-	Export-Certificate -Cert $cert -FilePath "c:\NeuralmCert.cer"
-	```
-	Then, Manually copy the certificate to the the root of the Presentation.CLI layer.
-5. Next, go to `Tools > NuGet Package Manager > Package Manager Console` in visual studio, To restore all dependencies:
+	Then, Manually copy the pfx certificate to the the root of the Presentation.CLI layer (the pfx certificate can be found at "c:\NeuralmCert.pfx").
+4. Next, go to `Tools > NuGet Package Manager > Package Manager Console` in visual studio, To restore all dependencies:
     ```
     dotnet restore
     ```
@@ -56,7 +51,7 @@ Follow these steps to get your development environment set up:
     dotnet build
     ```
     To make sure all dependencies were added succesfully, it should build without dependency warnings else you have probably not installed .NET core 2.2 SDK.
-6. Once the build has run successfully, start the server to confirm that the database connection is successful either by hitting `F5` or go to `Debug > Start`. A console will launch and start initializing. Upon completion, the console will look like this:
+5. Once the build has run successfully, start the server to confirm that the database connection is successful either by hitting `F5` or go to `Debug > Start`. A console will launch and start initializing. Upon completion, the console will look like this:
   
  ![Screenshot](https://github.com/neuralm/Neuralm-Server/blob/master/docs/images/Successful%20installation.png?raw=true)
 
