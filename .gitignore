@@ -343,3 +343,6 @@ healthchecksdb
 
 # Exclude the app settings
 src/Neuralm.Presentation.CLI/appSettings.json
+
+# Exclude certificate pfx
+*.pfx

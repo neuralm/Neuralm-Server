@@ -35,8 +35,9 @@ namespace Neuralm.Client
                 {
                     IMessageProcessor messageProcessor = new ClientMessageProcessor();
                     IMessageSerializer messageSerializer = new JsonMessageSerializer();
-                    INetworkConnector networkConnector = new TcpNetworkConnector(messageSerializer, messageProcessor, Host, Port);
+                    SslTcpNetworkConnector networkConnector = new SslTcpNetworkConnector(messageSerializer, messageProcessor, Host, Port);
                     await networkConnector.ConnectAsync(CancellationToken.None);
+                    await networkConnector.AuthenticateAsClient(CancellationToken.None);
                     networkConnector.Start();
 
                     MessageListener<AuthenticateResponse> loginResponseListener = new MessageListener<AuthenticateResponse>();

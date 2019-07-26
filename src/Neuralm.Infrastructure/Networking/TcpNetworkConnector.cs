@@ -11,7 +11,7 @@ namespace Neuralm.Infrastructure.Networking
     /// <summary>
     /// Represents the <see cref="TcpNetworkConnector"/> class; an implementation of the abstract <see cref="BaseNetworkConnector"/> class.
     /// </summary>
-    public sealed class TcpNetworkConnector : BaseNetworkConnector
+    public class TcpNetworkConnector : BaseNetworkConnector
     {
         private readonly TcpClient _tcpClient;
         private readonly string _host;
