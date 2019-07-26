@@ -107,12 +107,11 @@ namespace Neuralm.Infrastructure.Networking
         }
 
         /// <inheritdoc cref="BaseNetworkConnector.SendPacketAsync"/>
-        protected override async ValueTask<int> SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken)
-        {
-            await _sslStream.WriteAsync(packet, cancellationToken);
-            return packet.Length;
-        }
 
+        protected override ValueTask SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken)
+        {
+            return _sslStream.WriteAsync(packet, cancellationToken);
+        }
         /// <inheritdoc cref="BaseNetworkConnector.ReceivePacketAsync"/>
         protected override ValueTask<int> ReceivePacketAsync(Memory<byte> memory, CancellationToken cancellationToken)
         {

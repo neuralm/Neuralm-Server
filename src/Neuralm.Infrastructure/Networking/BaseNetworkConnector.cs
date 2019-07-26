@@ -104,8 +104,8 @@ namespace Neuralm.Infrastructure.Networking
         /// </summary>
         /// <param name="packet">The packet.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Returns an awaitable <see cref="ValueTask"/> with <see cref="int"/> as type parameter; with the bytes count sent.</returns>
-        protected abstract ValueTask<int> SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken);
+        /// <returns>Returns an awaitable <see cref="ValueTask"/>.</returns>
+        protected abstract ValueTask SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken);
 
         /// <summary>
         /// Receive a packet asynchronously.

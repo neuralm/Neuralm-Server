@@ -67,13 +67,13 @@ namespace Neuralm.Infrastructure.Networking
         /// <inheritdoc cref="BaseNetworkConnector.ReceivePacketAsync"/>
         protected override ValueTask<int> ReceivePacketAsync(Memory<byte> memory, CancellationToken cancellationToken)
         {
-            return _tcpClient.Client.ReceiveAsync(memory, SocketFlags.None, cancellationToken);
+            return _networkStream.ReadAsync(memory, cancellationToken);
         }
 
         /// <inheritdoc cref="BaseNetworkConnector.SendPacketAsync"/>
-        protected override ValueTask<int> SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken)
+        protected override ValueTask SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken)
         {
-            return _tcpClient.Client.SendAsync(packet, SocketFlags.None, cancellationToken);
+            return _networkStream.WriteAsync(packet, cancellationToken);
         }
 
         /// <summary>
