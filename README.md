@@ -43,7 +43,7 @@ Follow these steps to get your development environment set up:
 	```powershell
 	.\docs\GenerateSelfSignedCertificate.ps1
 	```
-	Then, Manually copy the pfx certificate to the the root of the Presentation.CLI layer (the pfx certificate can be found at "c:\NeuralmCert.pfx").
+	Then, manually copy the pfx certificate to the root of the Presentation.CLI layer (the pfx certificate can be found at "c:\NeuralmCert.pfx").
 4. Next, go to `Tools > NuGet Package Manager > Package Manager Console` in visual studio, To restore all dependencies:
     ```
     dotnet restore
