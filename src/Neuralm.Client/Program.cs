@@ -76,7 +76,7 @@ namespace Neuralm.Client
                         StartTrainingSessionResponse startTrainingSessionResponse = await startTrainingSessionResponseListener.ReceiveMessageAsync(CancellationToken.None);
                         Console.WriteLine($"StartTrainingSessionResponse: \n\tId: {startTrainingSessionResponse.Id}\n\tRequestId: {startTrainingSessionResponse.RequestId}\n\tDateTime: {startTrainingSessionResponse.DateTime}\n\tMessage: {startTrainingSessionResponse.Message}\n\tSuccess: {startTrainingSessionResponse.Success}\n\tTrainingSessionId: {startTrainingSessionResponse.TrainingSession.Id}");
 
-                        GetOrganismsRequest getOrganismsRequest = new GetOrganismsRequest(startTrainingSessionResponse.TrainingSession.Id);
+                        GetOrganismsRequest getOrganismsRequest = new GetOrganismsRequest(startTrainingSessionResponse.TrainingSession.Id, 10);
                         await networkConnector.SendMessageAsync(getOrganismsRequest, CancellationToken.None);
                         GetOrganismsResponse getOrganismsResponse = await getOrganismsResponseListener.ReceiveMessageAsync(CancellationToken.None);
                         Console.WriteLine($"GetOrganismsResponse: \n\tId: {getOrganismsResponse.Id}\n\tRequestId: {getOrganismsResponse.RequestId}\n\tDateTime: {getOrganismsResponse.DateTime}\n\tMessage: {getOrganismsResponse.Message}\n\tSuccess: {getOrganismsResponse.Success}\n\tOrganismsCount: {getOrganismsResponse.Organisms.Count()}\n\tConnectionGenesCount: {getOrganismsResponse.Organisms.Sum(o => o.Brain.ConnectionGenes.Count)}");

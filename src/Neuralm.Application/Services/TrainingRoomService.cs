@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -8,7 +9,6 @@ using Neuralm.Application.Interfaces;
 using Neuralm.Application.Messages.Dtos;
 using Neuralm.Application.Messages.Requests;
 using Neuralm.Application.Messages.Responses;
-using Neuralm.Domain;
 using Neuralm.Domain.Entities;
 using Neuralm.Domain.Entities.NEAT;
 
@@ -19,9 +19,15 @@ namespace Neuralm.Application.Services
     /// </summary>
     public class TrainingRoomService : ITrainingRoomService
     {
+        #region DI Fields
         private readonly IRepository<TrainingRoom> _trainingRoomRepository;
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<TrainingSession> _trainingSessionRepository;
+        #endregion DI Fields
+
+        #region Fields
+        private readonly ConcurrentDictionary<Guid, ConcurrentQueue<Organism>> _trainingSessionOrganismsDictionary;
+        #endregion Fields
 
         /// <summary>
         /// Initializes an instance of the <see cref="TrainingRoomService"/> class.
@@ -37,6 +43,7 @@ namespace Neuralm.Application.Services
             _trainingRoomRepository = trainingRoomRepository;
             _userRepository = userRepository;
             _trainingSessionRepository = trainingSessionRepository;
+            _trainingSessionOrganismsDictionary = new ConcurrentDictionary<Guid, ConcurrentQueue<Organism>>();
         }
 
         /// <inheritdoc cref="ITrainingRoomService.CreateTrainingRoomAsync(CreateTrainingRoomRequest)"/>
@@ -78,12 +85,10 @@ namespace Neuralm.Application.Services
                 return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, null, "Failed to start a training session.");
 
             await _trainingRoomRepository.UpdateAsync(trainingRoom);
-            TrainingSessionDto trainingSessionDto;
-            using (EntityLoadLock.Releaser lazyLoadLock = EntityLoadLock.Shared.Lock())
-            {
-                trainingSessionDto = EntityToDtoConverter.Convert<TrainingSessionDto, TrainingSession>(trainingSession);
-            }
 
+            _trainingSessionOrganismsDictionary.TryAdd(trainingSession.Id, new ConcurrentQueue<Organism>(trainingRoom.Species.SelectMany(sp => sp.LastGenerationOrganisms)));
+
+            TrainingSessionDto trainingSessionDto = EntityToDtoConverter.Convert<TrainingSessionDto, TrainingSession>(trainingSession);
             return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, trainingSessionDto, "Successfully started a training session.", true);
         }
 
@@ -107,12 +112,7 @@ namespace Neuralm.Application.Services
         public async Task<GetEnabledTrainingRoomsResponse> GetEnabledTrainingRoomsAsync(GetEnabledTrainingRoomsRequest getEnabledTrainingRoomsRequest)
         {
             IEnumerable<TrainingRoom> trainingRooms = await _trainingRoomRepository.FindManyByExpressionAsync(trainingRoom => trainingRoom.Enabled);
-            List<TrainingRoomDto> trainingRoomDtos;
-            using (EntityLoadLock.Releaser lazyLoadLock = EntityLoadLock.Shared.Lock())
-            {
-                trainingRoomDtos = trainingRooms.Select(EntityToDtoConverter.Convert<TrainingRoomDto, TrainingRoom>).ToList();
-            }
-
+            List<TrainingRoomDto> trainingRoomDtos = trainingRooms.Select(EntityToDtoConverter.Convert<TrainingRoomDto, TrainingRoom>).ToList();
             return new GetEnabledTrainingRoomsResponse(getEnabledTrainingRoomsRequest.Id, trainingRoomDtos, success: true);
         }
 
@@ -122,19 +122,55 @@ namespace Neuralm.Application.Services
             Expression<Func<TrainingSession, bool>> predicate = ts => ts.Id.Equals(getOrganismsRequest.TrainingSessionId);
             if (getOrganismsRequest.TrainingSessionId.Equals(Guid.Empty))
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training room id cannot be an empty guid.");
-
+            if (getOrganismsRequest.Amount < 1)
+                return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Amount cannot be smaller than 1.");
             if (!await _trainingSessionRepository.ExistsAsync(predicate))
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training session does not exist.");
 
-            TrainingSession trainingSession = await _trainingSessionRepository.FindSingleByExpressionAsync(predicate);
-            List<OrganismDto> organisms;
-            using (EntityLoadLock.Releaser lazyLoadLock = EntityLoadLock.Shared.Lock())
+            static IEnumerable<Organism> SelectManyOrganismsFromTrainingRoom(TrainingRoom trainingRoom) => trainingRoom.Species.SelectMany(sp => sp.LastGenerationOrganisms);
+            if (!_trainingSessionOrganismsDictionary.TryGetValue(getOrganismsRequest.TrainingSessionId, out ConcurrentQueue<Organism> organisms) || organisms.IsEmpty)
             {
+                TrainingSession trainingSession = await _trainingSessionRepository.FindSingleByExpressionAsync(predicate);
                 TrainingRoom trainingRoom = trainingSession.TrainingRoom;
-                organisms = trainingRoom.Species.SelectMany(sp => sp.LastGenerationOrganisms.Select(EntityToDtoConverter.Convert<OrganismDto, Organism>).ToList()).ToList();
+
+                // If the training room is in its first generation, initialize the first species with the training room settings
+                if (trainingRoom.Generation == 0)
+                {
+                    for (int i = 0; i < trainingRoom.TrainingRoomSettings.OrganismCount; i++)
+                    {
+                        Organism organism = new Organism(trainingRoom);
+                        trainingRoom.AddOrganism(organism);
+                        organisms.Enqueue(organism);
+                    }
+                    await _trainingSessionRepository.UpdateAsync(trainingSession);
+                }
+                else
+                {
+                    organisms = _trainingSessionOrganismsDictionary.AddOrUpdate(
+                        trainingSession.Id,
+                        new ConcurrentQueue<Organism>(SelectManyOrganismsFromTrainingRoom(trainingRoom)),
+                        (guid, queue) =>
+                        {
+                            foreach (Organism organism in SelectManyOrganismsFromTrainingRoom(trainingRoom))
+                            {
+                                queue.Enqueue(organism);
+                            }
+                            return queue;
+                        });
+                }
             }
-                
-            return new GetOrganismsResponse(getOrganismsRequest.Id, organisms, "Successfully fetched the organisms.", true);
+
+            List<OrganismDto> organismDtos = new List<OrganismDto>();
+            for (int i = 0; i < getOrganismsRequest.Amount; i++)
+            {
+                if (organisms.TryDequeue(out Organism org))
+                    organismDtos.Add(EntityToDtoConverter.Convert<OrganismDto, Organism>(org));
+                else
+                    break;
+            }
+            return organismDtos.Any() 
+                ? new GetOrganismsResponse(getOrganismsRequest.Id, organismDtos, "Successfully fetched the organisms.", true) 
+                : new GetOrganismsResponse(getOrganismsRequest.Id, organismDtos, "The organism queue is empty.", false);
         }
 
         /// <inheritdoc cref="ITrainingRoomService.PostOrganismsScoreAsync(PostOrganismsScoreRequest)"/>

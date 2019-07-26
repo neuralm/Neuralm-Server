@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Neuralm.Persistence.Contexts;
 
 namespace Neuralm.Persistence.Migrations
 {
     [DbContext(typeof(NeuralmDbContext))]
-    partial class NeuralmDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190724180828_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -423,28 +425,6 @@ namespace Neuralm.Persistence.Migrations
                                         .HasForeignKey("TrainingRoomId")
                                         .OnDelete(DeleteBehavior.Cascade);
                                 });
-                        });
-
-                    b.OwnsMany("Neuralm.Domain.Entities.NEAT.Trainer", "AuthorizedTrainers", b1 =>
-                        {
-                            b1.Property<Guid>("TrainingRoomId");
-
-                            b1.Property<Guid>("UserId");
-
-                            b1.HasKey("TrainingRoomId", "UserId");
-
-                            b1.HasIndex("UserId");
-
-                            b1.ToTable("Trainers");
-
-                            b1.HasOne("Neuralm.Domain.Entities.NEAT.TrainingRoom", "TrainingRoom")
-                                .WithMany("AuthorizedTrainers")
-                                .HasForeignKey("TrainingRoomId")
-                                .OnDelete(DeleteBehavior.Cascade);
-
-                            b1.HasOne("Neuralm.Domain.Entities.User", "User")
-                                .WithMany()
-                                .HasForeignKey("UserId");
                         });
 
                     b.OwnsMany("Neuralm.Domain.Entities.NEAT.Organism", "Organisms", b1 =>

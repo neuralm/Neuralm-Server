@@ -11,7 +11,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// Gets and sets the id.
         /// </summary>
         public Guid Id { get; private set; }
-        
+
         /// <summary>
         /// Gets and sets the brain count.
         /// </summary>
@@ -99,7 +99,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// Gets and sets the seed.
         /// </summary>
         public int Seed { get; private set; }
-        
+
         /// <summary>
         /// EFCore entity constructor IGNORE!
         /// </summary>

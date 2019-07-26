@@ -10,7 +10,6 @@ namespace Neuralm.Domain.Entities.NEAT
         private static readonly string[] Vowels = { "a", "e", "i", "o", "u", "y", "aa", "ee", "ie", "oo", "ou", "au" };
         private static readonly string[] Consonants = { "b", "c", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "z" };
 
-
         /// <summary>
         /// Gets and sets the id.
         /// </summary>
@@ -74,11 +73,12 @@ namespace Neuralm.Domain.Entities.NEAT
             TrainingRoomId = trainingRoom.Id;
             TrainingRoom = trainingRoom;
             Generation = trainingRoom.Generation;
-            Brain = new Brain(trainingRoom)
+            Brain brain = new Brain(trainingRoom)
             {
                 OrganismId = Id
             };
-            BrainId = Brain.Id;
+            Brain = brain;
+            BrainId = brain.Id;
             Name = GenerateName(trainingRoom.Random.Next);
         }
 

@@ -25,18 +25,20 @@ Follow these steps to get your development environment set up:
     ```json
     {
         "Jwt": {
-        "Secret": "{YOUR SECRET KEY, MINIMUM LENGTH OF 17!}" 
+          "Secret": "{YOUR SECRET KEY, MINIMUM LENGTH OF 17!}" 
         },
         "Server": {
-        "Port": 9999,
-		"CertificateName": "NeuralmCert.pfx",
-		"Password": "test123"
+          "Port": 9999,
+          "CertificateName": "NeuralmCert.pfx",
+          "Password": "test123"
         },
         "NeuralmDb": {
-        "ConnectionString": "Server=(LocalDb)\\MSSQLLocalDB;Database=NeuralmDbContext;Trusted_Connection=True;MultipleActiveResultSets=true",
+          "ConnectionString": "Server=(LocalDb)\\MSSQLLocalDB;Database=NeuralmDbContext;Trusted_Connection=True;MultipleActiveResultSets=true",
+          "UserLazyLoading": false
         } 
     }
     ```
+    NOTE: Keep `UseLazyLoading` on false for now!
 3. Afterwards generate a self signed certificate using the script in powershell (Administrator mode!), when asked for a password use the one from the appSettings.Server.Password:
 	```powershell
 	.\docs\GenerateSelfSignedCertificate.ps1
@@ -52,6 +54,7 @@ Follow these steps to get your development environment set up:
     ```
     To make sure all dependencies were added succesfully, it should build without dependency warnings else you have probably not installed .NET core 2.2 SDK.
 5. Once the build has run successfully, start the server to confirm that the database connection is successful either by hitting `F5` or go to `Debug > Start`. A console will launch and start initializing. Upon completion, the console will look like this:
+
   
  ![Screenshot](https://github.com/neuralm/Neuralm-Server/blob/master/docs/images/Successful%20installation.png?raw=true)
 
