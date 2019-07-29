@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Neuralm.Application.Interfaces;
 using Neuralm.Domain;
 using Neuralm.Domain.Entities.NEAT;
-using Neuralm.Domain.Exceptions;
 using Neuralm.Persistence.Abstractions;
 using Neuralm.Persistence.Contexts;
 

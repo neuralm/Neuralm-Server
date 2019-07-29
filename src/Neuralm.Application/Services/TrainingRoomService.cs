@@ -26,7 +26,7 @@ namespace Neuralm.Application.Services
         #endregion DI Fields
 
         #region Fields
-        private readonly ConcurrentDictionary<Guid, ConcurrentQueue<Organism>> _trainingSessionOrganismsDictionary;
+        private readonly ConcurrentDictionary<Guid, ConcurrentDictionary<Organism, bool>> _trainingSessionOrganismsDictionary;
         #endregion Fields
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Neuralm.Application.Services
             _trainingRoomRepository = trainingRoomRepository;
             _userRepository = userRepository;
             _trainingSessionRepository = trainingSessionRepository;
-            _trainingSessionOrganismsDictionary = new ConcurrentDictionary<Guid, ConcurrentQueue<Organism>>();
+            _trainingSessionOrganismsDictionary = new ConcurrentDictionary<Guid, ConcurrentDictionary<Organism, bool>>();
         }
 
         /// <inheritdoc cref="ITrainingRoomService.CreateTrainingRoomAsync(CreateTrainingRoomRequest)"/>
@@ -85,8 +85,7 @@ namespace Neuralm.Application.Services
                 return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, null, "Failed to start a training session.");
 
             await _trainingRoomRepository.UpdateAsync(trainingRoom);
-
-            _trainingSessionOrganismsDictionary.TryAdd(trainingSession.Id, new ConcurrentQueue<Organism>(trainingRoom.Species.SelectMany(sp => sp.LastGenerationOrganisms)));
+            _trainingSessionOrganismsDictionary.TryAdd(trainingSession.Id, new ConcurrentDictionary<Organism, bool>(GetOrganismsFree(trainingRoom)));
 
             TrainingSessionDto trainingSessionDto = EntityToDtoConverter.Convert<TrainingSessionDto, TrainingSession>(trainingSession);
             return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, trainingSessionDto, "Successfully started a training session.", true);
@@ -127,8 +126,7 @@ namespace Neuralm.Application.Services
             if (!await _trainingSessionRepository.ExistsAsync(predicate))
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training session does not exist.");
 
-            static IEnumerable<Organism> SelectManyOrganismsFromTrainingRoom(TrainingRoom trainingRoom) => trainingRoom.Species.SelectMany(sp => sp.LastGenerationOrganisms);
-            if (!_trainingSessionOrganismsDictionary.TryGetValue(getOrganismsRequest.TrainingSessionId, out ConcurrentQueue<Organism> organisms) || organisms.IsEmpty)
+            if (!_trainingSessionOrganismsDictionary.TryGetValue(getOrganismsRequest.TrainingSessionId, out ConcurrentDictionary<Organism, bool> organisms) || organisms.IsEmpty)
             {
                 TrainingSession trainingSession = await _trainingSessionRepository.FindSingleOrDefaultAsync(predicate);
                 TrainingRoom trainingRoom = trainingSession.TrainingRoom;
@@ -140,22 +138,23 @@ namespace Neuralm.Application.Services
                     {
                         Organism organism = new Organism(trainingRoom);
                         trainingRoom.AddOrganism(organism);
-                        organisms.Enqueue(organism);
+                        organisms.TryAdd(organism, true);
                     }
+                    // NOTE: The organisms list (in training room) does not get updated because it is not in the last generation...
                     await _trainingSessionRepository.UpdateAsync(trainingSession);
                 }
                 else
                 {
                     organisms = _trainingSessionOrganismsDictionary.AddOrUpdate(
                         trainingSession.Id,
-                        new ConcurrentQueue<Organism>(SelectManyOrganismsFromTrainingRoom(trainingRoom)),
-                        (guid, queue) =>
+                        new ConcurrentDictionary<Organism, bool>(GetOrganismsFree(trainingRoom)),
+                        (guid, dictionary) =>
                         {
-                            foreach (Organism organism in SelectManyOrganismsFromTrainingRoom(trainingRoom))
+                            foreach ((Organism organism, bool value) in GetOrganismsFree(trainingRoom))
                             {
-                                queue.Enqueue(organism);
+                                dictionary.TryAdd(organism, value);
                             }
-                            return queue;
+                            return dictionary;
                         });
                 }
             }
@@ -163,14 +162,18 @@ namespace Neuralm.Application.Services
             List<OrganismDto> organismDtos = new List<OrganismDto>();
             for (int i = 0; i < getOrganismsRequest.Amount; i++)
             {
-                if (organisms.TryDequeue(out Organism org))
-                    organismDtos.Add(EntityToDtoConverter.Convert<OrganismDto, Organism>(org));
+                (Organism organism, _) = organisms.FirstOrDefault(p => p.Value);
+                if (organism != default)
+                {
+                    organisms[organism] = false;
+                    organismDtos.Add(EntityToDtoConverter.Convert<OrganismDto, Organism>(organism));
+                }
                 else
                     break;
             }
             return organismDtos.Any() 
                 ? new GetOrganismsResponse(getOrganismsRequest.Id, organismDtos, "Successfully fetched the organisms.", true) 
-                : new GetOrganismsResponse(getOrganismsRequest.Id, organismDtos, "The organism queue is empty.", false);
+                : new GetOrganismsResponse(getOrganismsRequest.Id, organismDtos, "The organism bag is empty.", false);
         }
 
         /// <inheritdoc cref="ITrainingRoomService.PostOrganismsScoreAsync(PostOrganismsScoreRequest)"/>
@@ -179,8 +182,8 @@ namespace Neuralm.Application.Services
             TrainingSession trainingSession = await _trainingSessionRepository.FindSingleOrDefaultAsync(p => p.Id.Equals(postOrganismsScoreRequest.TrainingSessionId));
             if (trainingSession == default)
                 return new PostOrganismsScoreResponse(postOrganismsScoreRequest.Id, "Training session does not exist.");
-
-            foreach (Organism organism in postOrganismsScoreRequest.OrganismScores.Select(o => trainingSession.TrainingRoom.Organisms.SingleOrDefault(a => a.Id.Equals(o.Key))))
+            ConcurrentDictionary<Organism, bool> orgs = _trainingSessionOrganismsDictionary[postOrganismsScoreRequest.TrainingSessionId];
+            foreach (Organism organism in postOrganismsScoreRequest.OrganismScores.Select(o => orgs.SingleOrDefault(a => a.Key.Id.Equals(o.Key)).Key))
             {
                 if (organism == default)
                     return new PostOrganismsScoreResponse(postOrganismsScoreRequest.Id, "One of the organisms does not exist in the training room.");
@@ -189,6 +192,11 @@ namespace Neuralm.Application.Services
 
             await _trainingSessionRepository.UpdateAsync(trainingSession);
             return new PostOrganismsScoreResponse(postOrganismsScoreRequest.Id, "Successfully updated the organisms scores.", true);
+        }
+
+        private static IEnumerable<KeyValuePair<Organism, bool>> GetOrganismsFree(TrainingRoom trainingRoom)
+        {
+            return trainingRoom.Species.SelectMany(sp => sp.LastGenerationOrganisms).Select(a => new KeyValuePair<Organism, bool>(a, true));
         }
     }
 }
