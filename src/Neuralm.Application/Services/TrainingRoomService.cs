@@ -173,7 +173,7 @@ namespace Neuralm.Application.Services
             }
             return organismDtos.Any() 
                 ? new GetOrganismsResponse(getOrganismsRequest.Id, organismDtos, "Successfully fetched the organisms.", true) 
-                : new GetOrganismsResponse(getOrganismsRequest.Id, organismDtos, "The organism bag is empty.", false);
+                : new GetOrganismsResponse(getOrganismsRequest.Id, organismDtos, "The organism dictionary is empty.", false);
         }
 
         /// <inheritdoc cref="ITrainingRoomService.PostOrganismsScoreAsync(PostOrganismsScoreRequest)"/>
