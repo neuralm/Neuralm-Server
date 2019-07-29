@@ -49,18 +49,15 @@ namespace Neuralm.Persistence.Repositories
             return saveSuccess;
         }
 
-        /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.FindSingleByExpressionAsync"/>
-        public override async Task<TrainingRoom> FindSingleByExpressionAsync(Expression<Func<TrainingRoom, bool>> predicate)
+        /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.FindSingleOrDefaultAsync"/>
+        public override async Task<TrainingRoom> FindSingleOrDefaultAsync(Expression<Func<TrainingRoom, bool>> predicate)
         {
             using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
-            TrainingRoom entity = await TrainingRoomSetWithInclude().Where(predicate).SingleOrDefaultAsync();
-            if (entity == default)
-                Console.WriteLine(new EntityNotFoundException($"The entity of type {typeof(TrainingRoom).Name} could not be found by the predicate."));
-            return entity;
+            return await TrainingRoomSetWithInclude().Where(predicate).SingleOrDefaultAsync();
         }
 
-        /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.FindManyByExpressionAsync"/>
-        public override async Task<IEnumerable<TrainingRoom>> FindManyByExpressionAsync(Expression<Func<TrainingRoom, bool>> predicate)
+        /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.FindManyAsync"/>
+        public override async Task<IEnumerable<TrainingRoom>> FindManyAsync(Expression<Func<TrainingRoom, bool>> predicate)
         {
             using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
             return await TrainingRoomSetWithInclude().Where(predicate).ToListAsync();

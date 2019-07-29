@@ -56,11 +56,11 @@ namespace Neuralm.Application.Services
             if (!await _credentialTypeRepository.ExistsAsync(ct => CredentialTypeCodePredicate(ct, authenticateRequest.CredentialTypeCode)))
                 return new AuthenticateResponse(authenticateRequest.Id, Guid.Empty, message: "CredentialType not found.");
 
-            CredentialType credentialType = await _credentialTypeRepository.FindSingleByExpressionAsync(ct => CredentialTypeCodePredicate(ct, authenticateRequest.CredentialTypeCode));
+            CredentialType credentialType = await _credentialTypeRepository.FindSingleOrDefaultAsync(ct => CredentialTypeCodePredicate(ct, authenticateRequest.CredentialTypeCode));
             if (!await _credentialRepository.ExistsAsync(cred => CredentialPredicate(credentialType, cred, authenticateRequest.Username)))
                 return new AuthenticateResponse(authenticateRequest.Id, Guid.Empty, message: "Credentials not found.");
 
-            Credential credential = await _credentialRepository.FindSingleByExpressionAsync(cred => CredentialPredicate(credentialType, cred, authenticateRequest.Username));
+            Credential credential = await _credentialRepository.FindSingleOrDefaultAsync(cred => CredentialPredicate(credentialType, cred, authenticateRequest.Username));
             if (!_hasher.VerifyHash(credential.Secret, credential.Extra, authenticateRequest.Password))
                 return new AuthenticateResponse(authenticateRequest.Id, Guid.Empty, message: "Secret not valid.");
 
@@ -68,7 +68,7 @@ namespace Neuralm.Application.Services
             {
                 new Claim(ClaimTypes.Name, authenticateRequest.Username)
             };
-            User user = await _userRepository.FindSingleByExpressionAsync(usr => string.Equals(usr.Username, authenticateRequest.Username, StringComparison.OrdinalIgnoreCase));
+            User user = await _userRepository.FindSingleOrDefaultAsync(usr => string.Equals(usr.Username, authenticateRequest.Username, StringComparison.OrdinalIgnoreCase));
             string accessToken = _accessTokenService.GenerateAccessToken(claims, DateTime.Now.AddHours(2));
             return new AuthenticateResponse(authenticateRequest.Id, user.Id, accessToken, success: true);
         }
@@ -92,7 +92,7 @@ namespace Neuralm.Application.Services
             if (!await _userRepository.CreateAsync(user))
                 return new RegisterResponse(registerRequest.Id, "Failed to persist data.");
 
-            CredentialType credentialType = await _credentialTypeRepository.FindSingleByExpressionAsync(ct => CredentialTypeCodePredicate(ct, registerRequest.CredentialTypeCode));
+            CredentialType credentialType = await _credentialTypeRepository.FindSingleOrDefaultAsync(ct => CredentialTypeCodePredicate(ct, registerRequest.CredentialTypeCode));
             byte[] salt = _saltGenerator.GenerateSalt();
             Credential credential = new Credential
             {

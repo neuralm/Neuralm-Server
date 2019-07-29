@@ -16,16 +16,15 @@ namespace Neuralm.Application.Interfaces
         /// Finds a single Entity by an expression.
         /// </summary>
         /// <param name="predicate">The expression.</param>
-        /// <exception cref="EntityNotFoundException">If the expression cannot find a single Entity.</exception>
         /// <returns>Returns the result of the expression.</returns>
-        Task<TEntity> FindSingleByExpressionAsync(Expression<Func<TEntity, bool>> predicate);
+        Task<TEntity> FindSingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
 
         /// <summary>
         /// Finds many Entities using an expression.
         /// </summary>
         /// <param name="predicate">The expression.</param>
         /// <returns>The results of the expression.</returns>
-        Task<IEnumerable<TEntity>> FindManyByExpressionAsync(Expression<Func<TEntity, bool>> predicate);
+        Task<IEnumerable<TEntity>> FindManyAsync(Expression<Func<TEntity, bool>> predicate);
 
         /// <summary>
         /// Gets all Entities.

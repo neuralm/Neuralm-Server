@@ -81,21 +81,18 @@ namespace Neuralm.Persistence.Abstractions
             return await DbContext.Set<TEntity>().AnyAsync(predicate);
         }
 
-        /// <inheritdoc cref="IRepository{TEntity}.FindManyByExpressionAsync(Expression{Func{TEntity, bool}})"/>
-        public virtual async Task<IEnumerable<TEntity>> FindManyByExpressionAsync(Expression<Func<TEntity, bool>> predicate)
+        /// <inheritdoc cref="IRepository{TEntity}.FindManyAsync"/>
+        public virtual async Task<IEnumerable<TEntity>> FindManyAsync(Expression<Func<TEntity, bool>> predicate)
         {
             using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
             return await DbContext.Set<TEntity>().Where(predicate).ToListAsync();
         }
 
-        /// <inheritdoc cref="IRepository{TEntity}.FindSingleByExpressionAsync(Expression{Func{TEntity, bool}})"/>
-        public virtual async Task<TEntity> FindSingleByExpressionAsync(Expression<Func<TEntity, bool>> predicate)
+        /// <inheritdoc cref="IRepository{TEntity}.FindSingleOrDefaultAsync"/>
+        public virtual async Task<TEntity> FindSingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
         {
             using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
-            TEntity entity = await DbContext.Set<TEntity>().SingleOrDefaultAsync(predicate);
-            if (entity == default)
-                Console.WriteLine(new EntityNotFoundException($"The entity of type {typeof(TEntity).Name} could not be found by the predicate."));
-            return entity;
+            return await DbContext.Set<TEntity>().SingleOrDefaultAsync(predicate);
         }
 
         /// <inheritdoc cref="IRepository{TEntity}.GetAllAsync"/>

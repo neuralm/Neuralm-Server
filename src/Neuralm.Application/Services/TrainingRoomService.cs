@@ -61,7 +61,7 @@ namespace Neuralm.Application.Services
             if (!await _userRepository.ExistsAsync(user => user.Id.Equals(createTrainingRoomRequest.OwnerId)))
                 return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "User not found.");
 
-            User owner = await _userRepository.FindSingleByExpressionAsync(user => user.Id.Equals(createTrainingRoomRequest.OwnerId));
+            User owner = await _userRepository.FindSingleOrDefaultAsync(user => user.Id.Equals(createTrainingRoomRequest.OwnerId));
             TrainingRoom trainingRoom = new TrainingRoom(owner, createTrainingRoomRequest.TrainingRoomName, createTrainingRoomRequest.TrainingRoomSettings);
             if (!await _trainingRoomRepository.CreateAsync(trainingRoom))
                 return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "Failed to create training room.");
@@ -78,7 +78,7 @@ namespace Neuralm.Application.Services
             if (!await _userRepository.ExistsAsync(usr => usr.Id.Equals(startTrainingSessionRequest.UserId)))
                 return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, null, "User does not exist.");
 
-            TrainingRoom trainingRoom = await _trainingRoomRepository.FindSingleByExpressionAsync(predicate);
+            TrainingRoom trainingRoom = await _trainingRoomRepository.FindSingleOrDefaultAsync(predicate);
             if (!trainingRoom.IsUserAuthorized(startTrainingSessionRequest.UserId))
                 return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, null, "User is not authorized");
             if (!trainingRoom.StartTrainingSession(startTrainingSessionRequest.UserId, out TrainingSession trainingSession))
@@ -99,7 +99,7 @@ namespace Neuralm.Application.Services
             if (!await _trainingSessionRepository.ExistsAsync(predicate))
                 return new EndTrainingSessionResponse(endTrainingSessionRequest.Id, "Training session does not exist.");
 
-            TrainingSession trainingSession = await _trainingSessionRepository.FindSingleByExpressionAsync(predicate);
+            TrainingSession trainingSession = await _trainingSessionRepository.FindSingleOrDefaultAsync(predicate);
             if (trainingSession.EndedTimestamp != default)
                 return new EndTrainingSessionResponse(endTrainingSessionRequest.Id, "Training session was already ended.");
 
@@ -111,7 +111,7 @@ namespace Neuralm.Application.Services
         /// <inheritdoc cref="ITrainingRoomService.GetEnabledTrainingRoomsAsync(GetEnabledTrainingRoomsRequest)"/>
         public async Task<GetEnabledTrainingRoomsResponse> GetEnabledTrainingRoomsAsync(GetEnabledTrainingRoomsRequest getEnabledTrainingRoomsRequest)
         {
-            IEnumerable<TrainingRoom> trainingRooms = await _trainingRoomRepository.FindManyByExpressionAsync(trainingRoom => trainingRoom.Enabled);
+            IEnumerable<TrainingRoom> trainingRooms = await _trainingRoomRepository.FindManyAsync(trainingRoom => trainingRoom.Enabled);
             List<TrainingRoomDto> trainingRoomDtos = trainingRooms.Select(EntityToDtoConverter.Convert<TrainingRoomDto, TrainingRoom>).ToList();
             return new GetEnabledTrainingRoomsResponse(getEnabledTrainingRoomsRequest.Id, trainingRoomDtos, success: true);
         }
@@ -130,7 +130,7 @@ namespace Neuralm.Application.Services
             static IEnumerable<Organism> SelectManyOrganismsFromTrainingRoom(TrainingRoom trainingRoom) => trainingRoom.Species.SelectMany(sp => sp.LastGenerationOrganisms);
             if (!_trainingSessionOrganismsDictionary.TryGetValue(getOrganismsRequest.TrainingSessionId, out ConcurrentQueue<Organism> organisms) || organisms.IsEmpty)
             {
-                TrainingSession trainingSession = await _trainingSessionRepository.FindSingleByExpressionAsync(predicate);
+                TrainingSession trainingSession = await _trainingSessionRepository.FindSingleOrDefaultAsync(predicate);
                 TrainingRoom trainingRoom = trainingSession.TrainingRoom;
 
                 // If the training room is in its first generation, initialize the first species with the training room settings
@@ -174,9 +174,21 @@ namespace Neuralm.Application.Services
         }
 
         /// <inheritdoc cref="ITrainingRoomService.PostOrganismsScoreAsync(PostOrganismsScoreRequest)"/>
-        public Task<PostOrganismsScoreResponse> PostOrganismsScoreAsync(PostOrganismsScoreRequest postOrganismsScoreRequest)
+        public async Task<PostOrganismsScoreResponse> PostOrganismsScoreAsync(PostOrganismsScoreRequest postOrganismsScoreRequest)
         {
-            throw new NotImplementedException();
+            TrainingSession trainingSession = await _trainingSessionRepository.FindSingleOrDefaultAsync(p => p.Id.Equals(postOrganismsScoreRequest.TrainingSessionId));
+            if (trainingSession == default)
+                return new PostOrganismsScoreResponse(postOrganismsScoreRequest.Id, "Training session does not exist.");
+
+            foreach (Organism organism in postOrganismsScoreRequest.OrganismScores.Select(o => trainingSession.TrainingRoom.Organisms.SingleOrDefault(a => a.Id.Equals(o.Key))))
+            {
+                if (organism == default)
+                    return new PostOrganismsScoreResponse(postOrganismsScoreRequest.Id, "One of the organisms does not exist in the training room.");
+                trainingSession.TrainingRoom.PostScore(organism, postOrganismsScoreRequest.OrganismScores[organism.Id]);
+            }
+
+            await _trainingSessionRepository.UpdateAsync(trainingSession);
+            return new PostOrganismsScoreResponse(postOrganismsScoreRequest.Id, "Successfully updated the organisms scores.", true);
         }
     }
 }
