@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Neuralm.Application.Interfaces;
 using Neuralm.Application.Messages;
+using Neuralm.Application.Messages.Dtos;
 using Neuralm.Application.Messages.Requests;
 using Neuralm.Application.Messages.Responses;
 using Neuralm.Domain.Entities.NEAT;
@@ -22,6 +23,7 @@ namespace Neuralm.Client
         private const int MessageCount = 1;
         private const int ClientCount = 1;
         private const int TotalMessages = MessageCount * ClientCount;
+        private static readonly Random Random = new Random();
 
         static async Task Main(string[] args)
         {
@@ -46,12 +48,14 @@ namespace Neuralm.Client
                     MessageListener<GetEnabledTrainingRoomsResponse> getEnabledTrainingRoomsResponseListener = new MessageListener<GetEnabledTrainingRoomsResponse>();
                     MessageListener<StartTrainingSessionResponse> startTrainingSessionResponseListener = new MessageListener<StartTrainingSessionResponse>();
                     MessageListener<GetOrganismsResponse> getOrganismsResponseListener = new MessageListener<GetOrganismsResponse>();
+                    MessageListener<PostOrganismsScoreResponse> postOrganismsScoreResponseListener = new MessageListener<PostOrganismsScoreResponse>();
                     loginResponseListener.Subscribe(messageProcessor);
                     createTrainingRoomResponseListener.Subscribe(messageProcessor);
                     registerMessageListener.Subscribe(messageProcessor);
                     getEnabledTrainingRoomsResponseListener.Subscribe(messageProcessor);
                     startTrainingSessionResponseListener.Subscribe(messageProcessor);
                     getOrganismsResponseListener.Subscribe(messageProcessor);
+                    postOrganismsScoreResponseListener.Subscribe(messageProcessor);
                     for (int i = 0; i < MessageCount; i++)
                     {
                         Guid name = Guid.NewGuid();
@@ -80,11 +84,22 @@ namespace Neuralm.Client
                         await networkConnector.SendMessageAsync(getOrganismsRequest, CancellationToken.None);
                         GetOrganismsResponse getOrganismsResponse = await getOrganismsResponseListener.ReceiveMessageAsync(CancellationToken.None);
                         Console.WriteLine($"GetOrganismsResponse: \n\tId: {getOrganismsResponse.Id}\n\tRequestId: {getOrganismsResponse.RequestId}\n\tDateTime: {getOrganismsResponse.DateTime}\n\tMessage: {getOrganismsResponse.Message}\n\tSuccess: {getOrganismsResponse.Success}\n\tOrganismsCount: {getOrganismsResponse.Organisms.Count()}\n\tConnectionGenesCount: {getOrganismsResponse.Organisms.Sum(o => o.Brain.ConnectionGenes.Count)}");
+                        
+                        Dictionary<Guid, double> organismsScoreDictionary = new Dictionary<Guid, double>();
+                        foreach (OrganismDto organism in getOrganismsResponse.Organisms)
+                        {
+                            organism.Score += Random.NextDouble() + 0.001;
+                            organismsScoreDictionary.Add(organism.Id, organism.Score);
+                        }
+                        PostOrganismsScoreRequest postOrganismsScoreRequest = new PostOrganismsScoreRequest(startTrainingSessionResponse.TrainingSession.Id, organismsScoreDictionary);
+                        await networkConnector.SendMessageAsync(postOrganismsScoreRequest, CancellationToken.None);
+                        PostOrganismsScoreResponse postOrganismsScoreResponse = await postOrganismsScoreResponseListener.ReceiveMessageAsync(CancellationToken.None);
+                        Console.WriteLine($"PostOrganismsScoreResponse: \n\tId: {postOrganismsScoreResponse.Id}\n\tRequestId: {postOrganismsScoreResponse.RequestId}\n\tDateTime: {postOrganismsScoreResponse.DateTime}\n\tMessage: {postOrganismsScoreResponse.Message}\n\tSuccess: {postOrganismsScoreResponse.Success}");
 
-                        GetEnabledTrainingRoomsRequest getEnabledTrainingRoomsRequest = new GetEnabledTrainingRoomsRequest();
-                        await networkConnector.SendMessageAsync(getEnabledTrainingRoomsRequest, CancellationToken.None);
-                        GetEnabledTrainingRoomsResponse getEnabledTrainingRoomsResponse = await getEnabledTrainingRoomsResponseListener.ReceiveMessageAsync(CancellationToken.None);
-                        Console.WriteLine($"GetEnabledTrainingRoomsResponse: \n\tId: {getEnabledTrainingRoomsResponse.Id}\n\tRequestId: {getEnabledTrainingRoomsResponse.RequestId}\n\tDateTime: {getEnabledTrainingRoomsResponse.DateTime}\n\tMessage: {getEnabledTrainingRoomsResponse.Message}\n\tSuccess: {getEnabledTrainingRoomsResponse.Success}");
+                        //GetEnabledTrainingRoomsRequest getEnabledTrainingRoomsRequest = new GetEnabledTrainingRoomsRequest();
+                        //await networkConnector.SendMessageAsync(getEnabledTrainingRoomsRequest, CancellationToken.None);
+                        //GetEnabledTrainingRoomsResponse getEnabledTrainingRoomsResponse = await getEnabledTrainingRoomsResponseListener.ReceiveMessageAsync(CancellationToken.None);
+                        //Console.WriteLine($"GetEnabledTrainingRoomsResponse: \n\tId: {getEnabledTrainingRoomsResponse.Id}\n\tRequestId: {getEnabledTrainingRoomsResponse.RequestId}\n\tDateTime: {getEnabledTrainingRoomsResponse.DateTime}\n\tMessage: {getEnabledTrainingRoomsResponse.Message}\n\tSuccess: {getEnabledTrainingRoomsResponse.Success}");
 
 
                         //foreach (TrainingRoomDto trainingRoomDto in getEnabledTrainingRoomsResponse.TrainingRooms)

@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Neuralm.Application.Interfaces;
 using Neuralm.Domain;
 using Neuralm.Domain.Entities.NEAT;
-using Neuralm.Domain.Exceptions;
 using Neuralm.Persistence.Abstractions;
 using Neuralm.Persistence.Contexts;
 
@@ -27,14 +26,11 @@ namespace Neuralm.Persistence.Repositories
 
         }
 
-        /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.FindSingleByExpressionAsync"/>
-        public override async Task<TrainingSession> FindSingleByExpressionAsync(Expression<Func<TrainingSession, bool>> predicate)
+        /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.FindSingleOrDefaultAsync"/>
+        public override async Task<TrainingSession> FindSingleOrDefaultAsync(Expression<Func<TrainingSession, bool>> predicate)
         {
             using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
-            TrainingSession entity = await TrainingSessionSetWithInclude().Where(predicate).SingleOrDefaultAsync();
-            if (entity == default)
-                Console.WriteLine(new EntityNotFoundException($"The entity of type {typeof(TrainingSession).Name} could not be found by the predicate."));
-            return entity;
+            return await TrainingSessionSetWithInclude().Where(predicate).SingleOrDefaultAsync();
         }
 
         private IQueryable<TrainingSession> TrainingSessionSetWithInclude()
