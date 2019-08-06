@@ -61,7 +61,7 @@ namespace Neuralm.Presentation.CLI
 
             return Task.WhenAll(tasks).ContinueWith(task =>
             {
-                if (task.Status == TaskStatus.Canceled)
+                if (task.IsCanceled)
                     _cancellationTokenSource.Cancel();
             }, cancellationToken);
         }
