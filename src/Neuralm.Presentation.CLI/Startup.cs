@@ -25,10 +25,12 @@ namespace Neuralm.Presentation.CLI
     {
         private IGenericServiceProvider _serviceProvider;
         private readonly CancellationTokenSource _cancellationTokenSource;
+        private readonly CancellationTokenSource _cancellationTokenSourceTimed;
 
-        public Startup(CancellationTokenSource cancellationTokenSource)
+        public Startup(CancellationTokenSource cancellationTokenSource, uint timeoutInSeconds)
         {
             _cancellationTokenSource = cancellationTokenSource;
+            _cancellationTokenSourceTimed = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutInSeconds));
         }
 
         /// <summary>
@@ -52,11 +54,16 @@ namespace Neuralm.Presentation.CLI
 
             List<Task> tasks = new List<Task>
             {
-                Task.Run(() => VerifyDatabaseConnection(cancellationToken), cancellationToken),
-                Task.Run(() => MapMessagesToServices(cancellationToken), cancellationToken),
-                Task.Run(() => CreateServerCertificate(cancellationToken), cancellationToken)
+                Task.Run(() => VerifyDatabaseConnection(_cancellationTokenSourceTimed.Token), cancellationToken),
+                Task.Run(() => MapMessagesToServices(_cancellationTokenSourceTimed.Token), cancellationToken),
+                Task.Run(() => CreateServerCertificate(_cancellationTokenSourceTimed.Token), cancellationToken)
             };
-            return Task.WhenAll(tasks);
+
+            return Task.WhenAll(tasks).ContinueWith(task =>
+            {
+                if (task.Status == TaskStatus.Canceled)
+                    _cancellationTokenSource.Cancel();
+            }, cancellationToken);
         }
 
         /// <summary>

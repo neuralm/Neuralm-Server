@@ -88,7 +88,7 @@ namespace Neuralm.Presentation.CLI
                 CancellationTokenSource.Cancel();
                 return;
             }
-            Startup startup = new Startup(CancellationTokenSource);
+            Startup startup = new Startup(CancellationTokenSource, 60);
             Console.WriteLine("Initializing...");
             await startup.InitializeAsync(configuration, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();

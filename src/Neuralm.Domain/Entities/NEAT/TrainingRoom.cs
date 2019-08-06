@@ -23,7 +23,6 @@ namespace Neuralm.Domain.Entities.NEAT
         /// </summary>
         public Guid OwnerId { get; private set; }
 
-
         /// <summary>
         /// Gets and sets the owner.
         /// </summary>
@@ -69,7 +68,6 @@ namespace Neuralm.Domain.Entities.NEAT
         /// </summary>
         public uint Generation { get; private set; }
 
-        
         /// <summary>
         /// Gets and sets the random.
         /// </summary>

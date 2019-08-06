@@ -75,7 +75,7 @@ namespace Neuralm.Infrastructure.Networking
             }
             catch (AuthenticationException e)
             {
-                Console.WriteLine($"Authentication failed - closing the connection.!\n\t{e.Message}");
+                Console.WriteLine($"Authentication failed - closing the connection!\n\t{e.Message}");
                 Console.WriteLine("AuthenticateAsClient is cancelled.");
                 _tcpClient.Close();
                 Dispose();
@@ -97,7 +97,7 @@ namespace Neuralm.Infrastructure.Networking
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Authentication failed - closing the connection.!\n\t{e.Message}");
+                Console.WriteLine($"Authentication failed - closing the connection!\n\t{e.Message}");
                 Console.WriteLine($"AuthenticateAsServer is cancelled for: {_tcpClient.Client.RemoteEndPoint}.");
                 _tcpClient.Close();
                 Dispose();
