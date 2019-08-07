@@ -71,7 +71,7 @@ namespace Neuralm.Infrastructure.Networking
         {
             try
             {
-                await _sslStream.AuthenticateAsClientAsync("SelfSignedNeuralm");
+                await _sslStream.AuthenticateAsClientAsync(_host);
             }
             catch (AuthenticationException e)
             {
@@ -102,12 +102,10 @@ namespace Neuralm.Infrastructure.Networking
                 _tcpClient.Close();
                 Dispose();
                 await Task.FromCanceled(cancellationToken);
-                return;
             }
         }
 
         /// <inheritdoc cref="BaseNetworkConnector.SendPacketAsync"/>
-
         protected override ValueTask SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken)
         {
             return _sslStream.WriteAsync(packet, cancellationToken);

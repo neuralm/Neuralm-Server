@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Neuralm.Application.Exceptions
 {
     /// <summary>
-    /// The NetworkConnectorIsNotYetStartedException class; used to throw an Exception when the connector is not yet started.
+    /// The <see cref="NetworkConnectorIsNotYetStartedException"/> class; used to throw an Exception when the connector is not yet started.
     /// </summary>
     [Serializable]
     public class NetworkConnectorIsNotYetStartedException : Exception

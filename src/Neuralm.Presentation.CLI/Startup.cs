@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
@@ -176,24 +177,69 @@ namespace Neuralm.Presentation.CLI
         {
             ServerConfiguration configuration = _serviceProvider.GetService<IOptions<ServerConfiguration>>().Value;
 
-            try
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                X509Certificate certificate = new X509Certificate(configuration.CertificateName, configuration.Password);
-                cancellationToken.ThrowIfCancellationRequested();
-                configuration.Certificate = certificate;
-            }
-            catch (Exception e)
-            {
-                if (!cancellationToken.IsCancellationRequested)
+                X509Store computerCaStore = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+                try
                 {
-                    Console.WriteLine($"Please check if you have a valid CertificateName!\n\t{e.Message}");
-                    _cancellationTokenSource.Cancel();
-                }
+                    computerCaStore.Open(OpenFlags.ReadOnly);
+                    X509Certificate2Collection certificatesInStore = computerCaStore.Certificates.Find(X509FindType.FindBySubjectName, configuration.Host, true);
+                    if (certificatesInStore.Count == 0)
+                        throw new EmptyCertificateCollectionException($"No certificate was found with the given subject name: {configuration.Host}");
 
+                    if (certificatesInStore.Count > 1)
+                    {
+                        foreach (X509Certificate2 cert in certificatesInStore)
+                        {
+                            DisplayCertificate(cert);
+                        }
+                        throw new ArgumentOutOfRangeException(nameof(certificatesInStore), "More than one certificate was found!");
+                    }
+
+                    X509Certificate2 certificate = certificatesInStore[0];
+                    DisplayCertificate(certificate);
+                    configuration.Certificate = certificate;
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+                catch (Exception e)
+                {
+                    if (!cancellationToken.IsCancellationRequested)
+                    {
+                        Console.WriteLine($"Please check if you have a valid ServerConfiguration.Host name, also known as the Common Name (CN) or Fully Qualified Domain Name (FQDN)!\n\t{e.Message}");
+                        _cancellationTokenSource.Cancel();
+                    }
+
+                    Console.WriteLine("CreateServerCertificate is cancelled.");
+                    return Task.FromCanceled(cancellationToken);
+                }
+                finally
+                {
+                    computerCaStore.Close();
+                }
+            }
+            else
+            {
+                Console.WriteLine($"{new NotImplementedException("For non-Windows operating systems the certificate code is yet to be implemented.")}");
                 Console.WriteLine("CreateServerCertificate is cancelled.");
+                _cancellationTokenSource.Cancel();
                 return Task.FromCanceled(cancellationToken);
             }
+            
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Displays the given certificate to the console.
+        /// </summary>
+        /// <param name="cert">The certificate.</param>
+        private static void DisplayCertificate(X509Certificate2 cert)
+        {
+            Console.WriteLine("------------Certificate------------");
+            Console.WriteLine($"Common Name: {cert.SubjectName.Name?.Replace("CN=", "")}");
+            Console.WriteLine($"Issuer: {cert.Issuer}");
+            Console.WriteLine($"Expiration date: {cert.GetExpirationDateString()}");
+            Console.WriteLine($"Effective date: {cert.GetEffectiveDateString()}");
+            Console.WriteLine("-----------------------------------");
         }
 
         /// <summary>

@@ -13,12 +13,9 @@ namespace Neuralm.Application.Configurations
         [IntegerValidator(MinValue = 0, MaxValue = 8080, ExcludeRange = false)]
         public int Port { get; set; }
 
-        [ConfigurationProperty("CertificateName", IsRequired = true)]
-        [RegexStringValidator("^([a-zA-Z0-9-_/]*).cer$")]
-        public string CertificateName { get; set; }
-
-        [ConfigurationProperty("Password", IsRequired = true)]
-        public string Password { get; set; }
+        [ConfigurationProperty("Host", IsRequired = true)]
+        [StringValidator(MinLength = 6)]
+        public string Host { get; set; }
 
         [IgnoreDataMember]
         public X509Certificate Certificate { get; set; }
