@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Neuralm.Application.Exceptions
 {
     /// <summary>
-    /// The EntityValidationException class is used to denote an exception that occured during the validation of an entity.
+    /// The <see cref="EntityValidationException"/> class is used to denote an exception that occured during the validation of an entity.
     /// </summary>
     [Serializable]
     internal class EntityValidationException : Exception

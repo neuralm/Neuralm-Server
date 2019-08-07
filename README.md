@@ -29,21 +29,19 @@ Follow these steps to get your development environment set up:
         },
         "Server": {
           "Port": 9999,
-          "CertificateName": "NeuralmCert.pfx",
-          "Password": "test123"
+          "Host": "{COMMON NAME OR FULLY QUALLIFIED DOMAIN NAME}"
         },
         "NeuralmDb": {
-          "ConnectionString": "Server=(LocalDb)\\MSSQLLocalDB;Database=NeuralmDbContext;Trusted_Connection=True;MultipleActiveResultSets=true",
+          "ConnectionString": "Server={YOUR SERVER NAME\\MSSQLINSTANCE};Database=NeuralmDbContext;Trusted_Connection=True;MultipleActiveResultSets=true",
           "UserLazyLoading": false
         } 
     }
     ```
     NOTE: Keep `UseLazyLoading` on false for now!
-3. Afterwards generate a self signed certificate using the script in powershell (Administrator mode!), when asked for a password use the one from the appSettings.Server.Password:
+3. Afterwards generate a self signed certificate using the script in powershell (Administrator mode!)
 	```powershell
-	.\docs\GenerateSelfSignedCertificate.ps1
+	New-SelfSignedCertificate -DnsName "{COMMON NAME OR FULLY QUALLIFIED DOMAIN NAME}" -CertStoreLocation "cert:\LocalMachine\My" -FriendlyName "NeuralmCert"
 	```
-	Then, manually copy the pfx certificate to the root of the Presentation.CLI layer (the pfx certificate can be found at "c:\NeuralmCert.pfx").
 4. Next, go to `Tools > NuGet Package Manager > Package Manager Console` in visual studio, To restore all dependencies:
     ```
     dotnet restore
