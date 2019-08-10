@@ -17,6 +17,10 @@ namespace Neuralm.Persistence.Configurations
             builder.HasOne(p => p.TrainingRoom)
                 .WithMany(p => p.TrainingSessions)
                 .HasForeignKey(p => p.TrainingRoomId);
+
+            builder.OwnsMany(p => p.LeasedOrganisms)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasKey(p => p.Id);
         }
     }
 }

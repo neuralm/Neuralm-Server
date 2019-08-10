@@ -75,10 +75,11 @@ namespace Neuralm.Persistence.Repositories
             return DbContext.Set<TrainingRoom>()
                 .Include("TrainingRoomSettings")
                 .Include("Brains.ConnectionGenes")
-                .Include("Organisms.Brain")
                 .Include("Owner.Credentials.CredentialType")
                 .Include("Species.LastGenerationOrganisms.Brain")
                 .Include("Species.LastGenerationOrganisms.TrainingRoom")
+                .Include("Species.Organisms.Brain")
+                .Include("Species.Organisms.TrainingRoom")
                 .Include("AuthorizedTrainers")
                 .Include("TrainingSessions");
         }

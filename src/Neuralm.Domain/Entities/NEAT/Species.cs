@@ -97,6 +97,7 @@ namespace Neuralm.Domain.Entities.NEAT
             {
                 Organism org = organism.Clone();
                 org.Generation++;
+                org.SpeciesId = Id;
                 return org;
             }).ToList();
             // TODO: Check if clone is needed, may just be useless instance creation

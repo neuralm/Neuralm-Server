@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Neuralm.Domain.Entities.NEAT
 {
     /// <summary>
     /// Represents the <see cref="Organism"/> class.
     /// </summary>
+    [DebuggerDisplay("SpeciesId = {SpeciesId}")]
     public class Organism
     {
         private static readonly string[] Vowels = { "a", "e", "i", "o", "u", "y", "aa", "ee", "ie", "oo", "ou", "au" };
@@ -54,6 +56,16 @@ namespace Neuralm.Domain.Entities.NEAT
         /// Gets and sets the generation.
         /// </summary>
         public uint Generation { get; set; }
+
+        /// <summary>
+        /// Gets and sets a value whether the organism is leased.
+        /// </summary>
+        public bool Leased { get; set; }
+
+        /// <summary>
+        /// Gets and sets a value whether the organism is evaluated.
+        /// </summary>
+        public bool Evaluated { get; set; }
 
         /// <summary>
         /// EFCore entity constructor IGNORE!

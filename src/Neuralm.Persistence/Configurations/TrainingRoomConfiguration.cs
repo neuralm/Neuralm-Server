@@ -23,11 +23,12 @@ namespace Neuralm.Persistence.Configurations
             builder
                 .OwnsMany(p => p.Species)
                 .HasForeignKey(p => p.TrainingRoomId)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+                .OnDelete(DeleteBehavior.Cascade);
 
-            builder
-                .OwnsMany(p => p.Organisms)
-                .HasKey(p => p.Id);
+            //builder
+            //    .OwnsMany(p => p.Organisms)
+            //    .HasForeignKey(p => p.TrainingRoomId)
+            //    .HasKey(p => p.Id);
 
             builder
                 .OwnsMany(p => p.AuthorizedTrainers)

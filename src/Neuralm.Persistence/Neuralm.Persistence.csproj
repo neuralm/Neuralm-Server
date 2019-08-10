@@ -28,6 +28,40 @@
     <Compile Remove="Migrations\20190724190802_Trainer.Designer.cs" />
     <Compile Remove="Migrations\20190724194109_Trainer.cs" />
     <Compile Remove="Migrations\20190724194109_Trainer.Designer.cs" />
+    <Compile Remove="Migrations\20190808162111_TrainingSessionRework.cs" />
+    <Compile Remove="Migrations\20190808162111_TrainingSessionRework.Designer.cs" />
+    <Compile Remove="Migrations\20190808162428_TrainingSessionRework.cs" />
+    <Compile Remove="Migrations\20190808162428_TrainingSessionRework.Designer.cs" />
+    <Compile Remove="Migrations\20190808162603_TrainingSessionRework.cs" />
+    <Compile Remove="Migrations\20190808162603_TrainingSessionRework.Designer.cs" />
+    <Compile Remove="Migrations\20190809090511_TrainingSessionRework.cs" />
+    <Compile Remove="Migrations\20190809090511_TrainingSessionRework.Designer.cs" />
+    <Compile Remove="Migrations\20190809094455_TrainingSessionRework.cs" />
+    <Compile Remove="Migrations\20190809094455_TrainingSessionRework.Designer.cs" />
+    <Compile Remove="Migrations\20190809095737_TrainingSessionRework.cs" />
+    <Compile Remove="Migrations\20190809095737_TrainingSessionRework.Designer.cs" />
+    <Compile Remove="Migrations\20190809102407_TrainingSessionRework.cs" />
+    <Compile Remove="Migrations\20190809102407_TrainingSessionRework.Designer.cs" />
+    <Compile Remove="Migrations\20190809110908_TrainingSessionRework2.cs" />
+    <Compile Remove="Migrations\20190809110908_TrainingSessionRework2.Designer.cs" />
+    <Compile Remove="Migrations\20190809111018_TrainingSessionRework2.cs" />
+    <Compile Remove="Migrations\20190809111018_TrainingSessionRework2.Designer.cs" />
+    <Compile Remove="Migrations\20190809111114_TrainingSessionRework2.cs" />
+    <Compile Remove="Migrations\20190809111114_TrainingSessionRework2.Designer.cs" />
+    <Compile Remove="Migrations\20190809112754_TrainingSessionRework2.cs" />
+    <Compile Remove="Migrations\20190809112754_TrainingSessionRework2.Designer.cs" />
+    <Compile Remove="Migrations\20190809113054_TrainingSessionRework2.cs" />
+    <Compile Remove="Migrations\20190809113054_TrainingSessionRework2.Designer.cs" />
+    <Compile Remove="Migrations\20190809113215_TrainingSessionRework2.cs" />
+    <Compile Remove="Migrations\20190809113215_TrainingSessionRework2.Designer.cs" />
+    <Compile Remove="Migrations\20190809113459_TrainingSessionRework2.cs" />
+    <Compile Remove="Migrations\20190809113459_TrainingSessionRework2.Designer.cs" />
+    <Compile Remove="Migrations\20190809113601_TrainingSessionRework2.cs" />
+    <Compile Remove="Migrations\20190809113601_TrainingSessionRework2.Designer.cs" />
+    <Compile Remove="Migrations\20190809113850_TrainingSessionRework2.cs" />
+    <Compile Remove="Migrations\20190809113850_TrainingSessionRework2.Designer.cs" />
+    <Compile Remove="Migrations\20190809115346_TrainingSessionRework2.cs" />
+    <Compile Remove="Migrations\20190809115346_TrainingSessionRework2.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

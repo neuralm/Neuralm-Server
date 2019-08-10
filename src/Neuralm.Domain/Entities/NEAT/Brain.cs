@@ -9,16 +9,16 @@ namespace Neuralm.Domain.Entities.NEAT
     /// </summary>
     public class Brain
     {
-        private readonly Dictionary<uint, Node> _nodes;
-        private readonly List<Node> _outputNodes;
-        private readonly List<Node> _inputNodes;
-        private readonly List<ConnectionGene> _childGenes;
+        private readonly Dictionary<uint, Node> _nodes = new Dictionary<uint, Node>();
+        private readonly List<Node> _outputNodes = new List<Node>();
+        private readonly List<Node> _inputNodes = new List<Node>();
+        private readonly List<ConnectionGene> _childGenes = new List<ConnectionGene>();
         private uint _maxInnovation;
 
         /// <summary>
         /// Gets the list of genes.
         /// </summary>
-        public virtual List<ConnectionGene> ConnectionGenes { get; private set; }
+        public virtual List<ConnectionGene> ConnectionGenes { get; private set; } = new List<ConnectionGene>();
 
         /// <summary>
         /// Gets and sets the id.
@@ -56,13 +56,8 @@ namespace Neuralm.Domain.Entities.NEAT
         {
             TrainingRoom = trainingRoom;
             TrainingRoomId = TrainingRoom.Id;
-            ConnectionGenes = new List<ConnectionGene>();
-            _nodes = new Dictionary<uint, Node>();
-            _outputNodes = new List<Node>();
-            _inputNodes = new List<Node>();
-            _childGenes = new List<ConnectionGene>();
 
-            if (Id == Guid.Empty)
+            if (Id.Equals(Guid.Empty))
                 Id = Guid.NewGuid();
 
             for (uint i = 0; i < TrainingRoom.TrainingRoomSettings.InputCount; i++)
@@ -116,7 +111,7 @@ namespace Neuralm.Domain.Entities.NEAT
                 ConnectionGene geneToAdd = gene;
 
                 ConnectionGene gene2 = parent2Brain.ConnectionGenes.SingleOrDefault(gen => gen.InnovationNumber == gene.InnovationNumber);
-                if(gene2 != default)
+                if (gene2 != default)
                 {
                     geneToRemove = gene2;
                     geneToAdd = TrainingRoom.Random.NextDouble() < 0.5 ? gene : gene2;
@@ -201,14 +196,13 @@ namespace Neuralm.Domain.Entities.NEAT
             if (TrainingRoom.Random.NextDouble() < TrainingRoom.TrainingRoomSettings.AddNodeChance)
                 AddNodeMutation();
 
-            if ((TrainingRoom.Random.NextDouble() < TrainingRoom.TrainingRoomSettings.MutateWeightChance) && ConnectionGenes.Count > 0)
-            {
-                ConnectionGene connectionGene = ConnectionGenes.ElementAt(TrainingRoom.Random.Next(ConnectionGenes.Count));
-                if (TrainingRoom.Random.NextDouble() < TrainingRoom.TrainingRoomSettings.WeightReassignChance)
-                    connectionGene.Weight = TrainingRoom.Random.NextDouble() * 2 - 1;
-                else
-                    connectionGene.Weight += (TrainingRoom.Random.NextDouble() * 2 - 1) * 0.1;
-            }
+            if (!(TrainingRoom.Random.NextDouble() < TrainingRoom.TrainingRoomSettings.MutateWeightChance) || ConnectionGenes.Count <= 0)
+                return;
+            ConnectionGene connectionGene = ConnectionGenes.ElementAt(TrainingRoom.Random.Next(ConnectionGenes.Count));
+            if (TrainingRoom.Random.NextDouble() < TrainingRoom.TrainingRoomSettings.WeightReassignChance)
+                connectionGene.Weight = TrainingRoom.Random.NextDouble() * 2 - 1;
+            else
+                connectionGene.Weight += (TrainingRoom.Random.NextDouble() * 2 - 1) * 0.1;
         }
 
         /// <summary>
@@ -370,8 +364,8 @@ namespace Neuralm.Domain.Entities.NEAT
             return ConnectionGenes.SequenceEqual(other.ConnectionGenes) &&
                    _outputNodes.SequenceEqual(other._outputNodes) &&
                    _inputNodes.SequenceEqual(other._inputNodes) &&
-                   TrainingRoom.TrainingRoomSettings.InputCount == other.TrainingRoom.TrainingRoomSettings.InputCount &&
-                   TrainingRoom.TrainingRoomSettings.OutputCount == other.TrainingRoom.TrainingRoomSettings.OutputCount;
+                   TrainingRoom?.TrainingRoomSettings?.InputCount == other.TrainingRoom?.TrainingRoomSettings?.InputCount &&
+                   TrainingRoom?.TrainingRoomSettings?.OutputCount == other.TrainingRoom?.TrainingRoomSettings?.OutputCount;
         }
     }
 }

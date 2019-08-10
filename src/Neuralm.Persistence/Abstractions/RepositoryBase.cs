@@ -81,21 +81,21 @@ namespace Neuralm.Persistence.Abstractions
             return await DbContext.Set<TEntity>().AnyAsync(predicate);
         }
 
-        /// <inheritdoc cref="IRepository{TEntity}.FindManyAsync"/>
+        /// <inheritdoc cref="IRepository{TEntity}.FindManyAsync(Expression{Func{TEntity, bool}})"/>
         public virtual async Task<IEnumerable<TEntity>> FindManyAsync(Expression<Func<TEntity, bool>> predicate)
         {
             using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
             return await DbContext.Set<TEntity>().Where(predicate).ToListAsync();
         }
 
-        /// <inheritdoc cref="IRepository{TEntity}.FindSingleOrDefaultAsync"/>
+        /// <inheritdoc cref="IRepository{TEntity}.FindSingleOrDefaultAsync(Expression{Func{TEntity, bool}})"/>
         public virtual async Task<TEntity> FindSingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
         {
             using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
             return await DbContext.Set<TEntity>().SingleOrDefaultAsync(predicate);
         }
 
-        /// <inheritdoc cref="IRepository{TEntity}.GetAllAsync"/>
+        /// <inheritdoc cref="IRepository{TEntity}.GetAllAsync()"/>
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
         {
             using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();

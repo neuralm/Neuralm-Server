@@ -10,6 +10,7 @@ namespace Neuralm.Domain.Entities.NEAT
     public class TrainingRoom
     {
         private readonly Dictionary<(uint A, uint B), uint> _mutationToInnovation = new Dictionary<(uint A, uint B), uint>();
+        private readonly List<Organism> _tempOrganisms = new List<Organism>();
         private uint _nodeId;
         private Random _random;
 
@@ -37,11 +38,6 @@ namespace Neuralm.Domain.Entities.NEAT
         /// Gets the list of training sessions.
         /// </summary>
         public virtual List<TrainingSession> TrainingSessions { get; private set; }
-
-        /// <summary>
-        /// Gets the list of organisms.
-        /// </summary>
-        public virtual List<Organism> Organisms { get; private set; }
 
         /// <summary>
         /// Gets the list of species.
@@ -130,7 +126,6 @@ namespace Neuralm.Domain.Entities.NEAT
             AuthorizedTrainers = new List<Trainer> {new Trainer(owner, this)};
             Brains = new List<Brain>();
             Species = new List<Species>();
-            Organisms = new List<Organism>();
             TrainingSessions = new List<TrainingSession>();
         }
 
@@ -169,6 +164,7 @@ namespace Neuralm.Domain.Entities.NEAT
         public void PostScore(Organism organism, double score)
         {
             organism.Score = score;
+            organism.Evaluated = true;
         }
 
         /// <summary>
@@ -206,7 +202,7 @@ namespace Neuralm.Domain.Entities.NEAT
                 totalScore = 1; // TODO: Think about what this really does lol, if the total score is 0 should they have the right to reproduce?
 
             double rest = 0;
-            Organisms.Clear();
+            _tempOrganisms.Clear();
             foreach (Species species in Species)
             {
                 double fraction = species.SpeciesScore / totalScore;
@@ -222,16 +218,16 @@ namespace Neuralm.Domain.Entities.NEAT
                 amountOfOrganisms = Math.Floor(amountOfOrganisms);
                 for (int i = 0; i < amountOfOrganisms; i++)
                 {
-                    Organisms.Add(ProduceOrganism(species));
+                    _tempOrganisms.Add(ProduceOrganism(species));
                 }
             }
 
-            while (Organisms.Count < TrainingRoomSettings.OrganismCount)
+            while (_tempOrganisms.Count < TrainingRoomSettings.OrganismCount)
             {
-                Organisms.Add(new Organism(this));
+                _tempOrganisms.Add(new Organism(this));
             }
 
-            foreach (Organism organism in Organisms)
+            foreach (Organism organism in _tempOrganisms)
             {
                 AddOrganism(organism);
             }
@@ -265,7 +261,7 @@ namespace Neuralm.Domain.Entities.NEAT
 
             if (Random.NextDouble() < TrainingRoomSettings.MutationChance)
                 child.Mutate();
-            child.SpeciesId = Id;
+            child.SpeciesId = species.Id;
             return child;
         }
 

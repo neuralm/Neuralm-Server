@@ -67,11 +67,6 @@ namespace Neuralm.Persistence.Contexts
         public DbSet<Brain> Brains { get; set; }
 
         /// <summary>
-        /// Gets and sets organisms.
-        /// </summary>
-        public DbSet<Organism> Organisms { get; set; }
-
-        /// <summary>
         /// Gets and sets training sessions.
         /// </summary>
         public DbSet<TrainingSession> TrainingSessions { get; set; }
@@ -80,6 +75,11 @@ namespace Neuralm.Persistence.Contexts
         /// Gets and sets trainers.
         /// </summary>
         public DbSet<Trainer> Trainers { get; set; }
+
+        /// <summary>
+        /// Gets and sets leased organisms.
+        /// </summary>
+        public DbSet<LeasedOrganism> LeasedOrganisms { get; set; }
 
         /// <summary>
         /// Initializes an instance of the <see cref="NeuralmDbContext"/> class.

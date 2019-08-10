@@ -16,9 +16,15 @@ namespace Neuralm.Persistence.Configurations
 
             builder.OwnsMany(p => p.LastGenerationOrganisms)
                 .HasForeignKey(p => p.SpeciesId)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasKey(p => p.Id);
 
-            builder.Ignore(p => p.Organisms);
+            builder.OwnsMany(p => p.Organisms)
+                .HasForeignKey(p => p.SpeciesId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasKey(p => p.Id);
+
+            //builder.Ignore(p => p.Organisms);
         }
     }
 }
