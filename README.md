@@ -33,7 +33,7 @@ Follow these steps to get your development environment set up:
         },
         "NeuralmDb": {
           "ConnectionString": "Server={YOUR SERVER NAME\\MSSQLINSTANCE};Database=NeuralmDbContext;Trusted_Connection=True;MultipleActiveResultSets=true",
-          "UserLazyLoading": false
+          "UseLazyLoading": false
         } 
     }
     ```
