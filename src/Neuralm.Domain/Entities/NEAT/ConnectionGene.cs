@@ -90,7 +90,7 @@ namespace Neuralm.Domain.Entities.NEAT
         {
             InNode = organism.GetOrCreateNode(InId);
             OutNode = organism.GetOrCreateNode(OutId);
-            OutNode.Dependencies.Add(this); 
+            //OutNode.Dependencies.Add(this); 
         }
 
         /// <summary>

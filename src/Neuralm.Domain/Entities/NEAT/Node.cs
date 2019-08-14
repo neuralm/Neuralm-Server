@@ -7,10 +7,10 @@ namespace Neuralm.Domain.Entities.NEAT
     /// </summary>
     public class Node
     {
-        /// <summary>
-        /// Gets the list of dependencies.
-        /// </summary>
-        public List<ConnectionGene> Dependencies { get; }
+        ///// <summary>
+        ///// Gets the list of dependencies.
+        ///// </summary>
+        //public List<ConnectionGene> Dependencies { get; }
 
         /// <summary>
         /// Gets the id.
@@ -20,7 +20,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <summary>
         /// Gets the layer.
         /// </summary>
-        public uint Layer { get; private set; }
+        public uint Layer { get; set; }
 
         /// <summary>
         /// Gets the node type.
@@ -35,29 +35,28 @@ namespace Neuralm.Domain.Entities.NEAT
         public Node(uint id, NodeType type)
         {
             Layer = uint.MinValue;
-            Dependencies = new List<ConnectionGene>();
+            //Dependencies = new List<ConnectionGene>();
             Id = id;
             NodeType = type;
         }
 
-        /// <summary>
-        /// Sets the layer of this node.
-        /// Will only be set if either force is true, or the layer is higher than its current layer.
-        /// </summary>
-        /// <param name="layer">The new layer value.</param>
-        /// <param name="force">If <c>true</c> it will always set the new layer, else only if it is bigger than the current layer.</param>
-        public void SetLayer(uint layer, bool force = false)
-        {
-            Layer = force ? layer : (layer > Layer ? layer : Layer);
+        ///// <summary>
+        ///// Sets the layer of this node.
+        ///// Will only be set if either force is true, or the layer is higher than its current layer.
+        ///// </summary>
+        ///// <param name="layer">The new layer value.</param>
+        ///// <param name="force">If <c>true</c> it will always set the new layer, else only if it is bigger than the current layer.</param>
+        //public void SetLayer(uint layer, bool force = false)
+        //{
+        //    Layer = force ? layer : (layer > Layer ? layer : Layer);
 
-            if (!force)
-            {
-                foreach (ConnectionGene con in Dependencies)
-                {
-                    con.InNode.SetLayer(Layer + 1);
-                }
-            }
-        }
+        //    if (force)
+        //        return;
+        //    foreach (ConnectionGene con in Dependencies)
+        //    {
+        //        con.InNode.SetLayer(Layer + 1);
+        //    }
+        //}
 
         /// <summary>
         /// Checks whether the object is the same as this node.

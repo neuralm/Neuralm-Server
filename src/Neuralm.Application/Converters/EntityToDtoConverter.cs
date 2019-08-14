@@ -24,6 +24,8 @@ namespace Neuralm.Application.Converters
         /// <returns>Returns the converted entity as dto.</returns>
         public static TDto Convert<TDto, TEntity>(TEntity entity) where TDto : class, new()
         {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
             TDto dto = new TDto();
             IList<PropertyInfo> joinedProperties =
                 typeof(TDto).GetProperties().Join(typeof(TEntity).GetProperties(),
@@ -46,6 +48,9 @@ namespace Neuralm.Application.Converters
                     }
                     foreach (object item in list)
                     {
+                        if (item == null)
+                            continue;
+                        
                         Type actualType = ((IProxyTargetAccessor)item).DynProxyGetTarget().GetType().BaseType;
                         genericListInstance.Add(Convert(dtoItemType, actualType, item));
                     }
@@ -125,6 +130,9 @@ namespace Neuralm.Application.Converters
             {
                 entityObject = entityType.GetProperty(property.Name).GetValue(entity, null);
             }
+
+            if (entityObject == null)
+                return false;
 
             object result = Convert(property.PropertyType, newEntityType, entityObject);
             property.SetValue(dto, result);

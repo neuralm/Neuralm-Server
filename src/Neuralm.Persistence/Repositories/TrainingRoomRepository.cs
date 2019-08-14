@@ -49,26 +49,26 @@ namespace Neuralm.Persistence.Repositories
             return saveSuccess;
         }
 
-        /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.FindSingleOrDefaultAsync"/>
-        public override async Task<TrainingRoom> FindSingleOrDefaultAsync(Expression<Func<TrainingRoom, bool>> predicate)
-        {
-            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
-            return await TrainingRoomSetWithInclude().Where(predicate).SingleOrDefaultAsync();
-        }
+        ///// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.FindSingleOrDefaultAsync"/>
+        //public override async Task<TrainingRoom> FindSingleOrDefaultAsync(Expression<Func<TrainingRoom, bool>> predicate)
+        //{
+        //    using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
+        //    return await TrainingRoomSetWithInclude().Where(predicate).SingleOrDefaultAsync();
+        //}
 
-        /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.FindManyAsync"/>
-        public override async Task<IEnumerable<TrainingRoom>> FindManyAsync(Expression<Func<TrainingRoom, bool>> predicate)
-        {
-            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
-            return await TrainingRoomSetWithInclude().Where(predicate).ToListAsync();
-        }
+        ///// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.FindManyAsync"/>
+        //public override async Task<IEnumerable<TrainingRoom>> FindManyAsync(Expression<Func<TrainingRoom, bool>> predicate)
+        //{
+        //    using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
+        //    return await TrainingRoomSetWithInclude().Where(predicate).ToListAsync();
+        //}
 
-        /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.GetAllAsync"/>
-        public override async Task<IEnumerable<TrainingRoom>> GetAllAsync()
-        {
-            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
-            return await TrainingRoomSetWithInclude().ToListAsync();
-        }
+        ///// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.GetAllAsync"/>
+        //public override async Task<IEnumerable<TrainingRoom>> GetAllAsync()
+        //{
+        //    using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
+        //    return await TrainingRoomSetWithInclude().ToListAsync();
+        //}
 
         private IQueryable<TrainingRoom> TrainingRoomSetWithInclude()
         {

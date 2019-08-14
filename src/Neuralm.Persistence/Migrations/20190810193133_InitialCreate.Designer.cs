@@ -10,8 +10,8 @@ using Neuralm.Persistence.Contexts;
 namespace Neuralm.Persistence.Migrations
 {
     [DbContext(typeof(NeuralmDbContext))]
-    [Migration("20190809120219_TrainingSessionRework2")]
-    partial class TrainingSessionRework2
+    [Migration("20190810193133_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -402,8 +402,7 @@ namespace Neuralm.Persistence.Migrations
 
                                     b2.Property<double>("Score");
 
-                                    b2.Property<Guid?>("SpeciesId")
-                                        .IsRequired();
+                                    b2.Property<Guid>("SpeciesId");
 
                                     b2.Property<Guid>("TrainingRoomId");
 
@@ -450,8 +449,7 @@ namespace Neuralm.Persistence.Migrations
 
                                     b2.Property<double>("Score");
 
-                                    b2.Property<Guid?>("SpeciesId")
-                                        .IsRequired();
+                                    b2.Property<Guid>("SpeciesId");
 
                                     b2.Property<Guid>("TrainingRoomId");
 

@@ -167,17 +167,32 @@ namespace Neuralm.Domain.Entities.NEAT
 
             foreach (Node node in _nodes.Values)
             {
-                node.SetLayer(uint.MinValue, true);
+                SetLayer(node, uint.MinValue, true);
             }
 
             foreach (Node output in _outputNodes)
             {
-                output.SetLayer(0);
+                SetLayer(output, 0);
             }
 
             foreach (Node input in _inputNodes)
             {
-                input.SetLayer(uint.MaxValue, true);
+                SetLayer(input, uint.MaxValue, true);
+            }
+
+            void SetLayer(Node node, uint layer, bool force = false)
+            {
+                node.Layer = force ? layer : (layer > node.Layer ? layer : node.Layer);
+
+                if (force)
+                    return;
+                foreach (ConnectionGene connectionGene in ConnectionGenes)
+                {
+                    if (connectionGene.OutId.Equals(node.Id))
+                    {
+                        SetLayer(connectionGene.InNode, node.Layer + 1);
+                    }
+                }
             }
         }
 
@@ -263,7 +278,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <returns>Returns <c>true</c> if there is a connection that goes from the start node to the end node; otherwise, <c>false</c>.</returns>
         private bool ConnectionExists(Node startNode, Node endNode)
         {
-            return ConnectionGenes.Any(gene => gene.InId == startNode.Id && gene.OutId == endNode.Id);
+            return ConnectionGenes.Any(gene => gene.InId.Equals(startNode.Id) && gene.OutId.Equals(endNode.Id));
         }
 
         /// <summary>
@@ -318,7 +333,7 @@ namespace Neuralm.Domain.Entities.NEAT
 
             foreach (ConnectionGene gene in ConnectionGenes)
             {
-                ConnectionGene otherGene = other.ConnectionGenes.SingleOrDefault(gen => gen.InnovationNumber == gene.InnovationNumber);
+                ConnectionGene otherGene = other.ConnectionGenes.SingleOrDefault(gen => gen.InnovationNumber.Equals(gene.InnovationNumber));
                 if (otherGene != default)
                 {
                     weightDiff += Math.Abs(gene.Weight - otherGene.Weight);
