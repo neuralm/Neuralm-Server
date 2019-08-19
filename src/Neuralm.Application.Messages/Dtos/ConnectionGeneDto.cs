@@ -11,14 +11,14 @@ namespace Neuralm.Application.Messages.Dtos
         /// <inheritdoc cref="ConnectionGene.Id"/>
         public Guid Id { get; set; }
 
-        /// <inheritdoc cref="ConnectionGene.BrainId"/>
-        public Guid BrainId { get; set; }
+        /// <inheritdoc cref="ConnectionGene.OrganismId"/>
+        public Guid OrganismId { get; set; }
 
-        /// <inheritdoc cref="ConnectionGene.InId"/>
-        public uint InId { get; set; }
+        /// <inheritdoc cref="ConnectionGene.InNodeIdentifier"/>
+        public uint InNodeIdentifier { get; set; }
 
-        /// <inheritdoc cref="ConnectionGene.OutId"/>
-        public uint OutId { get; set; }
+        /// <inheritdoc cref="ConnectionGene.OutNodeIdentifier"/>
+        public uint OutNodeIdentifier { get; set; }
 
         /// <inheritdoc cref="ConnectionGene.InnovationNumber"/>
         public uint InnovationNumber { get; set; }

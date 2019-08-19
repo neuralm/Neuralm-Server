@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Neuralm.Domain.Entities.NEAT;
 
 namespace Neuralm.Application.Messages.Dtos
@@ -11,17 +12,8 @@ namespace Neuralm.Application.Messages.Dtos
         /// <inheritdoc cref="Organism.Id"/>
         public Guid Id { get; set; }
 
-        /// <inheritdoc cref="Organism.SpeciesId"/>
-        public Guid SpeciesId { get; set; }
-
-        /// <inheritdoc cref="Organism.BrainId"/>
-        public Guid BrainId { get; set; }
-
-        /// <inheritdoc cref="Organism.TrainingRoomId"/>
-        public Guid TrainingRoomId { get; set; }
-
-        /// <inheritdoc cref="Organism.Brain"/>
-        public BrainDto Brain { get; set; }
+        /// <inheritdoc cref="Organism.ConnectionGenes"/>
+        public List<ConnectionGeneDto> ConnectionGenes { get; set; }
 
         /// <inheritdoc cref="Organism.Score"/>
         public double Score { get; set; }

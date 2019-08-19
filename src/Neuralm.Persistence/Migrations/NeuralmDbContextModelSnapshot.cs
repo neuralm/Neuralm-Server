@@ -148,20 +148,89 @@ namespace Neuralm.Persistence.Migrations
                     b.ToTable("UserRoles");
                 });
 
-            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.Brain", b =>
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.Nodes.Node", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired();
+
+                    b.Property<long>("Layer");
+
+                    b.Property<long>("NodeIdentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Node");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Node");
+                });
+
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.Organism", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Evaluated");
+
+                    b.Property<long>("Generation");
+
+                    b.Property<bool>("Leased");
+
+                    b.Property<string>("Name");
+
+                    b.Property<double>("Score");
+
+                    b.Property<Guid?>("SpeciesId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SpeciesId");
+
+                    b.ToTable("Organism");
+                });
+
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.OrganismInputNode", b =>
+                {
                     b.Property<Guid>("OrganismId");
 
-                    b.Property<Guid>("TrainingRoomId");
+                    b.Property<Guid>("InputNodeId");
+
+                    b.HasKey("OrganismId", "InputNodeId");
+
+                    b.HasIndex("InputNodeId");
+
+                    b.ToTable("OrganismInputNode");
+                });
+
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.OrganismOutputNode", b =>
+                {
+                    b.Property<Guid>("OrganismId");
+
+                    b.Property<Guid>("OutputNodeId");
+
+                    b.HasKey("OrganismId", "OutputNodeId");
+
+                    b.HasIndex("OutputNodeId");
+
+                    b.ToTable("OrganismOutputNode");
+                });
+
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.Species", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<double>("SpeciesScore");
+
+                    b.Property<Guid?>("TrainingRoomId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("TrainingRoomId");
 
-                    b.ToTable("Brains");
+                    b.ToTable("Species");
                 });
 
             modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.TrainingRoom", b =>
@@ -169,75 +238,21 @@ namespace Neuralm.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<double>("AverageScore");
-
                     b.Property<bool>("Enabled");
 
                     b.Property<long>("Generation");
 
-                    b.Property<double>("HighestScore");
-
-                    b.Property<long>("InnovationId");
-
-                    b.Property<double>("LowestScore");
+                    b.Property<long>("HighestInnovationNumber");
 
                     b.Property<string>("Name");
 
-                    b.Property<Guid>("OwnerId");
-
-                    b.Property<Guid?>("TrainingRoomSettingsId");
+                    b.Property<Guid?>("OwnerId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId");
 
-                    b.HasIndex("TrainingRoomSettingsId");
-
                     b.ToTable("TrainingRooms");
-                });
-
-            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.TrainingRoomSettings", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<double>("AddConnectionChance");
-
-                    b.Property<double>("AddNodeChance");
-
-                    b.Property<double>("CrossOverChance");
-
-                    b.Property<double>("EnableConnectionChance");
-
-                    b.Property<long>("InputCount");
-
-                    b.Property<double>("InterSpeciesChance");
-
-                    b.Property<double>("MutateWeightChance");
-
-                    b.Property<double>("MutationChance");
-
-                    b.Property<long>("OrganismCount");
-
-                    b.Property<long>("OutputCount");
-
-                    b.Property<int>("Seed");
-
-                    b.Property<double>("SpeciesAverageWeightDiffWeight");
-
-                    b.Property<double>("SpeciesDisjointGeneWeight");
-
-                    b.Property<double>("SpeciesExcessGeneWeight");
-
-                    b.Property<double>("Threshold");
-
-                    b.Property<double>("TopAmountToSurvive");
-
-                    b.Property<double>("WeightReassignChance");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TrainingRoomSettings");
                 });
 
             modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.TrainingSession", b =>
@@ -278,6 +293,20 @@ namespace Neuralm.Persistence.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.Nodes.InputNode", b =>
+                {
+                    b.HasBaseType("Neuralm.Domain.Entities.NEAT.Nodes.Node");
+
+                    b.HasDiscriminator().HasValue("InputNode");
+                });
+
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.Nodes.OutputNode", b =>
+                {
+                    b.HasBaseType("Neuralm.Domain.Entities.NEAT.Nodes.Node");
+
+                    b.HasDiscriminator().HasValue("OutputNode");
+                });
+
             modelBuilder.Entity("Neuralm.Domain.Entities.Authentication.Credential", b =>
                 {
                     b.HasOne("Neuralm.Domain.Entities.Authentication.CredentialType", "CredentialType")
@@ -316,167 +345,82 @@ namespace Neuralm.Persistence.Migrations
                         .HasForeignKey("UserId1");
                 });
 
-            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.Brain", b =>
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.Organism", b =>
                 {
-                    b.HasOne("Neuralm.Domain.Entities.NEAT.TrainingRoom", "TrainingRoom")
-                        .WithMany("Brains")
-                        .HasForeignKey("TrainingRoomId");
+                    b.HasOne("Neuralm.Domain.Entities.NEAT.Species")
+                        .WithMany("Organisms")
+                        .HasForeignKey("SpeciesId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.OwnsMany("Neuralm.Domain.Entities.NEAT.ConnectionGene", "ConnectionGenes", b1 =>
                         {
                             b1.Property<Guid>("Id")
                                 .ValueGeneratedOnAdd();
 
-                            b1.Property<Guid>("BrainId");
-
                             b1.Property<bool>("Enabled");
 
-                            b1.Property<long>("InId");
+                            b1.Property<long>("InNodeIdentifier");
 
                             b1.Property<long>("InnovationNumber");
 
-                            b1.Property<long>("OutId");
+                            b1.Property<Guid>("OrganismId");
+
+                            b1.Property<long>("OutNodeIdentifier");
 
                             b1.Property<double>("Weight");
 
                             b1.HasKey("Id");
 
-                            b1.HasIndex("BrainId");
+                            b1.HasIndex("OrganismId");
 
                             b1.ToTable("ConnectionGenes");
 
-                            b1.HasOne("Neuralm.Domain.Entities.NEAT.Brain")
+                            b1.HasOne("Neuralm.Domain.Entities.NEAT.Organism")
                                 .WithMany("ConnectionGenes")
-                                .HasForeignKey("BrainId")
+                                .HasForeignKey("OrganismId")
                                 .OnDelete(DeleteBehavior.Cascade);
                         });
+                });
+
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.OrganismInputNode", b =>
+                {
+                    b.HasOne("Neuralm.Domain.Entities.NEAT.Nodes.InputNode", "InputNode")
+                        .WithMany("OrganismInputNodes")
+                        .HasForeignKey("InputNodeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Neuralm.Domain.Entities.NEAT.Organism", "Organism")
+                        .WithMany("Inputs")
+                        .HasForeignKey("OrganismId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.OrganismOutputNode", b =>
+                {
+                    b.HasOne("Neuralm.Domain.Entities.NEAT.Organism", "Organism")
+                        .WithMany("Outputs")
+                        .HasForeignKey("OrganismId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Neuralm.Domain.Entities.NEAT.Nodes.OutputNode", "OutputNode")
+                        .WithMany("OrganismOutputNodes")
+                        .HasForeignKey("OutputNodeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.Species", b =>
+                {
+                    b.HasOne("Neuralm.Domain.Entities.NEAT.TrainingRoom")
+                        .WithMany("Species")
+                        .HasForeignKey("TrainingRoomId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.TrainingRoom", b =>
                 {
                     b.HasOne("Neuralm.Domain.Entities.User", "Owner")
                         .WithMany("TrainingRooms")
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Neuralm.Domain.Entities.NEAT.TrainingRoomSettings", "TrainingRoomSettings")
-                        .WithMany()
-                        .HasForeignKey("TrainingRoomSettingsId");
-
-                    b.OwnsMany("Neuralm.Domain.Entities.NEAT.Species", "Species", b1 =>
-                        {
-                            b1.Property<Guid>("Id")
-                                .ValueGeneratedOnAdd();
-
-                            b1.Property<double>("SpeciesScore");
-
-                            b1.Property<Guid>("TrainingRoomId");
-
-                            b1.HasKey("Id");
-
-                            b1.HasIndex("TrainingRoomId");
-
-                            b1.ToTable("Species");
-
-                            b1.HasOne("Neuralm.Domain.Entities.NEAT.TrainingRoom")
-                                .WithMany("Species")
-                                .HasForeignKey("TrainingRoomId")
-                                .OnDelete(DeleteBehavior.Cascade);
-
-                            b1.OwnsMany("Neuralm.Domain.Entities.NEAT.Organism", "LastGenerationOrganisms", b2 =>
-                                {
-                                    b2.Property<Guid>("Id")
-                                        .ValueGeneratedOnAdd();
-
-                                    b2.Property<Guid>("BrainId");
-
-                                    b2.Property<bool>("Evaluated");
-
-                                    b2.Property<long>("Generation");
-
-                                    b2.Property<bool>("Leased");
-
-                                    b2.Property<string>("Name");
-
-                                    b2.Property<double>("Score");
-
-                                    b2.Property<Guid>("SpeciesId");
-
-                                    b2.Property<Guid>("TrainingRoomId");
-
-                                    b2.HasKey("Id");
-
-                                    b2.HasIndex("BrainId");
-
-                                    b2.HasIndex("SpeciesId");
-
-                                    b2.HasIndex("TrainingRoomId");
-
-                                    b2.ToTable("Species_LastGenerationOrganisms");
-
-                                    b2.HasOne("Neuralm.Domain.Entities.NEAT.Brain", "Brain")
-                                        .WithMany()
-                                        .HasForeignKey("BrainId")
-                                        .OnDelete(DeleteBehavior.Cascade);
-
-                                    b2.HasOne("Neuralm.Domain.Entities.NEAT.Species")
-                                        .WithMany("LastGenerationOrganisms")
-                                        .HasForeignKey("SpeciesId")
-                                        .OnDelete(DeleteBehavior.Restrict);
-
-                                    b2.HasOne("Neuralm.Domain.Entities.NEAT.TrainingRoom", "TrainingRoom")
-                                        .WithMany()
-                                        .HasForeignKey("TrainingRoomId")
-                                        .OnDelete(DeleteBehavior.Cascade);
-                                });
-
-                            b1.OwnsMany("Neuralm.Domain.Entities.NEAT.Organism", "Organisms", b2 =>
-                                {
-                                    b2.Property<Guid>("Id")
-                                        .ValueGeneratedOnAdd();
-
-                                    b2.Property<Guid>("BrainId");
-
-                                    b2.Property<bool>("Evaluated");
-
-                                    b2.Property<long>("Generation");
-
-                                    b2.Property<bool>("Leased");
-
-                                    b2.Property<string>("Name");
-
-                                    b2.Property<double>("Score");
-
-                                    b2.Property<Guid>("SpeciesId");
-
-                                    b2.Property<Guid>("TrainingRoomId");
-
-                                    b2.HasKey("Id");
-
-                                    b2.HasIndex("BrainId");
-
-                                    b2.HasIndex("SpeciesId");
-
-                                    b2.HasIndex("TrainingRoomId");
-
-                                    b2.ToTable("Species_Organisms");
-
-                                    b2.HasOne("Neuralm.Domain.Entities.NEAT.Brain", "Brain")
-                                        .WithMany()
-                                        .HasForeignKey("BrainId")
-                                        .OnDelete(DeleteBehavior.Cascade);
-
-                                    b2.HasOne("Neuralm.Domain.Entities.NEAT.Species")
-                                        .WithMany("Organisms")
-                                        .HasForeignKey("SpeciesId")
-                                        .OnDelete(DeleteBehavior.Restrict);
-
-                                    b2.HasOne("Neuralm.Domain.Entities.NEAT.TrainingRoom", "TrainingRoom")
-                                        .WithMany()
-                                        .HasForeignKey("TrainingRoomId")
-                                        .OnDelete(DeleteBehavior.Cascade);
-                                });
-                        });
+                        .HasForeignKey("OwnerId");
 
                     b.OwnsMany("Neuralm.Domain.Entities.NEAT.Trainer", "AuthorizedTrainers", b1 =>
                         {
@@ -497,7 +441,57 @@ namespace Neuralm.Persistence.Migrations
 
                             b1.HasOne("Neuralm.Domain.Entities.User", "User")
                                 .WithMany()
-                                .HasForeignKey("UserId");
+                                .HasForeignKey("UserId")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
+
+                    b.OwnsOne("Neuralm.Domain.Entities.NEAT.TrainingRoomSettings", "TrainingRoomSettings", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd();
+
+                            b1.Property<double>("AddConnectionChance");
+
+                            b1.Property<double>("AddNodeChance");
+
+                            b1.Property<double>("CrossOverChance");
+
+                            b1.Property<double>("EnableConnectionChance");
+
+                            b1.Property<long>("InputCount");
+
+                            b1.Property<double>("InterSpeciesChance");
+
+                            b1.Property<double>("MutateWeightChance");
+
+                            b1.Property<double>("MutationChance");
+
+                            b1.Property<long>("OrganismCount");
+
+                            b1.Property<long>("OutputCount");
+
+                            b1.Property<int>("Seed");
+
+                            b1.Property<double>("SpeciesAverageWeightDiffWeight");
+
+                            b1.Property<double>("SpeciesDisjointGeneWeight");
+
+                            b1.Property<double>("SpeciesExcessGeneWeight");
+
+                            b1.Property<double>("Threshold");
+
+                            b1.Property<double>("TopAmountToSurvive");
+
+                            b1.Property<double>("WeightReassignChance");
+
+                            b1.HasKey("Id");
+
+                            b1.ToTable("TrainingRoomSettings");
+
+                            b1.HasOne("Neuralm.Domain.Entities.NEAT.TrainingRoom")
+                                .WithOne("TrainingRoomSettings")
+                                .HasForeignKey("Neuralm.Domain.Entities.NEAT.TrainingRoomSettings", "Id")
+                                .OnDelete(DeleteBehavior.Cascade);
                         });
                 });
 

@@ -124,12 +124,14 @@ namespace Neuralm.Application.Services
             {
                 if (trainingSession.TrainingRoom.Generation == 0)
                 {
-                    for (int i = 0; i < trainingSession.TrainingRoom.TrainingRoomSettings.OrganismCount; i++)
+                    TrainingRoomSettings trainingRoomSettings = trainingSession.TrainingRoom.TrainingRoomSettings;
+                    for (int i = 0; i < trainingRoomSettings.OrganismCount; i++)
                     {
-                        Organism organism = new Organism(trainingSession.TrainingRoom) { Leased = true };
+                        Organism organism = new Organism(trainingSession.TrainingRoom.Generation, trainingRoomSettings) { Leased = true };
                         trainingSession.TrainingRoom.AddOrganism(organism);
                         trainingSession.LeasedOrganisms.Add(new LeasedOrganism(organism));
                     }
+                    trainingSession.TrainingRoom.IncreaseNodeIdTo(trainingRoomSettings.InputCount + trainingRoomSettings.OutputCount);
                     message = $"First generation; generated {trainingSession.TrainingRoom.TrainingRoomSettings.OrganismCount} organisms.";
                 }
                 else
@@ -201,13 +203,16 @@ namespace Neuralm.Application.Services
                 trainingSession.TrainingRoom.PostScore(leasedOrganism.Organism, postOrganismsScoreRequest.OrganismScores[leasedOrganism.OrganismId]);
             }
 
+            string message = "Successfully updated the organisms scores.";
             if (trainingSession.TrainingRoom.Species.SelectMany(p => p.Organisms).All(lo => lo.Evaluated))
             {
-                trainingSession.TrainingRoom.EndGeneration();
+                message = trainingSession.TrainingRoom.EndGeneration() 
+                    ? "Successfully updated the organisms and advanced a generation!" 
+                    : "Successfully updated the organisms but failed to advance a generation!";
                 trainingSession.LeasedOrganisms.Clear();
             }
             await _trainingSessionRepository.UpdateAsync(trainingSession);
-            return new PostOrganismsScoreResponse(postOrganismsScoreRequest.Id, "Successfully updated the organisms scores.", true);
+            return new PostOrganismsScoreResponse(postOrganismsScoreRequest.Id, message, true);
         }
     }
 }

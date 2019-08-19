@@ -50,8 +50,9 @@ namespace Neuralm.Application.Converters
                     {
                         if (item == null)
                             continue;
-                        
-                        Type actualType = ((IProxyTargetAccessor)item).DynProxyGetTarget().GetType().BaseType;
+                        Type actualType = item.GetType();
+                        if (item is IProxyTargetAccessor accessor)
+                            actualType = accessor.DynProxyGetTarget().GetType().BaseType;
                         genericListInstance.Add(Convert(dtoItemType, actualType, item));
                     }
                     property.SetValue(dto, genericListInstance);

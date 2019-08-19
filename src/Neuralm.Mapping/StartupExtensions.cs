@@ -46,7 +46,6 @@ namespace Neuralm.Mapping
             serviceCollection.AddTransient<IEntityValidator<Role>, RoleValidator>();
             serviceCollection.AddTransient<IEntityValidator<RolePermission>, RolePermissionValidator>();
             serviceCollection.AddTransient<IEntityValidator<Permission>, PermissionValidator>();
-            serviceCollection.AddTransient<IEntityValidator<Brain>, BrainValidator>();
             serviceCollection.AddTransient<IEntityValidator<TrainingRoom>, TrainingRoomValidator>();
             serviceCollection.AddTransient<IEntityValidator<TrainingSession>, TrainingSessionValidator>();
             serviceCollection.AddTransient<IEntityValidator<TrainingRoomSettings>, TrainingRoomSettingsValidator>();
@@ -94,12 +93,6 @@ namespace Neuralm.Mapping
                 IFactory<NeuralmDbContext> neuralmDbFactory = serviceProvider.GetService<IFactory<NeuralmDbContext>>();
                 IEntityValidator<Permission> entityValidator = serviceProvider.GetService<IEntityValidator<Permission>>();
                 return new PermissionRepository(neuralmDbFactory.Create(), entityValidator);
-            });
-            serviceCollection.AddTransient<IRepository<Brain>, BrainRepository>(serviceProvider =>
-            {
-                IFactory<NeuralmDbContext> neuralmDbFactory = serviceProvider.GetService<IFactory<NeuralmDbContext>>();
-                IEntityValidator<Brain> entityValidator = serviceProvider.GetService<IEntityValidator<Brain>>();
-                return new BrainRepository(neuralmDbFactory.Create(), entityValidator);
             });
             serviceCollection.AddTransient<IRepository<TrainingRoom>, TrainingRoomRepository>(serviceProvider =>
             {

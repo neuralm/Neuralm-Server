@@ -14,11 +14,7 @@ namespace Neuralm.Persistence.Configurations
         {
             builder.HasKey(p => p.Id);
 
-            //builder.HasOne(p => p.Organism)
-            //    .WithOne()
-            //    .HasForeignKey<LeasedOrganism>(p => p.OrganismId)
-            //    .OnDelete(DeleteBehavior.Cascade);
-
+            // NOTE: ???
             builder.Ignore(p => p.Organism);
         }
     }

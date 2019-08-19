@@ -21,8 +21,6 @@ namespace Neuralm.Application.Validators
                 throw new EntityValidationException("Name cannot be null or empty.");
             if (entity.Owner == null)
                 throw new EntityValidationException("Owner cannot be null.");
-            if (entity.OwnerId.Equals(Guid.Empty))
-                throw new EntityValidationException("The OwnerId cannot be an empty guid.");
             if (entity.TrainingRoomSettings == null)
                 throw new EntityValidationException("TrainingSettings cannot be null.");
             if (entity.TrainingSessions == null)

@@ -7,6 +7,8 @@ namespace Neuralm.Domain.Entities.NEAT
     /// </summary>
     public class TrainingRoomSettings
     {
+        private Random _random;
+
         /// <summary>
         /// Gets and sets the id.
         /// </summary>
@@ -99,6 +101,11 @@ namespace Neuralm.Domain.Entities.NEAT
         /// Gets and sets the seed.
         /// </summary>
         public int Seed { get; private set; }
+
+        /// <summary>
+        /// Gets the Random based on the <see cref="Seed"/>.
+        /// </summary>
+        public Random Random => _random ??= _random = new Random(Seed);
 
         /// <summary>
         /// EFCore entity constructor IGNORE!

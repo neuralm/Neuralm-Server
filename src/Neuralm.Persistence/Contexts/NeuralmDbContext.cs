@@ -62,11 +62,6 @@ namespace Neuralm.Persistence.Contexts
         public DbSet<ConnectionGene> ConnectionGenes { get; set; }
 
         /// <summary>
-        /// Gets and sets brains.
-        /// </summary>
-        public DbSet<Brain> Brains { get; set; }
-
-        /// <summary>
         /// Gets and sets training sessions.
         /// </summary>
         public DbSet<TrainingSession> TrainingSessions { get; set; }

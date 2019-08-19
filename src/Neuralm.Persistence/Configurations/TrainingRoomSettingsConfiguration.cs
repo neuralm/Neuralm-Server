@@ -13,6 +13,9 @@ namespace Neuralm.Persistence.Configurations
         public void Configure(EntityTypeBuilder<TrainingRoomSettings> builder)
         {
             builder.HasKey(p => p.Id);
+            builder.Property(p => p.Id).ValueGeneratedOnAdd();
+            builder.ToTable("TrainingRoomSettings");
+            builder.Ignore(p => p.Random);
         }
     }
 }

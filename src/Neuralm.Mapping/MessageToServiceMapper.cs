@@ -28,7 +28,7 @@ namespace Neuralm.Mapping
         public MessageToServiceMapper(IServiceProvider serviceProvider)
         {
             Console.WriteLine("Mapping messages to services...");
-            List<(Type serviceType, MethodInfo methodInfo, Type parameterType)> x = typeof(IService)
+            List<(Type, MethodInfo methodInfo, Type parameterType)> x = typeof(IService)
                 .Assembly
                 .GetTypes()
                 .Where(type => type.GetInterfaces().Contains(typeof(IService)) && type.IsClass)
@@ -40,6 +40,7 @@ namespace Neuralm.Mapping
                 .SelectMany(tuple => tuple.serviceMethods.Select(methodInfo => (tuple.serviceType.GetInterfaces()[0], methodInfo,
                     parameterType: methodInfo.GetParameters()[0].ParameterType)))
                 .ToList();
+
             foreach ((Type serviceType, MethodInfo methodInfo, Type parameterType) in x)
             {
                 if (!_services.TryGetValue(serviceType, out object service))

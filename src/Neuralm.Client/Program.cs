@@ -121,7 +121,7 @@ namespace Neuralm.Client
             GetOrganismsResponse getOrganismsResponse =
                 await getOrganismsResponseListener.ReceiveMessageAsync(CancellationToken.None);
             Console.WriteLine(
-                $"GetOrganismsResponse: \n\tId: {getOrganismsResponse.Id}\n\tRequestId: {getOrganismsResponse.RequestId}\n\tDateTime: {getOrganismsResponse.DateTime}\n\tMessage: {getOrganismsResponse.Message}\n\tSuccess: {getOrganismsResponse.Success}\n\tOrganismsCount: {getOrganismsResponse.Organisms.Count()}\n\tConnectionGenesCount: {getOrganismsResponse.Organisms.Sum(o => o.Brain.ConnectionGenes.Count)}");
+                $"GetOrganismsResponse: \n\tId: {getOrganismsResponse.Id}\n\tRequestId: {getOrganismsResponse.RequestId}\n\tDateTime: {getOrganismsResponse.DateTime}\n\tMessage: {getOrganismsResponse.Message}\n\tSuccess: {getOrganismsResponse.Success}\n\tOrganismsCount: {getOrganismsResponse.Organisms.Count()}\n\tConnectionGenesCount: {getOrganismsResponse.Organisms.Sum(o => o.ConnectionGenes.Count)}");
 
             Dictionary<Guid, double> organismsScoreDictionary = new Dictionary<Guid, double>();
             foreach (OrganismDto organism in getOrganismsResponse.Organisms)

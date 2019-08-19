@@ -12,31 +12,20 @@ namespace Neuralm.Persistence.Configurations
         /// <inheritdoc cref="IEntityTypeConfiguration{TEntity}.Configure"/>
         public void Configure(EntityTypeBuilder<TrainingRoom> builder)
         {
+            builder.HasKey(p => p.Id);
+            builder.Property(p => p.Id).ValueGeneratedOnAdd();
             builder
-                .HasKey(p => p.Id);
-
-            builder
-                .HasOne(p => p.Owner)
-                .WithMany(p => p.TrainingRooms)
-                .HasForeignKey(p => p.OwnerId);
-
-            builder
-                .OwnsMany(p => p.Species)
-                .HasForeignKey(p => p.TrainingRoomId)
+                .HasMany(p => p.Species)
+                .WithOne()
                 .OnDelete(DeleteBehavior.Cascade);
-
-            //builder
-            //    .OwnsMany(p => p.Organisms)
-            //    .HasForeignKey(p => p.TrainingRoomId)
-            //    .HasKey(p => p.Id);
+            builder
+                .OwnsOne(p => p.TrainingRoomSettings)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder
                 .OwnsMany(p => p.AuthorizedTrainers)
                 .HasForeignKey(p => p.TrainingRoomId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            // NOTE: Ignore users for now...
-            builder.Ignore(p => p.Random);
         }
     }
 }
