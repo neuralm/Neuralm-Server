@@ -87,7 +87,8 @@ namespace Neuralm.Application.Services
 
             User user = new User
             {
-                Username = registerRequest.Username
+                Username = registerRequest.Username,
+                TimestampCreated = DateTime.UtcNow
             };
             if (!await _userRepository.CreateAsync(user))
                 return new RegisterResponse(registerRequest.Id, "Failed to persist data.");

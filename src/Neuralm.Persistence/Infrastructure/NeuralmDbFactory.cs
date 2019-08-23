@@ -21,7 +21,6 @@ namespace Neuralm.Persistence.Infrastructure
 
         }
 
-
         /// <summary>
         /// Initializes an instance of the <see cref="NeuralmDbFactory"/> class.
         /// </summary>
