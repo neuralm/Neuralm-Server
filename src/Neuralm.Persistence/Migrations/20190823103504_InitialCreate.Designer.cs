@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Neuralm.Persistence.Contexts;
@@ -9,7 +10,7 @@ using Neuralm.Persistence.Contexts;
 namespace Neuralm.Persistence.Migrations
 {
     [DbContext(typeof(NeuralmDbContext))]
-    [Migration("20190823090023_InitialCreate")]
+    [Migration("20190823103504_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -17,7 +18,8 @@ namespace Neuralm.Persistence.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Neuralm.Domain.Entities.Authentication.Credential", b =>
                 {
@@ -49,7 +51,8 @@ namespace Neuralm.Persistence.Migrations
             modelBuilder.Entity("Neuralm.Domain.Entities.Authentication.CredentialType", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -78,7 +81,8 @@ namespace Neuralm.Persistence.Migrations
             modelBuilder.Entity("Neuralm.Domain.Entities.Authentication.Permission", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -98,7 +102,8 @@ namespace Neuralm.Persistence.Migrations
             modelBuilder.Entity("Neuralm.Domain.Entities.Authentication.Role", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -153,9 +158,9 @@ namespace Neuralm.Persistence.Migrations
                     b.Property<string>("Discriminator")
                         .IsRequired();
 
-                    b.Property<uint>("Layer");
+                    b.Property<long>("Layer");
 
-                    b.Property<uint>("NodeIdentifier");
+                    b.Property<long>("NodeIdentifier");
 
                     b.HasKey("Id");
 
@@ -171,7 +176,7 @@ namespace Neuralm.Persistence.Migrations
 
                     b.Property<bool>("Evaluated");
 
-                    b.Property<uint>("Generation");
+                    b.Property<long>("Generation");
 
                     b.Property<bool>("Leased");
 
@@ -237,9 +242,9 @@ namespace Neuralm.Persistence.Migrations
 
                     b.Property<bool>("Enabled");
 
-                    b.Property<uint>("Generation");
+                    b.Property<long>("Generation");
 
-                    b.Property<uint>("HighestInnovationNumber");
+                    b.Property<long>("HighestInnovationNumber");
 
                     b.Property<string>("Name");
 
@@ -355,13 +360,13 @@ namespace Neuralm.Persistence.Migrations
 
                             b1.Property<bool>("Enabled");
 
-                            b1.Property<uint>("InNodeIdentifier");
+                            b1.Property<long>("InNodeIdentifier");
 
-                            b1.Property<uint>("InnovationNumber");
+                            b1.Property<long>("InnovationNumber");
 
                             b1.Property<Guid>("OrganismId");
 
-                            b1.Property<uint>("OutNodeIdentifier");
+                            b1.Property<long>("OutNodeIdentifier");
 
                             b1.Property<double>("Weight");
 
@@ -454,7 +459,7 @@ namespace Neuralm.Persistence.Migrations
 
                             b1.Property<double>("EnableConnectionChance");
 
-                            b1.Property<uint>("InputCount");
+                            b1.Property<long>("InputCount");
 
                             b1.Property<double>("InterSpeciesChance");
 
@@ -462,9 +467,9 @@ namespace Neuralm.Persistence.Migrations
 
                             b1.Property<double>("MutationChance");
 
-                            b1.Property<uint>("OrganismCount");
+                            b1.Property<long>("OrganismCount");
 
-                            b1.Property<uint>("OutputCount");
+                            b1.Property<long>("OutputCount");
 
                             b1.Property<int>("Seed");
 
