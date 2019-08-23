@@ -32,12 +32,17 @@ Follow these steps to get your development environment set up:
           "Host": "{COMMON NAME OR FULLY QUALLIFIED DOMAIN NAME}"
         },
         "NeuralmDb": {
-          "ConnectionString": "Server={YOUR SERVER NAME\\MSSQLINSTANCE};Database=NeuralmDbContext;Trusted_Connection=True;MultipleActiveResultSets=true",
-          "UserLazyLoading": false
+          "ConnectionString": "{MSSQL/MYSQL CONNECTION STRING}",
+          "UseLazyLoading": true,
+          "DbProvider": "{MSSQL/MYSQL (OR LEAVE IT EMPTY FOR IN MEMORY PROVIDER)}"
         } 
     }
     ```
-    NOTE: Keep `UseLazyLoading` on false for now!
+	ConnectionString examples:
+	```
+	MSSQL: "Server=(LocalDb)\\MSSQLLocalDB;Database=NeuralmDbContext;Trusted_Connection=True;MultipleActiveResultSets=true"
+	MYSQL: "Server=localhost;Database=NeuralmDbContext;User=root;Password=;"
+	```
 3. Afterwards generate a self signed certificate using the script in powershell (Administrator mode!)
 	```powershell
 	New-SelfSignedCertificate -DnsName "{COMMON NAME OR FULLY QUALLIFIED DOMAIN NAME}" -CertStoreLocation "cert:\LocalMachine\My" -FriendlyName "NeuralmCert"
@@ -54,12 +59,13 @@ Follow these steps to get your development environment set up:
 5. Once the build has run successfully, start the server to confirm that the database connection is successful either by hitting `F5` or go to `Debug > Start`. A console will launch and start initializing. Upon completion, the console will look like this:
 
   
- ![Screenshot](https://github.com/neuralm/Neuralm-Server/blob/master/docs/images/Successful%20installation.png?raw=true)
+    ![Screenshot](https://github.com/neuralm/Neuralm-Server/blob/master/docs/images/Successful%20installation.png?raw=true)
 
 ## Running the tests
-
-**NOTE:** For the tests each method will create its own database with a random GUID and delete itself after completion of the test. This is done so that the tests can run in parallel and do not have any dependencies. Because InMemoryDatabase is not *yet* a relational-database provider, some tests will use the repository instead of the service to make the tests work as intended.
-
+Run the tests using this command:
+```
+dotnet test
+```
 ## Deployment
 
 ## Contributing

@@ -14,69 +14,70 @@ namespace Neuralm.Tests.NEAT
         private User _fakeUser;
         private string _roomName;
 
-        [TestInitialize]
-        public void Initialize()
+        [TestClass]
+        public class CrossOverTests : OrganismTests
         {
-            _fakeUser = new User();
-            _roomName = "CoolRoom";
-            _trainingRoom = new TrainingRoom(_fakeUser, _roomName, new TrainingRoomSettings(0, 2, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
-        }
-
-        [TestMethod]
-        public void CrossOverTest()
-        {
-            Guid expectedOrganismId = Guid.NewGuid();
-            Organism expectedOrganism = new Organism(expectedOrganismId, _trainingRoom.TrainingRoomSettings, 0, new List<ConnectionGene>() {
-                new ConnectionGene(expectedOrganismId, 1, 0, 3, -1),
-                new ConnectionGene(expectedOrganismId, 2, 1, 3, 1, false),
-                new ConnectionGene(expectedOrganismId, 3, 2, 3, 1),
-                new ConnectionGene(expectedOrganismId, 4, 1, 4, -1),
-                new ConnectionGene(expectedOrganismId, 5, 4, 3, 1, false),
-                new ConnectionGene(expectedOrganismId, 6, 4, 5, 1),
-                new ConnectionGene(expectedOrganismId, 7, 5, 3, 1),
-                new ConnectionGene(expectedOrganismId, 8, 0, 4, -1),
-                new ConnectionGene(expectedOrganismId, 9, 2, 4, 1),
-                new ConnectionGene(expectedOrganismId, 10, 0, 5, 1)
-            });
-            List<ConnectionGene> expectedGenes = expectedOrganism.ConnectionGenes.OrderBy(x => x.InnovationNumber).ToList();
-
-            Guid id1 = Guid.NewGuid();
-            Organism organism1 = new Organism(id1, _trainingRoom.TrainingRoomSettings, 0, new List<ConnectionGene>()
+            [TestInitialize]
+            public void Initialize()
             {
-                new ConnectionGene(id1, 1, 0, 3, -1),
-                new ConnectionGene(id1, 2, 1, 3, -1, false),
-                new ConnectionGene(id1, 3, 2, 3, -1),
-                new ConnectionGene(id1, 4, 1, 4, -1),
-                new ConnectionGene(id1, 5, 4, 3, -1),
-                new ConnectionGene(id1, 8, 0, 4, -1)
-            });
+                _fakeUser = new User();
+                _roomName = "CoolRoom";
+                _trainingRoom = new TrainingRoom(_fakeUser, _roomName, new TrainingRoomSettings(0, 2, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
+            }
 
-            Guid id2 = Guid.NewGuid();
-            Organism organism2 = new Organism(id2, _trainingRoom.TrainingRoomSettings, 0, new List<ConnectionGene>()
+            [TestMethod]
+            public void CrossOverTest()
             {
-                new ConnectionGene(id2, 1, 0, 3, 1),
-                new ConnectionGene(id2, 2, 1, 3, 1, false),
-                new ConnectionGene(id2, 3, 2, 3, 1),
-                new ConnectionGene(id2, 4, 1, 4, 1),
-                new ConnectionGene(id2, 5, 4, 3, 1, false),
-                new ConnectionGene(id2, 6, 4, 5, 1),
-                new ConnectionGene(id2, 7, 5, 3, 1),
-                new ConnectionGene(id2, 9, 2, 4, 1),
-                new ConnectionGene(id2, 10, 0, 5, 1)
-            });
+                Guid expectedOrganismId = Guid.NewGuid();
+                Organism expectedOrganism = new Organism(expectedOrganismId, _trainingRoom.TrainingRoomSettings, 0, new List<ConnectionGene>()
+                {
+                    new ConnectionGene(expectedOrganismId, 1, 0, 3, -1),
+                    new ConnectionGene(expectedOrganismId, 2, 1, 3, 1, false),
+                    new ConnectionGene(expectedOrganismId, 3, 2, 3, 1),
+                    new ConnectionGene(expectedOrganismId, 4, 1, 4, -1),
+                    new ConnectionGene(expectedOrganismId, 5, 4, 3, 1, false),
+                    new ConnectionGene(expectedOrganismId, 6, 4, 5, 1),
+                    new ConnectionGene(expectedOrganismId, 7, 5, 3, 1),
+                    new ConnectionGene(expectedOrganismId, 8, 0, 4, -1),
+                    new ConnectionGene(expectedOrganismId, 9, 2, 4, 1),
+                    new ConnectionGene(expectedOrganismId, 10, 0, 5, 1)
+                });
+                List<ConnectionGene> expectedGenes = expectedOrganism.ConnectionGenes.OrderBy(x => x.InnovationNumber).ToList();
 
-            Organism child = organism1.Crossover(organism2, _trainingRoom.TrainingRoomSettings);
+                Guid id1 = Guid.NewGuid();
+                Organism organism1 = new Organism(id1, _trainingRoom.TrainingRoomSettings, 0, new List<ConnectionGene>()
+                {
+                    new ConnectionGene(id1, 1, 0, 3, -1),
+                    new ConnectionGene(id1, 2, 1, 3, -1, false),
+                    new ConnectionGene(id1, 3, 2, 3, -1),
+                    new ConnectionGene(id1, 4, 1, 4, -1),
+                    new ConnectionGene(id1, 5, 4, 3, -1),
+                    new ConnectionGene(id1, 8, 0, 4, -1)
+                });
 
-            List<ConnectionGene> childGenes = child.ConnectionGenes.OrderBy(a => a.InnovationNumber).ToList();
+                Guid id2 = Guid.NewGuid();
+                Organism organism2 = new Organism(id2, _trainingRoom.TrainingRoomSettings, 0, new List<ConnectionGene>()
+                {
+                    new ConnectionGene(id2, 1, 0, 3, 1),
+                    new ConnectionGene(id2, 2, 1, 3, 1, false),
+                    new ConnectionGene(id2, 3, 2, 3, 1),
+                    new ConnectionGene(id2, 4, 1, 4, 1),
+                    new ConnectionGene(id2, 5, 4, 3, 1, false),
+                    new ConnectionGene(id2, 6, 4, 5, 1),
+                    new ConnectionGene(id2, 7, 5, 3, 1),
+                    new ConnectionGene(id2, 9, 2, 4, 1),
+                    new ConnectionGene(id2, 10, 0, 5, 1)
+                });
 
-            CollectionAssert.AreEqual(childGenes, expectedGenes);
+                Organism child = organism1.Crossover(organism2, _trainingRoom.TrainingRoomSettings);
+                List<ConnectionGene> childGenes = child.ConnectionGenes.OrderBy(a => a.InnovationNumber).ToList();
+                CollectionAssert.AreEqual(childGenes, expectedGenes);
+            }
         }
 
         [TestClass]
-        public class Clone
+        public class CloneTests : OrganismTests
         {
-            private User _fakeUser;
-            private TrainingRoom _trainingRoom;
             private Organism _original;
 
             [TestInitialize]
@@ -133,14 +134,9 @@ namespace Neuralm.Tests.NEAT
             }
         }
 
-
         [TestClass]
-        public class EqualsTest
+        public class EqualsTests : OrganismTests
         {
-            private TrainingRoom _trainingRoom;
-            private User _fakeUser;
-            private string _roomName;
-
             [TestInitialize]
             public void Initialize()
             {

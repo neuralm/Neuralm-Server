@@ -7,12 +7,12 @@ namespace Neuralm.Tests.NEAT
     [TestClass]
     public class ConnectionGeneTests
     {
-        [TestClass]
-        public class CloneTest
-        {
-            private ConnectionGene _original;
-            private Guid _id;
+        private ConnectionGene _original;
+        private Guid _id;
 
+        [TestClass]
+        public class CloneTests : ConnectionGeneTests
+        {
             [TestInitialize]
             public void Initialize()
             {
@@ -21,10 +21,9 @@ namespace Neuralm.Tests.NEAT
             }
 
             [TestMethod]
-            public void CloningTest()
+            public void CloneTest()
             {
                 ConnectionGene clone = _original.Clone(_id);
-
                 Assert.AreEqual(_original, clone);
             }
 
@@ -34,21 +33,18 @@ namespace Neuralm.Tests.NEAT
                 double originalWeight = _original.Weight;
                 ConnectionGene clone = _original.Clone(_id);
                 clone.Weight = 9001;
-
                 Assert.AreEqual(_original.Weight, originalWeight);
             }
         }
 
         [TestClass]
-        public class EqualsTest
+        public class EqualsTests : ConnectionGeneTests
         {
             [TestMethod]
             public void AreEqualTest()
             {
                 ConnectionGene gene1 = new ConnectionGene(Guid.NewGuid(), 1, 0, 2, 1, true);
-
                 ConnectionGene gene2 = new ConnectionGene(Guid.NewGuid(), 1, 0, 2, 1, true);
-
                 Assert.IsTrue(gene1.Equals(gene2));
             }
 
@@ -56,9 +52,7 @@ namespace Neuralm.Tests.NEAT
             public void DifferentEnableTest()
             {
                 ConnectionGene gene1 = new ConnectionGene(Guid.NewGuid(), 1, 0, 2, 1, true);
-
                 ConnectionGene gene2 = new ConnectionGene(Guid.NewGuid(), 1, 0, 2, 1, false);
-
                 Assert.IsFalse(gene1.Equals(gene2));
             }
 
@@ -66,9 +60,7 @@ namespace Neuralm.Tests.NEAT
             public void DifferentInnovationTest()
             {
                 ConnectionGene gene1 = new ConnectionGene(Guid.NewGuid(), 1, 0, 2, 1, true);
-
                 ConnectionGene gene2 = new ConnectionGene(Guid.NewGuid(), 2, 0, 2, 1, true);
-
                 Assert.IsFalse(gene1.Equals(gene2));
             }
 
@@ -76,9 +68,7 @@ namespace Neuralm.Tests.NEAT
             public void DifferentWeightTest()
             {
                 ConnectionGene gene1 = new ConnectionGene(Guid.NewGuid(), 1, 0, 2, 1, true);
-
                 ConnectionGene gene2 = new ConnectionGene(Guid.NewGuid(), 2, 0, 2, -1, true);
-
                 Assert.IsFalse(gene1.Equals(gene2));
             }
 
@@ -91,7 +81,6 @@ namespace Neuralm.Tests.NEAT
             public void DifferentTypeTest(object other)
             {
                 ConnectionGene gene1 = new ConnectionGene(Guid.NewGuid(), 1, 0, 2, 1, true);
-
                 Assert.IsFalse(gene1.Equals(other));
             }
         }

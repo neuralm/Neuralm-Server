@@ -344,6 +344,7 @@ namespace Neuralm.Domain.Entities.NEAT
             }
             else
             {
+                // Clone the current child.
                 child = child.Clone(TrainingRoomSettings);
 
                 // Increment generation, crossover does that automatically, but if no crossover happens we need to do it here.

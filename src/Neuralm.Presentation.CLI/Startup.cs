@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
@@ -88,14 +89,24 @@ namespace Neuralm.Presentation.CLI
             {
                 Console.WriteLine("Starting database verification..");
                 NeuralmDbContext neuralmDbContext = _serviceProvider.GetService<IFactory<NeuralmDbContext>>().Create();
-                RelationalDatabaseCreator relationalDatabaseCreator =
-                    neuralmDbContext.Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
-                bool? exists = relationalDatabaseCreator?.Exists();
-                cancellationToken.ThrowIfCancellationRequested();
-                Console.WriteLine($"Database {(exists.Value ? "" : "does not ")}exists.");
-                if (!exists.Value)
+                if (neuralmDbContext.Database.IsInMemory())
                 {
-                    relationalDatabaseCreator?.Create();
+                    Console.WriteLine("InMemory database provider found.");
+                    neuralmDbContext.Database.EnsureCreated();
+                    Console.WriteLine("Ensured that the database is created.");
+                    return;
+                }
+
+                RelationalDatabaseCreator relationalDatabaseCreator = neuralmDbContext.Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
+                if (relationalDatabaseCreator is null)
+                    throw new TargetException("The DbProvider is not relational database provider.");
+
+                bool exists = relationalDatabaseCreator.Exists();
+                cancellationToken.ThrowIfCancellationRequested();
+                Console.WriteLine($"Database {(exists ? "" : "does not ")}exists.");
+                if (!exists)
+                {
+                    relationalDatabaseCreator.Create();
                     Console.WriteLine("Database created.");
                 }
 
@@ -104,8 +115,7 @@ namespace Neuralm.Presentation.CLI
                 Console.WriteLine($"Database {(hasPendingMigrations ? "has" : "does not have")} pending migrations.");
                 if (hasPendingMigrations)
                 {
-                    Console.WriteLine(
-                        "Would you like to clear the database using EnsureDeleted. And, afterwards reapply all migrations? y/n");
+                    Console.WriteLine("Would you like to clear the database using EnsureDeleted. And, afterwards reapply all migrations? y/n");
                     ConsoleKeyInfo keyInfo = await WaitForReadKey(cancellationToken);
                     cancellationToken.ThrowIfCancellationRequested();
                     if (keyInfo.KeyChar == 'y')

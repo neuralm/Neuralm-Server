@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Neuralm.Application.Configurations;
 using Neuralm.Utilities;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace Neuralm.Persistence.Infrastructure
 {
@@ -56,10 +57,20 @@ namespace Neuralm.Persistence.Infrastructure
             {
                 optionsBuilder.UseLazyLoadingProxies();
             }
-            if (connectionString.Equals("InMemoryDatabase"))
-                optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString());
-            else
-                optionsBuilder.UseSqlServer(connectionString);
+
+            switch (_dbConfiguration.DbProvider.ToLower())
+            {
+                case "mssql":
+                    optionsBuilder.UseSqlServer(connectionString);
+                    break;
+                case "mysql":
+                    optionsBuilder.UseMySql(connectionString);
+                    break;
+                default:
+                    optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString());
+                    break;
+            }
+
             _dbContextOptionsBuilder = optionsBuilder;
         }
 
