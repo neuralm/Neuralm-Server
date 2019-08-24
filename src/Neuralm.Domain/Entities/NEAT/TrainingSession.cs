@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Neuralm.Domain.Entities.NEAT
 {
@@ -38,6 +39,11 @@ namespace Neuralm.Domain.Entities.NEAT
         public virtual TrainingRoom TrainingRoom { get; private set; }
         
         /// <summary>
+        /// Gets and sets the list of leased organisms.
+        /// </summary>
+        public virtual List<LeasedOrganism> LeasedOrganisms { get; private set; }
+
+        /// <summary>
         /// EFCore entity constructor IGNORE!
         /// </summary>
         protected TrainingSession()
@@ -57,6 +63,7 @@ namespace Neuralm.Domain.Entities.NEAT
             StartedTimestamp = DateTime.UtcNow;
             UserId = userId;
             TrainingRoom = trainingRoom;
+            LeasedOrganisms = new List<LeasedOrganism>();
         }
 
         /// <summary>

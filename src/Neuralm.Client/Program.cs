@@ -80,21 +80,14 @@ namespace Neuralm.Client
                         StartTrainingSessionResponse startTrainingSessionResponse = await startTrainingSessionResponseListener.ReceiveMessageAsync(CancellationToken.None);
                         Console.WriteLine($"StartTrainingSessionResponse: \n\tId: {startTrainingSessionResponse.Id}\n\tRequestId: {startTrainingSessionResponse.RequestId}\n\tDateTime: {startTrainingSessionResponse.DateTime}\n\tMessage: {startTrainingSessionResponse.Message}\n\tSuccess: {startTrainingSessionResponse.Success}\n\tTrainingSessionId: {startTrainingSessionResponse.TrainingSession.Id}");
 
-                        GetOrganismsRequest getOrganismsRequest = new GetOrganismsRequest(startTrainingSessionResponse.TrainingSession.Id, 10);
-                        await networkConnector.SendMessageAsync(getOrganismsRequest, CancellationToken.None);
-                        GetOrganismsResponse getOrganismsResponse = await getOrganismsResponseListener.ReceiveMessageAsync(CancellationToken.None);
-                        Console.WriteLine($"GetOrganismsResponse: \n\tId: {getOrganismsResponse.Id}\n\tRequestId: {getOrganismsResponse.RequestId}\n\tDateTime: {getOrganismsResponse.DateTime}\n\tMessage: {getOrganismsResponse.Message}\n\tSuccess: {getOrganismsResponse.Success}\n\tOrganismsCount: {getOrganismsResponse.Organisms.Count()}\n\tConnectionGenesCount: {getOrganismsResponse.Organisms.Sum(o => o.Brain.ConnectionGenes.Count)}");
-                        
-                        Dictionary<Guid, double> organismsScoreDictionary = new Dictionary<Guid, double>();
-                        foreach (OrganismDto organism in getOrganismsResponse.Organisms)
-                        {
-                            organism.Score += Random.NextDouble() + 0.001;
-                            organismsScoreDictionary.Add(organism.Id, organism.Score);
-                        }
-                        PostOrganismsScoreRequest postOrganismsScoreRequest = new PostOrganismsScoreRequest(startTrainingSessionResponse.TrainingSession.Id, organismsScoreDictionary);
-                        await networkConnector.SendMessageAsync(postOrganismsScoreRequest, CancellationToken.None);
-                        PostOrganismsScoreResponse postOrganismsScoreResponse = await postOrganismsScoreResponseListener.ReceiveMessageAsync(CancellationToken.None);
-                        Console.WriteLine($"PostOrganismsScoreResponse: \n\tId: {postOrganismsScoreResponse.Id}\n\tRequestId: {postOrganismsScoreResponse.RequestId}\n\tDateTime: {postOrganismsScoreResponse.DateTime}\n\tMessage: {postOrganismsScoreResponse.Message}\n\tSuccess: {postOrganismsScoreResponse.Success}");
+                        await GetAndPostOrganismsAsync(startTrainingSessionResponse, networkConnector, getOrganismsResponseListener, postOrganismsScoreResponseListener);
+                        await GetAndPostOrganismsAsync(startTrainingSessionResponse, networkConnector, getOrganismsResponseListener, postOrganismsScoreResponseListener);
+                        await GetAndPostOrganismsAsync(startTrainingSessionResponse, networkConnector, getOrganismsResponseListener, postOrganismsScoreResponseListener);
+                        await GetAndPostOrganismsAsync(startTrainingSessionResponse, networkConnector, getOrganismsResponseListener, postOrganismsScoreResponseListener);
+                        await GetAndPostOrganismsAsync(startTrainingSessionResponse, networkConnector, getOrganismsResponseListener, postOrganismsScoreResponseListener);
+
+                        //
+                        await GetAndPostOrganismsAsync(startTrainingSessionResponse, networkConnector, getOrganismsResponseListener, postOrganismsScoreResponseListener);
 
                         //GetEnabledTrainingRoomsRequest getEnabledTrainingRoomsRequest = new GetEnabledTrainingRoomsRequest();
                         //await networkConnector.SendMessageAsync(getEnabledTrainingRoomsRequest, CancellationToken.None);
@@ -116,6 +109,34 @@ namespace Neuralm.Client
                 Console.WriteLine($"Messages per second: {TotalMessages / stopwatch.Elapsed.TotalSeconds:N0}");
                 Console.ReadKey();
             });
+        }
+
+        private static async Task GetAndPostOrganismsAsync(StartTrainingSessionResponse startTrainingSessionResponse,
+            SslTcpNetworkConnector networkConnector, MessageListener<GetOrganismsResponse> getOrganismsResponseListener,
+            MessageListener<PostOrganismsScoreResponse> postOrganismsScoreResponseListener)
+        {
+            GetOrganismsRequest getOrganismsRequest =
+                new GetOrganismsRequest(startTrainingSessionResponse.TrainingSession.Id, 10);
+            await networkConnector.SendMessageAsync(getOrganismsRequest, CancellationToken.None);
+            GetOrganismsResponse getOrganismsResponse =
+                await getOrganismsResponseListener.ReceiveMessageAsync(CancellationToken.None);
+            Console.WriteLine(
+                $"GetOrganismsResponse: \n\tId: {getOrganismsResponse.Id}\n\tRequestId: {getOrganismsResponse.RequestId}\n\tDateTime: {getOrganismsResponse.DateTime}\n\tMessage: {getOrganismsResponse.Message}\n\tSuccess: {getOrganismsResponse.Success}\n\tOrganismsCount: {getOrganismsResponse.Organisms.Count()}\n\tConnectionGenesCount: {getOrganismsResponse.Organisms.Sum(o => o.ConnectionGenes.Count)}");
+
+            Dictionary<Guid, double> organismsScoreDictionary = new Dictionary<Guid, double>();
+            foreach (OrganismDto organism in getOrganismsResponse.Organisms)
+            {
+                organism.Score += Random.NextDouble() + 0.001;
+                organismsScoreDictionary.Add(organism.Id, organism.Score);
+            }
+
+            PostOrganismsScoreRequest postOrganismsScoreRequest =
+                new PostOrganismsScoreRequest(startTrainingSessionResponse.TrainingSession.Id, organismsScoreDictionary);
+            await networkConnector.SendMessageAsync(postOrganismsScoreRequest, CancellationToken.None);
+            PostOrganismsScoreResponse postOrganismsScoreResponse =
+                await postOrganismsScoreResponseListener.ReceiveMessageAsync(CancellationToken.None);
+            Console.WriteLine(
+                $"PostOrganismsScoreResponse: \n\tId: {postOrganismsScoreResponse.Id}\n\tRequestId: {postOrganismsScoreResponse.RequestId}\n\tDateTime: {postOrganismsScoreResponse.DateTime}\n\tMessage: {postOrganismsScoreResponse.Message}\n\tSuccess: {postOrganismsScoreResponse.Success}");
         }
     }
 }

@@ -7,5 +7,6 @@
     {
         public string ConnectionString { get; set; }
         public bool UseLazyLoading { get; set; }
+        public string DbProvider { get; set; }
     }
 }

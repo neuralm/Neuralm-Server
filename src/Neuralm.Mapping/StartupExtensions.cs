@@ -1,7 +1,8 @@
-﻿using System;
-using System.Text;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Neuralm.Application.Configurations;
 using Neuralm.Application.Cryptography;
@@ -10,12 +11,12 @@ using Neuralm.Application.Services;
 using Neuralm.Application.Validators;
 using Neuralm.Domain.Entities;
 using Neuralm.Domain.Entities.Authentication;
+using Neuralm.Domain.Entities.NEAT;
 using Neuralm.Persistence.Contexts;
 using Neuralm.Persistence.Infrastructure;
 using Neuralm.Persistence.Repositories;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
-using Neuralm.Domain.Entities.NEAT;
+using System;
+using System.Text;
 
 namespace Neuralm.Mapping
 {
@@ -24,14 +25,36 @@ namespace Neuralm.Mapping
     /// </summary>
     public static class StartupExtensions
     {
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
         /// <summary>
-        /// Adds services from the <see cref="Neuralm.Application.Interfaces"/> assembly into the <see cref="serviceCollection"/>.
+        /// Gets a value whether the application is running in Debug mode.
+        /// </summary>
+        private static bool IsDebug
+        {
+            get
+            {
+                bool isDebug = false;
+                #if DEBUG
+                isDebug = true;
+                #endif
+                return isDebug;
+            }
+        }
+
+        /// <summary>
+        /// Adds services from the <see cref="Application.Interfaces"/> assembly into the <see cref="serviceCollection"/>.
         /// </summary>
         /// <param name="serviceCollection">The service collection.</param>
         /// <returns>Returns the service collection to chain further upon.</returns>
         public static IServiceCollection AddApplicationServices(this IServiceCollection serviceCollection)
         {
+            if (IsDebug)
+                serviceCollection.AddLogging(p => p.AddDebug());
             serviceCollection.AddSingleton<IFactory<NeuralmDbContext>, NeuralmDbFactory>();
+
+            // Instead of using .AddDbContext, .AddTransient is used because, the IFactory<NeuralmDbContext>
+            // needs to be used for creating an instance of the NeuralmDbContext.
+            serviceCollection.AddTransient<NeuralmDbContext>(p => p.GetService<IFactory<NeuralmDbContext>>().Create());
 
             #region Cryptography
             serviceCollection.AddSingleton<IHasher, Pbkdf2Hasher>();
@@ -46,79 +69,25 @@ namespace Neuralm.Mapping
             serviceCollection.AddTransient<IEntityValidator<Role>, RoleValidator>();
             serviceCollection.AddTransient<IEntityValidator<RolePermission>, RolePermissionValidator>();
             serviceCollection.AddTransient<IEntityValidator<Permission>, PermissionValidator>();
-            serviceCollection.AddTransient<IEntityValidator<Brain>, BrainValidator>();
             serviceCollection.AddTransient<IEntityValidator<TrainingRoom>, TrainingRoomValidator>();
             serviceCollection.AddTransient<IEntityValidator<TrainingSession>, TrainingSessionValidator>();
             serviceCollection.AddTransient<IEntityValidator<TrainingRoomSettings>, TrainingRoomSettingsValidator>();
             #endregion Validators
 
             #region Repositories
-            serviceCollection.AddTransient<IRepository<User>, UserRepository>(serviceProvider =>
-            {
-                IFactory<NeuralmDbContext> neuralmDbFactory = serviceProvider.GetService<IFactory<NeuralmDbContext>>();
-                IEntityValidator<User> entityValidator = serviceProvider.GetService<IEntityValidator<User>>();
-                return new UserRepository(neuralmDbFactory.Create(), entityValidator);
-            });
-            serviceCollection.AddTransient<IRepository<Credential>, CredentialRepository>(serviceProvider =>
-            {
-                IFactory<NeuralmDbContext> neuralmDbFactory = serviceProvider.GetService<IFactory<NeuralmDbContext>>();
-                IEntityValidator<Credential> entityValidator = serviceProvider.GetService<IEntityValidator<Credential>>();
-                return new CredentialRepository(neuralmDbFactory.Create(), entityValidator);
-            });
-            serviceCollection.AddTransient<IRepository<CredentialType>, CredentialTypeRepository>(serviceProvider =>
-            {
-                IFactory<NeuralmDbContext> neuralmDbFactory = serviceProvider.GetService<IFactory<NeuralmDbContext>>();
-                IEntityValidator<CredentialType> entityValidator = serviceProvider.GetService<IEntityValidator<CredentialType>>();
-                return new CredentialTypeRepository(neuralmDbFactory.Create(), entityValidator);
-            });
-            serviceCollection.AddTransient<IRepository<UserRole>, UserRoleRepository>(serviceProvider =>
-            {
-                IFactory<NeuralmDbContext> neuralmDbFactory = serviceProvider.GetService<IFactory<NeuralmDbContext>>();
-                IEntityValidator<UserRole> entityValidator = serviceProvider.GetService<IEntityValidator<UserRole>>();
-                return new UserRoleRepository(neuralmDbFactory.Create(), entityValidator);
-            });
-            serviceCollection.AddTransient<IRepository<Role>, RoleRepository>(serviceProvider =>
-            {
-                IFactory<NeuralmDbContext> neuralmDbFactory = serviceProvider.GetService<IFactory<NeuralmDbContext>>();
-                IEntityValidator<Role> entityValidator = serviceProvider.GetService<IEntityValidator<Role>>();
-                return new RoleRepository(neuralmDbFactory.Create(), entityValidator);
-            });
-            serviceCollection.AddTransient<IRepository<RolePermission>, RolePermissionRepository>(serviceProvider =>
-            {
-                IFactory<NeuralmDbContext> neuralmDbFactory = serviceProvider.GetService<IFactory<NeuralmDbContext>>();
-                IEntityValidator<RolePermission> entityValidator = serviceProvider.GetService<IEntityValidator<RolePermission>>();
-                return new RolePermissionRepository(neuralmDbFactory.Create(), entityValidator);
-            });
-            serviceCollection.AddTransient<IRepository<Permission>, PermissionRepository>(serviceProvider =>
-            {
-                IFactory<NeuralmDbContext> neuralmDbFactory = serviceProvider.GetService<IFactory<NeuralmDbContext>>();
-                IEntityValidator<Permission> entityValidator = serviceProvider.GetService<IEntityValidator<Permission>>();
-                return new PermissionRepository(neuralmDbFactory.Create(), entityValidator);
-            });
-            serviceCollection.AddTransient<IRepository<Brain>, BrainRepository>(serviceProvider =>
-            {
-                IFactory<NeuralmDbContext> neuralmDbFactory = serviceProvider.GetService<IFactory<NeuralmDbContext>>();
-                IEntityValidator<Brain> entityValidator = serviceProvider.GetService<IEntityValidator<Brain>>();
-                return new BrainRepository(neuralmDbFactory.Create(), entityValidator);
-            });
-            serviceCollection.AddTransient<IRepository<TrainingRoom>, TrainingRoomRepository>(serviceProvider =>
-            {
-                IFactory<NeuralmDbContext> neuralmDbFactory = serviceProvider.GetService<IFactory<NeuralmDbContext>>();
-                IEntityValidator<TrainingRoom> entityValidator = serviceProvider.GetService<IEntityValidator<TrainingRoom>>();
-                return new TrainingRoomRepository(neuralmDbFactory.Create(), entityValidator);
-            });
-            serviceCollection.AddTransient<IRepository<TrainingSession>, TrainingSessionRepository>(serviceProvider =>
-            {
-                IFactory<NeuralmDbContext> neuralmDbFactory = serviceProvider.GetService<IFactory<NeuralmDbContext>>();
-                IEntityValidator<TrainingSession> entityValidator = serviceProvider.GetService<IEntityValidator<TrainingSession>>();
-                return new TrainingSessionRepository(neuralmDbFactory.Create(), entityValidator);
-            });
-            serviceCollection.AddTransient<IRepository<TrainingRoomSettings>, TrainingRoomSettingsRepository>(serviceProvider =>
-            {
-                IFactory<NeuralmDbContext> neuralmDbFactory = serviceProvider.GetService<IFactory<NeuralmDbContext>>();
-                IEntityValidator<TrainingRoomSettings> entityValidator = serviceProvider.GetService<IEntityValidator<TrainingRoomSettings>>();
-                return new TrainingRoomSettingsRepository(neuralmDbFactory.Create(), entityValidator);
-            });
+            // Explicit repository mapping
+            serviceCollection.AddTransient<IRepository<TrainingRoom>, TrainingRoomRepository>();
+            serviceCollection.AddTransient<IRepository<TrainingSession>, TrainingSessionRepository>();
+
+            // Default repository mapping
+            serviceCollection.AddTransient<IRepository<User>, NeuralmDbContextRepository<User>>();
+            serviceCollection.AddTransient<IRepository<Credential>, NeuralmDbContextRepository<Credential>>();
+            serviceCollection.AddTransient<IRepository<CredentialType>, NeuralmDbContextRepository<CredentialType>>();
+            serviceCollection.AddTransient<IRepository<UserRole>, NeuralmDbContextRepository<UserRole>>();
+            serviceCollection.AddTransient<IRepository<Role>, NeuralmDbContextRepository<Role>>();
+            serviceCollection.AddTransient<IRepository<RolePermission>, NeuralmDbContextRepository<RolePermission>>();
+            serviceCollection.AddTransient<IRepository<Permission>, NeuralmDbContextRepository<Permission>>();
+            serviceCollection.AddTransient<IRepository<TrainingRoomSettings>, NeuralmDbContextRepository<TrainingRoomSettings>>();
             #endregion Repositories
 
             #region Services
@@ -128,6 +97,7 @@ namespace Neuralm.Mapping
             #endregion Services
 
             serviceCollection.AddSingleton(p => new MessageToServiceMapper(p));
+
             return serviceCollection;
         }
 

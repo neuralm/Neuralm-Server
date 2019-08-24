@@ -15,7 +15,7 @@ namespace Neuralm.Persistence.Configurations
             builder.HasKey(user => user.Id);
             builder.Property(e => e.Id).ValueGeneratedOnAdd();
             builder.Property(e => e.Username).IsRequired().HasMaxLength(64);
-            builder.Property(p => p.TimestampCreated).HasDefaultValueSql("GetDate()");
+            builder.Property(p => p.TimestampCreated).ValueGeneratedOnAdd();
         }
     }
 }

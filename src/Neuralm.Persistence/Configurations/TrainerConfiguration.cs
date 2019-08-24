@@ -13,11 +13,11 @@ namespace Neuralm.Persistence.Configurations
         public void Configure(EntityTypeBuilder<Trainer> builder)
         {
             builder.HasKey(p => new { p.TrainingRoomId, p.UserId });
-
-            builder.HasOne(p => p.User)
+            builder
+                .HasOne(p => p.User)
                 .WithMany()
                 .HasForeignKey(p => p.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

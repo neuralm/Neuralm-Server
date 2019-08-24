@@ -13,12 +13,10 @@ namespace Neuralm.Persistence.Configurations
         public void Configure(EntityTypeBuilder<Species> builder)
         {
             builder.HasKey(p => p.Id);
-
-            builder.OwnsMany(p => p.LastGenerationOrganisms)
-                .HasForeignKey(p => p.SpeciesId)
-                .OnDelete(DeleteBehavior.ClientSetNull);
-
-            builder.Ignore(p => p.Organisms);
+            builder.Property(p => p.Id).ValueGeneratedOnAdd();
+            builder.HasMany(p => p.Organisms)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

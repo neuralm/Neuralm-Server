@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -18,6 +19,8 @@ namespace Neuralm.Application.Converters
         /// <returns>Returns the converted dto as entity.</returns>
         public static TEntity Convert<TEntity, TDto>(TDto dto) where TEntity : class, new()
         {
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
             TEntity entity = new TEntity();
             IList<PropertyInfo> dtoProperties = new List<PropertyInfo>(typeof(TDto).GetProperties());
             IList<PropertyInfo> entityProperties = new List<PropertyInfo>(typeof(TEntity).GetProperties());

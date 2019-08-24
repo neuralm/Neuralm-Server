@@ -1,12 +1,12 @@
-﻿using Neuralm.Application.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Neuralm.Application.Interfaces;
+using Neuralm.Domain;
 using Neuralm.Domain.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Neuralm.Domain;
 
 namespace Neuralm.Persistence.Abstractions
 {
@@ -48,7 +48,6 @@ namespace Neuralm.Persistence.Abstractions
             {
                 Console.WriteLine(new CreatingEntityFailedException($"The entity of type {typeof(TEntity).Name} could not be created.", ex));
             }
-
             return saveSuccess;
         }
 
@@ -70,7 +69,6 @@ namespace Neuralm.Persistence.Abstractions
             {
                 Console.WriteLine(new DeletingEntityFailedException($"The entity of type {typeof(TEntity).Name} could not be deleted.", ex));
             }
-
             return saveSuccess;
         }
 
@@ -81,21 +79,21 @@ namespace Neuralm.Persistence.Abstractions
             return await DbContext.Set<TEntity>().AnyAsync(predicate);
         }
 
-        /// <inheritdoc cref="IRepository{TEntity}.FindManyAsync"/>
+        /// <inheritdoc cref="IRepository{TEntity}.FindManyAsync(Expression{Func{TEntity, bool}})"/>
         public virtual async Task<IEnumerable<TEntity>> FindManyAsync(Expression<Func<TEntity, bool>> predicate)
         {
             using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
             return await DbContext.Set<TEntity>().Where(predicate).ToListAsync();
         }
 
-        /// <inheritdoc cref="IRepository{TEntity}.FindSingleOrDefaultAsync"/>
+        /// <inheritdoc cref="IRepository{TEntity}.FindSingleOrDefaultAsync(Expression{Func{TEntity, bool}})"/>
         public virtual async Task<TEntity> FindSingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
         {
             using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
             return await DbContext.Set<TEntity>().SingleOrDefaultAsync(predicate);
         }
 
-        /// <inheritdoc cref="IRepository{TEntity}.GetAllAsync"/>
+        /// <inheritdoc cref="IRepository{TEntity}.GetAllAsync()"/>
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
         {
             using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();

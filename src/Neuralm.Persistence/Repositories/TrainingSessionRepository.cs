@@ -1,19 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Neuralm.Application.Interfaces;
 using Neuralm.Domain;
 using Neuralm.Domain.Entities.NEAT;
+using Neuralm.Domain.Exceptions;
 using Neuralm.Persistence.Abstractions;
 using Neuralm.Persistence.Contexts;
+using System;
+using System.Threading.Tasks;
 
 namespace Neuralm.Persistence.Repositories
 {
-    /// <summary>
-    /// Represents the <see cref="TrainingSessionRepository"/> class.
-    /// </summary>
     public sealed class TrainingSessionRepository : RepositoryBase<TrainingSession, NeuralmDbContext>
     {
         /// <summary>
@@ -26,21 +22,27 @@ namespace Neuralm.Persistence.Repositories
 
         }
 
-        /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.FindSingleOrDefaultAsync"/>
-        public override async Task<TrainingSession> FindSingleOrDefaultAsync(Expression<Func<TrainingSession, bool>> predicate)
+        /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.UpdateAsync(TEntity)"/>
+        public override async Task<bool> UpdateAsync(TrainingSession entity)
         {
+            bool saveSuccess = false;
             using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
-            return await TrainingSessionSetWithInclude().Where(predicate).SingleOrDefaultAsync();
-        }
-
-        private IQueryable<TrainingSession> TrainingSessionSetWithInclude()
-        {
-            return DbContext.Set<TrainingSession>()
-                .Include("TrainingRoom.TrainingRoomSettings")
-                .Include("TrainingRoom.AuthorizedTrainers")
-                .Include("TrainingRoom.Organisms.Brain")
-                .Include("TrainingRoom.Species.LastGenerationOrganisms.Brain")
-                .Include("TrainingRoom.Species.LastGenerationOrganisms.TrainingRoom");
+            DbContext.Update(entity);
+            try
+            {
+                int saveResult = await DbContext.SaveChangesAsync();
+                // Force the DbContext to fetch the species anew on next query.
+                foreach (Species species in entity.TrainingRoom.Species)
+                {
+                    DbContext.Entry(species).State = EntityState.Detached;
+                }
+                saveSuccess = Convert.ToBoolean(saveResult);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(new UpdatingEntityFailedException($"The entity of type {typeof(TrainingSession).Name} failed to update.", ex));
+            }
+            return saveSuccess;
         }
     }
 }

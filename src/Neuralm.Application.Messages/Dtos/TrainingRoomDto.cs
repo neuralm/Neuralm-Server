@@ -22,14 +22,5 @@ namespace Neuralm.Application.Messages.Dtos
 
         /// <inheritdoc cref="TrainingRoom.TrainingRoomSettings"/>
         public TrainingRoomSettingsDto TrainingRoomSettings { get; set; }
-
-        /// <inheritdoc cref="TrainingRoom.HighestScore"/>
-        public double HighestScore { get; set; }
-
-        /// <inheritdoc cref="TrainingRoom.LowestScore"/>
-        public double LowestScore { get; set; }
-
-        /// <inheritdoc cref="TrainingRoom.AverageScore"/>
-        public double AverageScore { get; set; }
     }
 }

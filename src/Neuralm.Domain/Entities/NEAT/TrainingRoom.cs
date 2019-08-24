@@ -10,18 +10,13 @@ namespace Neuralm.Domain.Entities.NEAT
     public class TrainingRoom
     {
         private readonly Dictionary<(uint A, uint B), uint> _mutationToInnovation = new Dictionary<(uint A, uint B), uint>();
-        private uint _nodeId;
-        private Random _random;
+        private readonly List<Organism> _tempOrganisms = new List<Organism>();
+        private uint _nodeIdentifier;
 
         /// <summary>
         /// Gets and sets the id.
         /// </summary>
         public Guid Id { get; private set; }
-
-        /// <summary>
-        /// Gets and sets the owner id.
-        /// </summary>
-        public Guid OwnerId { get; private set; }
 
         /// <summary>
         /// Gets and sets the owner.
@@ -39,19 +34,9 @@ namespace Neuralm.Domain.Entities.NEAT
         public virtual List<TrainingSession> TrainingSessions { get; private set; }
 
         /// <summary>
-        /// Gets the list of organisms.
-        /// </summary>
-        public virtual List<Organism> Organisms { get; private set; }
-
-        /// <summary>
         /// Gets the list of species.
         /// </summary>
         public virtual List<Species> Species { get; private set; }
-
-        /// <summary>
-        /// Gets and sets the collection of brains.
-        /// </summary>
-        public virtual List<Brain> Brains { get; private set; }
 
         /// <summary>
         /// Gets and sets the training room settings.
@@ -69,33 +54,9 @@ namespace Neuralm.Domain.Entities.NEAT
         public uint Generation { get; private set; }
 
         /// <summary>
-        /// Gets and sets the random.
+        /// Gets and sets the highest innovation number.
         /// </summary>
-        public Random Random
-        {
-            get => _random ??= _random = new Random(TrainingRoomSettings.Seed);
-            private set => _random = value;
-        }
-
-        /// <summary>
-        /// Gets and sets the highest score.
-        /// </summary>
-        public double HighestScore { get; private set; }
-
-        /// <summary>
-        /// Gets and sets the lowest score.
-        /// </summary>
-        public double LowestScore { get; private set; }
-
-        /// <summary>
-        /// Gets and sets the average score.
-        /// </summary>
-        public double AverageScore { get; private set; }
-        
-        /// <summary>
-        /// Gets and sets the innovation id.
-        /// </summary>
-        public uint InnovationId { get; private set; }
+        public uint HighestInnovationNumber { get; private set; }
         
         /// <summary>
         /// Gets a value indicating whether the training room is enabled.
@@ -120,17 +81,13 @@ namespace Neuralm.Domain.Entities.NEAT
         public TrainingRoom(User owner, string name, TrainingRoomSettings trainingRoomSettings)
         {
             Id = Guid.NewGuid();
-            Generation = 0;
-            Owner = owner;
-            OwnerId = Owner.Id;
             Name = name;
+            Owner = owner;
+            Generation = 0;
             Enabled = true;
             TrainingRoomSettings = trainingRoomSettings;
-            Random = new Random(trainingRoomSettings.Seed);
-            AuthorizedTrainers = new List<Trainer> {new Trainer(owner, this)};
-            Brains = new List<Brain>();
+            AuthorizedTrainers = new List<Trainer> { new Trainer(owner, this) };
             Species = new List<Species>();
-            Organisms = new List<Organism>();
             TrainingSessions = new List<TrainingSession>();
         }
 
@@ -141,24 +98,18 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <param name="organism">The organism to add.</param>
         public void AddOrganism(Organism organism)
         {
+            // For each species in the species check if the organism is of the same species
+            // and add it if true.
             foreach (Species species in Species)
             {
-                if (species.AddOrganismIfSameSpecies(organism, Random.Next))
-                {
-                    return;
-                }
+                if (!species.IsSameSpecies(organism, TrainingRoomSettings))
+                    continue;
+                species.Organisms.Add(organism);
+                return;
             }
 
-            Species.Add(new Species(organism, Id));
-        }
-
-        /// <summary>
-        /// Gets a random organism from a random species.
-        /// </summary>
-        /// <returns>A randomly chosen <see cref="Organism"/>.</returns>
-        public Organism GetRandomOrganism()
-        {
-            return Species[Random.Next(Species.Count)].GetRandomOrganism(Random.Next);
+            // If the organism does not belong to any of the species create a new species and add it to the species.
+            Species.Add(new Species(organism));
         }
 
         /// <summary>
@@ -169,44 +120,54 @@ namespace Neuralm.Domain.Entities.NEAT
         public void PostScore(Organism organism, double score)
         {
             organism.Score = score;
+            organism.Evaluated = true;
         }
 
         /// <summary>
         /// Does 1 generation.
         /// kills the worst ones, mutate and breed and make the system ready for a new generation.
         /// </summary>
-        public void EndGeneration()
+        public bool EndGeneration()
         {
-            HighestScore = double.MinValue;
-            LowestScore = double.MaxValue;
-            double totalFullScore = 0;
+            // Verifies that all organisms of the current generation are evaluated, otherwise return false.
+            if (!Species.TrueForAll(s => s.Organisms.Where(o => o.Generation == Generation).All(o => o.Evaluated)))
+                return false;
 
+            // Prepares score values.
+            double highestScore = double.MinValue;
+            double lowestScore = double.MaxValue;
+
+            // For each through all the species and calculate the highest and lowest score.
             foreach (Species species in Species)
             {
+                // Remove all previous generation organisms, now only current generation organisms should exist.
+                species.Organisms.RemoveAll(o => o.Generation < Generation);
                 foreach (Organism organism in species.Organisms)
                 {
                     organism.Score /= Species.Count;
-                    HighestScore = Math.Max(organism.Score, HighestScore);
-                    LowestScore = Math.Min(organism.Score, LowestScore);
-                    totalFullScore += organism.Score;
+                    highestScore = Math.Max(organism.Score, highestScore);
+                    lowestScore = Math.Min(organism.Score, lowestScore);
                 }
             }
 
-            AverageScore = totalFullScore / TrainingRoomSettings.OrganismCount;
-
-            // Reproduce!
+            // For each species reproduce with the given training room settings.
             foreach (Species species in Species)
             {
-                species.PostGeneration(TrainingRoomSettings.TopAmountToSurvive);
+                species.PostGeneration(TrainingRoomSettings.TopAmountToSurvive, Generation);
             }
 
+            // Calculate the total score for all species.
             double totalScore = Species.Sum(species => species.SpeciesScore);
 
-            if ((int)totalScore == 0)
+            // If the total score is 0 than force the total score to be 1.
+            if (totalScore == 0)
                 totalScore = 1; // TODO: Think about what this really does lol, if the total score is 0 should they have the right to reproduce?
 
+            // Prepare rest value.
             double rest = 0;
-            Organisms.Clear();
+
+            // For each species determine the amount of organisms that is allowed to survive 
+            // and add them to the temporary organisms list.
             foreach (Species species in Species)
             {
                 double fraction = species.SpeciesScore / totalScore;
@@ -222,51 +183,39 @@ namespace Neuralm.Domain.Entities.NEAT
                 amountOfOrganisms = Math.Floor(amountOfOrganisms);
                 for (int i = 0; i < amountOfOrganisms; i++)
                 {
-                    Organisms.Add(ProduceOrganism(species));
+                    _tempOrganisms.Add(ProduceOrganism(species));
                 }
             }
 
-            while (Organisms.Count < TrainingRoomSettings.OrganismCount)
+            // If the temporary organisms count is lower than the amount specified in the training room settings then add more.
+            while (_tempOrganisms.Count < TrainingRoomSettings.OrganismCount)
             {
-                Organisms.Add(new Organism(this));
+                _tempOrganisms.Add(new Organism(Generation + 1, TrainingRoomSettings));
             }
 
-            foreach (Organism organism in Organisms)
+            // Adds the organisms from the temporary list to the species list.
+            foreach (Organism organism in _tempOrganisms)
             {
                 AddOrganism(organism);
             }
 
+            // Clears the temporary organisms list.
+            _tempOrganisms.Clear();
+
+            // Increases the generation.
+            Generation++;
+
+            // Remove all organisms that are not in the current generation.
+            Species.ForEach(s => s.Organisms.RemoveAll(o => o.Generation < Generation));
+
+            // Removes any species that have died out.
             Species.RemoveAll(species => !species.Organisms.Any());
 
+            // Resets the mutation to innovation map.
             _mutationToInnovation.Clear();
-            Generation++;
-        }
 
-        /// <summary>
-        /// Generates a organism based on the organisms from this species.
-        /// A random organism is chosen and based on chance it can be bred with a random organism from this species or from the global pool.
-        /// The organism is also mutated.
-        /// </summary>
-        /// <param name="species">The species.</param>
-        /// <returns>Returns a generated <see cref="Organism"/>.</returns>
-        private Organism ProduceOrganism(Species species)
-        {
-            Organism child = species.GetRandomOrganism(Random.Next);
-            if (Random.NextDouble() < TrainingRoomSettings.CrossOverChance)
-            {
-                Organism parent2 = Random.NextDouble() < TrainingRoomSettings.InterSpeciesChance
-                    ? GetRandomOrganism()
-                    : species.GetRandomOrganism(Random.Next);
-
-                child = child.Crossover(parent2);
-            }
-            else
-                child = child.Clone();
-
-            if (Random.NextDouble() < TrainingRoomSettings.MutationChance)
-                child.Mutate();
-            child.SpeciesId = Id;
-            return child;
+            // Returns true for a successful generation.
+            return true;
         }
 
         /// <summary>
@@ -275,7 +224,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <param name="min">The minimum value the nodeId should be.</param>
         public void IncreaseNodeIdTo(uint min)
         {
-            _nodeId = Math.Max(_nodeId, min);
+            _nodeIdentifier = Math.Max(_nodeIdentifier, min);
         }
 
         /// <summary>
@@ -284,7 +233,7 @@ namespace Neuralm.Domain.Entities.NEAT
         /// <returns>Returns the old node id before increasing it.</returns>
         public uint GetAndIncreaseNodeId()
         {
-            return _nodeId++;
+            return _nodeIdentifier++;
         }
 
         /// <summary>
@@ -298,8 +247,8 @@ namespace Neuralm.Domain.Entities.NEAT
             if (_mutationToInnovation.ContainsKey((inId, outId)))
                 return _mutationToInnovation[(inId, outId)];
 
-            _mutationToInnovation.Add((inId, outId), ++InnovationId);
-            return InnovationId;
+            _mutationToInnovation.Add((inId, outId), ++HighestInnovationNumber);
+            return HighestInnovationNumber;
         }
 
         /// <summary>
@@ -366,6 +315,49 @@ namespace Neuralm.Domain.Entities.NEAT
                 return false;
             TrainingSessions.Add(trainingSession);
             return true;
+        }
+
+        /// <summary>
+        /// Generates an organism based on the organisms from this species.
+        /// A random organism is chosen and based on chance it can be bred with a random organism from this species or from the global pool.
+        /// The organism is also mutated.
+        /// </summary>
+        /// <param name="species">The species.</param>
+        /// <returns>Returns a generated <see cref="Organism"/>.</returns>
+        private Organism ProduceOrganism(Species species)
+        {
+            // Gets a random organism as child.
+            Organism child = species.GetRandomOrganism(Generation, TrainingRoomSettings);
+
+            // If the random value is lower than the training room settings cross over chance,
+            // perform a cross over. Otherwise, clone the child.
+            if (TrainingRoomSettings.Random.NextDouble() < TrainingRoomSettings.CrossOverChance)
+            {
+                // Depending on the training room settings for the inter species chance to cross over get the 
+                // random organism from a random species else get it from the given species.
+                Organism parent2 = TrainingRoomSettings.Random.NextDouble() < TrainingRoomSettings.InterSpeciesChance
+                    ? Species[TrainingRoomSettings.Random.Next(Species.Count)].GetRandomOrganism(Generation, TrainingRoomSettings)
+                    : species.GetRandomOrganism(Generation, TrainingRoomSettings);
+
+                // Cross over the two organisms with the training room settings.
+                child = child.Crossover(parent2, TrainingRoomSettings);
+            }
+            else
+            {
+                // Clone the current child.
+                child = child.Clone(TrainingRoomSettings);
+
+                // Increment generation, crossover does that automatically, but if no crossover happens we need to do it here.
+                child.Generation++;
+            }
+
+            // If the random value is lower than the training room settings mutation chance,
+            // mutate the child with the training room settings.
+            if (TrainingRoomSettings.Random.NextDouble() < TrainingRoomSettings.MutationChance)
+                child.Mutate(TrainingRoomSettings, GetAndIncreaseNodeId, GetInnovationNumber);
+
+            // Return the child.
+            return child;
         }
     }
 }
