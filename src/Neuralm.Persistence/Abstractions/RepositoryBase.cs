@@ -1,12 +1,12 @@
-﻿using Neuralm.Application.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Neuralm.Application.Interfaces;
+using Neuralm.Domain;
 using Neuralm.Domain.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Neuralm.Domain;
 
 namespace Neuralm.Persistence.Abstractions
 {
@@ -48,7 +48,6 @@ namespace Neuralm.Persistence.Abstractions
             {
                 Console.WriteLine(new CreatingEntityFailedException($"The entity of type {typeof(TEntity).Name} could not be created.", ex));
             }
-
             return saveSuccess;
         }
 
@@ -70,7 +69,6 @@ namespace Neuralm.Persistence.Abstractions
             {
                 Console.WriteLine(new DeletingEntityFailedException($"The entity of type {typeof(TEntity).Name} could not be deleted.", ex));
             }
-
             return saveSuccess;
         }
 

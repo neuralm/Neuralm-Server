@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Neuralm.Application.Converters;
+﻿using Neuralm.Application.Converters;
 using Neuralm.Application.Interfaces;
 using Neuralm.Application.Messages.Dtos;
 using Neuralm.Application.Messages.Requests;
 using Neuralm.Application.Messages.Responses;
 using Neuralm.Domain.Entities;
 using Neuralm.Domain.Entities.NEAT;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Neuralm.Application.Services
 {
@@ -138,14 +138,6 @@ namespace Neuralm.Application.Services
                 {
                     trainingSession.LeasedOrganisms.AddRange(GetNewLeasedOrganisms(getOrganismsRequest.Amount));
                     message = "Start of new generation.";
-                    //// if the training room also is out of leasable organisms then perform EndGeneration
-                    //// but only if all organisms are evaluated (maybe another training session is still evaluating the organisms that are being leased)
-                    //if (!trainingSession.LeasedOrganisms.Any() && trainingSession.TrainingRoom.Species.SelectMany(p => p.Organisms).All(lo => lo.Evaluated))
-                    //{
-                    //    trainingSession.TrainingRoom.EndGeneration();
-                    //    trainingSession.LeasedOrganisms.AddRange(GetNewLeasedOrganisms(getOrganismsRequest.Amount));
-                    //    message = "Start of new generation.";
-                    //}
                 }
             }
             else if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.Evaluated) < getOrganismsRequest.Amount)

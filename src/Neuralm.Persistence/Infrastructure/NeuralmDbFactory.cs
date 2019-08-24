@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Neuralm.Application.Configurations;
 using Neuralm.Application.Interfaces;
@@ -16,7 +17,7 @@ namespace Neuralm.Persistence.Infrastructure
         /// <summary>
         /// Design time constructor IGNORE!
         /// </summary>
-        public NeuralmDbFactory() : base(null)
+        public NeuralmDbFactory() : base(null, null)
         {
 
         }
@@ -25,7 +26,8 @@ namespace Neuralm.Persistence.Infrastructure
         /// Initializes an instance of the <see cref="NeuralmDbFactory"/> class.
         /// </summary>
         /// <param name="neuralmDbConfigurationOptions">The options.</param>
-        public NeuralmDbFactory(IOptions<DbConfiguration> neuralmDbConfigurationOptions) : base(neuralmDbConfigurationOptions)
+        /// <param name="loggerFactory">The logger factory.</param>
+        public NeuralmDbFactory(IOptions<DbConfiguration> neuralmDbConfigurationOptions, ILoggerFactory loggerFactory) : base(neuralmDbConfigurationOptions, loggerFactory)
         {
 
         }

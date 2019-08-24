@@ -2,10 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Neuralm.Application.Configurations;
 using Neuralm.Utilities;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace Neuralm.Persistence.Infrastructure
 {
@@ -17,16 +17,19 @@ namespace Neuralm.Persistence.Infrastructure
     {
         private DbContextOptionsBuilder<TContext> _dbContextOptionsBuilder;
         private readonly DbConfiguration _dbConfiguration;
+        private readonly ILoggerFactory _loggerFactory;
 
         /// <summary>
         /// Initializes an instance of the <see cref="DesignTimeDbContextFactoryBase{TContext}"/> class.
         /// </summary>
         /// <param name="dbConfigurationOptions">The options.</param>
-        protected DesignTimeDbContextFactoryBase(IOptions<DbConfiguration> dbConfigurationOptions)
+        /// <param name="loggerFactory">The logger factory.</param>
+        protected DesignTimeDbContextFactoryBase(IOptions<DbConfiguration> dbConfigurationOptions, ILoggerFactory loggerFactory)
         {
             _dbConfiguration = dbConfigurationOptions == null 
                 ? GetDbConfiguration() 
                 : dbConfigurationOptions.Value;
+            _loggerFactory = loggerFactory;
         }
 
         /// <summary>
@@ -52,12 +55,14 @@ namespace Neuralm.Persistence.Infrastructure
         {
             if (string.IsNullOrEmpty(connectionString))
                 throw new ArgumentException($"Connection string '{connectionString}' is null or empty.", nameof(connectionString));
-            DbContextOptionsBuilder<TContext> optionsBuilder = new DbContextOptionsBuilder<TContext>();
-            if (_dbConfiguration.UseLazyLoading)
-            {
-                optionsBuilder.UseLazyLoadingProxies();
-            }
 
+            DbContextOptionsBuilder<TContext> optionsBuilder = new DbContextOptionsBuilder<TContext>();
+
+            // Adds lazy loading.
+            if (_dbConfiguration.UseLazyLoading)
+                optionsBuilder.UseLazyLoadingProxies();
+
+            // Switches to the correct DbProvider.
             switch (_dbConfiguration.DbProvider.ToLower())
             {
                 case "mssql":
@@ -69,6 +74,13 @@ namespace Neuralm.Persistence.Infrastructure
                 default:
                     optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString());
                     break;
+            }
+
+            // Adds logging.
+            if (_loggerFactory != null)
+            {
+                optionsBuilder.UseLoggerFactory(_loggerFactory);
+                optionsBuilder.EnableSensitiveDataLogging();
             }
 
             _dbContextOptionsBuilder = optionsBuilder;

@@ -10,7 +10,7 @@ using Neuralm.Persistence.Contexts;
 namespace Neuralm.Persistence.Migrations
 {
     [DbContext(typeof(NeuralmDbContext))]
-    [Migration("20190823103504_InitialCreate")]
+    [Migration("20190824161300_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,7 +45,7 @@ namespace Neuralm.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Credentials");
+                    b.ToTable("Credential");
                 });
 
             modelBuilder.Entity("Neuralm.Domain.Entities.Authentication.CredentialType", b =>
@@ -66,7 +66,7 @@ namespace Neuralm.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CredentialTypes");
+                    b.ToTable("CredentialType");
 
                     b.HasData(
                         new
@@ -96,7 +96,7 @@ namespace Neuralm.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Permissions");
+                    b.ToTable("Permission");
                 });
 
             modelBuilder.Entity("Neuralm.Domain.Entities.Authentication.Role", b =>
@@ -117,7 +117,7 @@ namespace Neuralm.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Role");
                 });
 
             modelBuilder.Entity("Neuralm.Domain.Entities.Authentication.RolePermission", b =>
@@ -130,7 +130,7 @@ namespace Neuralm.Persistence.Migrations
 
                     b.HasIndex("PermissionId");
 
-                    b.ToTable("RolePermissions");
+                    b.ToTable("RolePermission");
                 });
 
             modelBuilder.Entity("Neuralm.Domain.Entities.Authentication.UserRole", b =>
@@ -147,7 +147,7 @@ namespace Neuralm.Persistence.Migrations
 
                     b.HasIndex("UserId1");
 
-                    b.ToTable("UserRoles");
+                    b.ToTable("UserRole");
                 });
 
             modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.Nodes.Node", b =>
@@ -254,7 +254,7 @@ namespace Neuralm.Persistence.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("TrainingRooms");
+                    b.ToTable("TrainingRoom");
                 });
 
             modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.TrainingSession", b =>
@@ -274,7 +274,7 @@ namespace Neuralm.Persistence.Migrations
 
                     b.HasIndex("TrainingRoomId");
 
-                    b.ToTable("TrainingSessions");
+                    b.ToTable("TrainingSession");
                 });
 
             modelBuilder.Entity("Neuralm.Domain.Entities.User", b =>
@@ -291,7 +291,7 @@ namespace Neuralm.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("Neuralm.Domain.Entities.NEAT.Nodes.InputNode", b =>
@@ -374,7 +374,7 @@ namespace Neuralm.Persistence.Migrations
 
                             b1.HasIndex("OrganismId");
 
-                            b1.ToTable("ConnectionGenes");
+                            b1.ToTable("ConnectionGene");
 
                             b1.HasOne("Neuralm.Domain.Entities.NEAT.Organism")
                                 .WithMany("ConnectionGenes")
@@ -433,7 +433,7 @@ namespace Neuralm.Persistence.Migrations
 
                             b1.HasIndex("UserId");
 
-                            b1.ToTable("Trainers");
+                            b1.ToTable("Trainer");
 
                             b1.HasOne("Neuralm.Domain.Entities.NEAT.TrainingRoom", "TrainingRoom")
                                 .WithMany("AuthorizedTrainers")
@@ -520,7 +520,7 @@ namespace Neuralm.Persistence.Migrations
 
                             b1.HasIndex("TrainingSessionId");
 
-                            b1.ToTable("LeasedOrganisms");
+                            b1.ToTable("LeasedOrganism");
 
                             b1.HasOne("Neuralm.Domain.Entities.NEAT.TrainingSession")
                                 .WithMany("LeasedOrganisms")
