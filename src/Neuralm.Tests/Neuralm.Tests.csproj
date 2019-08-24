@@ -2,9 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-
     <IsPackable>false</IsPackable>
-
+    <ProjectGuid>{1B596C42-A206-479D-9850-9A9019359816}</ProjectGuid>
     <LangVersion>8</LangVersion>
   </PropertyGroup>
 
