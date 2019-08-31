@@ -225,7 +225,7 @@ namespace Neuralm.Tests.NEAT
             [DataRow(null)]
             [DataRow(default)]
             [DataRow("brain")]
-            [DataRow(new int[] { 1, 2, 3 })]
+            [DataRow(new[] { 1, 2, 3 })]
             public void DifferentTypeTest(object other)
             {
                 Guid id = Guid.NewGuid();
