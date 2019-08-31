@@ -59,12 +59,12 @@ namespace Neuralm.Client
                     for (int i = 0; i < MessageCount; i++)
                     {
                         Guid name = Guid.NewGuid();
-                        RegisterRequest registerRequest = new RegisterRequest(name.ToString(), "password", "Name");
+                        RegisterRequest registerRequest = new RegisterRequest(name.ToString(), "password2", "Name2");
                         await networkConnector.SendMessageAsync(registerRequest, CancellationToken.None);
                         RegisterResponse registerResponse = await registerMessageListener.ReceiveMessageAsync(CancellationToken.None);
                         Console.WriteLine($"RegisterResponse: \n\tSuccess: {registerResponse.Success}, \n\tRequestId: {registerResponse.RequestId}, \n\tResponseId: {registerResponse.Id}, \n\tMessage:{registerResponse.Message}");
 
-                        AuthenticateRequest loginRequest = new AuthenticateRequest(name.ToString(), "password", "Name");
+                        AuthenticateRequest loginRequest = new AuthenticateRequest(name.ToString(), "password2", "Name2");
                         await networkConnector.SendMessageAsync(loginRequest, CancellationToken.None);
                         AuthenticateResponse loginResponse = await loginResponseListener.ReceiveMessageAsync(CancellationToken.None);
                         Console.WriteLine($"AuthenticateResponse: \n\tSuccess: {loginResponse.Success}, \n\tAccessToken: {loginResponse.AccessToken}, \n\tRequestId: {loginResponse.RequestId}, \n\tResponseId: {loginResponse.Id}, \n\tMessage:{loginResponse.Message}");

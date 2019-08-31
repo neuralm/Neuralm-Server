@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Neuralm.Domain.Entities.NEAT.Nodes;
 
 namespace Neuralm.Application.Services
 {
@@ -155,7 +156,14 @@ namespace Neuralm.Application.Services
             List<OrganismDto> organismDtos = trainingSession.LeasedOrganisms
                 .Where(lo => !lo.Organism.Evaluated)
                 .Take(getOrganismsRequest.Amount)
-                .Select(lo => EntityToDtoConverter.Convert<OrganismDto, Organism>(lo.Organism)).ToList();
+                .Select(lo =>
+                {
+                    OrganismDto organismDto = EntityToDtoConverter.Convert<OrganismDto, Organism>(lo.Organism);
+                    // Because the input and output nodes are set using a Many To Many relation the nodes are converted separately.
+                    organismDto.InputNodes = lo.Organism.Inputs.Select(input => EntityToDtoConverter.Convert<NodeDto, InputNode>(input.InputNode)).ToList();
+                    organismDto.OutputNodes = lo.Organism.Outputs.Select(input => EntityToDtoConverter.Convert<NodeDto, OutputNode>(input.OutputNode)).ToList();
+                    return organismDto;
+                }).ToList();
 
             return new GetOrganismsResponse(getOrganismsRequest.Id, organismDtos, message, organismDtos.Any());
 

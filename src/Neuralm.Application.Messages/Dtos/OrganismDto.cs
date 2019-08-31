@@ -14,6 +14,16 @@ namespace Neuralm.Application.Messages.Dtos
 
         /// <inheritdoc cref="Organism.ConnectionGenes"/>
         public List<ConnectionGeneDto> ConnectionGenes { get; set; }
+        
+        /// <summary>
+        /// Gets and sets the input nodes.
+        /// </summary>
+        public List<NodeDto> InputNodes { get; set; }
+
+        /// <summary>
+        /// Gets and sets the output nodes.
+        /// </summary>
+        public List<NodeDto> OutputNodes { get; set; }
 
         /// <inheritdoc cref="Organism.Score"/>
         public double Score { get; set; }

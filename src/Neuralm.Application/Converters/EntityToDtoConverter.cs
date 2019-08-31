@@ -40,7 +40,7 @@ namespace Neuralm.Application.Converters
                 {
                     Type dtoItemType = propertyType.GetGenericArguments()[0];
                     IList genericListInstance = CreateGenericListOfType(dtoItemType);
-                    dynamic list = typeof(TEntity).GetProperty(property.Name).GetValue(entity);
+                    dynamic list = typeof(TEntity).GetProperty(property.Name)?.GetValue(entity);
                     if (list == null)
                     {
                         property.SetValue(dto, genericListInstance);
@@ -62,7 +62,7 @@ namespace Neuralm.Application.Converters
                 Type entityType = entity.GetType();
                 if (GetValue(entityType, entity, property, dto))
                     continue;
-                object value = entityType.GetProperty(property.Name).GetValue(entity);
+                object value = entityType.GetProperty(property.Name)?.GetValue(entity);
                 property.SetValue(dto, value);
             }
             return dto;
@@ -86,7 +86,7 @@ namespace Neuralm.Application.Converters
                 {
                     Type newDtoItemType = type.GetGenericArguments()[0];
                     IList genericListInstance = CreateGenericListOfType(newDtoItemType);
-                    dynamic list = entityType.GetProperty(property.Name).GetValue(entity);
+                    dynamic list = entityType.GetProperty(property.Name)?.GetValue(entity);
                     if (list == null)
                     {
                         property.SetValue(dto, genericListInstance);
@@ -103,7 +103,7 @@ namespace Neuralm.Application.Converters
 
                 if (GetValue(entityType, entity, property, dto))
                     continue;
-                object value = entityType.GetProperty(property.Name).GetValue(entity);
+                object value = entityType.GetProperty(property.Name)?.GetValue(entity);
                 property.SetValue(dto, value);
             }
 
@@ -125,11 +125,11 @@ namespace Neuralm.Application.Converters
             if (property.PropertyType.Name.Contains("Proxy"))
             {
                 using EntityLoadLock.Releaser lazyLoadLock = EntityLoadLock.Shared.Lock();
-                entityObject = entityType.GetProperty(property.Name).GetValue(entity, null);
+                entityObject = entityType.GetProperty(property.Name)?.GetValue(entity, null);
             }
             else
             {
-                entityObject = entityType.GetProperty(property.Name).GetValue(entity, null);
+                entityObject = entityType.GetProperty(property.Name)?.GetValue(entity, null);
             }
 
             if (entityObject == null)

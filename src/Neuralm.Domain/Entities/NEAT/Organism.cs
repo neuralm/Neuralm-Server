@@ -204,7 +204,7 @@ namespace Neuralm.Domain.Entities.NEAT
             if (genomeCount < 20)
                 genomeCount = 1;
 
-            // Depending on the training room settings return a bool.
+            // Depending on the training room settings return whether the organism is of the same species.
             return ((trainingRoomSettings.SpeciesExcessGeneWeight * excess) / genomeCount +
                     (trainingRoomSettings.SpeciesDisjointGeneWeight * disjoint) / genomeCount +
                     trainingRoomSettings.SpeciesAverageWeightDiffWeight * weightDiff) <
