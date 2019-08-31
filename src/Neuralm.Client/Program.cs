@@ -19,7 +19,7 @@ namespace Neuralm.Client
     internal static class Program
     {
         private const int Port = 9999;
-        private const string Host = "localhost";
+        private const string Host = "Neuralm.net";
         private const int MessageCount = 1;
         private const int ClientCount = 1;
         private const int TotalMessages = MessageCount * ClientCount;
@@ -59,12 +59,12 @@ namespace Neuralm.Client
                     for (int i = 0; i < MessageCount; i++)
                     {
                         Guid name = Guid.NewGuid();
-                        RegisterRequest registerRequest = new RegisterRequest(name.ToString(), "password2", "Name2");
+                        RegisterRequest registerRequest = new RegisterRequest(name.ToString(), "password", "Name");
                         await networkConnector.SendMessageAsync(registerRequest, CancellationToken.None);
                         RegisterResponse registerResponse = await registerMessageListener.ReceiveMessageAsync(CancellationToken.None);
                         Console.WriteLine($"RegisterResponse: \n\tSuccess: {registerResponse.Success}, \n\tRequestId: {registerResponse.RequestId}, \n\tResponseId: {registerResponse.Id}, \n\tMessage:{registerResponse.Message}");
 
-                        AuthenticateRequest loginRequest = new AuthenticateRequest(name.ToString(), "password2", "Name2");
+                        AuthenticateRequest loginRequest = new AuthenticateRequest(name.ToString(), "password", "Name");
                         await networkConnector.SendMessageAsync(loginRequest, CancellationToken.None);
                         AuthenticateResponse loginResponse = await loginResponseListener.ReceiveMessageAsync(CancellationToken.None);
                         Console.WriteLine($"AuthenticateResponse: \n\tSuccess: {loginResponse.Success}, \n\tAccessToken: {loginResponse.AccessToken}, \n\tRequestId: {loginResponse.RequestId}, \n\tResponseId: {loginResponse.Id}, \n\tMessage:{loginResponse.Message}");
@@ -126,6 +126,7 @@ namespace Neuralm.Client
             Dictionary<Guid, double> organismsScoreDictionary = new Dictionary<Guid, double>();
             foreach (OrganismDto organism in getOrganismsResponse.Organisms)
             {
+                
                 organism.Score += Random.NextDouble() + 0.001;
                 organismsScoreDictionary.Add(organism.Id, organism.Score);
             }
