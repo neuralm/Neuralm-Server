@@ -19,7 +19,7 @@ namespace Neuralm.Client
     internal static class Program
     {
         private const int Port = 9999;
-        private const string Host = "localhost";
+        private const string Host = "Neuralm.net";
         private const int MessageCount = 1;
         private const int ClientCount = 1;
         private const int TotalMessages = MessageCount * ClientCount;
@@ -126,6 +126,7 @@ namespace Neuralm.Client
             Dictionary<Guid, double> organismsScoreDictionary = new Dictionary<Guid, double>();
             foreach (OrganismDto organism in getOrganismsResponse.Organisms)
             {
+                
                 organism.Score += Random.NextDouble() + 0.001;
                 organismsScoreDictionary.Add(organism.Id, organism.Score);
             }
