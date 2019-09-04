@@ -126,7 +126,6 @@ namespace Neuralm.Client
             Dictionary<Guid, double> organismsScoreDictionary = new Dictionary<Guid, double>();
             foreach (OrganismDto organism in getOrganismsResponse.Organisms)
             {
-                
                 organism.Score += Random.NextDouble() + 0.001;
                 organismsScoreDictionary.Add(organism.Id, organism.Score);
             }
