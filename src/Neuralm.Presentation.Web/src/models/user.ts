@@ -1,6 +1,6 @@
 /**
  * Represents the user class.
  */
-export default class User {
-
-};
+export default interface User {
+  token: string;
+}

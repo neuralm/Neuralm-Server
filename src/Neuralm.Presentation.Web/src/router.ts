@@ -5,7 +5,7 @@ import About from './views/About.vue';
 
 Vue.use(Router);
 
-export const router: Router = new Router({
+const router: Router = new Router({
   mode: 'history',
   routes: [
     { path: '/', name: 'home', component: Home },
@@ -29,3 +29,4 @@ router.beforeEach((to: Route, from: Route, next) => {
   next();
 });
 
+export default router;

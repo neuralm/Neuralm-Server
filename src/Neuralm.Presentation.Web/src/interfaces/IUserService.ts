@@ -15,12 +15,12 @@ export default interface IUserService {
      * @param password The password.
      * @returns The user object.
      */
-    login(username: String, password: String): User;
+    login(username: string, password: string): Promise<User>;
 
     /**
      * Register the user.
      * @param user The user.
      * @returns A value whether the user was succesfully registered.
      */
-    register(user: User): boolean;
+    register(user: User): Promise<boolean>;
 }
