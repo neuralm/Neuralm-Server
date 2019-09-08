@@ -17,8 +17,7 @@ export default class UserService implements IUserService {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     };
-
-    return fetch(`${process.env.API_URL}/users/authenticate`, requestOptions)
+    return fetch(`${process.env.VUE_APP_API_URL}/users/authenticate`, requestOptions)
     .then(this.handleResponse)
     .then((user: User) => {
       // login successful if there's a jwt token in the response
@@ -37,8 +36,7 @@ export default class UserService implements IUserService {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(user)
     };
-
-    return fetch(`${process.env.API_URL}/users/register`, requestOptions)
+    return fetch(`${process.env.VUE_APP_API_URL}/users/register`, requestOptions)
       .then(this.handleResponse);
   }
 
@@ -51,11 +49,9 @@ export default class UserService implements IUserService {
           this.logout();
           location.reload(true);
         }
-
         const error = (data && data.message) || response.statusText;
         return Promise.reject(error);
       }
-
       return data;
     });
   }

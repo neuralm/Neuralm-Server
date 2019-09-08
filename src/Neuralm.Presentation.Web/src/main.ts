@@ -1,19 +1,52 @@
 import Vue from 'vue';
 import App from './App.vue';
-import router from './router';
 import Vuex from 'vuex';
-import UserModule, { IUserModule } from '@/store/User.module';
+import Router, { Route } from 'vue-router';
+import UserModule, { IUserModule } from '@/modules/User.module';
 import UserService from './services/UserService';
+import IUserService from './interfaces/IUserService';
 
 Vue.config.productionTip = false;
 Vue.use(Vuex);
+Vue.use(Router);
 
-const userModule: IUserModule = new UserModule(new UserService());
+const userService: IUserService = new UserService();
+const userModule: IUserModule = new UserModule();
 
 const store = new Vuex.Store({
   modules: {
-    userModule
+    user: userModule
   }
+});
+
+/* tslint:disable */
+const loadView = (name: string): any => import(`./views/${name}.vue`);
+/* tslint:enable */
+
+const router: Router = new Router({
+  mode: 'history',
+  routes: [
+    { path: '/', name: 'Home', component: () => loadView('Home') },
+    { path: '/about', name: 'about', component: () => loadView('About') },
+    { path: '/login', name: 'login', component: () => loadView('Login'), props: { userService } },
+    { path: '/register', name: 'register', component: () => loadView('Register'), props: { userService } },
+
+    // otherwise redirect to home.
+    { path: '*', redirect: '/' }
+  ]
+});
+
+router.beforeEach((to: Route, from: Route, next) => {
+  // redirect to login page if not logged in and trying to access a restricted page.
+  const publicPages = ['/login', '/register'];
+  const authRequired = !publicPages.includes(to.path);
+  const loggedIn = localStorage.getItem('user');
+  if (authRequired && !loggedIn) {
+    console.log('redirected to login!');
+    return next('/login');
+  }
+  console.log(`Routed to ${to.name}`);
+  next();
 });
 
 new Vue({
