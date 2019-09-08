@@ -10,8 +10,8 @@ export function authHeader() {
     const userString: string =  localStorage.getItem('user')!;
     const user: User | null = JSON.parse(userString) as User;
 
-    if (user && user.token) {
-      return { Authorization: 'Bearer ' + user.token };
+    if (user && user.accessToken) {
+      return { Authorization: 'Bearer ' + user.accessToken };
     }
   }
   return { };

@@ -158,19 +158,19 @@ namespace Neuralm.Infrastructure.Networking
                     switch (obj)
                     {
                         case IResponse responseImplementer:
-                            _ = _messageProcessor.ProcessResponse(type, responseImplementer, this);
+                            _ = _messageProcessor.ProcessResponse(type, responseImplementer);
                             break;
                         case IRequest requestImplementer:
                             {
-                                IResponse response = await _messageProcessor.ProcessRequest(type, requestImplementer, this);
+                                IResponse response = await _messageProcessor.ProcessRequest(type, requestImplementer);
                                 await SendMessageAsync(response, CancellationToken.None);
                                 break;
                             }
                         case ICommand commandImplementer:
-                            _ = _messageProcessor.ProcessCommand(type, commandImplementer, this);
+                            _ = _messageProcessor.ProcessCommand(type, commandImplementer);
                             break;
                         case IEvent eventImplementer:
-                            _ = _messageProcessor.ProcessEvent(type, eventImplementer, this);
+                            _ = _messageProcessor.ProcessEvent(type, eventImplementer);
                             break;
                         default:
                             Console.WriteLine($"Received unsupported message of type: {type.FullName}");

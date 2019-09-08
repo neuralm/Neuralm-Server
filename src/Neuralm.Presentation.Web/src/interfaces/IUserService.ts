@@ -1,4 +1,7 @@
-import User from '@/models/user';
+import AuthenticateRequest from '@/messages/requests/AuthenticateRequest';
+import AuthenticateResponse from '@/messages/responses/AuthenticateResponse';
+import RegisterRequest from '@/messages/requests/RegisterRequest';
+import RegisterResponse from '@/messages/responses/RegisterResponse';
 
 /**
  * Represents the IUserService interface.
@@ -11,16 +14,15 @@ export default interface IUserService {
 
     /**
      * Logs in the user with the given user name and password.
-     * @param username The user name.
-     * @param password The password.
-     * @returns The user object.
+     * @param authenticateRequest The authenticate request.
+     * @returns The authenticate response.
      */
-    login(username: string, password: string): Promise<User>;
+    login(authenticateRequest: AuthenticateRequest): Promise<AuthenticateResponse>;
 
     /**
      * Register the user.
      * @param user The user.
      * @returns A value whether the user was succesfully registered.
      */
-    register(user: User): Promise<boolean>;
+    register(registerRequest: RegisterRequest): Promise<RegisterResponse>;
 }

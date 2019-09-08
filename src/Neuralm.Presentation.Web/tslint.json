@@ -10,6 +10,8 @@
   },
   "rules": {
     "no-console": false,
+    "no-empty-interface": false,
+    "no-bitwise": false,
     "indent": [true, "spaces", 2],
     "interface-name": false,
     "no-consecutive-blank-lines": false,

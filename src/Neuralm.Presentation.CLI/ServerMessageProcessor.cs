@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Neuralm.Application.Interfaces;
 using Neuralm.Application.Messages;
-using Neuralm.Infrastructure.Interfaces;
 using Neuralm.Mapping;
 using Neuralm.Utilities.Observer;
 
@@ -28,7 +27,7 @@ namespace Neuralm.Presentation.CLI
             _observers = new ConcurrentDictionary<Type, ObserverCollection>();
         }
 
-        /// <inheritdoc cref="IMessageProcessor.Subscribe"/>
+        /// <inheritdoc cref="IObservable.Subscribe(Type, IObserver)"/>
         public IDisposable Subscribe(Type type, IObserver observer)
         {
             if (_observers.ContainsKey(type))
@@ -39,8 +38,8 @@ namespace Neuralm.Presentation.CLI
             return new ObserverUnsubscriber(_observers[type], observer);
         }
 
-        /// <inheritdoc cref="IMessageProcessor.ProcessRequest"/>
-        public async Task<IResponse> ProcessRequest(Type type, IRequest request, INetworkConnector networkConnector)
+        /// <inheritdoc cref="IRequestProcessor.ProcessRequest(Type, IRequest)"/>
+        public async Task<IResponse> ProcessRequest(Type type, IRequest request)
         {
             object response;
             Console.WriteLine($"ProcessRequest: {request}");
@@ -57,8 +56,8 @@ namespace Neuralm.Presentation.CLI
             return (IResponse)response;
         }
 
-        /// <inheritdoc cref="IMessageProcessor.ProcessCommand"/>
-        public Task ProcessCommand(Type type, ICommand command, INetworkConnector networkConnector)
+        /// <inheritdoc cref="IMessageProcessor.ProcessCommand(Type, ICommand)"/>
+        public Task ProcessCommand(Type type, ICommand command)
         {
             return Task.Run(() =>
             {
@@ -71,8 +70,8 @@ namespace Neuralm.Presentation.CLI
             });
         }
 
-        /// <inheritdoc cref="IMessageProcessor.ProcessResponse"/>
-        public Task ProcessResponse(Type type, IResponse response, INetworkConnector networkConnector)
+        /// <inheritdoc cref="IMessageProcessor.ProcessResponse(Type, IResponse)"/>
+        public Task ProcessResponse(Type type, IResponse response)
         {
             return Task.Run(() =>
             {
@@ -85,8 +84,8 @@ namespace Neuralm.Presentation.CLI
             });
         }
 
-        /// <inheritdoc cref="IMessageProcessor.ProcessEvent"/>
-        public Task ProcessEvent(Type type, IEvent @event, INetworkConnector networkConnector)
+        /// <inheritdoc cref="IMessageProcessor.ProcessEvent(Type, IEvent)"/>
+        public Task ProcessEvent(Type type, IEvent @event)
         {
             return Task.Run(() =>
             {

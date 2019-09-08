@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Neuralm.Application.Configurations;
+﻿using Microsoft.Extensions.Configuration;
 using Neuralm.Application.Interfaces;
 using Neuralm.Application.Messages.Dtos;
 using Neuralm.Application.Messages.Requests;
 using Neuralm.Application.Messages.Responses;
 using Neuralm.Infrastructure.Interfaces;
-using Neuralm.Infrastructure.MessageSerializers;
-using Neuralm.Infrastructure.Networking;
 using Neuralm.Mapping;
 using Neuralm.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using static Neuralm.Utilities.ConsoleUtility;
 
 namespace Neuralm.Presentation.CLI
@@ -104,21 +96,23 @@ namespace Neuralm.Presentation.CLI
             foreach (TrainingRoomDto trainingRoomDto in getEnabledTrainingRoomsResponse.TrainingRooms)
                 Console.WriteLine($"TrainingRoom:\n\tId: {trainingRoomDto.Id}\n\tName: {trainingRoomDto.Name}\n\tOwner: {trainingRoomDto.Owner?.Username}");
 
-            ServerConfiguration serverConfiguration = _genericServiceProvider.GetService<IOptions<ServerConfiguration>>().Value;
+            MessageToServiceMapper messageToServiceMapper = _genericServiceProvider.GetService<MessageToServiceMapper>();
+            IMessageSerializer messageSerializer = _genericServiceProvider.GetService<IMessageSerializer>();
+            IMessageProcessor messageProcessor = new ServerMessageProcessor(messageToServiceMapper);
 
             List<Task> tasks = new List<Task>();
             Console.WriteLine("Would you like to start the ClientEndPoint? y/n");
             ConsoleKeyInfo keyInfo = await WaitForReadKey(cancellationToken);
             bool runClientEndPoint = keyInfo.KeyChar == 'y';
             if (runClientEndPoint)
-                tasks.Add(Task.Run(() => RunClientEndPoint(cancellationToken, serverConfiguration), cancellationToken));
+                tasks.Add(Task.Run(() => RunClientEndPoint(cancellationToken, messageProcessor, messageSerializer), cancellationToken));
             Console.WriteLine();
 
             Console.WriteLine("Would you like to start the RestEndPoint? y/n");
             keyInfo = await WaitForReadKey(cancellationToken);
             bool runRestEndPoint = keyInfo.KeyChar == 'y';
             if (runRestEndPoint)
-                tasks.Add(Task.Run(() => RunRestEndPoint(cancellationToken, serverConfiguration), cancellationToken));
+                tasks.Add(Task.Run(() => RunRestEndPoint(cancellationToken, messageProcessor, messageSerializer), cancellationToken));
             Console.WriteLine();
 
             Interlocked.Exchange(ref _canReadConsole, 1);
@@ -135,69 +129,26 @@ namespace Neuralm.Presentation.CLI
         /// Runs the REST endpoint.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <param name="serverConfiguration">The server configuration.</param>
+        /// <param name="requestProcessor">The request processor.</param>
+        /// <param name="messageSerializer">The message serializer.</param>
         /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
-        private async Task RunRestEndPoint(CancellationToken cancellationToken, ServerConfiguration serverConfiguration)
+        private async Task RunRestEndPoint(CancellationToken cancellationToken, IRequestProcessor requestProcessor, IMessageSerializer messageSerializer)
         {
-            HttpListener httpListener = new HttpListener();
-            httpListener.Prefixes.Add($"http://{serverConfiguration.Host}:{serverConfiguration.RestPort}/");
-            httpListener.Start();
-
-            Console.WriteLine($"Started listening for Rest calls on port: {serverConfiguration.RestPort}.");
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                HttpListenerContext context = await httpListener.GetContextAsync();
-                Console.WriteLine($"Accepted a new request: \n\tLocalEndPoint: {context.Request.LocalEndPoint}\n\tRemoteEndPoint: {context.Request.RemoteEndPoint}");
-                _ = Task.Run(async () =>
-                {
-                    using StreamReader reader = new StreamReader(context.Request.InputStream);
-                    HttpListenerRequest request = context.Request;
-                    
-                    string body = await reader.ReadToEndAsync();
-
-                    Console.WriteLine(request.RawUrl);
-                    Console.WriteLine(body);
-
-                    HttpListenerResponse response = context.Response;
-
-                    response.AddHeader("Access-Control-Allow-Origin", "*");
-                    response.AddHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-                    response.AddHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, Authorization");
-                    response.AddHeader("Access-Control-Max-Age", "86400");
-
-                    response.StatusCode = 200;
-
-                    byte[] bytes = Encoding.UTF8.GetBytes("true\n");
-                    response.ContentLength64 = bytes.Length;
-                    await response.OutputStream.WriteAsync(bytes, cancellationToken);
-                }, cancellationToken);
-            }
+            IRestEndPoint restEndPoint = _genericServiceProvider.GetService<IRestEndPoint>();
+            await restEndPoint.StartAsync(cancellationToken, requestProcessor, messageSerializer);
         }
 
         /// <summary>
         /// Runs the client endpoint.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <param name="serverConfiguration">The server configuration.</param>
+        /// <param name="messageProcessor">The message processor.</param>
+        /// <param name="messageSerializer">The message serializer.</param>
         /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
-        private async Task RunClientEndPoint(CancellationToken cancellationToken, ServerConfiguration serverConfiguration)
+        private async Task RunClientEndPoint(CancellationToken cancellationToken, IMessageProcessor messageProcessor, IMessageSerializer messageSerializer)
         {
-            TcpListener tcpListener = new TcpListener(IPAddress.Any, serverConfiguration.ClientPort);
-            tcpListener.Start();
-            Console.WriteLine($"Started listening for clients on port: {serverConfiguration.ClientPort}.");
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                TcpClient tcpClient = await tcpListener.AcceptTcpClientAsync();
-                Console.WriteLine($"Accepted a new connection: \n\tLocalEndPoint: {tcpClient.Client.LocalEndPoint}\n\tRemoteEndPoint: {tcpClient.Client.RemoteEndPoint}");
-                _ = Task.Run(async () =>
-                {
-                    IMessageProcessor messageProcessor = new ServerMessageProcessor(_genericServiceProvider.GetService<MessageToServiceMapper>());
-                    IMessageSerializer messageSerializer = new JsonMessageSerializer();
-                    SslTcpNetworkConnector networkConnector = new SslTcpNetworkConnector(messageSerializer, messageProcessor, tcpClient);
-                    await networkConnector.AuthenticateAsServer(serverConfiguration.Certificate, CancellationToken.None);
-                    networkConnector.Start();
-                }, cancellationToken);
-            }
+            IClientEndPoint clientEndPoint = _genericServiceProvider.GetService<IClientEndPoint>();
+            await clientEndPoint.StartAsync(cancellationToken, messageProcessor, messageSerializer);
         }
     }
 }

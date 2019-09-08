@@ -1,6 +1,11 @@
 // import authHeader from '../helpers/auth-header';
 import IUserService from '@/interfaces/IUserService';
 import User from '@/models/user';
+import axios, { AxiosResponse } from 'axios';
+import AuthenticateRequest from '@/messages/requests/AuthenticateRequest';
+import AuthenticateResponse from '@/messages/responses/AuthenticateResponse';
+import RegisterRequest from '@/messages/requests/RegisterRequest';
+import RegisterResponse from '@/messages/responses/RegisterResponse';
 
 /**
  * Represents the UserService class, an implementation of the IUserService interface.
@@ -11,48 +16,52 @@ export default class UserService implements IUserService {
     localStorage.removeItem('user');
   }
 
-  public login(username: string, password: string): Promise<User> {
-    const requestOptions = {
+  public async login(authenticateRequest: AuthenticateRequest): Promise<AuthenticateResponse> {
+    const body: string = JSON.stringify(authenticateRequest);
+    return axios({
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    };
-    return fetch(`${process.env.VUE_APP_API_URL}/users/authenticate`, requestOptions)
+      url: `${process.env.VUE_APP_API_URL}/users/authenticate`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: body
+    })
     .then(this.handleResponse)
-    .then((user: User) => {
+    .then((response: AuthenticateResponse) => {
       // login successful if there's a jwt token in the response
-      if (user.token) {
+      if (response.accessToken.length > 0) {
         // store user details and jwt token in local storage to keep user logged in between page refreshes
+        const user: User = { accessToken: response.accessToken, userId: response.userId };
         localStorage.setItem('user', JSON.stringify(user));
       }
-
-      return user;
+      return response;
     });
   }
 
-  public register(user: User): Promise<boolean> {
-    const requestOptions = {
+  public async register(registerRequest: RegisterRequest): Promise<RegisterResponse> {
+    const body: string = JSON.stringify(registerRequest);
+    return axios({
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(user)
-    };
-    return fetch(`${process.env.VUE_APP_API_URL}/users/register`, requestOptions)
-      .then(this.handleResponse);
+      url: `${process.env.VUE_APP_API_URL}/users/register`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: body
+    })
+    .then(this.handleResponse);
   }
 
-  private async handleResponse(response: Response) {
-    return response.text().then((text: string) => {
-      const data = text && JSON.parse(text);
-      if (!response.ok) {
-        if (response.status === 401) {
-          // auto logout if 401 response returned from api
-          this.logout();
-          location.reload(true);
-        }
-        const error = (data && data.message) || response.statusText;
-        return Promise.reject(error);
-      }
+  private async handleResponse(response: AxiosResponse) {
+    const data = response.data;
+    if (response.status === 200) {
       return data;
-    });
+    }
+    if (response.status === 401) {
+      // auto logout if 401 response returned from api
+      this.logout();
+      location.reload(true);
+    }
+    const error = (data && data) || response.statusText;
+    return Promise.reject(error);
   }
 }
