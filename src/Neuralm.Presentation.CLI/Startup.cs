@@ -16,6 +16,7 @@ using Neuralm.Application.Configurations;
 using Neuralm.Application.Interfaces;
 using Neuralm.Mapping;
 using Neuralm.Persistence.Contexts;
+using static Neuralm.Utilities.ConsoleUtility;
 using Console = System.Console;
 
 namespace Neuralm.Presentation.CLI
@@ -250,24 +251,6 @@ namespace Neuralm.Presentation.CLI
             Console.WriteLine($"Expiration date: {cert.GetExpirationDateString()}");
             Console.WriteLine($"Effective date: {cert.GetEffectiveDateString()}");
             Console.WriteLine("-----------------------------------");
-        }
-
-        /// <summary>
-        /// Waits for the <see cref="Console.ReadKey()"/> method to return on an available key.
-        /// </summary>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Returns an awaitable <see cref="Task"/> with type parameter <see cref="ConsoleKeyInfo"/>.</returns>
-        private static async Task<ConsoleKeyInfo> WaitForReadKey(CancellationToken cancellationToken)
-        {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                if (Console.KeyAvailable)
-                {
-                    return Console.ReadKey(false);
-                }
-                await Task.Delay(50, cancellationToken);
-            }
-            return new ConsoleKeyInfo((char)0, 0, false, false, false);
         }
     }
 }

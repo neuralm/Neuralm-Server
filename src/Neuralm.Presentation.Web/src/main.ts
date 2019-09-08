@@ -26,7 +26,7 @@ const loadView = (name: string): any => import(`./views/${name}.vue`);
 const router: Router = new Router({
   mode: 'history',
   routes: [
-    { path: '/', name: 'Home', component: () => loadView('Home') },
+    { path: '/', name: 'home', component: () => loadView('Home') },
     { path: '/about', name: 'about', component: () => loadView('About') },
     { path: '/login', name: 'login', component: () => loadView('Login'), props: { userService } },
     { path: '/register', name: 'register', component: () => loadView('Register'), props: { userService } },
