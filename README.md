@@ -28,7 +28,8 @@ Follow these steps to get your development environment set up:
           "Secret": "{YOUR SECRET KEY, MINIMUM LENGTH OF 17!}" 
         },
         "Server": {
-          "Port": 9999,
+          "ClientPort": 9999,
+		  "RestPort": 9998,
           "Host": "{COMMON NAME OR FULLY QUALLIFIED DOMAIN NAME}"
         },
         "NeuralmDb": {
