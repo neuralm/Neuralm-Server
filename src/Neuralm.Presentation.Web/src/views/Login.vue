@@ -49,14 +49,13 @@ export default class LoginView extends Vue {
     this.userService.login(new AuthenticateRequest(username, password))
       .then(
         (response: AuthenticateResponse) => {
-          console.log('LOGIN SUCCESS');
-          const user: User = { userId: response.UserId, accessToken: response.AccessToken };
-          this.$store.commit('user/loginSuccess', user);
-          this.$router.push('/');
+          if (response.Success) {
+            const user: User = { Username: username, UserId: response.UserId, AccessToken: response.AccessToken };
+            this.$store.commit('user/loginSuccess', user);
+            this.$router.push('/');
+          }
         },
         (error: Promise<any>) => {
-          console.log(error);
-          console.log('LOGIN FAILURE');
           this.$store.commit('user/loginFailure');
           this.$store.dispatch('alert/error', error, { root: true });
         }

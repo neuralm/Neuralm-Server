@@ -5,11 +5,14 @@ import Router, { Route } from 'vue-router';
 import UserModule, { IUserModule } from '@/modules/User.module';
 import UserService from './services/UserService';
 import IUserService from './interfaces/IUserService';
+import ITrainingRoomService from './interfaces/ITrainingRoomService';
+import TrainingRoomService from './services/TrainingRoomService';
 
 Vue.config.productionTip = false;
 Vue.use(Vuex);
 Vue.use(Router);
 
+const trainingRoomService: ITrainingRoomService = new TrainingRoomService();
 const userService: IUserService = new UserService();
 const userModule: IUserModule = new UserModule();
 
@@ -26,7 +29,7 @@ const loadView = (name: string): any => import(`./views/${name}.vue`);
 const router: Router = new Router({
   mode: 'history',
   routes: [
-    { path: '/', name: 'home', component: () => loadView('Home') },
+    { path: '/', name: 'home', component: () => loadView('Home'), props: { trainingRoomService } },
     { path: '/about', name: 'about', component: () => loadView('About') },
     { path: '/login', name: 'login', component: () => loadView('Login'), props: { userService } },
     { path: '/register', name: 'register', component: () => loadView('Register'), props: { userService } },

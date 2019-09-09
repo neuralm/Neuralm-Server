@@ -1,4 +1,4 @@
-import User from '@/models/user';
+import User from '@/models/User';
 import { Module, MutationTree, ActionTree } from 'vuex';
 
 export interface IUserState {

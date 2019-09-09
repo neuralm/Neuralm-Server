@@ -4,25 +4,25 @@ import RegisterRequest from '@/messages/requests/RegisterRequest';
 import RegisterResponse from '@/messages/responses/RegisterResponse';
 
 /**
- * Represents the IUserService interface.
+ * Represents the user service interface.
  */
 export default interface IUserService {
-    /**
-     * Logs out the user.
-     */
-    logout(): void;
+  /**
+   * Logs out the user.
+   */
+  logout(): void;
 
-    /**
-     * Logs in the user with the given user name and password.
-     * @param authenticateRequest The authenticate request.
-     * @returns The authenticate response.
-     */
-    login(authenticateRequest: AuthenticateRequest): Promise<AuthenticateResponse>;
+  /**
+   * Logs in the user with the given user name and password.
+   * @param authenticateRequest The authenticate request.
+   * @returns The authenticate response.
+   */
+  login(authenticateRequest: AuthenticateRequest): Promise<AuthenticateResponse>;
 
-    /**
-     * Register the user.
-     * @param user The user.
-     * @returns A value whether the user was succesfully registered.
-     */
-    register(registerRequest: RegisterRequest): Promise<RegisterResponse>;
+  /**
+   * Register the user.
+   * @param user The user.
+   * @returns A value whether the user was succesfully registered.
+   */
+  register(registerRequest: RegisterRequest): Promise<RegisterResponse>;
 }

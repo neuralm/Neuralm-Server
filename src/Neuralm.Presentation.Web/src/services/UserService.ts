@@ -1,16 +1,16 @@
-// import authHeader from '../helpers/auth-header';
 import IUserService from '@/interfaces/IUserService';
-import User from '@/models/user';
-import axios, { AxiosResponse } from 'axios';
+import User from '@/models/User';
+import axios from 'axios';
 import AuthenticateRequest from '@/messages/requests/AuthenticateRequest';
 import AuthenticateResponse from '@/messages/responses/AuthenticateResponse';
 import RegisterRequest from '@/messages/requests/RegisterRequest';
 import RegisterResponse from '@/messages/responses/RegisterResponse';
+import BaseRestService from './BaseRestService';
 
 /**
  * Represents the UserService class, an implementation of the IUserService interface.
  */
-export default class UserService implements IUserService {
+export default class UserService extends BaseRestService implements IUserService {
   public logout(): void {
     // remove user from local storage to log user out
     localStorage.removeItem('user');
@@ -31,7 +31,7 @@ export default class UserService implements IUserService {
       // login successful if there's a jwt token in the response
       if (response.AccessToken.length > 0) {
         // store user details and jwt token in local storage to keep user logged in between page refreshes
-        const user: User = { accessToken: response.AccessToken, userId: response.UserId };
+        const user: User = { Username: authenticateRequest.Username, AccessToken: response.AccessToken, UserId: response.UserId };
         localStorage.setItem('user', JSON.stringify(user));
       }
       return response;
@@ -49,19 +49,5 @@ export default class UserService implements IUserService {
       data: body
     })
     .then(this.handleResponse);
-  }
-
-  private async handleResponse(response: AxiosResponse) {
-    const data = response.data;
-    if (response.status === 200) {
-      return data;
-    }
-    if (response.status === 401) {
-      // auto logout if 401 response returned from api
-      this.logout();
-      location.reload(true);
-    }
-    const error = (data && data) || response.statusText;
-    return Promise.reject(error);
   }
 }
