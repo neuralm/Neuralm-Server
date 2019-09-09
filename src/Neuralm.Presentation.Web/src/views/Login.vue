@@ -26,7 +26,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import { mapState, mapActions } from 'vuex';
 import IUserService from '../interfaces/IUserService';
 import User from '../models/user';
-import AuthenticateRequest from '@/messages/requests/AuthenticateRequest';
+import AuthenticateRequest from '../messages/requests/AuthenticateRequest';
 import AuthenticateResponse from '../messages/responses/AuthenticateResponse';
 
 @Component({
@@ -50,11 +50,12 @@ export default class LoginView extends Vue {
       .then(
         (response: AuthenticateResponse) => {
           console.log('LOGIN SUCCESS');
-          const user: User = { userId: response.userId, accessToken: response.accessToken };
+          const user: User = { userId: response.UserId, accessToken: response.AccessToken };
           this.$store.commit('user/loginSuccess', user);
           this.$router.push('/');
         },
         (error: Promise<any>) => {
+          console.log(error);
           console.log('LOGIN FAILURE');
           this.$store.commit('user/loginFailure');
           this.$store.dispatch('alert/error', error, { root: true });

@@ -29,9 +29,9 @@ export default class UserService implements IUserService {
     .then(this.handleResponse)
     .then((response: AuthenticateResponse) => {
       // login successful if there's a jwt token in the response
-      if (response.accessToken.length > 0) {
+      if (response.AccessToken.length > 0) {
         // store user details and jwt token in local storage to keep user logged in between page refreshes
-        const user: User = { accessToken: response.accessToken, userId: response.userId };
+        const user: User = { accessToken: response.AccessToken, userId: response.UserId };
         localStorage.setItem('user', JSON.stringify(user));
       }
       return response;

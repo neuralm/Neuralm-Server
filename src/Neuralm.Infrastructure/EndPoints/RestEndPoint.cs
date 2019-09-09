@@ -87,12 +87,12 @@ namespace Neuralm.Infrastructure.EndPoints
                         response.Close();
                         return;
                     }
-
                     
                     // Read request
-                    IMemoryOwner<byte> memoryOwner = MemoryPool<byte>.Shared.Rent((int)request.ContentLength64);
-                    await request.InputStream.ReadAsync(memoryOwner.Memory, cancellationToken);
-                    IRequest requestBody = messageSerializer.Deserialize(memoryOwner.Memory, type) as IRequest;
+                    int contentLength = (int) request.ContentLength64;  
+                    byte[] memory = ArrayPool<byte>.Shared.Rent(contentLength);
+                    await request.InputStream.ReadAsync(memory, cancellationToken);
+                    IRequest requestBody = messageSerializer.Deserialize(memory.AsMemory(0, contentLength), type) as IRequest;
 
                     // Process request
                     IResponse responseBody = await requestProcessor.ProcessRequest(type, requestBody);
@@ -103,7 +103,7 @@ namespace Neuralm.Infrastructure.EndPoints
                     response.ContentLength64 = responseBytes.Length;
                     await response.OutputStream.WriteAsync(responseBytes, cancellationToken);
                     response.Close();
-                    memoryOwner.Dispose();
+                    ArrayPool<byte>.Shared.Return(memory);
                 }, cancellationToken);
             }
         }

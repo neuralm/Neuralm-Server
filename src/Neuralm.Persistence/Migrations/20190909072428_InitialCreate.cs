@@ -13,7 +13,7 @@ namespace Neuralm.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Code = table.Column<string>(maxLength: 32, nullable: false),
                     Name = table.Column<string>(maxLength: 64, nullable: false),
                     Position = table.Column<int>(nullable: true)
@@ -28,8 +28,8 @@ namespace Neuralm.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    Layer = table.Column<long>(nullable: false),
-                    NodeIdentifier = table.Column<long>(nullable: false),
+                    Layer = table.Column<uint>(nullable: false),
+                    NodeIdentifier = table.Column<uint>(nullable: false),
                     Discriminator = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
@@ -42,7 +42,7 @@ namespace Neuralm.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Code = table.Column<string>(maxLength: 32, nullable: false),
                     Name = table.Column<string>(maxLength: 64, nullable: false),
                     Position = table.Column<int>(nullable: true)
@@ -57,7 +57,7 @@ namespace Neuralm.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Code = table.Column<string>(maxLength: 32, nullable: false),
                     Name = table.Column<string>(maxLength: 64, nullable: false),
                     Position = table.Column<int>(nullable: true)
@@ -74,6 +74,7 @@ namespace Neuralm.Persistence.Migrations
                     Id = table.Column<Guid>(nullable: false),
                     Username = table.Column<string>(maxLength: 64, nullable: false),
                     TimestampCreated = table.Column<DateTime>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn)
                 },
                 constraints: table =>
                 {
@@ -139,8 +140,8 @@ namespace Neuralm.Persistence.Migrations
                     Id = table.Column<Guid>(nullable: false),
                     OwnerId = table.Column<Guid>(nullable: true),
                     Name = table.Column<string>(nullable: true),
-                    Generation = table.Column<long>(nullable: false),
-                    HighestInnovationNumber = table.Column<long>(nullable: false),
+                    Generation = table.Column<uint>(nullable: false),
+                    HighestInnovationNumber = table.Column<uint>(nullable: false),
                     Enabled = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
@@ -227,9 +228,9 @@ namespace Neuralm.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    OrganismCount = table.Column<long>(nullable: false),
-                    InputCount = table.Column<long>(nullable: false),
-                    OutputCount = table.Column<long>(nullable: false),
+                    OrganismCount = table.Column<uint>(nullable: false),
+                    InputCount = table.Column<uint>(nullable: false),
+                    OutputCount = table.Column<uint>(nullable: false),
                     SpeciesExcessGeneWeight = table.Column<double>(nullable: false),
                     SpeciesDisjointGeneWeight = table.Column<double>(nullable: false),
                     SpeciesAverageWeightDiffWeight = table.Column<double>(nullable: false),
@@ -284,7 +285,7 @@ namespace Neuralm.Persistence.Migrations
                     Id = table.Column<Guid>(nullable: false),
                     Score = table.Column<double>(nullable: false),
                     Name = table.Column<string>(nullable: true),
-                    Generation = table.Column<long>(nullable: false),
+                    Generation = table.Column<uint>(nullable: false),
                     Leased = table.Column<bool>(nullable: false),
                     Evaluated = table.Column<bool>(nullable: false),
                     SpeciesId = table.Column<Guid>(nullable: true)
@@ -327,9 +328,9 @@ namespace Neuralm.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(nullable: false),
                     OrganismId = table.Column<Guid>(nullable: false),
-                    InNodeIdentifier = table.Column<long>(nullable: false),
-                    OutNodeIdentifier = table.Column<long>(nullable: false),
-                    InnovationNumber = table.Column<long>(nullable: false),
+                    InNodeIdentifier = table.Column<uint>(nullable: false),
+                    OutNodeIdentifier = table.Column<uint>(nullable: false),
+                    InnovationNumber = table.Column<uint>(nullable: false),
                     Weight = table.Column<double>(nullable: false),
                     Enabled = table.Column<bool>(nullable: false)
                 },

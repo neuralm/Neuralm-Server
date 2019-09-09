@@ -4,14 +4,14 @@ import Guid from '@/helpers/Guid';
  * Represents the Request class.
  */
 export default class Request {
-  public id: Guid;
-  public dateTime: Date;
+  public Id: string;
+  public DateTime: Date;
 
   /**
    *  Initializes the Request class.
    */
   constructor() {
-    this.id = Guid.newGuid();
-    this.dateTime = new Date();
+    this.Id = Guid.newGuid().toString();
+    this.DateTime = new Date();
   }
 }

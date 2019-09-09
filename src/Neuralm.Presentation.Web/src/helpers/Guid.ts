@@ -36,7 +36,7 @@ export default class Guid {
 
   /**
    * Creates an empty guid.
-   * @returns an empty guid. 
+   * @returns an empty guid.
    */
   public static get empty(): string {
     return '00000000-0000-0000-0000-000000000000';
@@ -44,7 +44,7 @@ export default class Guid {
 
   /**
    * Creates an empty guid.
-   * @returns an empty guid. 
+   * @returns an empty guid.
    */
   public get empty(): string {
     return Guid.empty;
