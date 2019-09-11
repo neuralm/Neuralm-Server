@@ -16,7 +16,7 @@ export default class UserService extends BaseRestService implements IUserService
     localStorage.removeItem('user');
   }
 
-  public async login(authenticateRequest: AuthenticateRequest): Promise<AuthenticateResponse> {
+  public login(authenticateRequest: AuthenticateRequest): Promise<AuthenticateResponse> {
     const body: string = JSON.stringify(authenticateRequest);
     return axios({
       method: 'POST',
@@ -29,16 +29,16 @@ export default class UserService extends BaseRestService implements IUserService
     .then(this.handleResponse)
     .then((response: AuthenticateResponse) => {
       // login successful if there's a jwt token in the response
-      if (response.AccessToken.length > 0) {
+      if (response.accessToken.length > 0) {
         // store user details and jwt token in local storage to keep user logged in between page refreshes
-        const user: User = { Username: authenticateRequest.Username, AccessToken: response.AccessToken, UserId: response.UserId };
+        const user: User = { username: authenticateRequest.username, accessToken: response.accessToken, userId: response.userId };
         localStorage.setItem('user', JSON.stringify(user));
       }
       return response;
     });
   }
 
-  public async register(registerRequest: RegisterRequest): Promise<RegisterResponse> {
+  public register(registerRequest: RegisterRequest): Promise<RegisterResponse> {
     const body: string = JSON.stringify(registerRequest);
     return axios({
       method: 'POST',

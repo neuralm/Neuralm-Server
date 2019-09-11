@@ -9,7 +9,7 @@ import axios from 'axios';
  * Represents the training room service class.
  */
 export default class TrainingRoomService extends BaseRestService implements ITrainingRoomService {
-  public async getEnabledTrainingRooms(getEnabledTrainingRoomsRequest: GetEnabledTrainingRoomsRequest): Promise<GetEnabledTrainingRoomsResponse> {
+  public getEnabledTrainingRooms(getEnabledTrainingRoomsRequest: GetEnabledTrainingRoomsRequest): Promise<GetEnabledTrainingRoomsResponse> {
     const body: string = JSON.stringify(getEnabledTrainingRoomsRequest);
     return axios({
       method: 'POST',

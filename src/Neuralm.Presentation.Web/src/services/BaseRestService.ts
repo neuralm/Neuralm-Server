@@ -9,7 +9,7 @@ export default class BaseRestService {
    * @param response The axios response.
    */
   protected async handleResponse(response: AxiosResponse) {
-    const data = response.data;
+    const data = BaseRestService.toCamelCase(response.data);
     if (response.status === 200) {
       return data;
     }
@@ -20,5 +20,29 @@ export default class BaseRestService {
     }
     const error = (data && data) || response.statusText;
     return Promise.reject(error);
+  }
+
+  private static toCamelCase(jsonObject: any): any {
+    if (jsonObject instanceof Array) {
+      return jsonObject.map((value: any) => {
+        if (typeof value === 'object') {
+          value = BaseRestService.toCamelCase(value);
+        }
+        return value;
+      });
+    } else {
+      const newObject: any = {};
+      for (const origKey in jsonObject) {
+        if (jsonObject.hasOwnProperty(origKey)) {
+          const newKey = (origKey.charAt(0).toLowerCase() + origKey.slice(1) || origKey).toString();
+          let value = jsonObject[origKey];
+          if (value instanceof Array || (value !== null && value.constructor === Object)) {
+            value = BaseRestService.toCamelCase(value);
+          }
+          newObject[newKey] = value;
+        }
+      }
+      return newObject;
+    }
   }
 }

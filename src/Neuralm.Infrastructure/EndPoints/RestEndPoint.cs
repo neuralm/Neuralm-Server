@@ -1,4 +1,11 @@
-﻿using System;
+﻿using Castle.Core.Internal;
+using Microsoft.Extensions.Options;
+using Neuralm.Application.Configurations;
+using Neuralm.Application.Interfaces;
+using Neuralm.Application.Messages;
+using Neuralm.Application.Messages.Requests;
+using Neuralm.Infrastructure.Interfaces;
+using System;
 using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,13 +14,6 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Castle.Core.Internal;
-using Microsoft.Extensions.Options;
-using Neuralm.Application.Configurations;
-using Neuralm.Application.Interfaces;
-using Neuralm.Application.Messages;
-using Neuralm.Application.Messages.Requests;
-using Neuralm.Infrastructure.Interfaces;
 
 namespace Neuralm.Infrastructure.EndPoints
 {
@@ -165,5 +165,4 @@ namespace Neuralm.Infrastructure.EndPoints
             return new KeyValuePair<string, Route>(route.Path, route);
         }
     }
-
 }

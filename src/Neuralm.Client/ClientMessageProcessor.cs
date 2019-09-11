@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Threading.Tasks;
-using Neuralm.Application.Interfaces;
+﻿using Neuralm.Application.Interfaces;
 using Neuralm.Application.Messages;
 using Neuralm.Utilities.Observer;
+using System;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace Neuralm.Client
 {
