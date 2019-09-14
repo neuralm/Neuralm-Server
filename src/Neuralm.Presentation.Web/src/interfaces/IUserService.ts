@@ -8,11 +8,6 @@ import RegisterResponse from '@/messages/responses/RegisterResponse';
  */
 export default interface IUserService {
   /**
-   * Logs out the user.
-   */
-  logout(): void;
-
-  /**
    * Logs in the user with the given user name and password.
    * @param authenticateRequest The authenticate request.
    * @returns The authenticate response.

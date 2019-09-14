@@ -19,7 +19,6 @@ export default class TrainingRoomService extends BaseRestService implements ITra
         ...authHeader()
       },
       data: body
-    })
-    .then(this.handleResponse);
+    }).then(this.handleResponse);
   }
 }

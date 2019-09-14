@@ -1,7 +1,6 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <!-- <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/> -->
+  <div>
+    <img alt="Vue logo" src="../assets/logo.png" />
     <button v-on:click="loadTrainingRooms()">Load training rooms</button>
   </div>
 </template>
@@ -13,11 +12,8 @@ import ITrainingRoomService from '../interfaces/ITrainingRoomService';
 import GetEnabledTrainingRoomsRequest from '../messages/requests/GetEnabledTrainingRoomsRequest';
 import GetEnabledTrainingRoomsResponse from '../messages/responses/GetEnabledTrainingRoomsResponse';
 
-
 @Component({
-  components: {
-    HelloWorld,
-  },
+  components: {},
   async mounted(): Promise<void> {
     return await (this as Home).loadTrainingRooms();
   }

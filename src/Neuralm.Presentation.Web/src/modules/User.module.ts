@@ -3,8 +3,8 @@ import { Module, MutationTree, ActionTree } from 'vuex';
 
 export interface IUserState {
   status: {
-    loggedIn: boolean,
-    registering: boolean
+    loggedIn: boolean;
+    registering: boolean;
   };
   user: User | null;
 }
@@ -34,7 +34,7 @@ export default class UserModule implements IUserModule, Module<IUserState, User>
   public mutations?: IUserMutations;
 
   /**
-   * Initializes an instance of the UserStore.
+   * Initializes an instance of the AppModule.
    */
   public constructor() {
     this.namespaced = true;
@@ -53,7 +53,7 @@ export default class UserModule implements IUserModule, Module<IUserState, User>
   private getMutations(): IUserMutations {
     const mutations: IUserMutations = {
       loginRequest(state: IUserState, user: User) {
-        state.status = { loggedIn: true, registering: false };
+        state.status = { loggedIn: false, registering: false };
         state.user = user;
       },
       loginSuccess(state: IUserState, user: User) {
@@ -67,6 +67,7 @@ export default class UserModule implements IUserModule, Module<IUserState, User>
       logout(state: IUserState) {
         state.status = { loggedIn: false, registering: false };
         state.user = null;
+        localStorage.removeItem('user');
       },
       registerRequest(state: IUserState) {
         state.status = { loggedIn: false, registering: true };

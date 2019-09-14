@@ -1,12 +1,16 @@
 import Vue from 'vue';
 import App from './App.vue';
 import Vuex from 'vuex';
+import vuetify from '@/plugins/vuetify';
 import Router, { Route } from 'vue-router';
 import UserModule, { IUserModule } from '@/modules/User.module';
 import UserService from './services/UserService';
 import IUserService from './interfaces/IUserService';
 import ITrainingRoomService from './interfaces/ITrainingRoomService';
 import TrainingRoomService from './services/TrainingRoomService';
+import AppModule, { IAppModule } from './modules/App.module';
+import AlertModule, { IAlertModule } from './modules/Alert.module';
+import 'typeface-nunito';
 
 Vue.config.productionTip = false;
 Vue.use(Vuex);
@@ -15,10 +19,14 @@ Vue.use(Router);
 const trainingRoomService: ITrainingRoomService = new TrainingRoomService();
 const userService: IUserService = new UserService();
 const userModule: IUserModule = new UserModule();
+const alertModule: IAlertModule = new AlertModule();
+const appModule: IAppModule = new AppModule();
 
 const store = new Vuex.Store({
   modules: {
-    user: userModule
+    user: userModule,
+    app: appModule,
+    alert: alertModule
   }
 });
 
@@ -30,6 +38,7 @@ const router: Router = new Router({
   mode: 'history',
   routes: [
     { path: '/', name: 'home', component: () => loadView('Home'), props: { trainingRoomService } },
+    { path: '/dashboard', name: 'dashboard', component: () => loadView('Dashboard') },
     { path: '/about', name: 'about', component: () => loadView('About') },
     { path: '/login', name: 'login', component: () => loadView('Login'), props: { userService } },
     { path: '/register', name: 'register', component: () => loadView('Register'), props: { userService } },
@@ -53,7 +62,8 @@ router.beforeEach((to: Route, from: Route, next) => {
 });
 
 new Vue({
+  vuetify,
   router,
   store,
-  render: (h) => h(App),
-}).$mount('#app');
+  render: (h: any) => h(App)
+} as any).$mount('#app');

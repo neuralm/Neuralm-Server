@@ -1,23 +1,27 @@
 <template>
-  <div>
-    <h2>Login</h2>
-    <form @submit.prevent="handleSubmit">
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" v-model="username" name="username" class="form-control" :class="{ 'is-invalid': submitted && !username }" />
-        <div v-show="submitted && !username" class="invalid-feedback">Username is required</div>
-      </div>
-      <div class="form-group">
-        <label htmlFor="password">Password</label>
-        <input type="password" v-model="password" name="password" class="form-control" :class="{ 'is-invalid': submitted && !password }" />
-        <div v-show="submitted && !password" class="invalid-feedback">Password is required</div>
-      </div>
-      <div class="form-group">
-        <button class="btn btn-primary" :disabled="status.loggingIn">Login</button>
-        <img v-show="status.loggingIn" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
-        <router-link to="/register" class="btn btn-link">Register</router-link>
-      </div>
-    </form>
+  <div id="login">
+    <div id="description">
+      <h1>Login</h1>
+      <p>By logging in you agree to the ridiculously long terms that you didn't bother to read.</p>
+    </div>
+    <div id="form">
+      <form @submit.prevent="handleSubmit">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" v-model="username" name="username" class="form-control" :class="{ 'is-invalid': submitted && !username }" autocomplete="off" />
+          <div v-show="submitted && !username" class="invalid-feedback">Username is required</div>
+        </div>
+        <div class="form-group">
+          <label htmlFor="password">Password</label>
+          <input type="password" v-model="password" name="password" class="form-control" :class="{ 'is-invalid': submitted && !password }" />
+          <div v-show="submitted && !password" class="invalid-feedback">Password is required</div>
+        </div>
+        <div class="form-group">
+          <button class="btn btn-primary" :disabled="!username && !password">Login</button>
+          <router-link to="/register" class="btn btn-link">Register</router-link>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -36,9 +40,7 @@ import AuthenticateResponse from '../messages/responses/AuthenticateResponse';
     submitted: false
   }),
   computed: {
-    ...mapState('user', {
-      status: 'status'
-    })
+    ...mapState('user', ['status'])
   }
 })
 export default class LoginView extends Vue {
@@ -46,25 +48,23 @@ export default class LoginView extends Vue {
 
   public login(username: string, password: string): void {
     this.$store.commit('user/loginRequest', { username });
-    this.userService.login(new AuthenticateRequest(username, password))
-      .then(
-        (response: AuthenticateResponse) => {
-          if (response.success) {
-            const user: User = { username, userId: response.userId, accessToken: response.accessToken };
-            this.$store.commit('user/loginSuccess', user);
-            this.$router.push('/');
-          }
-        },
-        (error: Promise<any>) => {
+    this.userService.login(new AuthenticateRequest(username, password)).then(
+      (response: AuthenticateResponse) => {
+        if (response.success) {
+          const user: User = { username, userId: response.userId, accessToken: response.accessToken };
+          this.$store.commit('user/loginSuccess', user);
+          this.$store.commit('alert/showSuccessAlert', 'Successfully logged in!');
+          this.$router.push('/');
+        } else {
           this.$store.commit('user/loginFailure');
-          this.$store.dispatch('alert/error', error, { root: true });
+          this.$store.commit('alert/showErrorAlert', 'Failed to logged in!');
         }
-      );
-  }
-
-  public logout() {
-    this.userService.logout();
-    this.$store.commit('user/logout');
+      },
+      (error: Promise<any>) => {
+        this.$store.commit('user/loginFailure');
+        this.$store.commit('alert/showErrorAlert', error);
+      }
+    );
   }
 
   public handleSubmit(e: Event): void {
@@ -76,3 +76,121 @@ export default class LoginView extends Vue {
   }
 }
 </script>
+<style scoped>
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+div#app {
+  width: 100%;
+  height: 100%;
+}
+
+div#app div#login {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+div#app div#login div#description {
+  background-color: #ffffff;
+  width: 280px;
+  padding: 35px;
+}
+
+div#app div#login div#description h1,
+div#app div#login div#description p {
+  margin: 0;
+}
+
+div#app div#login div#description p {
+  font-size: 0.8em;
+  color: #95a5a6;
+  margin-top: 10px;
+}
+
+div#app div#login div#form {
+  background-color: #34495e;
+  border-radius: 5px;
+  box-shadow: 0px 0px 30px 0px #666;
+  color: #ecf0f1;
+  width: 260px;
+  padding: 35px;
+}
+
+div#app div#login div#form label,
+div#app div#login div#form input {
+  outline: none;
+  width: 100%;
+}
+
+div#app div#login div#form label {
+  color: #95a5a6;
+  font-size: 0.8em;
+}
+
+div#app div#login div#form input {
+  background-color: transparent;
+  border: none;
+  color: #ecf0f1;
+  font-size: 1em;
+  margin-bottom: 20px;
+}
+
+div#app div#login div#form ::placeholder {
+  color: #ecf0f1;
+  opacity: 1;
+}
+
+div#app div#login div#form button {
+  background-color: #e2e2e5;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  padding: 10px;
+  transition: background-color 0.2s ease-in-out;
+  width: 100%;
+}
+
+div#app div#login div#form button:hover {
+  background-color: #eeeeee;
+}
+
+@media screen and (max-width: 600px) {
+  div#app div#login {
+    align-items: unset;
+    background-color: unset;
+    display: unset;
+    justify-content: unset;
+  }
+
+  div#app div#login div#description {
+    margin: 0 auto;
+    max-width: 350px;
+    width: 100%;
+  }
+
+  div#app div#login div#form {
+    border-radius: unset;
+    box-shadow: unset;
+    width: 100%;
+  }
+
+  div#app div#login div#form form {
+    margin: 0 auto;
+    max-width: 280px;
+    width: 100%;
+  }
+}
+</style>
