@@ -37,9 +37,7 @@ import RegisterResponse from '../messages/responses/RegisterResponse';
     submitted: false
   }),
   computed: {
-    ...mapState('user', {
-      status: 'status'
-    })
+    ...mapState('user', ['status'])
   }
 })
 export default class RegisterView extends Vue {
@@ -49,17 +47,20 @@ export default class RegisterView extends Vue {
     this.$store.commit('user/registerRequest');
     this.userService.register(new RegisterRequest(username, password)).then(
       (response: RegisterResponse) => {
-        console.log('REGISTER SUCCESS');
         this.$store.commit('user/registerSuccess');
-        this.$router.push('/login');
-        setTimeout(() => {
-          this.$store.dispatch('alert/success', 'Registration successful', { root: true });
-        });
+        if (response.success) {
+          this.$snotify.success('Registration successful!');
+          this.$router.push('/login');
+        } else {
+          this.$store.commit('user/registerFailure');
+          this.$snotify.success('Registration failed!');
+        }
       },
-      (error: Promise<any>) => {
-        console.log('REGISTER FAILURE');
+      (error: Promise<RegisterResponse>) => {
         this.$store.commit('user/registerFailure');
-        this.$store.dispatch('alert/error', error, { root: true });
+        error.then((value: RegisterResponse) => {
+          this.$snotify.error(value.message);
+        });
       }
     );
   }

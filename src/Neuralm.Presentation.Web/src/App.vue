@@ -1,7 +1,7 @@
 <template>
   <v-app>
+    <vue-snotify></vue-snotify>
     <core-app-bar />
-    <core-alert />
     <core-drawer />
     <core-view />
     <core-footer />
@@ -16,7 +16,6 @@ const loadCoreComponent = (name: string): any => import(`./components/core/${nam
 
 @Component({
   components: {
-    coreAlert: () => loadCoreComponent('CoreAlert'),
     coreAppBar: () => loadCoreComponent('CoreAppBar'),
     coreDrawer: () => loadCoreComponent('CoreDrawer'),
     coreView: () => loadCoreComponent('CoreView'),
