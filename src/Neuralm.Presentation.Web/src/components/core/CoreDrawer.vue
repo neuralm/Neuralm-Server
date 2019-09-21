@@ -53,8 +53,13 @@ import Component from 'vue-class-component';
     links: [
       {
         to: '/',
-        icon: 'mdi-view-dashboard',
+        icon: 'mdi-home',
         text: 'Home'
+      },
+      {
+        to: '/dashboard',
+        icon: 'mdi-view-dashboard',
+        text: 'Dashboard'
       },
       {
         to: '/about',
