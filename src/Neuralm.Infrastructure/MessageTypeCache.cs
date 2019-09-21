@@ -9,7 +9,7 @@ namespace Neuralm.Infrastructure
     /// <summary>
     /// Represents the <see cref="MessageTypeCache"/> class.
     /// </summary>
-    internal static class MessageTypeCache
+    public static class MessageTypeCache
     {
         private static readonly ConcurrentDictionary<string, Type> TypeCache = new ConcurrentDictionary<string, Type>();
         private static int _isLoaded;

@@ -17,6 +17,9 @@ using Neuralm.Persistence.Infrastructure;
 using Neuralm.Persistence.Repositories;
 using System;
 using System.Text;
+using Neuralm.Infrastructure.EndPoints;
+using Neuralm.Infrastructure.Interfaces;
+using Neuralm.Infrastructure.MessageSerializers;
 
 namespace Neuralm.Mapping
 {
@@ -96,6 +99,12 @@ namespace Neuralm.Mapping
             serviceCollection.AddTransient<ITrainingRoomService, TrainingRoomService>();
             #endregion Services
 
+            #region EndPoints
+            serviceCollection.AddSingleton<IClientEndPoint, ClientEndPoint>();
+            serviceCollection.AddSingleton<IRestEndPoint, RestEndPoint>();
+            #endregion EndPoints
+
+            serviceCollection.AddSingleton<IMessageSerializer, JsonMessageSerializer>();
             serviceCollection.AddSingleton(p => new MessageToServiceMapper(p));
 
             return serviceCollection;

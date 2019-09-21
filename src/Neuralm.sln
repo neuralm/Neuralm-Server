@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Infrastructure.Inte
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Infrastructure.MessageSerializers", "Neuralm.Infrastructure.MessageSerializers\Neuralm.Infrastructure.MessageSerializers.csproj", "{4C816069-C806-4597-B690-86572A8BC8BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Client", "Neuralm.Client\Neuralm.Client.csproj", "{C724684C-F628-4A20-84F4-76B805CB6AB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Client", "Neuralm.Client\Neuralm.Client.csproj", "{C724684C-F628-4A20-84F4-76B805CB6AB2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

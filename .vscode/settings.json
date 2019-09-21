@@ -1,0 +1,6 @@
+{
+    "prettier.disableLanguages": [],
+    "prettier.jsxSingleQuote": true,
+    "prettier.printWidth": 200,
+    "prettier.singleQuote": true
+}

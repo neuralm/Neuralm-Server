@@ -66,7 +66,8 @@ namespace Neuralm.Application.Services
 
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, authenticateRequest.Username)
+                new Claim(ClaimTypes.Name, authenticateRequest.Username),
+                new Claim("Authorized", "Logged in")
             };
             User user = await _userRepository.FindSingleOrDefaultAsync(usr => string.Equals(usr.Username, authenticateRequest.Username, StringComparison.OrdinalIgnoreCase));
             string accessToken = _accessTokenService.GenerateAccessToken(claims, DateTime.Now.AddHours(2));

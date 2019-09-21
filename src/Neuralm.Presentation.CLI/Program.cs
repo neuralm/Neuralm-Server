@@ -1,20 +1,16 @@
-﻿using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Neuralm.Application.Configurations;
+﻿using Microsoft.Extensions.Configuration;
 using Neuralm.Application.Interfaces;
 using Neuralm.Application.Messages.Dtos;
 using Neuralm.Application.Messages.Requests;
 using Neuralm.Application.Messages.Responses;
 using Neuralm.Infrastructure.Interfaces;
-using Neuralm.Infrastructure.MessageSerializers;
-using Neuralm.Infrastructure.Networking;
 using Neuralm.Mapping;
 using Neuralm.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using static Neuralm.Utilities.ConsoleUtility;
 
 namespace Neuralm.Presentation.CLI
 {
@@ -94,32 +90,65 @@ namespace Neuralm.Presentation.CLI
             cancellationToken.ThrowIfCancellationRequested();
             Console.WriteLine("Finished initializing!\n");
 
-            Interlocked.Exchange(ref _canReadConsole, 1);
-            Interlocked.Exchange(ref _canExit, 1);
-
             _genericServiceProvider = startup.GetGenericServiceProvider();
             GetEnabledTrainingRoomsResponse getEnabledTrainingRoomsResponse = await _genericServiceProvider.GetService<ITrainingRoomService>()
                 .GetEnabledTrainingRoomsAsync(new GetEnabledTrainingRoomsRequest());
             foreach (TrainingRoomDto trainingRoomDto in getEnabledTrainingRoomsResponse.TrainingRooms)
                 Console.WriteLine($"TrainingRoom:\n\tId: {trainingRoomDto.Id}\n\tName: {trainingRoomDto.Name}\n\tOwner: {trainingRoomDto.Owner?.Username}");
 
-            ServerConfiguration serverConfiguration = _genericServiceProvider.GetService<IOptions<ServerConfiguration>>().Value;
-            TcpListener tcpListener = new TcpListener(IPAddress.Any, serverConfiguration.Port);
-            tcpListener.Start();
-            Console.WriteLine($"Started listening for clients on port: {serverConfiguration.Port}.");
-            while (!cancellationToken.IsCancellationRequested)
+            MessageToServiceMapper messageToServiceMapper = _genericServiceProvider.GetService<MessageToServiceMapper>();
+            IMessageSerializer messageSerializer = _genericServiceProvider.GetService<IMessageSerializer>();
+            IMessageProcessor messageProcessor = new ServerMessageProcessor(messageToServiceMapper);
+
+            List<Task> tasks = new List<Task>();
+            Console.WriteLine("Would you like to start the ClientEndPoint? y/n");
+            ConsoleKeyInfo keyInfo = await WaitForReadKey(cancellationToken);
+            bool runClientEndPoint = keyInfo.KeyChar == 'y';
+            if (runClientEndPoint)
+                tasks.Add(Task.Run(() => RunClientEndPoint(cancellationToken, messageProcessor, messageSerializer), cancellationToken));
+            Console.WriteLine();
+
+            Console.WriteLine("Would you like to start the RestEndPoint? y/n");
+            keyInfo = await WaitForReadKey(cancellationToken);
+            bool runRestEndPoint = keyInfo.KeyChar == 'y';
+            if (runRestEndPoint)
+                tasks.Add(Task.Run(() => RunRestEndPoint(cancellationToken, messageProcessor, messageSerializer), cancellationToken));
+            Console.WriteLine();
+
+            Interlocked.Exchange(ref _canReadConsole, 1);
+            Interlocked.Exchange(ref _canExit, 1);
+
+            await Task.WhenAll(tasks).ContinueWith(task =>
             {
-                TcpClient tcpClient = await tcpListener.AcceptTcpClientAsync();
-                Console.WriteLine($"Accepted a new connection: \n\tLocalEndPoint: {tcpClient.Client.LocalEndPoint}\n\tRemoteEndPoint: {tcpClient.Client.RemoteEndPoint}");
-                _ = Task.Run(async () =>
-                {
-                    IMessageProcessor messageProcessor = new ServerMessageProcessor(_genericServiceProvider.GetService<MessageToServiceMapper>());
-                    IMessageSerializer messageSerializer = new JsonMessageSerializer();
-                    SslTcpNetworkConnector networkConnector = new SslTcpNetworkConnector(messageSerializer, messageProcessor, tcpClient);
-                    await networkConnector.AuthenticateAsServer(serverConfiguration.Certificate, CancellationToken.None);
-                    networkConnector.Start();
-                }, cancellationToken);
-            }
+                if (task.IsCanceled)
+                    CancellationTokenSource.Cancel();
+            }, cancellationToken);
+        }
+
+        /// <summary>
+        /// Runs the REST endpoint.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="requestProcessor">The request processor.</param>
+        /// <param name="messageSerializer">The message serializer.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
+        private async Task RunRestEndPoint(CancellationToken cancellationToken, IRequestProcessor requestProcessor, IMessageSerializer messageSerializer)
+        {
+            IRestEndPoint restEndPoint = _genericServiceProvider.GetService<IRestEndPoint>();
+            await restEndPoint.StartAsync(cancellationToken, requestProcessor, messageSerializer);
+        }
+
+        /// <summary>
+        /// Runs the client endpoint.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="messageProcessor">The message processor.</param>
+        /// <param name="messageSerializer">The message serializer.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
+        private async Task RunClientEndPoint(CancellationToken cancellationToken, IMessageProcessor messageProcessor, IMessageSerializer messageSerializer)
+        {
+            IClientEndPoint clientEndPoint = _genericServiceProvider.GetService<IClientEndPoint>();
+            await clientEndPoint.StartAsync(cancellationToken, messageProcessor, messageSerializer);
         }
     }
 }

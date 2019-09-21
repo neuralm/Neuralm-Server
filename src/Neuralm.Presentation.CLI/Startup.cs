@@ -1,21 +1,22 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Neuralm.Application.Configurations;
+using Neuralm.Application.Interfaces;
+using Neuralm.Mapping;
+using Neuralm.Persistence.Contexts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
-using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Neuralm.Application.Configurations;
-using Neuralm.Application.Interfaces;
-using Neuralm.Mapping;
-using Neuralm.Persistence.Contexts;
+using static Neuralm.Utilities.ConsoleUtility;
 using Console = System.Console;
 
 namespace Neuralm.Presentation.CLI
@@ -29,6 +30,11 @@ namespace Neuralm.Presentation.CLI
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly CancellationTokenSource _cancellationTokenSourceTimed;
 
+        /// <summary>
+        /// Initializes an instance of the <see cref="Startup"/> class.
+        /// </summary>
+        /// <param name="cancellationTokenSource">The cancellation token source.</param>
+        /// <param name="timeoutInSeconds">The time out in seconds.</param>
         public Startup(CancellationTokenSource cancellationTokenSource, uint timeoutInSeconds)
         {
             _cancellationTokenSource = cancellationTokenSource;
@@ -250,24 +256,6 @@ namespace Neuralm.Presentation.CLI
             Console.WriteLine($"Expiration date: {cert.GetExpirationDateString()}");
             Console.WriteLine($"Effective date: {cert.GetEffectiveDateString()}");
             Console.WriteLine("-----------------------------------");
-        }
-
-        /// <summary>
-        /// Waits for the <see cref="Console.ReadKey()"/> method to return on an available key.
-        /// </summary>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Returns an awaitable <see cref="Task"/> with type parameter <see cref="ConsoleKeyInfo"/>.</returns>
-        private static async Task<ConsoleKeyInfo> WaitForReadKey(CancellationToken cancellationToken)
-        {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                if (Console.KeyAvailable)
-                {
-                    return Console.ReadKey(false);
-                }
-                await Task.Delay(50, cancellationToken);
-            }
-            return new ConsoleKeyInfo((char)0, 0, false, false, false);
         }
     }
 }

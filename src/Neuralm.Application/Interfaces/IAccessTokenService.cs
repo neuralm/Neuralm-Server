@@ -21,7 +21,8 @@ namespace Neuralm.Application.Interfaces
         /// Validates an access token.
         /// </summary>
         /// <param name="accessToken">The access token.</param>
+        /// <param name="claimsPrincipal">The claims principal.</param>
         /// <returns>Returns <c>true</c> if the access token is valid; otherwise, <c>false</c>.</returns>
-        bool ValidateAccessToken(string accessToken);
+        bool ValidateAccessToken(string accessToken, out ClaimsPrincipal claimsPrincipal);
     }
 }

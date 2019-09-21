@@ -53,10 +53,26 @@ namespace Neuralm.Application.Services
         /// Validates the Jwt access token.
         /// </summary>
         /// <param name="accessToken">The Jwt access token as string.</param>
+        /// <param name="claimsPrincipal">The claims principal.</param>
         /// <returns>Returns <c>true</c> if the Jwt access token is valid; otherwise, <c>false</c>.</returns>
-        public bool ValidateAccessToken(string accessToken)
+        public bool ValidateAccessToken(string accessToken, out ClaimsPrincipal claimsPrincipal)
         {
-            throw new NotImplementedException();
+            TokenValidationParameters tokenValidationParameters = new TokenValidationParameters()
+            {
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtConfiguration.Secret))
+            };
+            try
+            {
+                claimsPrincipal = _jwtSecurityTokenHandler.ValidateToken(accessToken, tokenValidationParameters, out SecurityToken validatedToken);
+                return true;
+            }
+            catch (Exception)
+            {
+                claimsPrincipal = null;
+                return false;
+            }
         }
     }
 }

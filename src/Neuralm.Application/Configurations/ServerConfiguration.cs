@@ -9,9 +9,13 @@ namespace Neuralm.Application.Configurations
     /// </summary>
     public class ServerConfiguration
     {
-        [ConfigurationProperty("Port", IsRequired = true)]
-        [IntegerValidator(MinValue = 0, MaxValue = 8080, ExcludeRange = false)]
-        public int Port { get; set; }
+        [ConfigurationProperty("ClientPort", IsRequired = true)]
+        [IntegerValidator(MinValue = 0, MaxValue = 9999, ExcludeRange = false)]
+        public int ClientPort { get; set; }
+
+        [ConfigurationProperty("RestPort", IsRequired = true)]
+        [IntegerValidator(MinValue = 0, MaxValue = 9999, ExcludeRange = false)]
+        public int RestPort { get; set; }
 
         [ConfigurationProperty("Host", IsRequired = true)]
         [StringValidator(MinLength = 6)]
