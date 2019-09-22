@@ -10,6 +10,6 @@ namespace Neuralm.Services.Common.Domain
         /// <summary>
         /// Gets and sets the id.
         /// </summary>
-        Guid Id { get; set; }
+        Guid Id { get; }
     }
 }

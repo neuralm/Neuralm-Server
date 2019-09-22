@@ -4,9 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Neuralm.Services.Common.Mapping;
-using Neuralm.Services.UserService.Mapping;
+using Neuralm.Services.TrainingRoomService.Mapping;
 
-namespace Neuralm.Services.UserService.Rest
+namespace Neuralm.Services.TrainingRoomService.Rest
 {
     public class Startup
     {

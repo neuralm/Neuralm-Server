@@ -11,8 +11,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Neuralm.Services.Common.Mapping\Neuralm.Services.Common.Mapping.csproj" />
-    <ProjectReference Include="..\Neuralm.Services.UserService.Application\Neuralm.Services.UserService.Application.csproj" />
-    <ProjectReference Include="..\Neuralm.Services.UserService.Persistence\Neuralm.Services.UserService.Persistence.csproj" />
+    <ProjectReference Include="..\Neuralm.Services.TrainingRoomService.Application\Neuralm.Services.TrainingRoomService.Application.csproj" />
+    <ProjectReference Include="..\Neuralm.Services.TrainingRoomService.Persistence\Neuralm.Services.TrainingRoomService.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

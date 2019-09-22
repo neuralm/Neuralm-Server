@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Neuralm.Services.Common.Application\Neuralm.Services.Common.Application.csproj" />
+    <ProjectReference Include="..\Neuralm.Services.TrainingRoomService.Domain\Neuralm.Services.TrainingRoomService.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

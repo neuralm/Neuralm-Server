@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Neuralm.Services.Common.Persistence.EFCore\Neuralm.Services.Common.Persistence.EFCore.csproj" />
-    <ProjectReference Include="..\..\Neuralm.Services.Common.Persistence\Neuralm.Services.Common.Persistence.csproj" />
     <ProjectReference Include="..\Neuralm.Services.UserService.Domain\Neuralm.Services.UserService.Domain.csproj" />
   </ItemGroup>
 
