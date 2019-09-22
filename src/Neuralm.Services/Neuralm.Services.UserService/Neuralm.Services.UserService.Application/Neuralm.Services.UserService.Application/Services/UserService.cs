@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Exceptions;
 using Neuralm.Services.UserService.Application.Dtos;
 using Neuralm.Services.UserService.Application.Interfaces;
 using Neuralm.Services.UserService.Application.Models;
@@ -148,8 +149,7 @@ namespace Neuralm.Services.UserService.Application.Services
         /// <inheritdoc cref="IService{TEntity}.CreateAsync(TEntity)"/>
         public Task<(bool success, Guid id)> CreateAsync(UserDto entity)
         {
-            User user = _mapper.Map<User>(entity);
-            return _userRepository.CreateAsync(user);
+            throw new CreatingEntityFailedException("When creating a user use the RegisterAsync method.");
         }
     }
 }
