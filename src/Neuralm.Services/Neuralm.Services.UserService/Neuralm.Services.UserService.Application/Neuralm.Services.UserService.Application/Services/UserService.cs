@@ -60,14 +60,14 @@ namespace Neuralm.Services.UserService.Application.Services
             if (string.IsNullOrWhiteSpace(authenticateRequest.Username) || string.IsNullOrWhiteSpace(authenticateRequest.Password))
                 return new AuthenticateResponse(authenticateRequest.Id, Guid.Empty, message: "Credentials are null or empty.");
 
-            if (!await _credentialTypeRepository.ExistsAsync(ct => ct.Code.Equals(authenticateRequest.CredentialTypeCode, StringComparison.OrdinalIgnoreCase)))
+            if (!await _credentialTypeRepository.ExistsAsync(ct => ct.Code == authenticateRequest.CredentialTypeCode))
                 return new AuthenticateResponse(authenticateRequest.Id, Guid.Empty, message: "CredentialType not found.");
 
-            CredentialType credentialType = await _credentialTypeRepository.FindSingleOrDefaultAsync(ct => ct.Code.Equals(authenticateRequest.CredentialTypeCode, StringComparison.OrdinalIgnoreCase));
-            if (!await _credentialRepository.ExistsAsync(cred => cred.CredentialTypeId.Equals(credentialType.Id) && cred.Identifier.Equals(authenticateRequest.Username, StringComparison.OrdinalIgnoreCase)))
+            CredentialType credentialType = await _credentialTypeRepository.FindSingleOrDefaultAsync(ct => ct.Code == authenticateRequest.CredentialTypeCode);
+            if (!await _credentialRepository.ExistsAsync(cred => cred.CredentialTypeId == credentialType.Id && cred.Identifier == authenticateRequest.Username))
                 return new AuthenticateResponse(authenticateRequest.Id, Guid.Empty, message: "Credentials not found.");
 
-            Credential credential = await _credentialRepository.FindSingleOrDefaultAsync(cred => cred.CredentialTypeId.Equals(credentialType.Id) && cred.Identifier.Equals(authenticateRequest.Username, StringComparison.OrdinalIgnoreCase));
+            Credential credential = await _credentialRepository.FindSingleOrDefaultAsync(cred => cred.CredentialTypeId == credentialType.Id && cred.Identifier == authenticateRequest.Username);
             if (!_hasher.VerifyHash(credential.Secret, credential.Extra, authenticateRequest.Password))
                 return new AuthenticateResponse(authenticateRequest.Id, Guid.Empty, message: "Secret not valid.");
 
@@ -76,7 +76,7 @@ namespace Neuralm.Services.UserService.Application.Services
                 new Claim(ClaimTypes.Name, authenticateRequest.Username),
                 new Claim("Authorized", "Logged in")
             };
-            User user = await _userRepository.FindSingleOrDefaultAsync(usr => string.Equals(usr.Username, authenticateRequest.Username, StringComparison.OrdinalIgnoreCase));
+            User user = await _userRepository.FindSingleOrDefaultAsync(usr => usr.Username == authenticateRequest.Username);
             string accessToken = _accessTokenService.GenerateAccessToken(claims, DateTime.Now.AddHours(2));
             return new AuthenticateResponse(authenticateRequest.Id, user.Id, accessToken, success: true);
         }
@@ -87,10 +87,10 @@ namespace Neuralm.Services.UserService.Application.Services
             if (string.IsNullOrEmpty(registerRequest.Password))
                 return new RegisterResponse(registerRequest.Id, message: "Credentials are null or empty.");
 
-            if (await _userRepository.ExistsAsync(anyUser => anyUser.Username.Equals(registerRequest.Username, StringComparison.OrdinalIgnoreCase)))
+            if (await _userRepository.ExistsAsync(anyUser => anyUser.Username == registerRequest.Username))
                 return new RegisterResponse(registerRequest.Id, message: "Username already exists.");
 
-            if (!await _credentialTypeRepository.ExistsAsync(ct => ct.Code.Equals(registerRequest.CredentialTypeCode, StringComparison.OrdinalIgnoreCase)))
+            if (!await _credentialTypeRepository.ExistsAsync(ct => ct.Code == registerRequest.CredentialTypeCode))
                 return new RegisterResponse(registerRequest.Id, message: "CredentialType not found.");
 
             User user = new User
@@ -102,7 +102,7 @@ namespace Neuralm.Services.UserService.Application.Services
             if (!createdSuccess)
                 return new RegisterResponse(registerRequest.Id, "Failed to persist data.");
 
-            CredentialType credentialType = await _credentialTypeRepository.FindSingleOrDefaultAsync(ct => ct.Code.Equals(registerRequest.CredentialTypeCode, StringComparison.OrdinalIgnoreCase));
+            CredentialType credentialType = await _credentialTypeRepository.FindSingleOrDefaultAsync(ct => ct.Code == registerRequest.CredentialTypeCode);
             byte[] salt = _saltGenerator.GenerateSalt();
             Credential credential = new Credential
             {

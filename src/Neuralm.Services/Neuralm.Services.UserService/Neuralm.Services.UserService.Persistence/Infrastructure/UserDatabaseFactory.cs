@@ -1,4 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Neuralm.Services.Common.Configurations;
 using Neuralm.Services.Common.Persistence.EFCore.Infrastructure;
 using Neuralm.Services.UserService.Persistence.Contexts;
 
@@ -9,6 +12,16 @@ namespace Neuralm.Services.UserService.Persistence.Infrastructure
     /// </summary>
     public class UserDatabaseFactory : DatabaseFactory<UserDbContext>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UserDatabaseFactory"/> class.
+        /// </summary>
+        /// <param name="dbConfigurationOptions">The options.</param>
+        /// <param name="loggerFactory">The logger factory.</param>
+        public UserDatabaseFactory(IOptions<DbConfiguration> dbConfigurationOptions, ILoggerFactory loggerFactory) : base(dbConfigurationOptions, loggerFactory)
+        {
+            
+        }
+
         /// <summary>
         /// Creates a new instance of the <see cref="UserDbContext"/> class.
         /// </summary>
