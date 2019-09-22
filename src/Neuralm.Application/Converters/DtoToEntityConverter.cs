@@ -32,7 +32,7 @@ namespace Neuralm.Application.Converters
                     .ToList();
             foreach (PropertyInfo property in joinedProperties)
             {
-                object value = dto.GetType().GetProperty(property.Name).GetValue(dto);
+                object value = dto.GetType().GetProperty(property.Name)?.GetValue(dto);
                 if (value == null) continue;
                 property.SetValue(entity, value);
             }

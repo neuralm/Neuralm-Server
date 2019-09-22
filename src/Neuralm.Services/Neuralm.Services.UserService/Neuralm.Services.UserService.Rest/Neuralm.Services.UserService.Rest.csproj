@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <LangVersion>8</LangVersion>
+    <AssemblyName>Neuralm.Services.UserService.Rest</AssemblyName>
+    <RootNamespace>Neuralm.Services.UserService.Rest</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Neuralm.Services.Common.Rest\Neuralm.Services.Common.Rest.csproj" />
+    <ProjectReference Include="..\Neuralm.Services.UserService.Application\Neuralm.Services.UserService.Application\Neuralm.Services.UserService.Application.csproj" />
+    <ProjectReference Include="..\Neuralm.Services.UserService.Domain\Neuralm.Services.UserService.Domain.csproj" />
+    <ProjectReference Include="..\Neuralm.Services.UserService.Mapping\Neuralm.Services.UserService.Mapping.csproj" />
+  </ItemGroup>
+
+</Project>

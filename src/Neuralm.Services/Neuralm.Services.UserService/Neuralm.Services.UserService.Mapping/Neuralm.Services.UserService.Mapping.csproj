@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Neuralm.Services.Common.Mapping\Neuralm.Services.Common.Mapping.csproj" />
+    <ProjectReference Include="..\..\Neuralm.Services.Common.Persistence.EFCore\Neuralm.Services.Common.Persistence.EFCore.csproj" />
+    <ProjectReference Include="..\Neuralm.Services.UserService.Application\Neuralm.Services.UserService.Application\Neuralm.Services.UserService.Application.csproj" />
+    <ProjectReference Include="..\Neuralm.Services.UserService.Domain\Neuralm.Services.UserService.Domain.csproj" />
+    <ProjectReference Include="..\Neuralm.Services.UserService.Persistence\Neuralm.Services.UserService.Persistence.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.Extensions.Logging.Debug">
+      <HintPath>..\..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.logging.debug\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Debug.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

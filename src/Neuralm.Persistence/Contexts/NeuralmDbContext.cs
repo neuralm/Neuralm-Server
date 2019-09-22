@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Neuralm.Domain.Entities;
 using Neuralm.Domain.Entities.Authentication;
-using Neuralm.Domain.Entities.NEAT;
 using Neuralm.Persistence.Extensions;
 
 namespace Neuralm.Persistence.Contexts

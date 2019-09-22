@@ -1,13 +1,13 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Neuralm.Application.Configurations;
-using Neuralm.Utilities;
+using Neuralm.Services.Common.Configurations;
+using System;
+using System.Diagnostics;
 
-namespace Neuralm.Persistence.Infrastructure
+namespace Neuralm.Services.Common.Persistence.EFCore.Infrastructure
 {
     /// <summary>
     /// Represents the <see cref="DesignTimeDbContextFactoryBase{TContext}"/> class.
@@ -26,8 +26,8 @@ namespace Neuralm.Persistence.Infrastructure
         /// <param name="loggerFactory">The logger factory.</param>
         protected DesignTimeDbContextFactoryBase(IOptions<DbConfiguration> dbConfigurationOptions, ILoggerFactory loggerFactory)
         {
-            _dbConfiguration = dbConfigurationOptions == null 
-                ? GetDbConfiguration() 
+            _dbConfiguration = dbConfigurationOptions == null
+                ? GetDbConfiguration()
                 : dbConfigurationOptions.Value;
             _loggerFactory = loggerFactory;
         }
@@ -89,7 +89,7 @@ namespace Neuralm.Persistence.Infrastructure
         private static DbConfiguration GetDbConfiguration()
         {
             DbConfiguration dbConfiguration = new DbConfiguration();
-            ConfigurationLoader.GetConfiguration("appSettings").GetSection("NeuralmDb").Bind(dbConfiguration);
+            ConfigurationLoader.GetConfiguration("appsettings").GetSection("Database").Bind(dbConfiguration);
             return dbConfiguration;
         }
     }
