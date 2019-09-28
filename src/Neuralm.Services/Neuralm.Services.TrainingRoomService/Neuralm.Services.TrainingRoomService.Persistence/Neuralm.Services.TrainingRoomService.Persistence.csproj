@@ -6,6 +6,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Neuralm.Services.Common.Persistence.EFCore\Neuralm.Services.Common.Persistence.EFCore.csproj" />
     <ProjectReference Include="..\Neuralm.Services.TrainingRoomService.Domain\Neuralm.Services.TrainingRoomService.Domain.csproj" />
   </ItemGroup>

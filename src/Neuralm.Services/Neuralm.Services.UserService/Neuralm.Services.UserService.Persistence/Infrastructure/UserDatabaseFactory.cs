@@ -15,6 +15,14 @@ namespace Neuralm.Services.UserService.Persistence.Infrastructure
         /// <summary>
         /// Initializes a new instance of the <see cref="UserDatabaseFactory"/> class.
         /// </summary>
+        public UserDatabaseFactory() :base(null, null)
+        {
+            
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UserDatabaseFactory"/> class.
+        /// </summary>
         /// <param name="dbConfigurationOptions">The options.</param>
         /// <param name="loggerFactory">The logger factory.</param>
         public UserDatabaseFactory(IOptions<DbConfiguration> dbConfigurationOptions, ILoggerFactory loggerFactory) : base(dbConfigurationOptions, loggerFactory)

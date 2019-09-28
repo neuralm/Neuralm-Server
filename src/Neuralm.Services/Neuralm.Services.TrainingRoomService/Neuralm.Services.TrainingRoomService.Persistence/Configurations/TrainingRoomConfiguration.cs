@@ -19,14 +19,26 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Configurations
                 .HasMany(p => p.Species)
                 .WithOne()
                 .OnDelete(DeleteBehavior.Cascade);
-            builder
-                .OwnsOne(p => p.TrainingRoomSettings)
-                .OnDelete(DeleteBehavior.Cascade);
 
             builder
-                .OwnsMany(p => p.AuthorizedTrainers)
-                .HasForeignKey(p => p.TrainingRoomId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OwnsOne(p => p.TrainingRoomSettings, (trainingRoomSettingsBuilder) =>
+                {
+                    trainingRoomSettingsBuilder.HasKey(p => p.Id);
+                    trainingRoomSettingsBuilder.Property(p => p.Id).ValueGeneratedOnAdd();
+                    trainingRoomSettingsBuilder.ToTable("TrainingRoomSettings");
+                    trainingRoomSettingsBuilder.Ignore(p => p.Random);
+                });
+
+            builder
+                .OwnsMany(p => p.AuthorizedTrainers, (trainerBuilder) =>
+                {
+                    trainerBuilder
+                        .WithOwner(p => p.TrainingRoom)
+                        .HasForeignKey(p => p.TrainingRoomId);
+                    trainerBuilder.Ignore(p => p.Id);
+                    trainerBuilder.HasKey(p => new { p.TrainingRoomId, p.UserId });
+                    trainerBuilder.Ignore(p => p.User);
+                });
         }
     }
 }

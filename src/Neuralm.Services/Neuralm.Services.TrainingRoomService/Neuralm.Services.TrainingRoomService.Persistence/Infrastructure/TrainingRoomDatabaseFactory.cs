@@ -15,6 +15,14 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Infrastructure
         /// <summary>
         /// Initializes a new instance of the <see cref="TrainingRoomDatabaseFactory"/> class.
         /// </summary>
+        public TrainingRoomDatabaseFactory() : base(null, null)
+        {
+            
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TrainingRoomDatabaseFactory"/> class.
+        /// </summary>
         /// <param name="dbConfigurationOptions">The options.</param>
         /// <param name="loggerFactory">The logger factory.</param>
         public TrainingRoomDatabaseFactory(IOptions<DbConfiguration> dbConfigurationOptions, ILoggerFactory loggerFactory) : base(dbConfigurationOptions, loggerFactory)
