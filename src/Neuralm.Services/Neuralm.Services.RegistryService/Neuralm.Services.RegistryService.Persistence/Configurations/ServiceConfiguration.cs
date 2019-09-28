@@ -5,7 +5,8 @@ using Neuralm.Services.RegistryService.Domain;
 namespace Neuralm.Services.RegistryService.Persistence.Configurations
 {
     /// <summary>
-    /// Represents the <see cref="ServiceConfiguration"/> class used to configure the relations and columns in the <see cref="DbSet{TEntity}"/> for <see cref="ConnectionGene"/> in the DbContext.
+    /// Represents the <see cref="ServiceConfiguration"/> class used to configure the relations and columns
+    /// in the <see cref="DbSet{TEntity}"/> for <see cref="Service"/> in the DbContext.
     /// </summary>
     public class ServiceConfiguration : IEntityTypeConfiguration<Service>
     {
