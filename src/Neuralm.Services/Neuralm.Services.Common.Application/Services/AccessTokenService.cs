@@ -1,14 +1,13 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Configurations;
-using Neuralm.Services.UserService.Application.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 
-namespace Neuralm.Services.UserService.Application.Services
+namespace Neuralm.Services.Common.Application.Services
 {
     /// <summary>
     /// Represents the <see cref="JwtAccessTokenService"/> class, provides methods to generate access tokens in Jwt format.
@@ -33,16 +32,16 @@ namespace Neuralm.Services.UserService.Application.Services
         /// Generates a Jwt access token using the provided claims and expiry date.
         /// </summary>
         /// <param name="claims">The claims.</param>
-        /// <param name="expires">Th expiry date.</param>
         /// <returns>Returns the Jwt access token as string.</returns>
-        public string GenerateAccessToken(IEnumerable<Claim> claims, DateTime expires)
+        public string GenerateAccessToken(IEnumerable<Claim> claims)
         {
-            byte[] key = Encoding.ASCII.GetBytes(_jwtConfiguration.Secret);
             SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
             {
+                Issuer = _jwtConfiguration.Issuer,
+                Audience = _jwtConfiguration.Audience,
                 Subject = new ClaimsIdentity(claims),
-                Expires = expires,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                Expires = DateTime.Now.AddMinutes(_jwtConfiguration.AccessExpiration),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_jwtConfiguration.SecretBytes), SecurityAlgorithms.HmacSha256Signature)
             };
             SecurityToken token = _jwtSecurityTokenHandler.CreateToken(tokenDescriptor);
             string tokenString = _jwtSecurityTokenHandler.WriteToken(token);
@@ -61,7 +60,7 @@ namespace Neuralm.Services.UserService.Application.Services
             {
                 ValidateIssuer = false,
                 ValidateAudience = false,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtConfiguration.Secret))
+                IssuerSigningKey = new SymmetricSecurityKey(_jwtConfiguration.SecretBytes)
             };
             try
             {

@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Security.Claims;
 
-namespace Neuralm.Services.UserService.Application.Interfaces
+namespace Neuralm.Services.Common.Application.Interfaces
 {
     /// <summary>
     /// Represents the <see cref="IAccessTokenService"/> interface.
@@ -13,9 +12,8 @@ namespace Neuralm.Services.UserService.Application.Interfaces
         /// Generates an access token as string.
         /// </summary>
         /// <param name="claims">The claims.</param>
-        /// <param name="expires">The expiry date.</param>
         /// <returns>Returns a generated access token as string.</returns>
-        string GenerateAccessToken(IEnumerable<Claim> claims, DateTime expires);
+        string GenerateAccessToken(IEnumerable<Claim> claims);
 
         /// <summary>
         /// Validates an access token.

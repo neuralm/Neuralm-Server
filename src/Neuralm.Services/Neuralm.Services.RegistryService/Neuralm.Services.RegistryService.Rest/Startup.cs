@@ -5,9 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Neuralm.Services.Common.Configurations;
 using Neuralm.Services.Common.Mapping;
-using Neuralm.Services.UserService.Mapping;
+using Neuralm.Services.RegistryService.Mapping;
 
-namespace Neuralm.Services.UserService.Rest
+namespace Neuralm.Services.RegistryService.Rest
 {
     public class Startup
     {

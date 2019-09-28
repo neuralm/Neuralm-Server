@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Neuralm.Services.Common.Configurations;
 using Neuralm.Services.Common.Mapping;
 using Neuralm.Services.TrainingRoomService.Mapping;
 
@@ -23,6 +24,7 @@ namespace Neuralm.Services.TrainingRoomService.Rest
             services.AddControllers();
             services.AddConfigurations(Configuration);
             services.AddApplicationServices();
+            services.AddJwtAuthentication(Configuration.GetSection("Jwt").Get<JwtConfiguration>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -34,6 +36,8 @@ namespace Neuralm.Services.TrainingRoomService.Rest
             }
 
             app.UseRouting();
+
+            app.UseJwtAuthenticationWithCors();
 
             app.UseAuthorization();
 

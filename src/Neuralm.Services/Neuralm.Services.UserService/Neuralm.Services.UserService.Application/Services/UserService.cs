@@ -71,10 +71,10 @@ namespace Neuralm.Services.UserService.Application.Services
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, authenticateRequest.Username),
-                new Claim("Authorized", "Logged in")
+                new Claim(ClaimTypes.Role, "User")
             };
             User user = await EntityRepository.FindSingleOrDefaultAsync(usr => usr.Username == authenticateRequest.Username);
-            string accessToken = _accessTokenService.GenerateAccessToken(claims, DateTime.Now.AddHours(2));
+            string accessToken = _accessTokenService.GenerateAccessToken(claims);
             return new AuthenticateResponse(authenticateRequest.Id, user.Id, accessToken, success: true);
         }
 

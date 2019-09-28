@@ -20,7 +20,7 @@ namespace Neuralm.Services.Common.Application.Interfaces
         /// <summary>
         /// Gets all Entities.
         /// </summary>
-        /// <returns>Returns all Entities.</returns>
+        /// <returns>Returns all dtos.</returns>
         Task<IEnumerable<TDto>> GetAllAsync();
 
         /// <summary>
@@ -53,7 +53,10 @@ namespace Neuralm.Services.Common.Application.Interfaces
         /// </summary>
         /// <param name="dto">The dto.</param>
         /// <exception cref="CreatingEntityFailedException">If it fails to the save changes.</exception>
-        /// <returns>Returns (<c>true</c>, <see cref="Guid"/>) If the dto is successfully created; otherwise, (<c>false</c>, <see cref="Guid"/>).</returns>
+        /// <returns>
+        /// Returns (<c>true</c>, <see cref="Guid"/>) If the dto is successfully created;
+        /// otherwise, (<c>false</c>, <see cref="Guid"/>).
+        /// </returns>
         Task<(bool success, Guid id)> CreateAsync(TDto dto);
     }
 }

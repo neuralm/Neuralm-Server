@@ -4,6 +4,7 @@ using Neuralm.Services.UserService.Application.Dtos;
 using Neuralm.Services.UserService.Application.Interfaces;
 using Neuralm.Services.UserService.Application.Models;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Neuralm.Services.UserService.Rest.Controllers
 {
@@ -16,7 +17,7 @@ namespace Neuralm.Services.UserService.Rest.Controllers
             _userService = userService;
         }
 
-        [HttpPost("authenticate")]
+        [AllowAnonymous, HttpPost("authenticate")]
         public async Task<IActionResult> AuthenticateAsync(AuthenticateRequest authenticateRequest)
         {
             if (!ModelState.IsValid)
@@ -25,7 +26,7 @@ namespace Neuralm.Services.UserService.Rest.Controllers
             return new OkObjectResult(authenticateResponse);
         }
 
-        [HttpPost("register")]
+        [AllowAnonymous, HttpPost("register")]
         public async Task<IActionResult> RegisterAsync(RegisterRequest registerRequest)
         {
             if (!ModelState.IsValid)

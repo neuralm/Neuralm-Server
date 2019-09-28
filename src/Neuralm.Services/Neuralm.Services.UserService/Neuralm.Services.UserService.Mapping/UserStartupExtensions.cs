@@ -14,6 +14,7 @@ using Neuralm.Services.UserService.Persistence.Contexts;
 using Neuralm.Services.UserService.Persistence.Infrastructure;
 using Neuralm.Services.UserService.Persistence.Validators;
 using System.Reflection;
+using Neuralm.Services.Common.Application.Services;
 
 namespace Neuralm.Services.UserService.Mapping
 {
@@ -66,7 +67,7 @@ namespace Neuralm.Services.UserService.Mapping
             #endregion Repositories
 
             #region Services
-            serviceCollection.AddSingleton<IAccessTokenService, JwtAccessTokenService>();
+            serviceCollection.AddTransient<IAccessTokenService, JwtAccessTokenService>();
             serviceCollection.AddTransient<IUserService, Application.Services.UserService>();
             #endregion Services
 
