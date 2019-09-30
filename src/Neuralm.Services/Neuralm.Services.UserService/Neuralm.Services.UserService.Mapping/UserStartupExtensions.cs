@@ -2,12 +2,10 @@
 using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Mapping;
-using Neuralm.Services.Common.Messaging.Serializers;
 using Neuralm.Services.Common.Persistence;
 using Neuralm.Services.Common.Persistence.EFCore.Repositories;
 using Neuralm.Services.UserService.Application.Cryptography;
 using Neuralm.Services.UserService.Application.Interfaces;
-using Neuralm.Services.UserService.Application.Services;
 using Neuralm.Services.UserService.Domain;
 using Neuralm.Services.UserService.Domain.Authentication;
 using Neuralm.Services.UserService.Persistence.Contexts;
@@ -70,8 +68,6 @@ namespace Neuralm.Services.UserService.Mapping
             serviceCollection.AddTransient<IAccessTokenService, JwtAccessTokenService>();
             serviceCollection.AddTransient<IUserService, Application.Services.UserService>();
             #endregion Services
-
-            serviceCollection.AddSingleton<IMessageSerializer, JsonMessageSerializer>();
 
             return serviceCollection;
         }

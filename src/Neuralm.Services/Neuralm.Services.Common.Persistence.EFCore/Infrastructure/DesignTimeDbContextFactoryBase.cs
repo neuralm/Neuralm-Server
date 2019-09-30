@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Neuralm.Services.Common.Application;
 using Neuralm.Services.Common.Configurations;
 using System;
-using System.Diagnostics;
 
 namespace Neuralm.Services.Common.Persistence.EFCore.Infrastructure
 {

@@ -21,7 +21,7 @@ namespace Neuralm.Services.Common.Persistence.Exceptions
         {
         }
 
-        public EntityValidationException(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected EntityValidationException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

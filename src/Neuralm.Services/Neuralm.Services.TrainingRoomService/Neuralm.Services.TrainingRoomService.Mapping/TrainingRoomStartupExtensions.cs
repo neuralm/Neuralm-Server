@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Mapping;
-using Neuralm.Services.Common.Messaging.Serializers;
 using Neuralm.Services.Common.Persistence;
 using Neuralm.Services.Common.Persistence.EFCore.Repositories;
 using Neuralm.Services.TrainingRoomService.Application.Interfaces;
@@ -55,8 +54,6 @@ namespace Neuralm.Services.TrainingRoomService.Mapping
             serviceCollection.AddSingleton<ITrainingSessionService, Application.Services.TrainingSessionService>();
             serviceCollection.AddTransient<IAccessTokenService, JwtAccessTokenService>();
             #endregion Services
-
-            serviceCollection.AddSingleton<IMessageSerializer, JsonMessageSerializer>();
 
             return serviceCollection;
         }

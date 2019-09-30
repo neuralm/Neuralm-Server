@@ -6,12 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\Neuralm.Services.Common.Application\Neuralm.Services.Common.Application.csproj" />
     <ProjectReference Include="..\Neuralm.Services.TrainingRoomService.Domain\Neuralm.Services.TrainingRoomService.Domain.csproj" />
+    <ProjectReference Include="..\Neuralm.Services.TrainingRoomService.Messages\Neuralm.Services.TrainingRoomService.Messages.csproj" />
   </ItemGroup>
 
 </Project>

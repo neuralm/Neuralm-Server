@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Neuralm.Services.Common.Rest;
-using Neuralm.Services.UserService.Application.Dtos;
 using Neuralm.Services.UserService.Application.Interfaces;
-using Neuralm.Services.UserService.Application.Models;
+using Neuralm.Services.UserService.Messages;
+using Neuralm.Services.UserService.Messages.Dtos;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Neuralm.Services.UserService.Rest.Controllers
 {

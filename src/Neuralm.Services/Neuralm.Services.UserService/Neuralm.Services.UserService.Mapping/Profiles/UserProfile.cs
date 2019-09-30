@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Neuralm.Services.UserService.Application.Dtos;
 using Neuralm.Services.UserService.Domain;
+using Neuralm.Services.UserService.Messages.Dtos;
 
 namespace Neuralm.Services.UserService.Mapping.Profiles
 {

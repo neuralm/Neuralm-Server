@@ -1,6 +1,6 @@
 ﻿using Neuralm.Services.Common.Application.Interfaces;
-using Neuralm.Services.UserService.Application.Dtos;
-using Neuralm.Services.UserService.Application.Models;
+using Neuralm.Services.UserService.Messages;
+using Neuralm.Services.UserService.Messages.Dtos;
 using System.Threading.Tasks;
 
 namespace Neuralm.Services.UserService.Application.Interfaces

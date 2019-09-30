@@ -15,6 +15,7 @@ namespace Neuralm.Services.RegistryService.Persistence.Configurations
         {
             builder.HasKey(p => p.Id);
             builder.Property(p => p.Id).ValueGeneratedOnAdd();
+            builder.ToTable("Services");
         }
     }
 }

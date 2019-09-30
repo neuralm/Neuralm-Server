@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
+using Neuralm.Services.Common.Application.Abstractions;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Exceptions;
-using Neuralm.Services.UserService.Application.Dtos;
 using Neuralm.Services.UserService.Application.Interfaces;
-using Neuralm.Services.UserService.Application.Models;
 using Neuralm.Services.UserService.Domain;
 using Neuralm.Services.UserService.Domain.Authentication;
+using Neuralm.Services.UserService.Messages;
+using Neuralm.Services.UserService.Messages.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Neuralm.Services.Common.Application.Abstractions;
 
 namespace Neuralm.Services.UserService.Application.Services
 {

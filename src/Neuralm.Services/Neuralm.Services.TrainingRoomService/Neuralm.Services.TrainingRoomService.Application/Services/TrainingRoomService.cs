@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Neuralm.Services.Common.Application.Abstractions;
 using Neuralm.Services.Common.Application.Interfaces;
-using Neuralm.Services.TrainingRoomService.Application.Dtos;
 using Neuralm.Services.TrainingRoomService.Application.Interfaces;
 using Neuralm.Services.TrainingRoomService.Domain;
+using Neuralm.Services.TrainingRoomService.Messages.Dtos;
 
 namespace Neuralm.Services.TrainingRoomService.Application.Services
 {

@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Neuralm.Services.Common.Application\Neuralm.Services.Common.Application.csproj" />
     <ProjectReference Include="..\Neuralm.Services.UserService.Domain\Neuralm.Services.UserService.Domain.csproj" />
+    <ProjectReference Include="..\Neuralm.Services.UserService.Messages\Neuralm.Services.UserService.Messages.csproj" />
   </ItemGroup>
 
 </Project>

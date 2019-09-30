@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Neuralm.Services.TrainingRoomService.Application.Dtos;
 using Neuralm.Services.TrainingRoomService.Domain;
+using Neuralm.Services.TrainingRoomService.Messages.Dtos;
 
 namespace Neuralm.Services.TrainingRoomService.Mapping.Profiles
 {

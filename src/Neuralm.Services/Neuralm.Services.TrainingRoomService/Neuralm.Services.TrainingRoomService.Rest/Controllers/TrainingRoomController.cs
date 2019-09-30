@@ -1,6 +1,6 @@
 ﻿using Neuralm.Services.Common.Rest;
-using Neuralm.Services.TrainingRoomService.Application.Dtos;
 using Neuralm.Services.TrainingRoomService.Application.Interfaces;
+using Neuralm.Services.TrainingRoomService.Messages.Dtos;
 
 namespace Neuralm.Services.TrainingRoomService.Rest.Controllers
 {
