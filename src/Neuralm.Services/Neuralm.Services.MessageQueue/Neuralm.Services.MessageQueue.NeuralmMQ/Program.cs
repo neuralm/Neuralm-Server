@@ -86,7 +86,7 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
 
             _genericServiceProvider = startup.GetGenericServiceProvider();
             IMessageQueue messageQueue = _genericServiceProvider.GetService<IMessageQueue>();
-            MessageToServiceMapper messageToServiceMapper = _genericServiceProvider.GetService<MessageToServiceMapper>();
+            MessageToServiceMapper messageToServiceMapper = new MessageToServiceMapper(_genericServiceProvider);
             IRegistryService registryService = _genericServiceProvider.GetService<IRegistryService>();
             IMessageSerializer messageSerializer = _genericServiceProvider.GetService<IMessageSerializer>();
             IMessageProcessor messageProcessor = new NeuralmMessageProcessor(messageToServiceMapper, registryService);

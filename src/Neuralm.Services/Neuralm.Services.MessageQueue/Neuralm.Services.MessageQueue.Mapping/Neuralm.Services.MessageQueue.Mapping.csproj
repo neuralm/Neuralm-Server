@@ -7,6 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Neuralm.Services.Common.Mapping\Neuralm.Services.Common.Mapping.csproj" />
     <ProjectReference Include="..\Neuralm.Services.MessageQueue.Application\Neuralm.Services.MessageQueue.Application.csproj" />
+    <ProjectReference Include="..\Neuralm.Services.MessageQueue.Infrastructure\Neuralm.Services.MessageQueue.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

@@ -30,6 +30,7 @@ namespace Neuralm.Services.MessageQueue.Mapping
             // needs to be used for creating an instance of the UserDbContext.
             //serviceCollection.AddTransient<MessageDbContext>(p => p.GetService<IFactory<MessageDbContext>>().Create());
 
+            serviceCollection.AddSingleton<IMessageQueue, Infrastructure.Messaging.MessageQueue>();
 
             #region Services
             serviceCollection.AddSingleton<IRegistryService, IRegistryService>();
