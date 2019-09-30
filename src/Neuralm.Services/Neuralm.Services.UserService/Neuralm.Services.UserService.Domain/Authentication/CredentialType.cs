@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Neuralm.Services.Common.Domain;
+using System;
 using System.Collections.Generic;
-using Neuralm.Services.Common.Domain;
 
 namespace Neuralm.Services.UserService.Domain.Authentication
 {

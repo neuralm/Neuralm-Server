@@ -11,7 +11,7 @@ namespace Neuralm.Services.TrainingRoomService.Messages.Dtos
         /// Gets and sets the id.
         /// </summary>
         public Guid Id { get; set; }
-        
+
         /// <summary>
         /// Gets and sets the user name.
         /// </summary>

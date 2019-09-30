@@ -1,5 +1,5 @@
-﻿using System;
-using Neuralm.Services.Common.Domain;
+﻿using Neuralm.Services.Common.Domain;
+using System;
 
 namespace Neuralm.Services.UserService.Domain.Authentication
 {

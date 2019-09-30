@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Neuralm.Services.Common.Domain;
+using Neuralm.Services.Common.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Neuralm.Services.Common.Domain;
-using Neuralm.Services.Common.Exceptions;
 
 namespace Neuralm.Services.Common.Application.Interfaces
 {

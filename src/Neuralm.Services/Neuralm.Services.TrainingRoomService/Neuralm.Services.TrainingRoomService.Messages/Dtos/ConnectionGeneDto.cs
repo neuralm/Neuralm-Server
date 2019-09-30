@@ -31,7 +31,7 @@ namespace Neuralm.Services.TrainingRoomService.Messages.Dtos
         /// Gets and sets the innovation number.
         /// </summary>
         public uint InnovationNumber { get; set; }
-        
+
         /// <summary>
         /// Gets and sets the weight.
         /// </summary>

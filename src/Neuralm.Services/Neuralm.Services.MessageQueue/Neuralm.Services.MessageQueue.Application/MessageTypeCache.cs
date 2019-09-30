@@ -1,12 +1,12 @@
 ﻿using Neuralm.Services.Common.Messages.Abstractions;
+using Neuralm.Services.TrainingRoomService.Messages;
+using Neuralm.Services.UserService.Messages;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using Neuralm.Services.TrainingRoomService.Messages;
-using Neuralm.Services.UserService.Messages;
 
 namespace Neuralm.Services.MessageQueue.Application
 {
@@ -46,7 +46,7 @@ namespace Neuralm.Services.MessageQueue.Application
             messageTypes.AddRange(GetMessageTypes<RegisterRequest>());
             // TrainingRoomService messages
             messageTypes.AddRange(GetMessageTypes<CreateTrainingRoomRequest>());
-            
+
             foreach (Type messageType in messageTypes)
             {
                 TypeCache.TryAdd(messageType.Name, messageType);
@@ -58,8 +58,8 @@ namespace Neuralm.Services.MessageQueue.Application
         private static IEnumerable<Type> GetMessageTypes<T>()
         {
             return Assembly.GetAssembly(typeof(T)).GetTypes().Where(t =>
-                t.BaseType == typeof(Request) || 
-                t.BaseType == typeof(Response) || 
+                t.BaseType == typeof(Request) ||
+                t.BaseType == typeof(Response) ||
                 t.BaseType == typeof(Event) ||
                 t.BaseType == typeof(Command));
         }

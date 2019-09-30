@@ -87,8 +87,8 @@ namespace Neuralm.Services.Common.Rest
             (bool success, bool found) = await _service.DeleteAsync(dto);
             if (!found)
                 return new NotFoundResult();
-            return success 
-                ? new NoContentResult() 
+            return success
+                ? new NoContentResult()
                 : new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
 
@@ -107,8 +107,8 @@ namespace Neuralm.Services.Common.Rest
                 return BadRequest(ModelState.GetErrorMessages());
             (bool success, Guid id) = await _service.CreateAsync(dto);
             return success
-                ? new CreatedAtActionResult(nameof(GetAsync), GetType().Name, new {id}, "")
-                : (IActionResult) new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                ? new CreatedAtActionResult(nameof(GetAsync), GetType().Name, new { id }, "")
+                : (IActionResult)new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
     }
 }

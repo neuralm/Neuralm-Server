@@ -33,7 +33,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// </summary>
         public virtual TrainingRoom TrainingRoom { get; set; }
 
-        
+
 
         /// <summary>
         /// EFCore entity constructor.

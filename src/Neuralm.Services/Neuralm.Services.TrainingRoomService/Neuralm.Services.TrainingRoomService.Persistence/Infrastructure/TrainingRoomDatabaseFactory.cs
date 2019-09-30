@@ -17,7 +17,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Infrastructure
         /// </summary>
         public TrainingRoomDatabaseFactory() : base(null, null)
         {
-            
+
         }
 
         /// <summary>

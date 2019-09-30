@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Application.Services;
 using Neuralm.Services.Common.Mapping;
 using Neuralm.Services.Common.Persistence;
 using Neuralm.Services.Common.Persistence.EFCore.Repositories;
@@ -12,7 +13,6 @@ using Neuralm.Services.UserService.Persistence.Contexts;
 using Neuralm.Services.UserService.Persistence.Infrastructure;
 using Neuralm.Services.UserService.Persistence.Validators;
 using System.Reflection;
-using Neuralm.Services.Common.Application.Services;
 
 namespace Neuralm.Services.UserService.Mapping
 {

@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Neuralm.Services.Common.Configurations;
 using System;
 using System.Reflection;
-using Microsoft.AspNetCore.Builder;
 
 namespace Neuralm.Services.Common.Mapping
 {
@@ -39,7 +39,7 @@ namespace Neuralm.Services.Common.Mapping
         /// <returns>Returns the service collection to chain further upon.</returns>
         public static IServiceCollection AddAutoMapper(this IServiceCollection serviceCollection, Assembly assembly)
         {
-            serviceCollection.AddAutoMapper(new [] { assembly });
+            serviceCollection.AddAutoMapper(new[] { assembly });
             return serviceCollection;
         }
 

@@ -13,7 +13,7 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
     /// </summary>
     public class Program
     {
-        private static readonly  CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
+        private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
         private IGenericServiceProvider _genericServiceProvider;
         private static int _canReadConsole;
         private static int _canExit;
@@ -84,13 +84,13 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
             cancellationToken.ThrowIfCancellationRequested();
             Console.WriteLine("Finished initializing!\n");
 
-           _genericServiceProvider = startup.GetGenericServiceProvider();
-           IMessageQueue messageQueue = _genericServiceProvider.GetService<IMessageQueue>();
-           MessageToServiceMapper messageToServiceMapper = _genericServiceProvider.GetService<MessageToServiceMapper>();
-           IRegistryService registryService = _genericServiceProvider.GetService<IRegistryService>();
-           IMessageSerializer messageSerializer = _genericServiceProvider.GetService<IMessageSerializer>();
-           IMessageProcessor messageProcessor = new NeuralmMessageProcessor(messageToServiceMapper, registryService);
-           await messageQueue.StartAsync(cancellationToken, messageProcessor, messageSerializer);
+            _genericServiceProvider = startup.GetGenericServiceProvider();
+            IMessageQueue messageQueue = _genericServiceProvider.GetService<IMessageQueue>();
+            MessageToServiceMapper messageToServiceMapper = _genericServiceProvider.GetService<MessageToServiceMapper>();
+            IRegistryService registryService = _genericServiceProvider.GetService<IRegistryService>();
+            IMessageSerializer messageSerializer = _genericServiceProvider.GetService<IMessageSerializer>();
+            IMessageProcessor messageProcessor = new NeuralmMessageProcessor(messageToServiceMapper, registryService);
+            await messageQueue.StartAsync(cancellationToken, messageProcessor, messageSerializer);
         }
     }
 }

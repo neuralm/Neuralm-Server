@@ -16,7 +16,7 @@ namespace Neuralm.Services.Common.Configurations
         /// <summary>
         /// Gets the secret as bytes.
         /// </summary>
-        [JsonIgnore] 
+        [JsonIgnore]
         public byte[] SecretBytes => Encoding.ASCII.GetBytes(Secret);
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Neuralm.Services.Common.Configurations
         /// Gets and sets the access expiration.
         /// </summary>
         public int AccessExpiration { get; set; }
-        
+
         /// <summary>
         /// Gets and sets the refresh expiration.
         /// </summary>

@@ -26,10 +26,10 @@ namespace Neuralm.Services.UserService.Application.Cryptography
         {
             return Convert.ToBase64String(
                 KeyDerivation.Pbkdf2(
-                    secret, 
-                    salt, 
-                    KeyDerivationPrf.HMACSHA1, 
-                    10000, 
+                    secret,
+                    salt,
+                    KeyDerivationPrf.HMACSHA1,
+                    10000,
                     256 / 8));
         }
     }
