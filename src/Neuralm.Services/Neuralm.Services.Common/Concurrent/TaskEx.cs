@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Neuralm.Services.Common.Concurrent
@@ -33,15 +34,16 @@ namespace Neuralm.Services.Common.Concurrent
         /// <param name="condition">The break condition.</param>
         /// <param name="frequency">The frequency at which the condition will be checked.</param>
         /// <param name="timeout">The timeout in milliseconds.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
-        public static async Task WaitUntil(Func<bool> condition, int frequency = 25, int timeout = -1)
+        public static async Task WaitUntil(Func<bool> condition, int frequency = 25, int timeout = -1, CancellationToken cancellationToken = default)
         {
             using Task waitTask = Task.Run(async () =>
             {
                 while (!condition())
-                    await Task.Delay(frequency);
-            });
-            if (waitTask != await Task.WhenAny(waitTask, Task.Delay(timeout)))
+                    await Task.Delay(frequency, cancellationToken);
+            }, cancellationToken);
+            if (waitTask != await Task.WhenAny(waitTask, Task.Delay(timeout, cancellationToken)))
                 throw new TimeoutException();
         }
     }

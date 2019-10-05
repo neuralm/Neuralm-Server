@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.Threading.Tasks;
+using Neuralm.Services.MessageQueue.Application;
 
 namespace Neuralm.Services.MessageQueue.NeuralmMQ
 {
@@ -42,10 +43,9 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
         {
             object response;
             Console.WriteLine($"ProcessRequest: {request}");
-            if (_messageToServiceMapper.MessageToServiceMap.TryGetValue(type, out (object service, MethodInfo methodInfo) a))
+            if (_messageToServiceMapper.MessageToServiceMap.TryGetValue(type, out IServiceConnector serviceConnector))
             {
-                dynamic task = a.methodInfo.Invoke(a.service, new object[] { request });
-                response = await task;
+                serviceConnector.EnqueueMessage(request);
             }
             else
                 throw new ArgumentOutOfRangeException(nameof(request), $"Unknown Request message of type: {type.Name}");
