@@ -48,15 +48,13 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
             _genericServiceProvider = new ServiceCollection()
                 .AddConfigurations(configuration)
                 .Configure<MessageQueueConfiguration>(configuration.GetSection("MessageQueue").Bind)
+                .Configure<RegistryConfiguration>(configuration.GetSection("Registry").Bind)
                 .AddApplicationServices()
                 .BuildServiceProvider()
                 .ToGenericServiceProvider();
 
-            // Initializes further tasks like creating the server certificate, verifying database, etc..
-
             List<Task> tasks = new List<Task>
             {
-                //Task.Run(() => MapMessagesToServices(_cancellationTokenSourceTimed.Token), cancellationToken),
                 Task.Run(() => CreateServerCertificate(_cancellationTokenSourceTimed.Token), cancellationToken)
             };
 

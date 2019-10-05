@@ -6,7 +6,7 @@ namespace Neuralm.Services.Common.Messages.Abstractions
     /// <summary>
     /// Represents the <see cref="Command"/> class.
     /// </summary>
-    public abstract class Command : ICommand
+    public abstract class Command : IMessage
     {
         /// <summary>
         /// Gets the id.

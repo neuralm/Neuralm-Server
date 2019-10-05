@@ -1,8 +1,11 @@
 ﻿using Neuralm.Services.Common.Concurrent;
+using Neuralm.Services.Common.Messages.Interfaces;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
 using Neuralm.Services.MessageQueue.Domain;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,22 +16,29 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
     /// </summary>
     public class ServiceConnector : IServiceConnector
     {
-        private readonly List<INetworkConnector> _networkConnectors;
-        private readonly AsyncConcurrentQueue<object> _messageQueue;
+        private readonly ConcurrentDictionary<Guid, INetworkConnector> _networkConnectors;
+        private readonly AsyncConcurrentQueue<IMessage> _messageQueue;
         private static readonly Random Random = new Random();
+
+        /// <inheritdoc cref="IServiceConnector.Name"/>
+        public string Name { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceConnector"/> class.
         /// </summary>
         /// <param name="networkConnector">The networkConnector.</param>
-        public ServiceConnector(INetworkConnector networkConnector)
+        /// <param name="name">The service name.</param>
+        /// <param name="id">The service id.</param>
+        public ServiceConnector(INetworkConnector networkConnector, string name, Guid id)
         {
-            _networkConnectors = new List<INetworkConnector> { networkConnector };
-            _messageQueue = new AsyncConcurrentQueue<object>();
+            Name = name;
+            _networkConnectors = new ConcurrentDictionary<Guid, INetworkConnector>();
+            _networkConnectors .TryAdd(id, networkConnector);
+            _messageQueue = new AsyncConcurrentQueue<IMessage>();
         }
 
-        /// <inheritdoc cref="IServiceConnector.EnqueueMessage(object)" />
-        public void EnqueueMessage(object message)
+        /// <inheritdoc cref="IServiceConnector.EnqueueMessage(IMessage)" />
+        public void EnqueueMessage(IMessage message)
         {
             _messageQueue.Enqueue(message);
         }
@@ -40,42 +50,51 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
             {
                 await TaskEx.WaitUntil(() => _networkConnectors.Count != 0, cancellationToken: cancellationToken);
                 cancellationToken.ThrowIfCancellationRequested();
-                object message = await _messageQueue.DequeueAsync(cancellationToken);
-                INetworkConnector networkConnector = GetNetworkConnector();
-                if (networkConnector == null)
-                    continue;
+                IMessage message = await _messageQueue.DequeueAsync(cancellationToken);
+                INetworkConnector networkConnector = null;
+                while (networkConnector == null)
+                {
+                    networkConnector = GetNetworkConnector();
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
                 _ = Task.Run(() => networkConnector.SendMessageAsync(message, cancellationToken), cancellationToken);
             }
         }
 
-        /// <inheritdoc cref="IServiceConnector.AddService(INetworkConnector)" />
-        public void AddService(INetworkConnector networkConnector)
+        /// <inheritdoc cref="IServiceConnector.AddService(INetworkConnector, Guid)" />
+        public void AddService(INetworkConnector networkConnector, Guid id)
         {
-            _networkConnectors.Add(networkConnector);
+            _networkConnectors.TryAdd(id, networkConnector);
+        }
+
+        /// <inheritdoc cref="IServiceConnector.RemoveService(Guid)"/>
+        public void RemoveService(Guid serviceId)
+        {
+            _networkConnectors.TryRemove(serviceId, out _);
         }
 
         private INetworkConnector GetNetworkConnector()
         {
-            INetworkConnector networkConnector;
+            KeyValuePair<Guid, INetworkConnector> networkConnectorKeyPair;
             int networkConnectors = _networkConnectors.Count;
             switch (networkConnectors)
             {
                 case 0:
                     return null;
                 case 1:
-                    networkConnector = _networkConnectors[0];
+                    networkConnectorKeyPair = _networkConnectors.ElementAt(0);
                     break;
                 default:
                 {
                     int num = Random.Next(networkConnectors);
-                    networkConnector = _networkConnectors[num];
+                    networkConnectorKeyPair = _networkConnectors.ElementAt(num);
                     break;
                 }
             }
 
-            if (networkConnector.IsConnected) 
-                return networkConnector;
-            _networkConnectors.Remove(networkConnector);
+            if (networkConnectorKeyPair.Value.IsConnected) 
+                return networkConnectorKeyPair.Value;
+            RemoveService(networkConnectorKeyPair.Key);
             return null;
         }
     }

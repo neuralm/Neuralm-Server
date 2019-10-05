@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,6 +10,11 @@ namespace Neuralm.Services.MessageQueue.Application.Interfaces
     /// </summary>
     public interface INetworkConnector : IDisposable
     {
+        /// <summary>
+        /// Gets the end point.
+        /// </summary>
+        EndPoint EndPoint { get; }
+
         /// <summary>
         /// Gets a value indicating whether the network connector is connected.
         /// </summary>

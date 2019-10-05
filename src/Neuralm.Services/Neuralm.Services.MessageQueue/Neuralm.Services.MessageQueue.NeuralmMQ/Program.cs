@@ -2,6 +2,7 @@
 using Neuralm.Services.Common.Application;
 using Neuralm.Services.Common.Mapping;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
+using Neuralm.Services.MessageQueue.Infrastructure;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -85,12 +86,14 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
             Console.WriteLine("Finished initializing!\n");
 
             _genericServiceProvider = startup.GetGenericServiceProvider();
-            IMessageQueue messageQueue = _genericServiceProvider.GetService<IMessageQueue>();
-            MessageToServiceMapper messageToServiceMapper = new MessageToServiceMapper(_genericServiceProvider);
+
+            Console.WriteLine("Started RegistryService EndPoint.");
             IRegistryService registryService = _genericServiceProvider.GetService<IRegistryService>();
-            IMessageSerializer messageSerializer = _genericServiceProvider.GetService<IMessageSerializer>();
-            IMessageProcessor messageProcessor = new NeuralmMessageProcessor(messageToServiceMapper, registryService);
-            await messageQueue.StartAsync(cancellationToken, messageProcessor, messageSerializer);
+            _ = Task.Run(async () => await registryService.StartReceivingServiceEndPointsAsync(cancellationToken), cancellationToken);
+
+            Console.WriteLine("Started client messaging EndPoint.");
+            IClientMessageProcessor clientMessageProcessor = _genericServiceProvider.GetService<ClientMessageProcessor>();
+            _ = Task.Run(async () => await clientMessageProcessor.StartAsync(cancellationToken), cancellationToken);
         }
     }
 }

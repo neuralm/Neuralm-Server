@@ -6,6 +6,7 @@ using Neuralm.Services.MessageQueue.Infrastructure.Messaging;
 using System;
 using System.Buffers;
 using System.Diagnostics;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,6 +27,11 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Networking
         /// Gets and sets a value indicating whether <see cref="Start"/> has ran.
         /// </summary>
         public bool IsRunning { get; private set; }
+
+        /// <summary>
+        /// Gets the end point.
+        /// </summary>
+        public abstract EndPoint EndPoint { get; }
 
         /// <summary>
         /// Gets a value indicating whether <see cref="ConnectAsync"/> has ran.
@@ -154,23 +160,13 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Networking
             {
                 if (MessageTypeCache.TryGetMessageType(typeName, out Type type))
                 {
-                    object message = _messageConstructor.DeconstructMessageBody(bodyBufferMemory, type);
-
-                    switch (message)
+                    object rawMessage = _messageConstructor.DeconstructMessageBody(bodyBufferMemory, type);
+                    if (rawMessage is IMessage message)
                     {
-                        case IRequest requestMessage:
-                            {
-                                IResponse response = await _messageProcessor.ProcessRequestAsync(type, requestMessage);
-                                await SendMessageAsync(response, CancellationToken.None);
-                                break;
-                            }
-                        case ICommand commandMessage:
-                            _ = _messageProcessor.ProcessCommandAsync(type, commandMessage);
-                            break;
-                        default:
-                            Console.WriteLine($"Received unsupported message of type: {type.FullName}");
-                            break;
+                        await _messageProcessor.ProcessMessageAsync(message, this);
                     }
+                    else
+                        throw new ArgumentOutOfRangeException(rawMessage.GetType().Name);
                 }
 
                 ArrayPool<byte>.Shared.Return(bodyBufferSource);

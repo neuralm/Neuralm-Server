@@ -1,4 +1,4 @@
-﻿using Neuralm.Services.Common.Messages.Abstractions;
+﻿using Neuralm.Services.Common.Messages.Interfaces;
 using Neuralm.Services.TrainingRoomService.Messages;
 using Neuralm.Services.UserService.Messages;
 using System;
@@ -16,8 +16,14 @@ namespace Neuralm.Services.MessageQueue.Application
     public static class MessageTypeCache
     {
         private static readonly ConcurrentDictionary<string, Type> TypeCache = new ConcurrentDictionary<string, Type>();
+
         private static int _isLoaded;
         private static int _isLoading;
+
+        /// <summary>
+        /// Gets the readonly types dictionary.
+        /// </summary>
+        public static IEnumerable<Type> Types => TypeCache.Values;
 
         /// <summary>
         /// Tries to get a message type with the given type name.
@@ -57,11 +63,7 @@ namespace Neuralm.Services.MessageQueue.Application
 
         private static IEnumerable<Type> GetMessageTypes<T>()
         {
-            return Assembly.GetAssembly(typeof(T)).GetTypes().Where(t =>
-                t.BaseType == typeof(Request) ||
-                t.BaseType == typeof(Response) ||
-                t.BaseType == typeof(Event) ||
-                t.BaseType == typeof(Command));
+            return Assembly.GetAssembly(typeof(T)).GetTypes().Where(t => t.BaseType == typeof(IMessage));
         }
     }
 }

@@ -17,6 +17,9 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Networking
         private readonly int _port;
         private NetworkStream _networkStream;
 
+        /// <inheritdoc cref="BaseNetworkConnector.EndPoint"/>
+        public override EndPoint EndPoint => _tcpClient.Client.RemoteEndPoint;
+
         /// <inheritdoc cref="BaseNetworkConnector.IsConnected"/>
         public override bool IsConnected => _tcpClient.Connected;
 

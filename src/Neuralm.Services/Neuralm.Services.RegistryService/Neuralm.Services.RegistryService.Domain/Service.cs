@@ -17,9 +17,14 @@ namespace Neuralm.Services.RegistryService.Domain
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets and sets the url.
+        /// Gets and sets the host.
         /// </summary>
-        public string Url { get; set; }
+        public string Host { get; set; }
+
+        /// <summary>
+        /// Gets and sets the port.
+        /// </summary>
+        public int Port { get; set; }
 
         /// <summary>
         /// Gets and sets the start date time.

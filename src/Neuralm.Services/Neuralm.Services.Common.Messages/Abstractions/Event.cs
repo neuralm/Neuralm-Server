@@ -6,7 +6,7 @@ namespace Neuralm.Services.Common.Messages.Abstractions
     /// <summary>
     /// Represents the <see cref="Event"/> class.
     /// </summary>
-    public abstract class Event : IEvent
+    public abstract class Event : IMessage
     {
         /// <summary>
         /// Gets the id.

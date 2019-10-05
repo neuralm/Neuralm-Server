@@ -1,5 +1,6 @@
 ﻿using Neuralm.Services.MessageQueue.Application.Interfaces;
 using System;
+using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
@@ -19,6 +20,9 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Networking
         private readonly string _host;
         private readonly int _port;
         private SslStream _sslStream;
+
+        /// <inheritdoc cref="BaseNetworkConnector.EndPoint"/>
+        public override EndPoint EndPoint => _tcpClient.Client.RemoteEndPoint;
 
         /// <inheritdoc cref="BaseNetworkConnector.IsConnected"/>
         public override bool IsConnected => _tcpClient.Connected;

@@ -6,7 +6,7 @@ namespace Neuralm.Services.Common.Messages.Abstractions
     /// <summary>
     /// Represents the <see cref="Request"/> class.
     /// </summary>
-    public abstract class Request : IRequest
+    public abstract class Request : IMessage
     {
         /// <summary>
         /// Gets the id.

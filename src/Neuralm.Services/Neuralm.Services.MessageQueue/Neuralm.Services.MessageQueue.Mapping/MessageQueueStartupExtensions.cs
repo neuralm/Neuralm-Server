@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Mapping;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
 using Neuralm.Services.MessageQueue.Application.Serializers;
+using Neuralm.Services.MessageQueue.Infrastructure;
 using System.Reflection;
 
 namespace Neuralm.Services.MessageQueue.Mapping
@@ -29,14 +30,17 @@ namespace Neuralm.Services.MessageQueue.Mapping
             // Instead of using .AddDbContext, .AddTransient is used because, the IFactory<MessageDbContext>
             // needs to be used for creating an instance of the UserDbContext.
             //serviceCollection.AddTransient<MessageDbContext>(p => p.GetService<IFactory<MessageDbContext>>().Create());
-
-            serviceCollection.AddSingleton<IMessageQueue, Infrastructure.Messaging.MessageQueue>();
+            serviceCollection.AddSingleton<IMessageSerializer, JsonMessageSerializer>();
+            
+            serviceCollection.AddSingleton<IMessageToServiceMapper, MessageToServiceMapper>();
 
             #region Services
-            serviceCollection.AddSingleton<IRegistryService, IRegistryService>();
+            serviceCollection.AddSingleton<IRegistryService, Infrastructure.Services.RegistryService>();
             #endregion Services
 
-            serviceCollection.AddSingleton<IMessageSerializer, JsonMessageSerializer>();
+            serviceCollection.AddSingleton<IRegistryServiceMessageProcessor, RegistryServiceMessageProcessor>();
+            serviceCollection.AddSingleton<IServiceMessageProcessor, ServiceMessageProcessor>();
+            serviceCollection.AddSingleton<IClientMessageProcessor, ClientMessageProcessor>();
 
             return serviceCollection;
         }

@@ -57,23 +57,25 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.RegistrySe
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Neuralm.Services.MessageQueue", "Neuralm.Services.MessageQueue", "{E9E1DEF4-BF22-4468-B695-F122CB2AB159}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Services.MessageQueue.NeuralmMQ", "Neuralm.Services\Neuralm.Services.MessageQueue\Neuralm.Services.MessageQueue.NeuralmMQ\Neuralm.Services.MessageQueue.NeuralmMQ.csproj", "{4833DF7A-2CDD-41BC-B12C-61B2732709D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.MessageQueue.NeuralmMQ", "Neuralm.Services\Neuralm.Services.MessageQueue\Neuralm.Services.MessageQueue.NeuralmMQ\Neuralm.Services.MessageQueue.NeuralmMQ.csproj", "{4833DF7A-2CDD-41BC-B12C-61B2732709D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Services.MessageQueue.Application", "Neuralm.Services\Neuralm.Services.MessageQueue\Neuralm.Services.MessageQueue.Application\Neuralm.Services.MessageQueue.Application.csproj", "{4DD46554-4CAF-4F64-B59E-CF0226EBBD07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.MessageQueue.Application", "Neuralm.Services\Neuralm.Services.MessageQueue\Neuralm.Services.MessageQueue.Application\Neuralm.Services.MessageQueue.Application.csproj", "{4DD46554-4CAF-4F64-B59E-CF0226EBBD07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Services.MessageQueue.Mapping", "Neuralm.Services\Neuralm.Services.MessageQueue\Neuralm.Services.MessageQueue.Mapping\Neuralm.Services.MessageQueue.Mapping.csproj", "{82B88CE4-5795-4C45-98DF-FEB45C4C4B1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.MessageQueue.Mapping", "Neuralm.Services\Neuralm.Services.MessageQueue\Neuralm.Services.MessageQueue.Mapping\Neuralm.Services.MessageQueue.Mapping.csproj", "{82B88CE4-5795-4C45-98DF-FEB45C4C4B1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Services.MessageQueue.Infrastructure", "Neuralm.Services\Neuralm.Services.MessageQueue\Neuralm.Services.MessageQueue.Infrastructure\Neuralm.Services.MessageQueue.Infrastructure.csproj", "{1104D836-4E8F-4108-884B-A6AE4A8897AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.MessageQueue.Infrastructure", "Neuralm.Services\Neuralm.Services.MessageQueue\Neuralm.Services.MessageQueue.Infrastructure\Neuralm.Services.MessageQueue.Infrastructure.csproj", "{1104D836-4E8F-4108-884B-A6AE4A8897AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Services.MessageQueue.Domain", "Neuralm.Services\Neuralm.Services.MessageQueue\Neuralm.Services.MessageQueue.Domain\Neuralm.Services.MessageQueue.Domain.csproj", "{78605888-627B-4BB9-A9BC-490AB75AEEDE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.MessageQueue.Domain", "Neuralm.Services\Neuralm.Services.MessageQueue\Neuralm.Services.MessageQueue.Domain\Neuralm.Services.MessageQueue.Domain.csproj", "{78605888-627B-4BB9-A9BC-490AB75AEEDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Services.UserService.Messages", "Neuralm.Services\Neuralm.Services.UserService\Neuralm.Services.UserService.Messages\Neuralm.Services.UserService.Messages.csproj", "{30449351-E89F-47A1-BD19-50AB7FB96D6B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.UserService.Messages", "Neuralm.Services\Neuralm.Services.UserService\Neuralm.Services.UserService.Messages\Neuralm.Services.UserService.Messages.csproj", "{30449351-E89F-47A1-BD19-50AB7FB96D6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Services.Common.Messages", "Neuralm.Services\Neuralm.Services.Common.Messages\Neuralm.Services.Common.Messages.csproj", "{ADE91982-1374-40A6-82D0-14938C9A9B04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.Common.Messages", "Neuralm.Services\Neuralm.Services.Common.Messages\Neuralm.Services.Common.Messages.csproj", "{ADE91982-1374-40A6-82D0-14938C9A9B04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Services.MessageQueue.Client", "Neuralm.Services\Neuralm.Services.MessageQueue\Neuralm.Services.MessageQueue.Client\Neuralm.Services.MessageQueue.Client.csproj", "{635B85D4-7B70-4F94-9801-2B0CAD18FE81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.MessageQueue.Client", "Neuralm.Services\Neuralm.Services.MessageQueue\Neuralm.Services.MessageQueue.Client\Neuralm.Services.MessageQueue.Client.csproj", "{635B85D4-7B70-4F94-9801-2B0CAD18FE81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Services.TrainingRoomService.Messages", "Neuralm.Services\Neuralm.Services.TrainingRoomService\Neuralm.Services.TrainingRoomService.Messages\Neuralm.Services.TrainingRoomService.Messages.csproj", "{44A97F31-85F4-4B5F-B311-3E70DA6878CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.TrainingRoomService.Messages", "Neuralm.Services\Neuralm.Services.TrainingRoomService\Neuralm.Services.TrainingRoomService.Messages\Neuralm.Services.TrainingRoomService.Messages.csproj", "{44A97F31-85F4-4B5F-B311-3E70DA6878CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Services.RegistryService.Messages", "Neuralm.Services\Neuralm.Services.RegistryService\Neuralm.Services.RegistryService.Messages\Neuralm.Services.RegistryService.Messages.csproj", "{4EE917B1-3E30-40C5-B519-3768B45CD098}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -205,6 +207,10 @@ Global
 		{44A97F31-85F4-4B5F-B311-3E70DA6878CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44A97F31-85F4-4B5F-B311-3E70DA6878CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44A97F31-85F4-4B5F-B311-3E70DA6878CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EE917B1-3E30-40C5-B519-3768B45CD098}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EE917B1-3E30-40C5-B519-3768B45CD098}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EE917B1-3E30-40C5-B519-3768B45CD098}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EE917B1-3E30-40C5-B519-3768B45CD098}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -245,6 +251,7 @@ Global
 		{ADE91982-1374-40A6-82D0-14938C9A9B04} = {CB3EBA39-DB0E-4F7C-9DEC-B0ECD756D11E}
 		{635B85D4-7B70-4F94-9801-2B0CAD18FE81} = {E9E1DEF4-BF22-4468-B695-F122CB2AB159}
 		{44A97F31-85F4-4B5F-B311-3E70DA6878CC} = {5AC96FAB-9B63-4162-874F-B81F385861A7}
+		{4EE917B1-3E30-40C5-B519-3768B45CD098} = {002E927A-8DFD-4BC6-A978-3AA0174BAE1F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0B434211-311E-4D7B-B548-FCC4B9E78751}

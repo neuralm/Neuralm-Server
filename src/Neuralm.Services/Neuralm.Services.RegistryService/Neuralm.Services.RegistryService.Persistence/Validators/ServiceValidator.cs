@@ -22,8 +22,8 @@ namespace Neuralm.Services.RegistryService.Persistence.Validators
                 throw new EntityValidationException("End must be null upon creation.");
             if (string.IsNullOrWhiteSpace(entity.Name))
                 throw new EntityValidationException("Name cannot be null or empty.");
-            if (ValidationUtilities.IsUrlValid(entity.Url))
-                throw new EntityValidationException("Url is invalid.");
+            if (ValidationUtilities.IsUrlValid(entity.Host))
+                throw new EntityValidationException("Host is invalid.");
             return true;
         }
     }
