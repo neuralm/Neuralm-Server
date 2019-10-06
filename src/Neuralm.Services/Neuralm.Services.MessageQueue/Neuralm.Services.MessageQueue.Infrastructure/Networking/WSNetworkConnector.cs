@@ -123,7 +123,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Networking
                 await writer.WriteAsync($"\r\n");
             }
 
-            _webSocket = WebSocket.CreateFromStream(_networkStream, true, "neuralm", TimeSpan.MaxValue);
+            _webSocket = WebSocket.CreateFromStream(_networkStream, true, "neuralm", Timeout.InfiniteTimeSpan);
             _handshakeComplete = true;
         }
 
@@ -162,7 +162,8 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Networking
                 do remainder = await reader.ReadLineAsync();
                 while (!string.IsNullOrEmpty(remainder));
             }
-            _webSocket = WebSocket.CreateFromStream(_networkStream, false, "neuralm", TimeSpan.Zero);
+            _webSocket = WebSocket.CreateFromStream(_networkStream, false, "neuralm", Timeout.InfiniteTimeSpan);
+            _handshakeComplete = true;
         }
 
         /// <inheritdoc cref="BaseNetworkConnector.ConnectAsync"/>
