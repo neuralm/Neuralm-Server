@@ -139,7 +139,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
             const int extendedPayloadLength16 = 2; // 2 bytes
             const int extendedPayloadLength64 = 8; // 8 bytes
 
-            if (this.PayloadLength < 126)
+            if (PayloadLength < 126)
             {
                 outgoingFrame = new byte[finRsv1Rsv2Rsv3Opcode + maskPayloadLength + PayloadLength];
                 outgoingFrame[1] = (byte)PayloadLength;
@@ -167,7 +167,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
                 outgoingFrame[9] = (byte)(PayloadLength & 255);
                 Array.Copy(PayloadData, 0, outgoingFrame, 10, PayloadLength);
             }
-
+            // 1 0 0 0 0 0 1 0 == (Fin 1, Rsv1 = 0, Rsv2 = 0, Rsv3 = 0, (0010 = Opcode = 2))
             outgoingFrame[0] = (byte)((byte)Opcode | 128);
 
             return outgoingFrame;

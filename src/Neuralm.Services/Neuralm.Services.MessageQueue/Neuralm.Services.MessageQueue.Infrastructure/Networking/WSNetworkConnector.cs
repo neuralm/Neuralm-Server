@@ -67,7 +67,6 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Networking
             _host = hostEntry.HostName;
             _port = endPoint.Port;
             _networkStream = _tcpClient.GetStream();
-            
         }
 
         /// <summary>
@@ -78,7 +77,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Networking
         {
             if (!IsConnected)
                 throw new NetworkConnectorIsNotYetConnectedException("Call ConnectAsync first.");
-
+            Console.WriteLine("Started handshake as server.");
             string secWebsocketAccept = string.Empty;
             using (StreamReader reader = new StreamReader(_networkStream, Encoding.UTF8, detectEncodingFromByteOrderMarks: false, bufferSize: 1, leaveOpen: true))
             {
@@ -106,7 +105,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Networking
                 while (!string.IsNullOrEmpty(line));
             }
 
-            if (secWebsocketAccept.Equals(string.Empty))
+            if (string.IsNullOrEmpty(secWebsocketAccept))
             {
                 Console.WriteLine("Sec-WebSocket-Key is not found.");
                 Dispose();
@@ -125,6 +124,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Networking
 
             _webSocket = WebSocket.CreateFromStream(_networkStream, true, "neuralm", Timeout.InfiniteTimeSpan);
             _handshakeComplete = true;
+            Console.WriteLine("Finished handshake as server.");
         }
 
         /// <summary>
@@ -136,6 +136,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Networking
             if (!IsConnected)
                 throw new NetworkConnectorIsNotYetConnectedException("Call ConnectAsync first.");
 
+            Console.WriteLine("Started handshake as client.");
             await using (StreamWriter writer = new StreamWriter(_networkStream, Encoding.UTF8, bufferSize: 1, leaveOpen: true))
             {
                 // Write client handshake "Request-Line" format.
@@ -164,6 +165,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Networking
             }
             _webSocket = WebSocket.CreateFromStream(_networkStream, false, "neuralm", Timeout.InfiniteTimeSpan);
             _handshakeComplete = true;
+            Console.WriteLine("Finished handshake as client.");
         }
 
         /// <inheritdoc cref="BaseNetworkConnector.ConnectAsync"/>

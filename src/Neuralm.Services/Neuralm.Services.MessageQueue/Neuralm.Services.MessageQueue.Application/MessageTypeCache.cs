@@ -63,7 +63,7 @@ namespace Neuralm.Services.MessageQueue.Application
 
         private static IEnumerable<Type> GetMessageTypes<T>()
         {
-            return Assembly.GetAssembly(typeof(T)).GetTypes().Where(t => t.BaseType == typeof(IMessage));
+            return Assembly.GetAssembly(typeof(T)).GetTypes().Where(type => typeof(IMessage).IsAssignableFrom(type));
         }
     }
 }

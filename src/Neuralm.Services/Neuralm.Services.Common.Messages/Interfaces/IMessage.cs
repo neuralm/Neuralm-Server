@@ -10,6 +10,6 @@ namespace Neuralm.Services.Common.Messages.Interfaces
         /// <summary>
         /// Gets the id.
         /// </summary>
-        Guid Id { get; }
+        Guid Id { get; set; }
     }
 }

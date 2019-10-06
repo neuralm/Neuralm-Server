@@ -11,12 +11,12 @@ namespace Neuralm.Services.Common.Messages.Abstractions
         /// <summary>
         /// Gets the id.
         /// </summary>
-        public Guid Id { get; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// Gets the date time.
         /// </summary>
-        public DateTime DateTime { get; }
+        public DateTime DateTime { get; set; }
 
         /// <summary>
         /// Initializes an instance of the <see cref="Request"/> class.

@@ -75,7 +75,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.MessageQue
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.TrainingRoomService.Messages", "Neuralm.Services\Neuralm.Services.TrainingRoomService\Neuralm.Services.TrainingRoomService.Messages\Neuralm.Services.TrainingRoomService.Messages.csproj", "{44A97F31-85F4-4B5F-B311-3E70DA6878CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Services.RegistryService.Messages", "Neuralm.Services\Neuralm.Services.RegistryService\Neuralm.Services.RegistryService.Messages\Neuralm.Services.RegistryService.Messages.csproj", "{4EE917B1-3E30-40C5-B519-3768B45CD098}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.RegistryService.Messages", "Neuralm.Services\Neuralm.Services.RegistryService\Neuralm.Services.RegistryService.Messages\Neuralm.Services.RegistryService.Messages.csproj", "{4EE917B1-3E30-40C5-B519-3768B45CD098}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Services.MessageQueue.Tests", "Neuralm.Services\Neuralm.Services.MessageQueue\Neuralm.Services.MessageQueue.Tests\Neuralm.Services.MessageQueue.Tests.csproj", "{0E36FCA7-2B27-4AEF-999F-58E8F3AD9002}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -211,6 +213,10 @@ Global
 		{4EE917B1-3E30-40C5-B519-3768B45CD098}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EE917B1-3E30-40C5-B519-3768B45CD098}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EE917B1-3E30-40C5-B519-3768B45CD098}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E36FCA7-2B27-4AEF-999F-58E8F3AD9002}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E36FCA7-2B27-4AEF-999F-58E8F3AD9002}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E36FCA7-2B27-4AEF-999F-58E8F3AD9002}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E36FCA7-2B27-4AEF-999F-58E8F3AD9002}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -252,6 +258,7 @@ Global
 		{635B85D4-7B70-4F94-9801-2B0CAD18FE81} = {E9E1DEF4-BF22-4468-B695-F122CB2AB159}
 		{44A97F31-85F4-4B5F-B311-3E70DA6878CC} = {5AC96FAB-9B63-4162-874F-B81F385861A7}
 		{4EE917B1-3E30-40C5-B519-3768B45CD098} = {002E927A-8DFD-4BC6-A978-3AA0174BAE1F}
+		{0E36FCA7-2B27-4AEF-999F-58E8F3AD9002} = {E9E1DEF4-BF22-4468-B695-F122CB2AB159}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0B434211-311E-4D7B-B548-FCC4B9E78751}
