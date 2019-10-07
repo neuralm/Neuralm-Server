@@ -46,13 +46,11 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
         {
             CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(DefaultTimeOut * 3));
             _ = StartServer(cts.Token, 9988);
-
             TcpNetworkConnector tcpNetworkConnector = await StartClient(cts.Token, 9988);
             AuthenticateRequest message = new AuthenticateRequest() { CredentialTypeCode = "Name", Password = "Mario", Username = "Mario" };
             await tcpNetworkConnector.SendMessageAsync(message, cts.Token);
             IMessage messageInMessageProcessor = await MessageProcessor.GetMessageAsync(cts.Token);
-
-            Assert.AreEqual(message.Id, messageInMessageProcessor.Id);
+            Assert.AreEqual(message.Id, messageInMessageProcessor?.Id);
             cts.Cancel();
         }
 

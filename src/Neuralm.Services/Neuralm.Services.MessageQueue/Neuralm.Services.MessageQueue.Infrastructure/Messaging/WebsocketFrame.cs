@@ -29,24 +29,18 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
         public WebSocketFrame(byte[] incomingFrame)
         {
             byte firstByte = incomingFrame[0];
-            BitArray firstBitArray = new BitArray(BitConverter.GetBytes(firstByte).ToArray());
-            Fin = Convert.ToBoolean(firstBitArray[0]);
-            Rsv1 = Convert.ToBoolean(firstBitArray[1]);
-            Rsv2 = Convert.ToBoolean(firstBitArray[2]);
-            Rsv3 = Convert.ToBoolean(firstBitArray[3]);
-            uint[] num = new uint[1];
-            firstBitArray.CopyTo(num, 4);
-            Opcode = (Opcode) num[0];
+            BitArray firstBitArray = new BitArray(new [] { firstByte });
+            Fin = Convert.ToBoolean(firstBitArray[7]);
+            Rsv1 = Convert.ToBoolean(firstBitArray[6]);
+            Rsv2 = Convert.ToBoolean(firstBitArray[5]);
+            Rsv3 = Convert.ToBoolean(firstBitArray[4]);
+            Opcode = (Opcode) BoolArrayToInt(firstBitArray.Cast<bool>().Take(4).ToArray());
 
             byte secondByte = incomingFrame[1];
-            BitArray secondBitArray = new BitArray(BitConverter.GetBytes(secondByte).ToArray());
-            Masked = Convert.ToBoolean(secondBitArray[0]);
+            BitArray secondBitArray = new BitArray(new[] { secondByte });
+            Masked = Convert.ToBoolean(secondBitArray.Get(secondBitArray.Length - 1));
+            PayloadLength = BoolArrayToInt(secondBitArray.Cast<bool>().SkipLast(1).ToArray());
 
-            num = new uint[1];
-            secondBitArray.CopyTo(num, 1);
-            PayloadLength = num[0];
-
-            const long maskLength = 4;
             long offset;
             long totalLength;
             switch (PayloadLength)
@@ -54,7 +48,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
                 case var length when length >= 0 && length < 126:
                 {
                     offset = 2;
-                    totalLength = PayloadLength + maskLength + offset;
+                    totalLength = PayloadLength + offset; 
                     break;
                 }
                 case var length when length == 126:
@@ -65,7 +59,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
                         incomingFrame[2]
                     }, 0);
                     offset = 4;
-                    totalLength = PayloadLength + maskLength + offset;
+                    totalLength = PayloadLength + offset;
                     break;
                 }
                 case var length when length == 127:
@@ -78,7 +72,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
                         incomingFrame[3], incomingFrame[2]
                     }, 0);
                     offset = 10;
-                    totalLength = PayloadLength + maskLength + offset;
+                    totalLength = PayloadLength + offset; 
                     break;
                 }
                 default:
@@ -100,7 +94,10 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
 
             PayloadData = new byte[PayloadLength];
 
-            Array.Copy(incomingFrame, offset + maskLength, PayloadData, 0, PayloadLength);
+            Array.Copy(incomingFrame, offset, PayloadData, 0, PayloadLength);
+
+            if (!Masked)
+                return;
 
             for (int i = 0; i < PayloadData.Length; i++)
             {
@@ -171,6 +168,29 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
             outgoingFrame[0] = (byte)((byte)Opcode | 128);
 
             return outgoingFrame;
+        }
+
+        private static void Reverse(BitArray array)
+        {
+            int length = array.Length;
+            int mid = (length / 2);
+
+            for (int i = 0; i < mid; i++)
+            {
+                bool bit = array[i];
+                array[i] = array[length - i - 1];
+                array[length - i - 1] = bit;
+            }
+        }
+
+        private static int BoolArrayToInt(bool[] arr)
+        {
+            if (arr.Length > 31)
+                throw new ApplicationException("too many elements to be converted to a single int");
+            int val = 0;
+            for (int i = 0; i < arr.Length; ++i)
+                if (arr[i]) val |= 1 << i;
+            return val;
         }
     }
 

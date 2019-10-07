@@ -43,15 +43,13 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
         [TestMethod]
         public async Task SendMessageAsync_Should_Invoke_MessageProcessor()
         {
-            CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(DefaultTimeOut * 3));
+            CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(DefaultTimeOut * 300));
             _ = StartServer(cts.Token, 9987);
-
-            WSNetworkConnector wsNetworkConnector = await StartClient(cts.Token, 9987);
             AuthenticateRequest message = new AuthenticateRequest() { CredentialTypeCode = "Name", Password = "Mario", Username = "Mario" };
-
+            WSNetworkConnector wsNetworkConnector = await StartClient(cts.Token, 9987);
             await wsNetworkConnector.SendMessageAsync(message, cts.Token);
             IMessage messageInMessageProcessor = await MessageProcessor.GetMessageAsync(cts.Token);
-            Assert.AreEqual(message.Id, messageInMessageProcessor.Id);
+            Assert.AreEqual(message.Id, messageInMessageProcessor?.Id);
             cts.Cancel();
         }
 
