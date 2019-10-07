@@ -12,4 +12,10 @@
     <ProjectReference Include="..\Neuralm.Services.MessageQueue.Mapping\Neuralm.Services.MessageQueue.Mapping.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

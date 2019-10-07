@@ -87,12 +87,12 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
 
             _genericServiceProvider = startup.GetGenericServiceProvider();
 
-            Console.WriteLine("Started RegistryService EndPoint.");
-            IRegistryService registryService = _genericServiceProvider.GetService<IRegistryService>();
-            _ = Task.Run(async () => await registryService.StartReceivingServiceEndPointsAsync(cancellationToken), cancellationToken);
+            //Console.WriteLine("Started RegistryService EndPoint.");
+            //IRegistryService registryService = _genericServiceProvider.GetService<IRegistryService>();
+            //_ = Task.Run(async () => await registryService.StartReceivingServiceEndPointsAsync(cancellationToken), cancellationToken);
 
             Console.WriteLine("Started client messaging EndPoint.");
-            IClientMessageProcessor clientMessageProcessor = _genericServiceProvider.GetService<ClientMessageProcessor>();
+            IClientMessageProcessor clientMessageProcessor = _genericServiceProvider.GetService<IClientMessageProcessor>();
             _ = Task.Run(async () => await clientMessageProcessor.StartAsync(cancellationToken), cancellationToken);
         }
     }

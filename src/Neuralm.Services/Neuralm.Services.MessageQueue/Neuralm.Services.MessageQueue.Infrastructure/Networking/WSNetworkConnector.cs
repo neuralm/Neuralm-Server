@@ -2,6 +2,7 @@
 using Neuralm.Services.MessageQueue.Domain;
 using Neuralm.Services.MessageQueue.Infrastructure.Messaging;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -183,7 +184,8 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Networking
             if (!_handshakeComplete)
                 throw new HandshakeIsNotCompletedYetException("Call StartHandshakeAsClient/StartHandshakeAsServer first.");
 
-            await _webSocket.ReceiveAsync(memory, cancellationToken);
+            ValueWebSocketReceiveResult rec = await _webSocket.ReceiveAsync(memory, cancellationToken);
+            Console.WriteLine($"WebSocketReceiveResult: Count {rec.Count}, Type: {rec.MessageType}");
             WebSocketFrame websocketFrame = new WebSocketFrame(memory.ToArray());
             websocketFrame.PayloadData.CopyTo(memory);
             return (int)websocketFrame.PayloadLength;

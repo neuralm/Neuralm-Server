@@ -51,8 +51,10 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
                 TcpClient tcpClient = await _tcpListener.AcceptTcpClientAsync();
                 _ = Task.Run(async () =>
                 {
-                    SslTcpNetworkConnector networkConnector = new SslTcpNetworkConnector(_messageSerializer, this, tcpClient);
-                    await networkConnector.AuthenticateAsServer(_messageQueueConfiguration.Certificate, CancellationToken.None);
+                    //SslTcpNetworkConnector networkConnector = new SslTcpNetworkConnector(_messageSerializer, this, tcpClient);
+                    WSNetworkConnector networkConnector = new WSNetworkConnector(_messageSerializer, this, tcpClient);
+                    //await networkConnector.AuthenticateAsServer(_messageQueueConfiguration.Certificate, CancellationToken.None);
+                    await networkConnector.StartHandshakeAsServerAsync();
                     networkConnector.Start();
                 }, cancellationToken);
             }
