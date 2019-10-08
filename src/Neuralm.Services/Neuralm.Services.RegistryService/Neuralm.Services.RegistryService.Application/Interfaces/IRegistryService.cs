@@ -1,5 +1,7 @@
 ﻿using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.RegistryService.Application.Dtos;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Neuralm.Services.RegistryService.Application.Interfaces
 {
@@ -8,8 +10,18 @@ namespace Neuralm.Services.RegistryService.Application.Interfaces
     /// </summary>
     public interface IRegistryService : IService<ServiceDto>
     {
-        // Check health of services
+        /// <summary>
+        /// Starts up the registry service and checks which services are needed and launches them asynchronously.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
+        Task StartupAsync(CancellationToken cancellationToken);
 
-        //
+        /// <summary>
+        /// Starts to monitor the services asynchronously. 
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
+        Task StartMonitoringAsync(CancellationToken cancellationToken);
     }
 }

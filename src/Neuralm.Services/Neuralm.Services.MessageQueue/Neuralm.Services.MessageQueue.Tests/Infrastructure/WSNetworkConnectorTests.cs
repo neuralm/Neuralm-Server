@@ -32,9 +32,8 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
         [TestMethod]
         public async Task ConnectAsync_Should_Set_IsConnected_To_True()
         {
-            CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(DefaultTimeOut * 3));
+            using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(DefaultTimeOut * 3));
             _ = StartServer(cts.Token, 9986);
-
             WSNetworkConnector wsNetworkConnector = await StartClient(cts.Token, 9986);
             Assert.IsTrue(wsNetworkConnector.IsConnected);
             cts.Cancel();
@@ -43,7 +42,7 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
         [TestMethod]
         public async Task SendMessageAsync_Should_Invoke_MessageProcessor()
         {
-            CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(DefaultTimeOut * 300));
+            using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(DefaultTimeOut * 3));
             _ = StartServer(cts.Token, 9987);
             AuthenticateRequest message = new AuthenticateRequest() { CredentialTypeCode = "Name", Password = "Mario", Username = "Mario" };
             WSNetworkConnector wsNetworkConnector = await StartClient(cts.Token, 9987);

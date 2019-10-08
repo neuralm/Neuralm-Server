@@ -21,7 +21,6 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
         public MessageProcessorMock MessageProcessor { get; set; }
         public string Host { get; set; }
 
-
         [TestInitialize]
         public void Setup()
         {
@@ -33,9 +32,8 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
         [TestMethod]
         public async Task ConnectAsync_Should_Set_IsConnected_To_True()
         {
-            CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(DefaultTimeOut * 3));
+            using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(DefaultTimeOut * 3));
             _ = StartServer(cts.Token, 9989);
-
             TcpNetworkConnector tcpNetworkConnector = await StartClient(cts.Token, 9989);
             Assert.IsTrue(tcpNetworkConnector.IsConnected);
             cts.Cancel();
@@ -44,7 +42,7 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
         [TestMethod]
         public async Task SendMessageAsync_Should_Invoke_MessageProcessor()
         {
-            CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(DefaultTimeOut * 3));
+            using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(DefaultTimeOut * 3));
             _ = StartServer(cts.Token, 9988);
             TcpNetworkConnector tcpNetworkConnector = await StartClient(cts.Token, 9988);
             AuthenticateRequest message = new AuthenticateRequest() { CredentialTypeCode = "Name", Password = "Mario", Username = "Mario" };
