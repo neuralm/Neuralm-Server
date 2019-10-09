@@ -11,6 +11,8 @@ using Neuralm.Services.RegistryService.Persistence.Contexts;
 using Neuralm.Services.RegistryService.Persistence.Infrastructure;
 using Neuralm.Services.RegistryService.Persistence.Validators;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
+using Neuralm.Services.RegistryService.Application.Configurations;
 
 namespace Neuralm.Services.RegistryService.Mapping
 {
@@ -23,11 +25,13 @@ namespace Neuralm.Services.RegistryService.Mapping
         /// Adds services from the <see cref="Application"/> assembly into the <see cref="serviceCollection"/>.
         /// </summary>
         /// <param name="serviceCollection">The service collection.</param>
+        /// <param name="configuration">The configuration.</param>
         /// <returns>Returns the service collection to chain further upon.</returns>
-        public static IServiceCollection AddApplicationServices(this IServiceCollection serviceCollection)
+        public static IServiceCollection AddApplicationServices(this IServiceCollection serviceCollection, IConfiguration configuration)
         {
-            serviceCollection.AddAutoMapper(Assembly.GetAssembly(typeof(RegistryStartupExtensions)));
+            serviceCollection.Configure<NeuralmConfiguration>(configuration.GetSection("Neuralm").Bind);
 
+            serviceCollection.AddAutoMapper(Assembly.GetAssembly(typeof(RegistryStartupExtensions)));
             if (StartupExtensions.IsDebug)
                 serviceCollection.AddLogging(p => p.AddDebug());
 

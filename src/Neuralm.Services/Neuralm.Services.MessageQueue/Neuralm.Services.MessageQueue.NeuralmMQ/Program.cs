@@ -2,7 +2,6 @@
 using Neuralm.Services.Common.Application;
 using Neuralm.Services.Common.Mapping;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
-using Neuralm.Services.MessageQueue.Infrastructure;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

@@ -23,7 +23,7 @@ namespace Neuralm.Services.RegistryService.Rest
         {
             services.AddControllers();
             services.AddConfigurations(Configuration);
-            services.AddApplicationServices();
+            services.AddApplicationServices(Configuration);
             services.AddJwtAuthentication(Configuration.GetSection("Jwt").Get<JwtConfiguration>());
         }
 
