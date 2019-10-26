@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using static Neuralm.Utilities.ConsoleUtility;
 using Console = System.Console;
+using Microsoft.OpenApi.Models;
 
 namespace Neuralm.Presentation.CLI
 {
