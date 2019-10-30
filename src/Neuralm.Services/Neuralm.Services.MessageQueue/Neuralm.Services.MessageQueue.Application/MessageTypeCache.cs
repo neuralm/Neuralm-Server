@@ -55,7 +55,7 @@ namespace Neuralm.Services.MessageQueue.Application
 
             foreach (Type messageType in messageTypes)
             {
-                TypeCache.TryAdd(messageType.Name, messageType);
+                TypeCache.TryAdd(messageType.FullName, messageType);
             }
             Interlocked.Decrement(ref _isLoading);
             Interlocked.Increment(ref _isLoaded);

@@ -14,5 +14,5 @@ export interface IMessageSerializer {
    * @param uint8Array The uint8Array.
    * @returns The message deserialized from the Uint8Array.
    */
-  deserialize(uint8Array: Uint8Array): object;
+  deserialize(uint8Array: Uint8Array): any;
 }

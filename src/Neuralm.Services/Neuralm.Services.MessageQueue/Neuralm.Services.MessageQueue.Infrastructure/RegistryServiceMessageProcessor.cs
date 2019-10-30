@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Neuralm.Services.Common.Application.Interfaces;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure
 {
@@ -14,16 +15,16 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
     public class RegistryServiceMessageProcessor : IRegistryServiceMessageProcessor
     {
         private readonly ConcurrentDictionary<Type, MethodInfo> _messageToMethodMap = new ConcurrentDictionary<Type, MethodInfo>();
-        private readonly IRegistryService _registryService;
+        private readonly IFetch<IRegistryService> _registryServiceFetcher;
 
         /// <summary>
         /// Initializes an instance of the <see cref="RegistryServiceMessageProcessor"/> class.
         /// </summary>
-        /// <param name="registryService">The registry service.</param>
-        public RegistryServiceMessageProcessor(IRegistryService registryService)
+        /// <param name="registryServiceFetcher">The registry service fetcher.</param>
+        public RegistryServiceMessageProcessor(IFetch<IRegistryService> registryServiceFetcher)
         {
-            _registryService = registryService;
-            Type serviceType = registryService.GetType();
+            _registryServiceFetcher = registryServiceFetcher;
+            Type serviceType = registryServiceFetcher.GetType().GetGenericArguments()[0];
             foreach ((MethodInfo methodInfo, Type parameterType) in serviceType
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public)
                 .Where(p => p.IsFinal)
@@ -38,13 +39,10 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         public async Task ProcessMessageAsync(IMessage message, INetworkConnector networkConnector)
         {
             Console.WriteLine($"Started processing RegistryService({networkConnector.EndPoint}) message.");
-            if (_messageToMethodMap.TryGetValue(message.GetType(), out MethodInfo methodInfo))
-            {
-                dynamic task = methodInfo.Invoke(_registryService, new object[] { message });
-                await task;
-            }
-            else
+            if (!_messageToMethodMap.TryGetValue(message.GetType(), out MethodInfo methodInfo))
                 throw new ArgumentOutOfRangeException(nameof(message), $"Unknown Request message of type: {message.GetType().Name}");
+            dynamic task = methodInfo.Invoke(_registryServiceFetcher.Fetch(), new object[] {message});
+            await task;
             Console.WriteLine($"Finished processing RegistryService({networkConnector.EndPoint}) message.");
         }
     }

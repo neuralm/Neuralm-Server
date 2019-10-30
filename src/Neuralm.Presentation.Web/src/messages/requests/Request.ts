@@ -1,9 +1,10 @@
 import Guid from '@/helpers/Guid';
+import { IMessage } from '@/interfaces/IMessage';
 
 /**
  * Represents the Request class.
  */
-export default class Request {
+export default class Request implements IMessage {
   public id: string;
   public dateTime: Date;
 

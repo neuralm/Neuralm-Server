@@ -5,6 +5,8 @@ using Neuralm.Services.MessageQueue.Infrastructure.Networking;
 using Neuralm.Services.RegistryService.Messages;
 using Neuralm.Services.RegistryService.Messages.Dtos;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -19,7 +21,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
     {
         private readonly IMessageSerializer _messageSerializer;
         private readonly IServiceMessageProcessor _serviceMessageProcessor;
-        private readonly RegistryServiceMessageProcessor _registryServiceMessageProcessor;
+        private readonly IRegistryServiceMessageProcessor _registryServiceMessageProcessor;
         private readonly IMessageToServiceMapper _messageToServiceMapper;
         private readonly TcpListener _tcpListener;
 
@@ -28,14 +30,14 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
         /// </summary>
         /// <param name="registryConfigurationOptions">The registry configuration options.</param>
         /// <param name="messageSerializer">The message serializer.</param>
-        /// <param name="serviceMessageProcessor"></param>
-        /// <param name="registryServiceMessageProcessor"></param>
+        /// <param name="serviceMessageProcessor">The service message processor.</param>
+        /// <param name="registryServiceMessageProcessor">The registry service message processor.</param>
         /// <param name="messageToServiceMapper">The message to service mapper.</param>
         public RegistryService(
             IOptions<RegistryConfiguration> registryConfigurationOptions,
             IMessageSerializer messageSerializer,
             IServiceMessageProcessor serviceMessageProcessor,
-            RegistryServiceMessageProcessor registryServiceMessageProcessor,
+            IRegistryServiceMessageProcessor registryServiceMessageProcessor,
             IMessageToServiceMapper messageToServiceMapper)
         {
             _messageSerializer = messageSerializer;
@@ -63,24 +65,26 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
         }
 
         /// <inheritdoc cref="IRegistryService.AddServices(AddServicesCommand)"/>
-        public async Task AddServices(AddServicesCommand addServicesCommand)
+        public Task AddServices(AddServicesCommand addServicesCommand)
         {
-            foreach (ServiceDto service in addServicesCommand.Services)
-            {
-                INetworkConnector networkConnector = new TcpNetworkConnector(_messageSerializer, _serviceMessageProcessor, service.Host, service.Port);
-                await networkConnector.ConnectAsync(CancellationToken.None);
-                networkConnector.Start();
-                _messageToServiceMapper.AddService(service.Id, service.Name, networkConnector);
-            }
+            IEnumerable<Task> tasks = addServicesCommand.Services
+                .Select(service => Task.Run(() => AddService(service.Id, service.Name, service.Host, service.Port)));
+            return Task.WhenAll(tasks);
         }
 
         /// <inheritdoc cref="IRegistryService.AddService(AddServiceCommand)"/>
-        public async Task AddService(AddServiceCommand addServiceCommand)
+        public Task AddService(AddServiceCommand addServiceCommand)
         {
-            INetworkConnector networkConnector = new TcpNetworkConnector(_messageSerializer, _serviceMessageProcessor, addServiceCommand.Service.Host, addServiceCommand.Service.Port);
+            return AddService(addServiceCommand.Service.Id, addServiceCommand.Service.Name, 
+                addServiceCommand.Service.Host, addServiceCommand.Service.Port);
+        }
+
+        private async Task AddService(Guid id, string name, string host, int port)
+        {
+            INetworkConnector networkConnector = new TcpNetworkConnector(_messageSerializer, _serviceMessageProcessor, host, port);
             await networkConnector.ConnectAsync(CancellationToken.None);
             networkConnector.Start();
-            _messageToServiceMapper.AddService(addServiceCommand.Service.Id, addServiceCommand.Service.Name, networkConnector);
+            _messageToServiceMapper.AddService(id, name, networkConnector);
         }
 
         /// <inheritdoc cref="IRegistryService.RemoveService(RemoveServiceCommand)"/>

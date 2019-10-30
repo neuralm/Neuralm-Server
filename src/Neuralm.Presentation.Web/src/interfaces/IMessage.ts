@@ -1,5 +1,7 @@
-import Guid from "@/helpers/Guid";
-
 export interface IMessage {
-  id: Guid;
+  id: string;
+}
+
+export interface IResponse extends IMessage {
+  success: boolean;
 }

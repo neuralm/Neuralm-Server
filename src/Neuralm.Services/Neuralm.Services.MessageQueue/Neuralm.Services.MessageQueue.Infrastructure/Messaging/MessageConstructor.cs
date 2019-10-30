@@ -30,7 +30,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
         {
             ReadOnlyMemory<byte> body = _messageSerializer.Serialize(messageBody);
             byte[] bodySizeBytes = BitConverter.GetBytes(body.Length);
-            byte[] typeNameBytes = Encoding.UTF8.GetBytes(messageBody.GetType().Name);
+            byte[] typeNameBytes = Encoding.UTF8.GetBytes(messageBody.GetType().FullName);
             byte[] headerSizeBytes = BitConverter.GetBytes(4 + bodySizeBytes.Length + typeNameBytes.Length);
             ReadOnlyMemory<byte> header = headerSizeBytes.Concat(bodySizeBytes).Concat(typeNameBytes).ToArray();
             return new Message(header, body);

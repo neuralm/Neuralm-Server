@@ -19,11 +19,27 @@ import IUserService from './interfaces/IUserService';
 
 // Styling
 import 'typeface-nunito';
+import WSNetworkConnector from './messaging/WSNetworkConnector';
+import JsonMessageSerializer from './messaging/JsonMessageSerializer';
+import { IMessageSerializer } from './interfaces/IMessageSerializer';
+import { IMessageProcessor } from './interfaces/IMessageProcessor';
+import MessageProcessor from './messaging/MessageProcessor';
+import { INetworkConnector } from './interfaces/INetworkConnector';
+import INeuralmMQClient from './interfaces/INeuralmMQClient';
+import NeuralmMQClient from './messaging/NeuralmMQClient';
 
 Vue.config.productionTip = false;
+const messageSerializer: IMessageSerializer = new JsonMessageSerializer();
+const messageProcessor: IMessageProcessor = new MessageProcessor();
+const url: string = 'ws://localhost:9999/neuralm';
+const wsNetworkConnector: INetworkConnector = new WSNetworkConnector(messageSerializer, messageProcessor, url);
+wsNetworkConnector.connectAsync().then((_) => {
+  wsNetworkConnector.start();
+});
 
-const trainingRoomService: ITrainingRoomService = new TrainingRoomService();
-const userService: IUserService = new UserService();
+const neuralmMQClient: INeuralmMQClient = new NeuralmMQClient(messageProcessor, wsNetworkConnector);
+const trainingRoomService: ITrainingRoomService = new TrainingRoomService(neuralmMQClient);
+const userService: IUserService = new UserService(neuralmMQClient);
 const userModule: IUserModule = new UserModule();
 const appModule: IAppModule = new AppModule();
 

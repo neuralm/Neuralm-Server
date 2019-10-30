@@ -15,7 +15,9 @@ import GetEnabledTrainingRoomsResponse from '../messages/responses/GetEnabledTra
 @Component({
   components: {},
   async mounted(): Promise<void> {
-    return await (this as Home).loadTrainingRooms();
+    return;
+    // NOTE: Temporarily removed this call because it will call the server everytime /Home is visited.
+    // return await (this as Home).loadTrainingRooms();
   }
 })
 export default class Home extends Vue {

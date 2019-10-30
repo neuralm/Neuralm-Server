@@ -4,10 +4,21 @@ import { IMessage } from './IMessage';
  * Represents the INetworkConnector interface.
  */
 export interface INetworkConnector {
+
+  /**
+   * Gets a value whether the connector is connected.
+   */
+  isConnected: boolean;
+
+  /**
+   * Gets a value whether the network connector is running.
+   */
+  isRunning: boolean;
+
   /**
    * Connects asynchronously.
    */
-  connectAsync(): Promise<Boolean>;
+  connectAsync(): Promise<boolean>;
 
   /**
    * Starts the network connector.
@@ -20,8 +31,8 @@ export interface INetworkConnector {
   stop(): void;
 
   /**
-   * Sends a message asynchronously.
+   * Sends a message.
    * @param message the message.
    */
-  sendMessageAsync<TMessage extends IMessage>(message: TMessage): Promise<any>; 
+  sendMessage<TMessage extends IMessage>(message: TMessage): void;
 }

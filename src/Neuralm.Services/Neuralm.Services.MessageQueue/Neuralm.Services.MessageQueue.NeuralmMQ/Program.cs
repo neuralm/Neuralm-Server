@@ -86,13 +86,32 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
 
             _genericServiceProvider = startup.GetGenericServiceProvider();
 
-            IRegistryService registryService = _genericServiceProvider.GetService<IRegistryService>();
-            _ = Task.Run(async () => await registryService.StartReceivingServiceEndPointsAsync(cancellationToken), cancellationToken);
-            Console.WriteLine("Started RegistryService EndPoint.");
+            try
+            {
+                IRegistryService registryService = _genericServiceProvider.GetService<IRegistryService>();
+                _ = Task.Run(async () => await registryService.StartReceivingServiceEndPointsAsync(cancellationToken), cancellationToken);
+                Console.WriteLine("Started RegistryService EndPoint.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
 
-            IClientMessageProcessor clientMessageProcessor = _genericServiceProvider.GetService<IClientMessageProcessor>();
-            _ = Task.Run(async () => await clientMessageProcessor.StartAsync(cancellationToken), cancellationToken);
-            Console.WriteLine("Started client messaging EndPoint.");
+            try
+            {
+                IClientMessageProcessor clientMessageProcessor = _genericServiceProvider.GetService<IClientMessageProcessor>();
+                _ = Task.Run(async () => await clientMessageProcessor.StartAsync(cancellationToken), cancellationToken);
+                Console.WriteLine("Started client messaging EndPoint.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+            Interlocked.Exchange(ref _canReadConsole, 1);
+            Interlocked.Exchange(ref _canExit, 1);
         }
     }
 }

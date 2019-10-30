@@ -1,5 +1,6 @@
 ﻿using Neuralm.Services.MessageQueue.Application.Interfaces;
 using System;
+using System.Text;
 using System.Text.Json;
 
 namespace Neuralm.Services.MessageQueue.Application.Serializers

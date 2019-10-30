@@ -5,6 +5,8 @@ using Neuralm.Services.MessageQueue.Application.Interfaces;
 using Neuralm.Services.MessageQueue.Application.Serializers;
 using Neuralm.Services.MessageQueue.Infrastructure;
 using System.Reflection;
+using Neuralm.Services.Common.Application;
+using Neuralm.Services.Common.Application.Interfaces;
 
 namespace Neuralm.Services.MessageQueue.Mapping
 {
@@ -33,6 +35,7 @@ namespace Neuralm.Services.MessageQueue.Mapping
             serviceCollection.AddSingleton<IMessageSerializer, JsonMessageSerializer>();
             
             serviceCollection.AddSingleton<IMessageToServiceMapper, MessageToServiceMapper>();
+            serviceCollection.AddSingleton<IFetch<IRegistryService>, Fetcher<IRegistryService>>();
 
             #region Services
             serviceCollection.AddSingleton<IRegistryService, Infrastructure.Services.RegistryService>();

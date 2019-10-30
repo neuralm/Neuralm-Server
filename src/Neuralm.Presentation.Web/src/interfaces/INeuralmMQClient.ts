@@ -1,11 +1,11 @@
-import { MessageHandlerDestructor, MessageHandler } from '@/messaging/MessageHandler';
-import MessageWrapper from '@/messaging/MessageWrapper';
+import { IMessage } from './IMessage';
+import { MessageHandler, MessageHandlerDestructor } from '@/messaging/MessageHandler';
 
 /**
- * Represents the IMessageProcessor interface.
+ * Represents the INeuralmMQClient interface.
+ * Used for communication with the Neuralm MessageQueue.
  */
-export interface IMessageProcessor {
-
+export default interface INeuralmMQClient {
   /**
    * Adds a message handler.
    * @param messageHandler the message handler.
@@ -24,8 +24,8 @@ export interface IMessageProcessor {
   handlerDestructor(): MessageHandlerDestructor;
 
   /**
-   * Processes the message.
-   * @param messageWrapper the message wrapper..
+   * Sends the message.
+   * @param message The message.
    */
-  processMessage(messageWrapper: MessageWrapper): void;
+  sendMessage(message: IMessage): void;
 }

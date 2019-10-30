@@ -1,8 +1,13 @@
 import Response from './Response';
 
 /**
- * Represents the RegisterResponse interface.
+ * Represents the RegisterResponse class.
  */
-export default interface RegisterResponse extends Response {
-
+export default class RegisterResponse extends Response {
+  /**
+   * Initializes a new instance of the RegisterResponse class.
+   */
+  constructor(id: string, requestId: string, dateTime: Date, message: string, success: boolean) {
+    super(id, requestId, dateTime, message, success);
+  }
 }

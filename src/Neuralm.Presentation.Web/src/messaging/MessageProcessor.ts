@@ -1,7 +1,6 @@
-import { IMessageProcessor } from "@/interfaces/IMessageProcessor";
+import { IMessageProcessor } from '@/interfaces/IMessageProcessor';
 import { MessageHandler, MessageHandlerDestructor } from './MessageHandler';
-import { IMessage } from '@/interfaces/IMessage';
-import { INetworkConnector } from '@/interfaces/INetworkConnector';
+import MessageWrapper from './MessageWrapper';
 
 /**
  * Represents the MessageProcessor class.
@@ -15,7 +14,7 @@ export default class MessageProcessor implements IMessageProcessor {
   constructor() {
     this._messageHandlers = new Map<string, MessageHandler[]>();
   }
-  
+
   public addHandler(messageHandler: MessageHandler): void {
     if (this._messageHandlers.has(messageHandler.messageName)) {
       this._messageHandlers.get(messageHandler.messageName)!.push(messageHandler);
@@ -33,29 +32,25 @@ export default class MessageProcessor implements IMessageProcessor {
     }
   }
 
-  public messageHandlerDestructor(): MessageHandlerDestructor {
+  public handlerDestructor(): MessageHandlerDestructor {
     return (messageHandler: MessageHandler) => this.removeHandler(messageHandler);
   }
 
-  public processMessageAsync(message: IMessage, networkConnector: INetworkConnector): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
-
-  private messageHandler(event: MessageEvent): void {
-    const message: IMessage = JSON.parse(event.data);
-    if (!this._messageHandlers.has(message.eventName)) {
+  public processMessage(messageWrapper: MessageWrapper): void {
+    if (!this._messageHandlers.has(messageWrapper.name)) {
+      console.log(`A message handler for '${messageWrapper.name}' was not found.`);
       return;
     }
-    if (message.success === false) {
+    if (!messageWrapper.message.success) {
       this._messageHandlers.get('errorHandler')!.forEach((eventHandler) => {
-        eventHandler.callback(message.message);
+        eventHandler.callback(messageWrapper.message);
       });
-      this._messageHandlers.delete(message.eventName);
+      this._messageHandlers.delete(messageWrapper.name);
       return;
     }
-    this._messageHandlers.get(message.eventName)!
-      .forEach((eventHandler: EventHandler) => {
-        eventHandler.callback(message.data);
+    return this._messageHandlers.get(messageWrapper.name)!
+      .forEach((eventHandler: MessageHandler) => {
+        eventHandler.callback(messageWrapper.message);
     });
   }
 }

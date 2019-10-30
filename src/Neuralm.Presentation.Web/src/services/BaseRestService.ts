@@ -45,4 +45,28 @@ export default class BaseRestService {
       return newObject;
     }
   }
+
+  private static toPascalCase(jsonObject: any): any {
+    if (jsonObject instanceof Array) {
+      return jsonObject.map((value: any) => {
+        if (typeof value === 'object') {
+          value = BaseRestService.toPascalCase(value);
+        }
+        return value;
+      });
+    } else {
+      const newObject: any = {};
+      for (const origKey in jsonObject) {
+        if (jsonObject.hasOwnProperty(origKey)) {
+          const newKey = (origKey.charAt(0).toUpperCase() + origKey.slice(1) || origKey).toString();
+          let value = jsonObject[origKey];
+          if (value instanceof Array || (value !== null && value.constructor === Object)) {
+            value = BaseRestService.toPascalCase(value);
+          }
+          newObject[newKey] = value;
+        }
+      }
+      return newObject;
+    }
+  }
 }

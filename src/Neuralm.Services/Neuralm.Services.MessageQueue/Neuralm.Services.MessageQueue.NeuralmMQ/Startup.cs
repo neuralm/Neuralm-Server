@@ -55,7 +55,7 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
 
             List<Task> tasks = new List<Task>
             {
-                Task.Run(() => CreateServerCertificate(_cancellationTokenSourceTimed.Token), cancellationToken)
+                //Task.Run(() => CreateServerCertificate(_cancellationTokenSourceTimed.Token), cancellationToken)
             };
 
             return Task.WhenAll(tasks).ContinueWith(task =>
