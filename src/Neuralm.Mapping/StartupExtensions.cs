@@ -20,6 +20,7 @@ using System.Text;
 using Neuralm.Infrastructure.EndPoints;
 using Neuralm.Infrastructure.Interfaces;
 using Neuralm.Infrastructure.MessageSerializers;
+using Microsoft.OpenApi.Models;
 
 namespace Neuralm.Mapping
 {
@@ -150,6 +151,10 @@ namespace Neuralm.Mapping
             serviceCollection.Configure<ServerConfiguration>(configuration.GetSection("Server").Bind);
             serviceCollection.Configure<DbConfiguration>(configuration.GetSection("NeuralmDb").Bind);
             serviceCollection.Configure<JwtConfiguration>(configuration.GetSection("Jwt").Bind);
+            serviceCollection.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Neuralm", Version = "v1" });
+            });
             return serviceCollection;
         }
 
