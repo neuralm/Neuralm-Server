@@ -1,13 +1,14 @@
 ﻿using Neuralm.Services.Common.Concurrent;
 using Neuralm.Services.Common.Messages.Interfaces;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
-using Neuralm.Services.MessageQueue.Domain;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Domain;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure
 {

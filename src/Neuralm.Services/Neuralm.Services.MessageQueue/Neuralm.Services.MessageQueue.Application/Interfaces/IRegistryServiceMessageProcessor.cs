@@ -1,4 +1,6 @@
-﻿namespace Neuralm.Services.MessageQueue.Application.Interfaces
+﻿using Neuralm.Services.Common.Application.Interfaces;
+
+namespace Neuralm.Services.MessageQueue.Application.Interfaces
 {
     /// <summary>
     /// Represents the <see cref="IRegistryServiceMessageProcessor"/> interface.

@@ -2,6 +2,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Neuralm.Services.Common.Application.Interfaces;
 
 namespace Neuralm.Services.MessageQueue.Application.Interfaces
 {

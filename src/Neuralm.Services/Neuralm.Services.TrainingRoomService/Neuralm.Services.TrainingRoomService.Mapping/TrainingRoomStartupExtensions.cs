@@ -11,6 +11,8 @@ using Neuralm.Services.TrainingRoomService.Persistence.Contexts;
 using Neuralm.Services.TrainingRoomService.Persistence.Infrastructure;
 using Neuralm.Services.TrainingRoomService.Persistence.Validators;
 using System.Reflection;
+using Neuralm.Services.Common.Application.Serializers;
+using Neuralm.Services.Common.Infrastructure.Services;
 
 namespace Neuralm.Services.TrainingRoomService.Mapping
 {
@@ -50,10 +52,14 @@ namespace Neuralm.Services.TrainingRoomService.Mapping
             #endregion Repositories
 
             #region Services
+            serviceCollection.AddTransient<IAccessTokenService, JwtAccessTokenService>();
             serviceCollection.AddSingleton<ITrainingRoomService, Application.Services.TrainingRoomService>();
             serviceCollection.AddSingleton<ITrainingSessionService, Application.Services.TrainingSessionService>();
-            serviceCollection.AddTransient<IAccessTokenService, JwtAccessTokenService>();
             #endregion Services
+
+            serviceCollection.AddSingleton<IMessageSerializer, JsonMessageSerializer>();
+            serviceCollection.AddSingleton<IStartupService, StartupService>();
+//            serviceCollection.AddHttpClient<IStartupService>();
 
             return serviceCollection;
         }

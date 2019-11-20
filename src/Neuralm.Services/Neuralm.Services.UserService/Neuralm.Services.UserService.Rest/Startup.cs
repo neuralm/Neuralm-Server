@@ -1,8 +1,12 @@
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Configurations;
 using Neuralm.Services.Common.Mapping;
 using Neuralm.Services.UserService.Mapping;
@@ -45,6 +49,16 @@ namespace Neuralm.Services.UserService.Rest
             {
                 endpoints.MapControllers();
             });
+            
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, "UserService"),
+                new Claim(ClaimTypes.Role, "Service")
+            };
+            string x = app.ApplicationServices.GetService<IAccessTokenService>().GenerateAccessToken(claims);
+            RegistryServiceConfiguration registryServiceConfiguration = Configuration.GetSection("RegistryService").Get<RegistryServiceConfiguration>();
+            app.ApplicationServices.GetService<IStartupService>().RegisterServiceAsync("UserService",
+                registryServiceConfiguration.Host, registryServiceConfiguration.Port);
         }
     }
 }

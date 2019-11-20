@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Neuralm.Services.Common.Application.Interfaces;
 
 namespace Neuralm.Services.MessageQueue.Application.Interfaces
 {

@@ -1,8 +1,10 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Configurations;
 using Neuralm.Services.Common.Mapping;
 using Neuralm.Services.TrainingRoomService.Mapping;
@@ -45,6 +47,9 @@ namespace Neuralm.Services.TrainingRoomService.Rest
             {
                 endpoints.MapControllers();
             });
+            RegistryServiceConfiguration registryServiceConfiguration = Configuration.GetSection("RegistryService").Get<RegistryServiceConfiguration>();
+            Task.Run(() => app.ApplicationServices.GetService<IStartupService>().RegisterServiceAsync("TrainingRoomService",
+                registryServiceConfiguration.Host, registryServiceConfiguration.Port));
         }
     }
 }

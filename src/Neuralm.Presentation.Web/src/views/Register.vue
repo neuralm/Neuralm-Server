@@ -26,7 +26,7 @@
 import { Component, Vue, Prop, Inject } from 'vue-property-decorator';
 import { mapState, mapActions } from 'vuex';
 import IUserService from '../interfaces/IUserService';
-import User from '../models/user';
+import User from '../models/User';
 import RegisterRequest from '../messages/requests/RegisterRequest';
 import RegisterResponse from '../messages/responses/RegisterResponse';
 

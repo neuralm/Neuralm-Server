@@ -8,7 +8,7 @@ namespace Neuralm.Services.Common.Messages.Interfaces
     public interface IMessage
     {
         /// <summary>
-        /// Gets the id.
+        /// Gets and sets the id.
         /// </summary>
         Guid Id { get; set; }
     }

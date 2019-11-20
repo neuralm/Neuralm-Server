@@ -9,5 +9,15 @@
         /// Gets and sets the array of services.
         /// </summary>
         public string[] Services { get; set; }
+
+        /// <summary>
+        /// Gets and sets the host.
+        /// </summary>
+        public string Host { get; set; }
+        
+        /// <summary>
+        /// Gets and sets the port.
+        /// </summary>
+        public int Port { get; set; }
     }
 }

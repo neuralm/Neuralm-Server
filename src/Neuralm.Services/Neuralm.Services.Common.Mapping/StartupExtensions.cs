@@ -54,6 +54,7 @@ namespace Neuralm.Services.Common.Mapping
             serviceCollection.AddOptions();
             serviceCollection.Configure<DbConfiguration>(configuration.GetSection("Database").Bind);
             serviceCollection.Configure<JwtConfiguration>(configuration.GetSection("Jwt").Bind);
+            serviceCollection.Configure<RegistryServiceConfiguration>(configuration.GetSection("RegistryService").Bind);
             return serviceCollection;
         }
 

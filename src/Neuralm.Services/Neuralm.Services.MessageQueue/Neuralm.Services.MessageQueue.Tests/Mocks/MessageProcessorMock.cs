@@ -1,10 +1,10 @@
 ﻿using Neuralm.Services.Common.Messages.Interfaces;
-using Neuralm.Services.MessageQueue.Application.Interfaces;
-using Neuralm.Services.MessageQueue.Domain;
 using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Domain;
 
 namespace Neuralm.Services.MessageQueue.Tests.Mocks
 {

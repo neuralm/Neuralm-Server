@@ -1,4 +1,4 @@
-import User from '@/models/User';
+import User from '../models/User';
 
 /**
  * The auth header is used to make authenticated HTTP requests

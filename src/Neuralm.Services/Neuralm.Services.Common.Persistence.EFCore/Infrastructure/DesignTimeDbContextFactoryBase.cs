@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Neuralm.Services.Common.Application;
 using Neuralm.Services.Common.Configurations;
 using System;
+using System.Reflection.Emit;
 
 namespace Neuralm.Services.Common.Persistence.EFCore.Infrastructure
 {
@@ -47,14 +48,24 @@ namespace Neuralm.Services.Common.Persistence.EFCore.Infrastructure
         public virtual TContext CreateDbContext(string[] args)
         {
             if (_dbContextOptionsBuilder == null)
-                SetDbContextOptionsBuilder(_dbConfiguration.ConnectionString);
+                SetDbContextOptionsBuilder(_dbConfiguration.ConnectionString, _dbConfiguration.DbProvider);
             return CreateNewInstance(_dbContextOptionsBuilder.Options);
         }
 
-        private void SetDbContextOptionsBuilder(string connectionString)
+        private void SetDbContextOptionsBuilder(string connectionString, string providerName)
         {
+            // If both empty, continue.
+            // The in memory database will be selected.
+            if (string.IsNullOrEmpty(providerName) && string.IsNullOrEmpty(connectionString))
+                goto label;
+            
             if (string.IsNullOrEmpty(connectionString))
                 throw new ArgumentException($"Connection string '{connectionString}' is null or empty.", nameof(connectionString));
+            
+            if (string.IsNullOrEmpty(providerName))
+                throw new ArgumentException($"DbProvider string '{providerName}' is null or empty.", nameof(connectionString));
+            
+            label: 
 
             DbContextOptionsBuilder<TContext> optionsBuilder = new DbContextOptionsBuilder<TContext>();
 

@@ -2,12 +2,13 @@
 using Neuralm.Services.Common.Messages.Interfaces;
 using Neuralm.Services.MessageQueue.Application.Configurations;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
-using Neuralm.Services.MessageQueue.Infrastructure.Networking;
 using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Infrastructure.Networking;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure
 {
@@ -18,6 +19,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
     {
         private readonly IMessageSerializer _messageSerializer;
         private readonly IServiceMessageProcessor _serviceMessageProcessor;
+        private readonly IMessageTypeCache _messageTypeCache;
         private readonly IMessageToServiceMapper _messageToServiceMapper;
         private readonly MessageQueueConfiguration _messageQueueConfiguration;
         private readonly TcpListener _tcpListener;
@@ -29,15 +31,18 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         /// <param name="messageSerializer">The message serializer.</param>
         /// <param name="messageQueueConfigurationOptions">The message queue configuration options.</param>
         /// <param name="serviceMessageProcessor">The service message processor.</param>
+        /// <param name="messageTypeCache">The message type cache.</param>
         public ClientMessageProcessor(
             IMessageToServiceMapper messageToServiceMapper, 
             IMessageSerializer messageSerializer,
             IOptions<MessageQueueConfiguration> messageQueueConfigurationOptions,
-            IServiceMessageProcessor serviceMessageProcessor)
+            IServiceMessageProcessor serviceMessageProcessor,
+            IMessageTypeCache messageTypeCache)
         {
             _messageToServiceMapper = messageToServiceMapper;
             _messageSerializer = messageSerializer;
             _serviceMessageProcessor = serviceMessageProcessor;
+            _messageTypeCache = messageTypeCache;
             _messageQueueConfiguration = messageQueueConfigurationOptions.Value;
             _tcpListener = new TcpListener(IPAddress.Any, _messageQueueConfiguration.Port);
         }
@@ -52,7 +57,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
                 _ = Task.Run(async () =>
                 {
                     //SslTcpNetworkConnector networkConnector = new SslTcpNetworkConnector(_messageSerializer, this, tcpClient);
-                    WSNetworkConnector networkConnector = new WSNetworkConnector(_messageSerializer, this, tcpClient);
+                    WSNetworkConnector networkConnector = new WSNetworkConnector(_messageTypeCache, _messageSerializer, this, tcpClient);
                     //await networkConnector.AuthenticateAsServer(_messageQueueConfiguration.Certificate, CancellationToken.None);
                     await networkConnector.StartHandshakeAsServerAsync();
                     networkConnector.Start();

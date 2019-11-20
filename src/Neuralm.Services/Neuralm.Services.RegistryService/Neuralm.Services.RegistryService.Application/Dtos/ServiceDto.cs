@@ -14,8 +14,11 @@ namespace Neuralm.Services.RegistryService.Application.Dtos
         /// <inheritdoc cref="Service.Name"/>
         public string Name { get; set; }
 
-        /// <inheritdoc cref="Service.Url"/>
-        public string Url { get; set; }
+        /// <inheritdoc cref="Service.Host"/>
+        public string Host { get; set; }
+        
+        /// <inheritdoc cref="Service.Port"/>
+        public int Port { get; set; }
 
         /// <inheritdoc cref="Service.Start"/>
         public DateTime Start { get; set; }

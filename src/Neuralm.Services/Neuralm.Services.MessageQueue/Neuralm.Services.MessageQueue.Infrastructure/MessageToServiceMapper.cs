@@ -1,4 +1,5 @@
-﻿using Neuralm.Services.MessageQueue.Application;
+﻿using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.MessageQueue.Application;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
 using System;
 using System.Collections.Concurrent;
@@ -12,6 +13,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
     /// </summary>
     public class MessageToServiceMapper : IMessageToServiceMapper
     {
+        private readonly IMessageTypeCache _messageTypeCache;
         private static readonly ConcurrentDictionary<string, List<Type>> ServiceTypeCache = new ConcurrentDictionary<string, List<Type>>();
         private readonly ConcurrentDictionary<Type, IServiceConnector> _messageToServiceMap = new ConcurrentDictionary<Type, IServiceConnector>();
         private readonly ConcurrentDictionary<Guid, IServiceConnector> _serviceMap = new ConcurrentDictionary<Guid, IServiceConnector>();
@@ -23,12 +25,11 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         /// <summary>
         /// Initializes an instance of the <see cref="MessageToServiceMapper"/> class.
         /// </summary>
-        public MessageToServiceMapper()
+        public MessageToServiceMapper(IMessageTypeCache messageTypeCache)
         {
+            _messageTypeCache = messageTypeCache;
             Console.WriteLine("Mapping messages to services...");
-            MessageTypeCache.LoadMessageTypeCache();
-            
-            foreach (Type type in MessageTypeCache.Types)
+            foreach (Type type in _messageTypeCache.GetMessageTypes())
             {
                 string typename = type.FullName ?? "";
                 Match match = _regex.Match(typename);

@@ -1,15 +1,18 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Neuralm.Services.Common.Messages.Interfaces;
-using Neuralm.Services.MessageQueue.Application.Interfaces;
-using Neuralm.Services.MessageQueue.Application.Serializers;
-using Neuralm.Services.MessageQueue.Infrastructure.Networking;
 using Neuralm.Services.MessageQueue.Tests.Mocks;
 using Neuralm.Services.UserService.Messages;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Application.Serializers;
+using Neuralm.Services.Common.Infrastructure;
+using Neuralm.Services.Common.Infrastructure.Networking;
+using Neuralm.Services.TrainingRoomService.Messages;
 
 namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
 {
@@ -19,6 +22,8 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
         private const int DefaultTimeOut = 5;
         public IMessageSerializer MessageSerializer { get; set; }
         public MessageProcessorMock MessageProcessor { get; set; }
+        public IMessageTypeCache MessageTypeCache { get; set; }
+        public IFactory<IMessageTypeCache, IEnumerable<Type>> MessageTypeCacheFactory { get; set; }
         public string Host { get; set; }
 
         [TestInitialize]
@@ -27,6 +32,12 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
             Host = "localhost";
             MessageSerializer = new JsonMessageSerializer();
             MessageProcessor = new MessageProcessorMock(MessageSerializer);
+            MessageTypeCacheFactory = new MessageTypeCacheFactory();
+            List<Type> types = new List<Type>
+            {
+                typeof(RegisterRequest), typeof(CreateTrainingRoomRequest)
+            };
+            MessageTypeCache = MessageTypeCacheFactory.Create(types);
         }
 
         [TestMethod]
@@ -65,7 +76,7 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
                 Console.WriteLine("Accepted connection!");
                 _ = Task.Run(async () =>
                 {
-                    WSNetworkConnector networkConnector = new WSNetworkConnector(MessageSerializer, MessageProcessor, tcpClient);
+                    WSNetworkConnector networkConnector = new WSNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, tcpClient);
                     await networkConnector.StartHandshakeAsServerAsync();
                     networkConnector.Start();
                     Console.WriteLine("Started websocket network connector");
@@ -75,7 +86,7 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
 
         private async Task<WSNetworkConnector> StartClient(CancellationToken cancellationToken, int port)
         {
-            WSNetworkConnector wsNetworkConnector = new WSNetworkConnector(MessageSerializer, MessageProcessor, Host, port);
+            WSNetworkConnector wsNetworkConnector = new WSNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Host, port);
             await wsNetworkConnector.ConnectAsync(cancellationToken);
             await wsNetworkConnector.StartHandshakeAsClientAsync();
             wsNetworkConnector.Start();

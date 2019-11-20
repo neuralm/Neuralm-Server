@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Neuralm.Services.MessageQueue.Application.Configurations;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
-using Neuralm.Services.MessageQueue.Infrastructure.Networking;
 using Neuralm.Services.RegistryService.Messages;
-using Neuralm.Services.RegistryService.Messages.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +9,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Infrastructure.Networking;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure.Services
 {
@@ -24,6 +24,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
         private readonly IRegistryServiceMessageProcessor _registryServiceMessageProcessor;
         private readonly IMessageToServiceMapper _messageToServiceMapper;
         private readonly TcpListener _tcpListener;
+        private readonly IMessageTypeCache _messageTypeCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryService"/> class.
@@ -33,12 +34,14 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
         /// <param name="serviceMessageProcessor">The service message processor.</param>
         /// <param name="registryServiceMessageProcessor">The registry service message processor.</param>
         /// <param name="messageToServiceMapper">The message to service mapper.</param>
+        /// <param name="messageTypeCache">The message type cache.</param>
         public RegistryService(
             IOptions<RegistryConfiguration> registryConfigurationOptions,
             IMessageSerializer messageSerializer,
             IServiceMessageProcessor serviceMessageProcessor,
             IRegistryServiceMessageProcessor registryServiceMessageProcessor,
-            IMessageToServiceMapper messageToServiceMapper)
+            IMessageToServiceMapper messageToServiceMapper,
+            IMessageTypeCache messageTypeCache)
         {
             _messageSerializer = messageSerializer;
             _serviceMessageProcessor = serviceMessageProcessor;
@@ -46,6 +49,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
             _messageToServiceMapper = messageToServiceMapper;
             RegistryConfiguration registryConfiguration = registryConfigurationOptions.Value;
             _tcpListener = new TcpListener(IPAddress.Any, registryConfiguration.Port);
+            _messageTypeCache = messageTypeCache;
         }
 
         /// <inheritdoc cref="IRegistryService.StartReceivingServiceEndPointsAsync(CancellationToken)"/>
@@ -57,7 +61,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
                 TcpClient tcpClient = await _tcpListener.AcceptTcpClientAsync();
                 _ = Task.Run(() =>
                 {
-                    INetworkConnector networkConnector = new TcpNetworkConnector(_messageSerializer, _registryServiceMessageProcessor, tcpClient);
+                    INetworkConnector networkConnector = new TcpNetworkConnector(_messageTypeCache, _messageSerializer, _registryServiceMessageProcessor, tcpClient);
                     networkConnector.Start();
                 }, cancellationToken);
                 Console.WriteLine("Accepted a new RegistryService!");
@@ -81,7 +85,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
 
         private async Task AddService(Guid id, string name, string host, int port)
         {
-            INetworkConnector networkConnector = new TcpNetworkConnector(_messageSerializer, _serviceMessageProcessor, host, port);
+            INetworkConnector networkConnector = new TcpNetworkConnector(_messageTypeCache, _messageSerializer, _serviceMessageProcessor, host, port);
             await networkConnector.ConnectAsync(CancellationToken.None);
             networkConnector.Start();
             _messageToServiceMapper.AddService(id, name, networkConnector);

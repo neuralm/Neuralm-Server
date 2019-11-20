@@ -31,7 +31,7 @@ import NeuralmMQClient from './messaging/NeuralmMQClient';
 Vue.config.productionTip = false;
 const messageSerializer: IMessageSerializer = new JsonMessageSerializer();
 const messageProcessor: IMessageProcessor = new MessageProcessor();
-const url: string = 'ws://localhost:9999/neuralm';
+const url: string = 'ws://localhost:5000/neuralm';
 const wsNetworkConnector: INetworkConnector = new WSNetworkConnector(messageSerializer, messageProcessor, url);
 wsNetworkConnector.connectAsync().then((_) => {
   wsNetworkConnector.start();

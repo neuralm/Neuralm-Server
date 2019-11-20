@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using Neuralm.Services.Common.Application.Interfaces;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure
 {
@@ -29,7 +30,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
                 await clientNetworkConnector.SendMessageAsync(message, CancellationToken.None);
             else
                 throw new ArgumentOutOfRangeException(nameof(message), $"Unknown message of type: {message.GetType().Name}");
-            Console.WriteLine($"Finished Processing message: {message.Id} from {networkConnector.EndPoint}");
+            Console.WriteLine($"Finished Processing message: {message.Id.ToString()} from {networkConnector.EndPoint}");
         }
 
         /// <inheritdoc cref="IServiceMessageProcessor.AddClientMessage(Guid, INetworkConnector)"/>

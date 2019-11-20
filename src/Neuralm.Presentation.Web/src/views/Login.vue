@@ -29,7 +29,7 @@
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { mapState, mapActions } from 'vuex';
 import IUserService from '../interfaces/IUserService';
-import User from '../models/user';
+import User from '../models/User';
 import AuthenticateRequest from '../messages/requests/AuthenticateRequest';
 import AuthenticateResponse from '../messages/responses/AuthenticateResponse';
 

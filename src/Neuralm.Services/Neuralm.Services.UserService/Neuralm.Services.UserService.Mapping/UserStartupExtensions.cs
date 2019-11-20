@@ -13,6 +13,8 @@ using Neuralm.Services.UserService.Persistence.Contexts;
 using Neuralm.Services.UserService.Persistence.Infrastructure;
 using Neuralm.Services.UserService.Persistence.Validators;
 using System.Reflection;
+using Neuralm.Services.Common.Application.Serializers;
+using Neuralm.Services.Common.Infrastructure.Services;
 
 namespace Neuralm.Services.UserService.Mapping
 {
@@ -69,6 +71,10 @@ namespace Neuralm.Services.UserService.Mapping
             serviceCollection.AddTransient<IUserService, Application.Services.UserService>();
             #endregion Services
 
+            serviceCollection.AddTransient<IMessageSerializer, JsonMessageSerializer>();
+            serviceCollection.AddSingleton<IStartupService, StartupService>();
+//            serviceCollection.AddHttpClient<IStartupService>();
+            
             return serviceCollection;
         }
     }
