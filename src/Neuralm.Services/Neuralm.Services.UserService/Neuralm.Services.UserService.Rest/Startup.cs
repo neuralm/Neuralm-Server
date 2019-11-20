@@ -49,16 +49,8 @@ namespace Neuralm.Services.UserService.Rest
             {
                 endpoints.MapControllers();
             });
-            
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, "UserService"),
-                new Claim(ClaimTypes.Role, "Service")
-            };
-            string x = app.ApplicationServices.GetService<IAccessTokenService>().GenerateAccessToken(claims);
-            RegistryServiceConfiguration registryServiceConfiguration = Configuration.GetSection("RegistryService").Get<RegistryServiceConfiguration>();
-            app.ApplicationServices.GetService<IStartupService>().RegisterServiceAsync("UserService",
-                registryServiceConfiguration.Host, registryServiceConfiguration.Port);
+
+            app.RegisterService(Configuration, "UserService");
         }
     }
 }

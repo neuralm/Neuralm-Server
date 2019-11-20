@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Neuralm.Services.Common.Mapping;
 using Neuralm.Services.MessageQueue.Application.Configurations;
+using Neuralm.Services.MessageQueue.Application.Interfaces;
 using Neuralm.Services.MessageQueue.Mapping;
 using System;
 using System.Collections.Generic;
@@ -56,6 +57,8 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
             List<Task> tasks = new List<Task>
             {
                 //Task.Run(() => CreateServerCertificate(_cancellationTokenSourceTimed.Token), cancellationToken)
+                // Initiate service map..
+                Task.Run(_genericServiceProvider.GetService<IMessageToServiceMapper>, cancellationToken)
             };
 
             return Task.WhenAll(tasks).ContinueWith(task =>

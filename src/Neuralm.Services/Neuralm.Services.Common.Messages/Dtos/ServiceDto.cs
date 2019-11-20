@@ -26,5 +26,10 @@ namespace Neuralm.Services.Common.Messages.Dtos
         /// Gets and sets the port.
         /// </summary>
         public int Port { get; set; }
+
+        /// <summary>
+        /// Gets and sets the datetime.
+        /// </summary>
+        public DateTime Start { get; set; }
     }
 }

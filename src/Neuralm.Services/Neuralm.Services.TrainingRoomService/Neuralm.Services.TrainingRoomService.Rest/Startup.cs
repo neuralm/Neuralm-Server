@@ -47,9 +47,8 @@ namespace Neuralm.Services.TrainingRoomService.Rest
             {
                 endpoints.MapControllers();
             });
-            RegistryServiceConfiguration registryServiceConfiguration = Configuration.GetSection("RegistryService").Get<RegistryServiceConfiguration>();
-            Task.Run(() => app.ApplicationServices.GetService<IStartupService>().RegisterServiceAsync("TrainingRoomService",
-                registryServiceConfiguration.Host, registryServiceConfiguration.Port));
+
+            app.RegisterService(Configuration, "TrainingRoomService");
         }
     }
 }

@@ -10,7 +10,7 @@ using Neuralm.Services.TrainingRoomService.Persistence.Contexts;
 namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
 {
     [DbContext(typeof(TrainingRoomDbContext))]
-    [Migration("20190925091322_InitialCreate")]
+    [Migration("20191120191427_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

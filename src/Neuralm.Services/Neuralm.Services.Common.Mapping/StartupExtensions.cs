@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Configurations;
 using System;
 using System.Reflection;
@@ -97,6 +98,21 @@ namespace Neuralm.Services.Common.Mapping
         {
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseAuthentication();
+            return app;
+        }
+
+        /// <summary>
+        /// Registers the service with the registry service.
+        /// </summary>
+        /// <param name="app">The application builder interface.</param>
+        /// <param name="configuration">The configuration interface.</param>
+        /// <param name="serviceName">The service name.</param>
+        /// <returns>Returns <see cref="IApplicationBuilder"/> to chain further upon.</returns>
+        public static IApplicationBuilder RegisterService(this IApplicationBuilder app, IConfiguration configuration, string serviceName)
+        {
+            RegistryServiceConfiguration registryServiceConfiguration = configuration.GetSection("RegistryService").Get<RegistryServiceConfiguration>();
+            app.ApplicationServices.GetService<IStartupService>().RegisterServiceAsync(serviceName,
+                registryServiceConfiguration.Host, registryServiceConfiguration.Port);
             return app;
         }
 

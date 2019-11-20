@@ -1,13 +1,13 @@
+using Microsoft.Extensions.Options;
+using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Configurations;
+using Neuralm.Services.Common.Messages.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using Neuralm.Services.Common.Application.Interfaces;
-using Neuralm.Services.Common.Configurations;
-using Neuralm.Services.Common.Messages.Dtos;
 
 namespace Neuralm.Services.Common.Infrastructure.Services
 {
@@ -44,7 +44,8 @@ namespace Neuralm.Services.Common.Infrastructure.Services
                 Id = Guid.NewGuid(),
                 Host = host,
                 Port = port,
-                Name = serviceName
+                Name = serviceName,
+                Start = DateTime.Now
             };
             List<Claim> claims = new List<Claim>
             {
@@ -54,7 +55,7 @@ namespace Neuralm.Services.Common.Infrastructure.Services
             using HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_accessTokenService.GenerateAccessToken(claims)}");
             string json = _messageSerializer.SerializeToString(serviceDto);
-            httpClient.BaseAddress = new Uri($"{_registryServiceConfiguration.Host}:{_registryServiceConfiguration.Port.ToString()}");
+            httpClient.BaseAddress = new Uri($"http://{_registryServiceConfiguration.Host}:{_registryServiceConfiguration.Port.ToString()}");
             await httpClient.PostAsync("registry/create", new StringContent(json, Encoding.UTF8, "application/json"));
         }
     }

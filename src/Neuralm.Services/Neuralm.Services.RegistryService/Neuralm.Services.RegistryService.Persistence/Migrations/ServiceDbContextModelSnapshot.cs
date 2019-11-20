@@ -28,21 +28,24 @@ namespace Neuralm.Services.RegistryService.Persistence.Migrations
                     b.Property<DateTime>("End")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Host")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsAlive")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Port")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Start")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Url")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
-                    b.ToTable("Service");
+                    b.ToTable("Services");
                 });
 #pragma warning restore 612, 618
         }

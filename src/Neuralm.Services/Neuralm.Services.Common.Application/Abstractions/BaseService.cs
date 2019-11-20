@@ -39,29 +39,29 @@ namespace Neuralm.Services.Common.Application.Abstractions
         public virtual Task<IEnumerable<TDto>> GetAllAsync()
         {
             return EntityRepository.GetAllAsync()
-                .ContinueWith(trainingRooms => Mapper.Map<IEnumerable<TDto>>(trainingRooms.Result));
+                .ContinueWith(entities => Mapper.Map<IEnumerable<TDto>>(entities.Result));
         }
 
         /// <inheritdoc cref="IService{TEntity}.DeleteAsync(TEntity)"/>
         public virtual async Task<(bool success, bool found)> DeleteAsync(TDto dto)
         {
-            TEntity trainingRoom = Mapper.Map<TEntity>(dto);
-            bool found = await EntityRepository.ExistsAsync(u => u.Id.Equals(trainingRoom.Id));
-            return !found ? (false, false) : (await EntityRepository.DeleteAsync(trainingRoom), true);
+            TEntity entity = Mapper.Map<TEntity>(dto);
+            bool found = await EntityRepository.ExistsAsync(u => u.Id.Equals(entity.Id));
+            return !found ? (false, false) : (await EntityRepository.DeleteAsync(entity), true);
         }
 
         /// <inheritdoc cref="IService{TEntity}.UpdateAsync(TEntity)"/>
         public virtual Task<(bool success, Guid id, bool updated)> UpdateAsync(TDto dto)
         {
-            TEntity trainingRoom = Mapper.Map<TEntity>(dto);
-            return EntityRepository.UpdateAsync(trainingRoom);
+            TEntity entity = Mapper.Map<TEntity>(dto);
+            return EntityRepository.UpdateAsync(entity);
         }
 
         /// <inheritdoc cref="IService{TEntity}.CreateAsync(TEntity)"/>
         public virtual Task<(bool success, Guid id)> CreateAsync(TDto dto)
         {
-            TEntity trainingRoom = Mapper.Map<TEntity>(dto);
-            return EntityRepository.CreateAsync(trainingRoom);
+            TEntity entity = Mapper.Map<TEntity>(dto);
+            return EntityRepository.CreateAsync(entity);
         }
     }
 }
