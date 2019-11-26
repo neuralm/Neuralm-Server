@@ -19,7 +19,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
     {
         private readonly IMessageSerializer _messageSerializer;
         private readonly IServiceMessageProcessor _serviceMessageProcessor;
-        private readonly IMessageTypeCache _messageTypeCache;
+        private readonly IClientMessageTypeCache _messageTypeCache;
         private readonly IMessageToServiceMapper _messageToServiceMapper;
         private readonly MessageQueueConfiguration _messageQueueConfiguration;
         private readonly TcpListener _tcpListener;
@@ -37,7 +37,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
             IMessageSerializer messageSerializer,
             IOptions<MessageQueueConfiguration> messageQueueConfigurationOptions,
             IServiceMessageProcessor serviceMessageProcessor,
-            IMessageTypeCache messageTypeCache)
+            IClientMessageTypeCache messageTypeCache)
         {
             _messageToServiceMapper = messageToServiceMapper;
             _messageSerializer = messageSerializer;

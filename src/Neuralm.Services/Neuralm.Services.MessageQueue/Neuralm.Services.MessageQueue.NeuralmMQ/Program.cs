@@ -27,35 +27,36 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
             Task task = new Program().RunAsync(CancellationTokenSource.Token);
             _ = Task.Run(() => task);
 
-            while (!CancellationTokenSource.IsCancellationRequested)
-            {
-                if (Interlocked.CompareExchange(ref _canReadConsole, 0, 0) == 0)
-                {
-                    await Task.Delay(500);
-                    continue;
-                }
-
-                if (Console.ReadKey().Key == ConsoleKey.Q)
-                {
-                    CancellationTokenSource.Cancel();
-                    continue;
-                }
-                Console.WriteLine("\nPress Q to shut down the message queue.");
-            }
+//            while (!CancellationTokenSource.IsCancellationRequested)
+//            {
+//                if (Interlocked.CompareExchange(ref _canReadConsole, 0, 0) == 0)
+//                {
+//                    await Task.Delay(500);
+//                    continue;
+//                }
+//
+//                if (Console.ReadKey().Key == ConsoleKey.Q)
+//                {
+//                    CancellationTokenSource.Cancel();
+//                    continue;
+//                }
+//                Console.WriteLine("\nPress Q to shut down the message queue.");
+//            }
             if (Interlocked.CompareExchange(ref _canExit, 1, 1) == 0)
             {
                 try
                 {
                     await task;
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     Console.WriteLine("RunAsync cancelled.");
+                    Console.WriteLine(e);
                 }
             }
 
             // Temporary fix, docker won't allow input...
-//            await Task.Delay(-1);
+            await Task.Delay(-1);
             Console.WriteLine("\nMessage queue has shut down");
             Console.WriteLine("Press any key to continue..");
             Console.ReadKey();

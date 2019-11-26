@@ -20,7 +20,7 @@
     "Neuralm.Services.RegistryService.Rest": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "registry/all",
+      "launchUrl": "registry",
       "applicationUrl": "http://localhost:5002",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
