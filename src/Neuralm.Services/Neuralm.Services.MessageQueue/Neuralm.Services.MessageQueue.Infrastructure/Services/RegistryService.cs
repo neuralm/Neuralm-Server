@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
+using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Infrastructure.Networking;
 using Neuralm.Services.MessageQueue.Application.Configurations;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
 using Neuralm.Services.RegistryService.Messages;
@@ -9,8 +11,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Neuralm.Services.Common.Application.Interfaces;
-using Neuralm.Services.Common.Infrastructure.Networking;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure.Services
 {
@@ -32,20 +32,18 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
         /// <param name="registryConfigurationOptions">The registry configuration options.</param>
         /// <param name="messageSerializer">The message serializer.</param>
         /// <param name="serviceMessageProcessor">The service message processor.</param>
-        /// <param name="registryServiceMessageProcessor">The registry service message processor.</param>
         /// <param name="messageToServiceMapper">The message to service mapper.</param>
         /// <param name="messageTypeCache">The message type cache.</param>
         public RegistryService(
             IOptions<RegistryConfiguration> registryConfigurationOptions,
             IMessageSerializer messageSerializer,
             IServiceMessageProcessor serviceMessageProcessor,
-            IRegistryServiceMessageProcessor registryServiceMessageProcessor,
             IMessageToServiceMapper messageToServiceMapper,
             IMessageTypeCache messageTypeCache)
         {
             _messageSerializer = messageSerializer;
             _serviceMessageProcessor = serviceMessageProcessor;
-            _registryServiceMessageProcessor = registryServiceMessageProcessor;
+            _registryServiceMessageProcessor = new RegistryServiceMessageProcessor(this);
             _messageToServiceMapper = messageToServiceMapper;
             RegistryConfiguration registryConfiguration = registryConfigurationOptions.Value;
             _tcpListener = new TcpListener(IPAddress.Any, registryConfiguration.Port);

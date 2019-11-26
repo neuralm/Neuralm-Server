@@ -1,11 +1,12 @@
-﻿using Neuralm.Services.Common.Messages.Interfaces;
+﻿using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Messages.Interfaces;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
-using Neuralm.Services.Common.Application.Interfaces;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure
 {
@@ -15,19 +16,19 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
     public class RegistryServiceMessageProcessor : IRegistryServiceMessageProcessor
     {
         private readonly ConcurrentDictionary<Type, MethodInfo> _messageToMethodMap = new ConcurrentDictionary<Type, MethodInfo>();
-        private readonly IFetch<IRegistryService> _registryServiceFetcher;
+        private readonly IRegistryService _registryService;
 
         /// <summary>
         /// Initializes an instance of the <see cref="RegistryServiceMessageProcessor"/> class.
         /// </summary>
-        /// <param name="registryServiceFetcher">The registry service fetcher.</param>
-        public RegistryServiceMessageProcessor(IFetch<IRegistryService> registryServiceFetcher)
+        /// <param name="registryService">The registry service fetcher.</param>
+        public RegistryServiceMessageProcessor(IRegistryService registryService)
         {
-            _registryServiceFetcher = registryServiceFetcher;
-            Type serviceType = registryServiceFetcher.Fetch().GetType();
+            _registryService = registryService;
+            Type serviceType = registryService.GetType();
             foreach ((MethodInfo methodInfo, Type parameterType) in serviceType
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                .Where(p => p.IsFinal)
+                .Where(p => p.IsFinal && p.GetParameters()[0].ParameterType != typeof(CancellationToken))
                 .Select(methodInfo => (methodInfo, parameterType: methodInfo.GetParameters()[0].ParameterType)))
             {
                 _messageToMethodMap.TryAdd(parameterType, methodInfo);
@@ -41,7 +42,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
             Console.WriteLine($"Started processing RegistryService({networkConnector.EndPoint}) message.");
             if (!_messageToMethodMap.TryGetValue(message.GetType(), out MethodInfo methodInfo))
                 throw new ArgumentOutOfRangeException(nameof(message), $"Unknown Request message of type: {message.GetType().FullName}");
-            dynamic task = methodInfo.Invoke(_registryServiceFetcher.Fetch(), new object[] {message});
+            dynamic task = methodInfo.Invoke(_registryService, new object[] {message});
             await task;
             Console.WriteLine($"Finished processing RegistryService({networkConnector.EndPoint}) message.");
         }

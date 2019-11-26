@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
+using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Infrastructure.Networking;
 using Neuralm.Services.Common.Messages.Interfaces;
 using Neuralm.Services.MessageQueue.Application.Configurations;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
@@ -7,8 +9,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Neuralm.Services.Common.Application.Interfaces;
-using Neuralm.Services.Common.Infrastructure.Networking;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure
 {

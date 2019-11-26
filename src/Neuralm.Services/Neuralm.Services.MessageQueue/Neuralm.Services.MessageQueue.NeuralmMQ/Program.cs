@@ -84,20 +84,11 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
             Console.WriteLine("Initializing...");
             await startup.InitializeAsync(configuration, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
-            Console.WriteLine("Finished initializing!\n");
+            Console.WriteLine("Finished initializing!");
 
             _genericServiceProvider = startup.GetGenericServiceProvider();
 
-            IRegistryService registryService;
-            try
-            {
-                 registryService = _genericServiceProvider.GetService<IRegistryService>();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            IRegistryService registryService = _genericServiceProvider.GetService<IRegistryService>();
             _ = Task.Run(async () => await registryService.StartReceivingServiceEndPointsAsync(cancellationToken), cancellationToken);
             Console.WriteLine("Started RegistryService EndPoint.");
 

@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Neuralm.Services.Common.Mapping;
-using Neuralm.Services.MessageQueue.Application.Interfaces;
-using Neuralm.Services.MessageQueue.Infrastructure;
-using System.Reflection;
-using Neuralm.Services.Common.Application;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Application.Serializers;
 using Neuralm.Services.Common.Infrastructure;
-using Neuralm.Services.MessageQueue.Application;
+using Neuralm.Services.Common.Mapping;
+using Neuralm.Services.MessageQueue.Application.Interfaces;
+using Neuralm.Services.MessageQueue.Infrastructure;
 using Neuralm.Services.TrainingRoomService.Messages;
 using Neuralm.Services.UserService.Messages;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace Neuralm.Services.MessageQueue.Mapping
 {
@@ -47,10 +45,7 @@ namespace Neuralm.Services.MessageQueue.Mapping
                 return serviceCollection.GetService<IFactory<IMessageTypeCache, IEnumerable<Type>>>().Create(types);
             });
             serviceCollection.AddSingleton<IMessageSerializer, JsonMessageSerializer>();
-            
             serviceCollection.AddSingleton<IMessageToServiceMapper, MessageToServiceMapper>();
-            serviceCollection.AddSingleton<IFetch<IRegistryService>, Fetcher<IRegistryService>>();
-            serviceCollection.AddSingleton<IRegistryServiceMessageProcessor, RegistryServiceMessageProcessor>();
             serviceCollection.AddSingleton<IServiceMessageProcessor, ServiceMessageProcessor>();
             serviceCollection.AddSingleton<IClientMessageProcessor, ClientMessageProcessor>();
 
