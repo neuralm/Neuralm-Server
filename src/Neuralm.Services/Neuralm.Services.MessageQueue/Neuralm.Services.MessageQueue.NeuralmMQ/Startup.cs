@@ -53,7 +53,7 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
                 .AddApplicationServices()
                 .BuildServiceProvider()
                 .ToGenericServiceProvider();
-
+            
             List<Task> tasks = new List<Task>
             {
                 //Task.Run(() => CreateServerCertificate(_cancellationTokenSourceTimed.Token), cancellationToken)
@@ -99,10 +99,8 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
 
                     if (certificatesInStore.Count > 1)
                     {
-                        foreach (X509Certificate2 cert in certificatesInStore)
-                        {
+                        foreach (X509Certificate2 cert in certificatesInStore) 
                             DisplayCertificate(cert);
-                        }
                         throw new ArgumentOutOfRangeException(nameof(certificatesInStore), "More than one certificate was found!");
                     }
 

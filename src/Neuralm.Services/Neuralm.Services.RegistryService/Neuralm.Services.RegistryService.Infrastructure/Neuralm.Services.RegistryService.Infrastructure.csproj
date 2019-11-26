@@ -9,6 +9,7 @@
       <ProjectReference Include="..\..\Neuralm.Services.Common.Infrastructure\Neuralm.Services.Common.Infrastructure.csproj" />
       <ProjectReference Include="..\Neuralm.Services.RegistryService.Application\Neuralm.Services.RegistryService.Application.csproj" />
       <ProjectReference Include="..\Neuralm.Services.RegistryService.Domain\Neuralm.Services.RegistryService.Domain.csproj" />
+      <ProjectReference Include="..\Neuralm.Services.RegistryService.Messages\Neuralm.Services.RegistryService.Messages.csproj" />
     </ItemGroup>
 
 </Project>

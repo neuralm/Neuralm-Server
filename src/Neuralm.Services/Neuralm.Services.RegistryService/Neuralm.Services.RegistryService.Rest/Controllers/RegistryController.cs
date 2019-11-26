@@ -19,7 +19,6 @@ namespace Neuralm.Services.RegistryService.Rest.Controllers
         [Authorize(Roles = "Service"), HttpPost("create")]
         public override Task<IActionResult> CreateAsync(ServiceDto dto)
         {
-            // TODO: on success notify message queue.
             return base.CreateAsync(dto);
         }
 

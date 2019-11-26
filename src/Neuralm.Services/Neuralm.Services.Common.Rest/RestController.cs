@@ -107,7 +107,7 @@ namespace Neuralm.Services.Common.Rest
                 return BadRequest(ModelState.GetErrorMessages());
             (bool success, Guid id) = await _service.CreateAsync(dto);
             return success
-                ? new CreatedAtActionResult(nameof(GetAsync), GetType().Name, new { id }, "")
+                ? new CreatedAtActionResult(nameof(GetAsync), this.GetType().Name, new { id }, "")
                 : (IActionResult)new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
     }

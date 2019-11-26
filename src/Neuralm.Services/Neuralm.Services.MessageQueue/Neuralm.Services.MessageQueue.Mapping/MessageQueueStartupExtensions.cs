@@ -38,7 +38,7 @@ namespace Neuralm.Services.MessageQueue.Mapping
             //serviceCollection.AddTransient<MessageDbContext>(p => p.GetService<IFactory<MessageDbContext>>().Create());
             
             serviceCollection.AddSingleton<IFactory<IMessageTypeCache, IEnumerable<Type>>, MessageTypeCacheFactory>();
-            serviceCollection.AddSingleton<IMessageTypeCache>(serviceCollection =>
+            serviceCollection.AddSingleton<IMessageTypeCache, IMessageTypeCache>(serviceCollection =>
             {
                 List<Type> types = new List<Type>
                 {
@@ -50,15 +50,14 @@ namespace Neuralm.Services.MessageQueue.Mapping
             
             serviceCollection.AddSingleton<IMessageToServiceMapper, MessageToServiceMapper>();
             serviceCollection.AddSingleton<IFetch<IRegistryService>, Fetcher<IRegistryService>>();
-
-            #region Services
-            serviceCollection.AddSingleton<IRegistryService, Infrastructure.Services.RegistryService>();
-            #endregion Services
-
             serviceCollection.AddSingleton<IRegistryServiceMessageProcessor, RegistryServiceMessageProcessor>();
             serviceCollection.AddSingleton<IServiceMessageProcessor, ServiceMessageProcessor>();
             serviceCollection.AddSingleton<IClientMessageProcessor, ClientMessageProcessor>();
 
+            #region Services
+            serviceCollection.AddSingleton<IRegistryService, Infrastructure.Services.RegistryService>();
+            #endregion Services
+            
             return serviceCollection;
         }
     }

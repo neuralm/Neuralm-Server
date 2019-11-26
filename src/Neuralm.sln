@@ -71,8 +71,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.UserServic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.Common.Messages", "Neuralm.Services\Neuralm.Services.Common.Messages\Neuralm.Services.Common.Messages.csproj", "{ADE91982-1374-40A6-82D0-14938C9A9B04}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.MessageQueue.Client", "Neuralm.Services\Neuralm.Services.MessageQueue\Neuralm.Services.MessageQueue.Client\Neuralm.Services.MessageQueue.Client.csproj", "{635B85D4-7B70-4F94-9801-2B0CAD18FE81}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.TrainingRoomService.Messages", "Neuralm.Services\Neuralm.Services.TrainingRoomService\Neuralm.Services.TrainingRoomService.Messages\Neuralm.Services.TrainingRoomService.Messages.csproj", "{44A97F31-85F4-4B5F-B311-3E70DA6878CC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.RegistryService.Messages", "Neuralm.Services\Neuralm.Services.RegistryService\Neuralm.Services.RegistryService.Messages\Neuralm.Services.RegistryService.Messages.csproj", "{4EE917B1-3E30-40C5-B519-3768B45CD098}"
@@ -207,10 +205,6 @@ Global
 		{ADE91982-1374-40A6-82D0-14938C9A9B04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADE91982-1374-40A6-82D0-14938C9A9B04}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ADE91982-1374-40A6-82D0-14938C9A9B04}.Release|Any CPU.Build.0 = Release|Any CPU
-		{635B85D4-7B70-4F94-9801-2B0CAD18FE81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{635B85D4-7B70-4F94-9801-2B0CAD18FE81}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{635B85D4-7B70-4F94-9801-2B0CAD18FE81}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{635B85D4-7B70-4F94-9801-2B0CAD18FE81}.Release|Any CPU.Build.0 = Release|Any CPU
 		{44A97F31-85F4-4B5F-B311-3E70DA6878CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{44A97F31-85F4-4B5F-B311-3E70DA6878CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44A97F31-85F4-4B5F-B311-3E70DA6878CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -273,7 +267,6 @@ Global
 		{78605888-627B-4BB9-A9BC-490AB75AEEDE} = {E9E1DEF4-BF22-4468-B695-F122CB2AB159}
 		{30449351-E89F-47A1-BD19-50AB7FB96D6B} = {79154190-8C61-406E-87EA-8A378F5C511C}
 		{ADE91982-1374-40A6-82D0-14938C9A9B04} = {CB3EBA39-DB0E-4F7C-9DEC-B0ECD756D11E}
-		{635B85D4-7B70-4F94-9801-2B0CAD18FE81} = {E9E1DEF4-BF22-4468-B695-F122CB2AB159}
 		{44A97F31-85F4-4B5F-B311-3E70DA6878CC} = {5AC96FAB-9B63-4162-874F-B81F385861A7}
 		{4EE917B1-3E30-40C5-B519-3768B45CD098} = {002E927A-8DFD-4BC6-A978-3AA0174BAE1F}
 		{0E36FCA7-2B27-4AEF-999F-58E8F3AD9002} = {E9E1DEF4-BF22-4468-B695-F122CB2AB159}

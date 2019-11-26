@@ -45,6 +45,8 @@ namespace Neuralm.Services.RegistryService.Rest
             {
                 endpoints.MapControllers();
             });
+
+            app.StartRegistryServiceAsync();
         }
     }
 }

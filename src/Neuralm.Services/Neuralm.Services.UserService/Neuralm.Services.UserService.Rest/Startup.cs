@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -49,7 +50,15 @@ namespace Neuralm.Services.UserService.Rest
             {
                 endpoints.MapControllers();
             });
-
+//
+//            List<Claim> claims = new List<Claim>
+//            {
+//                new Claim(ClaimTypes.Name, "UserService"),
+//                new Claim(ClaimTypes.Role, "Service")
+//            };
+//            var service = app.ApplicationServices.GetService(typeof(IAccessTokenService)) as IAccessTokenService;
+//            string x = service.GenerateAccessToken(claims);
+//            Console.WriteLine(x);
             app.RegisterService(Configuration, "UserService");
         }
     }

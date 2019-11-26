@@ -110,9 +110,9 @@ namespace Neuralm.Services.Common.Mapping
         /// <returns>Returns <see cref="IApplicationBuilder"/> to chain further upon.</returns>
         public static IApplicationBuilder RegisterService(this IApplicationBuilder app, IConfiguration configuration, string serviceName)
         {
-            RegistryServiceConfiguration registryServiceConfiguration = configuration.GetSection("RegistryService").Get<RegistryServiceConfiguration>();
+            ServiceConfiguration serviceConfiguration = configuration.GetSection("Service").Get<ServiceConfiguration>();
             app.ApplicationServices.GetService<IStartupService>().RegisterServiceAsync(serviceName,
-                registryServiceConfiguration.Host, registryServiceConfiguration.Port);
+                serviceConfiguration.Host, serviceConfiguration.Port);
             return app;
         }
 

@@ -13,6 +13,9 @@ using Neuralm.Services.RegistryService.Persistence.Contexts;
 using Neuralm.Services.RegistryService.Persistence.Infrastructure;
 using Neuralm.Services.RegistryService.Persistence.Validators;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Neuralm.Services.Common.Application.Serializers;
 using Neuralm.Services.Common.Infrastructure;
@@ -68,11 +71,23 @@ namespace Neuralm.Services.RegistryService.Mapping
             serviceCollection.AddTransient<IMessageProcessor, MessageProcessor>();
             
             #region Services
-            serviceCollection.AddSingleton<IRegistryService, Infrastructure.Services.RegistryService>();
             serviceCollection.AddTransient<IAccessTokenService, JwtAccessTokenService>();
+            serviceCollection.AddSingleton<IRegistryService, Infrastructure.Services.RegistryService>();
             #endregion Services
 
             return serviceCollection;
+        }
+        
+        /// <summary>
+        /// Starts the registry service asynchronously.
+        /// </summary>
+        /// <param name="app">The application builder.</param>
+        /// <returns>Returns the application builder.</returns>
+        public static IApplicationBuilder StartRegistryServiceAsync(this IApplicationBuilder app)
+        {
+            IRegistryService registryService = app.ApplicationServices.GetService(typeof(IRegistryService)) as IRegistryService;
+            Task.Run(async () => await registryService.StartupAsync(CancellationToken.None));
+            return app;
         }
     }
 }
