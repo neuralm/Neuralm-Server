@@ -51,10 +51,10 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         public TcpNetworkConnector(IMessageTypeCache messageTypeCache, IMessageSerializer messageSerializer, IMessageProcessor messageProcessor, TcpClient tcpClient) : base(messageTypeCache, messageSerializer, messageProcessor)
         {
             _tcpClient = tcpClient;
-            IPEndPoint endPoint = (IPEndPoint)tcpClient.Client.RemoteEndPoint;
-            IPHostEntry hostEntry = Dns.GetHostEntry(endPoint.Address);
-            _host = hostEntry.HostName;
-            _port = endPoint.Port;
+            //IPEndPoint endPoint = (IPEndPoint)tcpClient.Client.RemoteEndPoint;
+            //IPHostEntry hostEntry = Dns.GetHostEntry(endPoint.Address);
+            //_host = hostEntry.HostName;
+            //_port = endPoint.Port;
             _tcpClient.Client.NoDelay = true;
             _networkStream = _tcpClient.GetStream();
         }

@@ -58,7 +58,6 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
             _messageConstructor = new MessageConstructor(messageSerializer);
             _messageProcessor = messageProcessor ?? throw new ArgumentNullException(nameof(messageProcessor));
             _messageTypeCache = messageTypeCache ?? throw new ArgumentNullException(nameof(messageTypeCache));
-            // MessageTypeCache.LoadMessageTypeCache();
         }
 
         /// <summary>
