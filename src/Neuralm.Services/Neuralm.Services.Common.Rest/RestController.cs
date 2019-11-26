@@ -45,7 +45,7 @@ namespace Neuralm.Services.Common.Rest
         /// Gets all dtos asynchronously.
         /// </summary>
         /// <returns>Returns all dtos with status code OK.</returns>
-        [HttpGet("all")]
+        [HttpGet("")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public virtual async Task<IActionResult> GetAllAsync()
         {
@@ -61,7 +61,7 @@ namespace Neuralm.Services.Common.Rest
         /// returns Conflict if it failed to update; otherwise,
         /// Created with a LocationHeader to the created resource.
         /// </returns>
-        [HttpPut("update")]
+        [HttpPut("")]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -87,7 +87,7 @@ namespace Neuralm.Services.Common.Rest
         /// if the dto was not found the NotFound result;
         /// otherwise, an InternalServerError status code.
         /// </returns>
-        [HttpDelete("delete")]
+        [HttpDelete("")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -111,7 +111,7 @@ namespace Neuralm.Services.Common.Rest
         /// Returns Created with a LocationHeader to the created resource if created successfully;
         /// otherwise, an InternalServerError status code.
         /// </returns>
-        [HttpPost("create")]
+        [HttpPost("")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -120,11 +120,8 @@ namespace Neuralm.Services.Common.Rest
             if (!ModelState.IsValid)
                 return BadRequest(ModelState.GetErrorMessages());
             (bool success, Guid id) = await _service.CreateAsync(dto);
-            //string str = (this.UrlHelper ?? HttpContext.RequestServices.GetRequiredService<IUrlHelperFactory>().GetUrlHelper(context)).Action(this.ActionName, this.ControllerName, (object) this.RouteValues, request.Scheme, request.Host.ToUriComponent());
-            //this.HttpContext.Response.Headers["Location"] = "";
             return success
                 ? new CreatedAtRouteResult(new { id }, dto)
-                //? new CreatedAtActionResult(nameof(GetAsync), this.GetType().Name, new { id }, dto)
                 : (IActionResult)new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
     }

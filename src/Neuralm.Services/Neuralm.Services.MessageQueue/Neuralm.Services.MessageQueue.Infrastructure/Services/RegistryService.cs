@@ -39,7 +39,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
             IMessageSerializer messageSerializer,
             IServiceMessageProcessor serviceMessageProcessor,
             IMessageToServiceMapper messageToServiceMapper,
-            IMessageTypeCache messageTypeCache)
+            IRegistryServiceMessageTypeCache messageTypeCache)
         {
             _messageSerializer = messageSerializer;
             _serviceMessageProcessor = serviceMessageProcessor;

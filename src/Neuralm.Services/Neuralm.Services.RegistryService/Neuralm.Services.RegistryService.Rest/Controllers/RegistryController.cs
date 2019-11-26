@@ -16,19 +16,19 @@ namespace Neuralm.Services.RegistryService.Rest.Controllers
             _registryService = registryService;
         }
 
-        [Authorize(Roles = "Service"), HttpPost("create")]
+        [Authorize(Roles = "Service"), HttpPost("")]
         public override Task<IActionResult> CreateAsync(ServiceDto dto)
         {
             return base.CreateAsync(dto);
         }
 
-        [Authorize(Roles = "Service"), HttpPut("update")]
+        [Authorize(Roles = "Service"), HttpPut("")]
         public override Task<IActionResult> UpdateAsync(ServiceDto dto)
         {
             return base.UpdateAsync(dto);
         }
 
-        [Authorize(Roles = "Service"), HttpDelete("delete")]
+        [Authorize(Roles = "Service"), HttpDelete("")]
         public override Task<IActionResult> DeleteAsync(ServiceDto dto)
         {
             return base.DeleteAsync(dto);

@@ -56,7 +56,7 @@ namespace Neuralm.Services.Common.Infrastructure.Services
             httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_accessTokenService.GenerateAccessToken(claims)}");
             string json = _messageSerializer.SerializeToString(serviceDto);
             httpClient.BaseAddress = new Uri($"http://{_registryServiceConfiguration.Host}:{_registryServiceConfiguration.Port.ToString()}");
-            await httpClient.PostAsync("registry/create", new StringContent(json, Encoding.UTF8, "application/json"));
+            await httpClient.PostAsync("registry", new StringContent(json, Encoding.UTF8, "application/json"));
         }
     }
 }

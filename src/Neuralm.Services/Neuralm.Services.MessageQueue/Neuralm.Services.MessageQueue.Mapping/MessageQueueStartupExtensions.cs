@@ -11,6 +11,8 @@ using Neuralm.Services.UserService.Messages;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Neuralm.Services.MessageQueue.Application;
+using Neuralm.Services.RegistryService.Messages;
 
 namespace Neuralm.Services.MessageQueue.Mapping
 {
@@ -36,13 +38,24 @@ namespace Neuralm.Services.MessageQueue.Mapping
             //serviceCollection.AddTransient<MessageDbContext>(p => p.GetService<IFactory<MessageDbContext>>().Create());
             
             serviceCollection.AddSingleton<IFactory<IMessageTypeCache, IEnumerable<Type>>, MessageTypeCacheFactory>();
-            serviceCollection.AddSingleton<IMessageTypeCache, IMessageTypeCache>(serviceCollection =>
+            serviceCollection.AddSingleton<IClientMessageTypeCache, ClientMessageTypeCache>(serviceCollection =>
             {
                 List<Type> types = new List<Type>
                 {
                     typeof(RegisterRequest), typeof(CreateTrainingRoomRequest)
                 };
-                return serviceCollection.GetService<IFactory<IMessageTypeCache, IEnumerable<Type>>>().Create(types);
+                IMessageTypeCache messageTypeCache = serviceCollection.GetService<IFactory<IMessageTypeCache, IEnumerable<Type>>>().Create(types);
+                return new ClientMessageTypeCache(messageTypeCache);
+            });
+            
+            serviceCollection.AddSingleton<IRegistryServiceMessageTypeCache, RegistryServiceMessageTypeCache>(serviceCollection =>
+            {
+                List<Type> types = new List<Type>
+                {
+                    typeof(AddServiceCommand)
+                };
+                IMessageTypeCache messageTypeCache = serviceCollection.GetService<IFactory<IMessageTypeCache, IEnumerable<Type>>>().Create(types);
+                return new RegistryServiceMessageTypeCache(messageTypeCache);
             });
             serviceCollection.AddSingleton<IMessageSerializer, JsonMessageSerializer>();
             serviceCollection.AddSingleton<IMessageToServiceMapper, MessageToServiceMapper>();

@@ -13,7 +13,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
     /// </summary>
     public class MessageToServiceMapper : IMessageToServiceMapper
     {
-        private readonly IMessageTypeCache _messageTypeCache;
+        private readonly IClientMessageTypeCache _messageTypeCache;
         private static readonly ConcurrentDictionary<string, List<Type>> ServiceTypeCache = new ConcurrentDictionary<string, List<Type>>();
         private readonly ConcurrentDictionary<Type, IServiceConnector> _messageToServiceMap = new ConcurrentDictionary<Type, IServiceConnector>();
         private readonly ConcurrentDictionary<Guid, IServiceConnector> _serviceMap = new ConcurrentDictionary<Guid, IServiceConnector>();
@@ -25,7 +25,8 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         /// <summary>
         /// Initializes an instance of the <see cref="MessageToServiceMapper"/> class.
         /// </summary>
-        public MessageToServiceMapper(IMessageTypeCache messageTypeCache)
+        /// <param name="messageTypeCache">The message type cache.</param>
+        public MessageToServiceMapper(IClientMessageTypeCache messageTypeCache)
         {
             _messageTypeCache = messageTypeCache;
             Console.WriteLine("Mapping messages to services...");
