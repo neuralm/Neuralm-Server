@@ -64,7 +64,7 @@
   </v-container>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
@@ -183,17 +183,17 @@ import Component from 'vue-class-component';
   methods: {
     numberOfPages: () => Math.ceil(this.items.length / this.itemsPerPage),
     nextPage() {
-      if ((this as any).page + 1 <= (this as any).numberOfPages) {
-        (this as any).page += 1;
+      if (this.page + 1 <= this.numberOfPages) {
+        this.page += 1;
       }
     },
     formerPage() {
-      if ((this as any).page - 1 >= 1) {
-        (this as any).page -= 1;
+      if (this.page - 1 >= 1) {
+        this.page -= 1;
       }
     },
     updateItemsPerPage(n) {
-      (this as any).itemsPerPage = n;
+      this.itemsPerPage = n;
     },
     propnames(item) {
       return Object.keys(item);

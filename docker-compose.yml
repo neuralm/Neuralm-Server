@@ -1,0 +1,42 @@
+version: '3'
+services:
+    web:
+        build: 
+            context: .
+            dockerfile: neuralm-web.DockerFile
+        depends_on: 
+            - "messagequeue"
+        ports:
+            - "80:80"
+    messagequeue:
+        build: 
+            context: .
+            dockerfile: neuralm-messagequeue.DockerFile
+        ports:
+            - "5000:5000"
+            - "5001:5001"
+    registryservice:
+        build: 
+            context: .
+            dockerfile: neuralm-registryservice.DockerFile
+        depends_on: 
+            - "messagequeue"
+        ports:
+            - "5002:80"
+    userservice:
+        build: 
+            context: .
+            dockerfile: neuralm-userservice.DockerFile
+        depends_on: 
+            - "registryservice"
+        ports:
+            - "5003:80"
+    trainingroomservice:
+        build: 
+            context: .
+            dockerfile: neuralm-trainingroomservice.DockerFile
+        depends_on: 
+            - "registryservice"
+        ports:
+            - "5004:80"
+        
