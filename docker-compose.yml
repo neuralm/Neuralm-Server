@@ -25,10 +25,11 @@ services:
             dockerfile: neuralm-registryservice.DockerFile
         depends_on: 
             - "messagequeue"
+            - "registrydb"
         ports:
             - "5002:80"
         environment:
-            WAIT_HOSTS: messagequeue:5001
+            WAIT_HOSTS: messagequeue:5001, registrydb:1433
         networks:
             - neuralm-network
     userservice:
@@ -37,8 +38,11 @@ services:
             dockerfile: neuralm-userservice.DockerFile
         depends_on: 
             - "registryservice"
+            - "userdb"
         ports:
             - "5003:80"
+        environment:
+            WAIT_HOSTS: userdb:1433
         networks:
             - neuralm-network
     trainingroomservice:
@@ -47,8 +51,32 @@ services:
             dockerfile: neuralm-trainingroomservice.DockerFile
         depends_on: 
             - "registryservice"
+            - "trainingroomdb"
         ports:
             - "5004:80"
+        environment:
+            WAIT_HOSTS: trainingroomdb:1433
+        networks:
+            - neuralm-network
+    userdb:
+        image: "mcr.microsoft.com/mssql/server"
+        environment:
+            SA_PASSWORD: "Your_password123"
+            ACCEPT_EULA: "Y"
+        networks:
+            - neuralm-network
+    registrydb:
+        image: "mcr.microsoft.com/mssql/server"
+        environment:
+            SA_PASSWORD: "Your_password123"
+            ACCEPT_EULA: "Y"
+        networks:
+            - neuralm-network
+    trainingroomdb:
+        image: "mcr.microsoft.com/mssql/server"
+        environment:
+            SA_PASSWORD: "Your_password123"
+            ACCEPT_EULA: "Y"
         networks:
             - neuralm-network
 networks:

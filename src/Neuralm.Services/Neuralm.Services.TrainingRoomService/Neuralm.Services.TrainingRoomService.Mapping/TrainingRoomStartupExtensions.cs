@@ -13,6 +13,7 @@ using Neuralm.Services.TrainingRoomService.Persistence.Validators;
 using System.Reflection;
 using Neuralm.Services.Common.Application.Serializers;
 using Neuralm.Services.Common.Infrastructure.Services;
+using Neuralm.Services.Common.Persistence.EFCore;
 
 namespace Neuralm.Services.TrainingRoomService.Mapping
 {
@@ -59,7 +60,8 @@ namespace Neuralm.Services.TrainingRoomService.Mapping
 
             serviceCollection.AddSingleton<IMessageSerializer, JsonMessageSerializer>();
             serviceCollection.AddSingleton<IStartupService, StartupService>();
-//            serviceCollection.AddHttpClient<IStartupService>();
+
+            serviceCollection.VerifyDatabaseConnection<TrainingRoomDbContext>();
 
             return serviceCollection;
         }

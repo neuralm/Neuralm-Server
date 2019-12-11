@@ -81,8 +81,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.RegistrySe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.Common.Infrastructure", "Neuralm.Services\Neuralm.Services.Common.Infrastructure\Neuralm.Services.Common.Infrastructure.csproj", "{A61B8277-62E0-47D2-A3F7-93BA33A79379}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.UserService.Infrastructure", "Neuralm.Services\Neuralm.Services.UserService\Neuralm.Services.UserService.Infrastructure\Neuralm.Services.UserService.Infrastructure.csproj", "{57DDB251-C8E9-4501-A20C-7E2A6311C69F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -363,14 +361,6 @@ Global
 		{A61B8277-62E0-47D2-A3F7-93BA33A79379}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A61B8277-62E0-47D2-A3F7-93BA33A79379}.Release|x64.ActiveCfg = Release|Any CPU
 		{A61B8277-62E0-47D2-A3F7-93BA33A79379}.Release|x64.Build.0 = Release|Any CPU
-		{57DDB251-C8E9-4501-A20C-7E2A6311C69F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{57DDB251-C8E9-4501-A20C-7E2A6311C69F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{57DDB251-C8E9-4501-A20C-7E2A6311C69F}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{57DDB251-C8E9-4501-A20C-7E2A6311C69F}.Debug|x64.Build.0 = Debug|Any CPU
-		{57DDB251-C8E9-4501-A20C-7E2A6311C69F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{57DDB251-C8E9-4501-A20C-7E2A6311C69F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{57DDB251-C8E9-4501-A20C-7E2A6311C69F}.Release|x64.ActiveCfg = Release|Any CPU
-		{57DDB251-C8E9-4501-A20C-7E2A6311C69F}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -414,7 +404,6 @@ Global
 		{0E36FCA7-2B27-4AEF-999F-58E8F3AD9002} = {E9E1DEF4-BF22-4468-B695-F122CB2AB159}
 		{CCE11508-18E1-4024-8E2F-5C2A9657B294} = {002E927A-8DFD-4BC6-A978-3AA0174BAE1F}
 		{A61B8277-62E0-47D2-A3F7-93BA33A79379} = {CB3EBA39-DB0E-4F7C-9DEC-B0ECD756D11E}
-		{57DDB251-C8E9-4501-A20C-7E2A6311C69F} = {79154190-8C61-406E-87EA-8A378F5C511C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0B434211-311E-4D7B-B548-FCC4B9E78751}

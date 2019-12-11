@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Neuralm.Services.Common.Application.Serializers;
 using Neuralm.Services.Common.Infrastructure;
+using Neuralm.Services.Common.Persistence.EFCore;
 using Neuralm.Services.RegistryService.Application.Configurations;
 using Neuralm.Services.RegistryService.Infrastructure;
 using Neuralm.Services.RegistryService.Messages;
@@ -74,6 +75,8 @@ namespace Neuralm.Services.RegistryService.Mapping
             serviceCollection.AddTransient<IAccessTokenService, JwtAccessTokenService>();
             serviceCollection.AddSingleton<IRegistryService, Infrastructure.Services.RegistryService>();
             #endregion Services
+            
+            serviceCollection.VerifyDatabaseConnection<ServiceDbContext>();
 
             return serviceCollection;
         }

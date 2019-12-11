@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Application.Services;
@@ -13,8 +14,10 @@ using Neuralm.Services.UserService.Persistence.Contexts;
 using Neuralm.Services.UserService.Persistence.Infrastructure;
 using Neuralm.Services.UserService.Persistence.Validators;
 using System.Reflection;
+using System.Threading;
 using Neuralm.Services.Common.Application.Serializers;
 using Neuralm.Services.Common.Infrastructure.Services;
+using Neuralm.Services.Common.Persistence.EFCore;
 
 namespace Neuralm.Services.UserService.Mapping
 {
@@ -73,7 +76,8 @@ namespace Neuralm.Services.UserService.Mapping
 
             serviceCollection.AddTransient<IMessageSerializer, JsonMessageSerializer>();
             serviceCollection.AddSingleton<IStartupService, StartupService>();
-//            serviceCollection.AddHttpClient<IStartupService>();
+
+            serviceCollection.VerifyDatabaseConnection<UserDbContext>();
             
             return serviceCollection;
         }
