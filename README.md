@@ -19,7 +19,10 @@ You will need the following tools:
 ### Setup
 Follow these steps to get your development environment set up:
 
-Soon.
+1. The docker-compose file requires a network to be created:
+```
+docker network create -d bridge neuralm-network
+```
 
 ## Running the tests
 Soon.
