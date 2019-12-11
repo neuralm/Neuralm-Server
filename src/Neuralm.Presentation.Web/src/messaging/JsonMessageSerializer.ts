@@ -22,6 +22,7 @@ export default class JsonMessageSerializer implements IMessageSerializer {
 
   public deserialize(uint8Array: Uint8Array): any {
     const json: string = this._textDecoder.decode(uint8Array);
+    console.log('JSON:' + json);
     return JsonMessageSerializer.toCamelCase(JSON.parse(json));
   }
   private static toPascalCase(jsonObject: any): any {

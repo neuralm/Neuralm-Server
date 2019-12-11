@@ -23,8 +23,9 @@ export default class UserService implements IUserService {
   }
 
   public async login(authenticateRequest: AuthenticateRequest): Promise<AuthenticateResponse> {
+    let messageHandler: MessageHandler;
     return new Promise<AuthenticateResponse>((resolve, reject) => {
-      const messageHandler: MessageHandler = new AuthenticateResponseHandler(resolve, reject);
+      messageHandler = new AuthenticateResponseHandler(resolve, reject);
       this._neuralmMQClient.addHandler(messageHandler);
       this._neuralmMQClient.sendMessage(authenticateRequest);
     }).then((response) => {
@@ -34,15 +35,20 @@ export default class UserService implements IUserService {
         const user: User = { username: authenticateRequest.username, accessToken: response.accessToken, userId: response.userId };
         localStorage.setItem('user', JSON.stringify(user));
       }
+      this._neuralmMQClient.removeHandler(messageHandler);
       return response;
     });
   }
 
   public async register(registerRequest: RegisterRequest): Promise<RegisterResponse> {
-    return new Promise((resolve, reject) => {
-      const messageHandler: MessageHandler = new RegisterResponseHandler(resolve, reject);
+    let messageHandler: MessageHandler;
+    return new Promise<RegisterResponse>((resolve, reject) => {
+      messageHandler = new RegisterResponseHandler(resolve, reject);
       this._neuralmMQClient.addHandler(messageHandler);
       this._neuralmMQClient.sendMessage(registerRequest);
+    }).then((response) => {
+      this._neuralmMQClient.removeHandler(messageHandler);
+      return response;
     });
   }
 }

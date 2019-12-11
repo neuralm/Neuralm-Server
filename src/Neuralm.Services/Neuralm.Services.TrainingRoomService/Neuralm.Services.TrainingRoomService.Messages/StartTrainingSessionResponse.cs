@@ -12,7 +12,7 @@ namespace Neuralm.Services.TrainingRoomService.Messages
         /// <summary>
         /// Gets the training session.
         /// </summary>
-        public TrainingSessionDto TrainingSession { get; }
+        public TrainingSessionDto TrainingSession { get; set; }
 
         /// <summary>
         /// Initializes an instance of the <see cref="StartTrainingSessionResponse"/> class.
@@ -24,6 +24,15 @@ namespace Neuralm.Services.TrainingRoomService.Messages
         public StartTrainingSessionResponse(Guid requestId, TrainingSessionDto trainingSession, string message, bool success = false) : base(requestId, message, success)
         {
             TrainingSession = trainingSession;
+        }
+        
+        /// <summary>
+        /// Initializes an instance of the <see cref="StartTrainingSessionResponse"/> class.
+        /// SERIALIZATION CONSTRUCTOR.
+        /// </summary>
+        public StartTrainingSessionResponse()
+        {
+            
         }
     }
 }

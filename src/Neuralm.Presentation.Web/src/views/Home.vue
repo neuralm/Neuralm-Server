@@ -11,7 +11,6 @@ import HelloWorld from '@/components/HelloWorld.vue';
 import ITrainingRoomService from '../interfaces/ITrainingRoomService';
 import GetEnabledTrainingRoomsRequest from '../messages/requests/GetEnabledTrainingRoomsRequest';
 import GetEnabledTrainingRoomsResponse from '../messages/responses/GetEnabledTrainingRoomsResponse';
-
 @Component({
   components: {},
   async mounted(): Promise<void> {

@@ -9,6 +9,16 @@ namespace Neuralm.Services.Common.Application.Serializers
     /// </summary>
     public sealed class JsonMessageSerializer : IMessageSerializer
     {
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsonMessageSerializer"/> class.
+        /// </summary>
+        public JsonMessageSerializer()
+        {
+            _jsonSerializerOptions = new JsonSerializerOptions() {PropertyNameCaseInsensitive = true};
+        }
+        
         /// <inheritdoc cref="IMessageSerializer.Serialize"/>
         public Memory<byte> Serialize(object message)
         {
@@ -24,13 +34,13 @@ namespace Neuralm.Services.Common.Application.Serializers
         /// <inheritdoc cref="IMessageSerializer.Deserialize{T}"/>
         public T Deserialize<T>(Memory<byte> message)
         {
-            return JsonSerializer.Deserialize<T>(message.Span);
+            return JsonSerializer.Deserialize<T>(message.Span, _jsonSerializerOptions);
         }
 
         /// <inheritdoc cref="IMessageSerializer.Deserialize"/>
         public object Deserialize(Memory<byte> message, Type type)
         {
-            return JsonSerializer.Deserialize(message.Span, type);
+            return JsonSerializer.Deserialize(message.Span, type, _jsonSerializerOptions);
         }
     }
 }

@@ -11,6 +11,7 @@ using Neuralm.Services.UserService.Messages;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Neuralm.Services.Common.Application.Services;
 using Neuralm.Services.MessageQueue.Application;
 using Neuralm.Services.RegistryService.Messages;
 
@@ -58,6 +59,7 @@ namespace Neuralm.Services.MessageQueue.Mapping
                 return new RegistryServiceMessageTypeCache(messageTypeCache);
             });
             serviceCollection.AddSingleton<IMessageSerializer, JsonMessageSerializer>();
+            serviceCollection.AddSingleton<IAccessTokenService, JwtAccessTokenService>();
             serviceCollection.AddSingleton<IMessageToServiceMapper, MessageToServiceMapper>();
             serviceCollection.AddSingleton<IServiceMessageProcessor, ServiceMessageProcessor>();
             serviceCollection.AddSingleton<IClientMessageProcessor, ClientMessageProcessor>();

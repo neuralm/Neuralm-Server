@@ -11,12 +11,12 @@ namespace Neuralm.Services.UserService.Messages
         /// <summary>
         /// Gets the access token.
         /// </summary>
-        public string AccessToken { get; }
+        public string AccessToken { get; set; }
 
         /// <summary>
         /// Gets the user id.
         /// </summary>
-        public Guid UserId { get; }
+        public Guid UserId { get; set; }
 
         /// <summary>
         /// Initializes an instance of the <see cref="AuthenticateResponse"/> class.
@@ -30,6 +30,15 @@ namespace Neuralm.Services.UserService.Messages
         {
             AccessToken = accessToken;
             UserId = userId;
+        }
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuthenticateResponse"/> class.
+        /// SERIALIZATION CONSTRUCTOR!
+        /// </summary>
+        public AuthenticateResponse()
+        {
+            
         }
     }
 }

@@ -28,8 +28,13 @@ export default class MessageProcessor implements IMessageProcessor {
       const filteredMessageHandlers: MessageHandler[] = this._messageHandlers
         .get(messageHandler.messageName)!
         .filter((handler: MessageHandler) => handler !== messageHandler);
-      this._messageHandlers.set(messageHandler.messageName, filteredMessageHandlers);
+      if (filteredMessageHandlers.length === 0) {
+        this._messageHandlers.delete(messageHandler.messageName);
+      } else {
+        this._messageHandlers.set(messageHandler.messageName, filteredMessageHandlers);
+      }
     }
+    console.log(this._messageHandlers);
   }
 
   public handlerDestructor(): MessageHandlerDestructor {
@@ -41,14 +46,16 @@ export default class MessageProcessor implements IMessageProcessor {
       console.log(`A message handler for '${messageWrapper.name}' was not found.`);
       return;
     }
-    if (!messageWrapper.message.success) {
-      this._messageHandlers.get('errorHandler')!.forEach((eventHandler) => {
-        eventHandler.callback(messageWrapper.message);
-      });
-      this._messageHandlers.delete(messageWrapper.name);
-      return;
-    }
-    return this._messageHandlers.get(messageWrapper.name)!
+
+    // TODO: fix errorhandling
+    // if (!messageWrapper.message.success) {
+    //   this._messageHandlers.get('errorHandler')!.forEach((eventHandler) => {
+    //     eventHandler.callback(messageWrapper.message);
+    //   });
+    //   this._messageHandlers.delete(messageWrapper.name);
+    //   return;
+    // }
+    this._messageHandlers.get(messageWrapper.name)!
       .forEach((eventHandler: MessageHandler) => {
         eventHandler.callback(messageWrapper.message);
     });

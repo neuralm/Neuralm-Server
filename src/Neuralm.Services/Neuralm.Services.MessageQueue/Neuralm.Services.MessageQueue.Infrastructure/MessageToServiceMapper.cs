@@ -5,6 +5,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure
 {
@@ -13,6 +15,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
     /// </summary>
     public class MessageToServiceMapper : IMessageToServiceMapper
     {
+        private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly IClientMessageTypeCache _messageTypeCache;
         private static readonly ConcurrentDictionary<string, List<Type>> ServiceTypeCache = new ConcurrentDictionary<string, List<Type>>();
         private readonly ConcurrentDictionary<Type, IServiceConnector> _messageToServiceMap = new ConcurrentDictionary<Type, IServiceConnector>();
@@ -46,6 +49,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
                         });
                 }
             }
+            _cancellationTokenSource = new CancellationTokenSource();
             Console.WriteLine("Finished Mapping messages to services!");
         }
 
@@ -73,6 +77,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
                 {
                     _messageToServiceMap.TryAdd(messageType, serviceConnector);
                 }
+                _ = Task.Run(() => serviceConnector.StartPublishingAsync(_cancellationTokenSource.Token), _cancellationTokenSource.Token);
             }
         }
 

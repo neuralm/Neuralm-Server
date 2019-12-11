@@ -8,6 +8,8 @@ services:
             - "messagequeue"
         ports:
             - "80:80"
+        networks:
+            - neuralm-network
     messagequeue:
         build: 
             context: .
@@ -15,6 +17,8 @@ services:
         ports:
             - "5000:5000"
             - "5001:5001"
+        networks:
+            - neuralm-network
     registryservice:
         build: 
             context: .
@@ -23,6 +27,10 @@ services:
             - "messagequeue"
         ports:
             - "5002:80"
+        environment:
+            WAIT_HOSTS: messagequeue:5001
+        networks:
+            - neuralm-network
     userservice:
         build: 
             context: .
@@ -31,6 +39,8 @@ services:
             - "registryservice"
         ports:
             - "5003:80"
+        networks:
+            - neuralm-network
     trainingroomservice:
         build: 
             context: .
@@ -39,4 +49,8 @@ services:
             - "registryservice"
         ports:
             - "5004:80"
-        
+        networks:
+            - neuralm-network
+networks:
+    neuralm-network:
+        external: true

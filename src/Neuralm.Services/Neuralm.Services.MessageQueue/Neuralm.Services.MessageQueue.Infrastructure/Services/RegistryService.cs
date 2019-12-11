@@ -25,6 +25,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
         private readonly IMessageToServiceMapper _messageToServiceMapper;
         private readonly TcpListener _tcpListener;
         private readonly IMessageTypeCache _messageTypeCache;
+        private readonly IAccessTokenService _accessTokenService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryService"/> class.
@@ -34,12 +35,14 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
         /// <param name="serviceMessageProcessor">The service message processor.</param>
         /// <param name="messageToServiceMapper">The message to service mapper.</param>
         /// <param name="messageTypeCache">The message type cache.</param>
+        /// <param name="accessTokenService">The accesstoken service.</param>
         public RegistryService(
             IOptions<RegistryConfiguration> registryConfigurationOptions,
             IMessageSerializer messageSerializer,
             IServiceMessageProcessor serviceMessageProcessor,
             IMessageToServiceMapper messageToServiceMapper,
-            IRegistryServiceMessageTypeCache messageTypeCache)
+            IRegistryServiceMessageTypeCache messageTypeCache,
+            IAccessTokenService accessTokenService)
         {
             _messageSerializer = messageSerializer;
             _serviceMessageProcessor = serviceMessageProcessor;
@@ -48,6 +51,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
             RegistryConfiguration registryConfiguration = registryConfigurationOptions.Value;
             _tcpListener = new TcpListener(IPAddress.Any, registryConfiguration.Port);
             _messageTypeCache = messageTypeCache;
+            _accessTokenService = accessTokenService;
         }
 
         /// <inheritdoc cref="IRegistryService.StartReceivingServiceEndPointsAsync(CancellationToken)"/>
@@ -83,7 +87,9 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
 
         private async Task AddService(Guid id, string name, string host, int port)
         {
-            INetworkConnector networkConnector = new TcpNetworkConnector(_messageTypeCache, _messageSerializer, _serviceMessageProcessor, host, port);
+//            INetworkConnector networkConnector = new TcpNetworkConnector(_messageTypeCache, _messageSerializer, _serviceMessageProcessor, host, port);
+            Uri baseUrl = new Uri($"http://{host}:{port.ToString()}/{name.ToLower().Replace("service", "")}");
+            INetworkConnector networkConnector = new HttpNetworkConnector(_messageSerializer, _serviceMessageProcessor, baseUrl, _accessTokenService);
             await networkConnector.ConnectAsync(CancellationToken.None);
             networkConnector.Start();
             _messageToServiceMapper.AddService(id, name, networkConnector);

@@ -68,8 +68,9 @@ export default class WSNetworkConnector extends BaseNetworkConnector {
         console.log('Failed to parse header.');
         return;
       }
+      console.log(this._messageHeader);
+      return;
     }
-    console.log(this._messageHeader);
     const messageWrapper: MessageWrapper = {
       name: this._messageHeader!.typeName,
       message: this._messsageSeriliazer.deserialize(packet)

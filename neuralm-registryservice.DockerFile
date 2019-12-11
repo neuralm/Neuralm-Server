@@ -18,4 +18,8 @@ RUN dotnet publish "Neuralm.Services.RegistryService.Rest.csproj" -c Release -o 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Neuralm.Services.RegistryService.Rest.dll"]
+
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.6.0/wait /wait
+RUN chmod +x /wait
+
+CMD /wait && dotnet Neuralm.Services.RegistryService.Rest.dll

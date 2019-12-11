@@ -13,7 +13,7 @@ namespace Neuralm.Services.TrainingRoomService.Messages
         /// <summary>
         /// Gets the collection of organisms.
         /// </summary>
-        public IEnumerable<OrganismDto> Organisms { get; }
+        public IEnumerable<OrganismDto> Organisms { get; set; }
 
         /// <summary>
         /// Initializes an instance of the <see cref="GetOrganismsResponse"/> class.
@@ -25,6 +25,15 @@ namespace Neuralm.Services.TrainingRoomService.Messages
         public GetOrganismsResponse(Guid requestId, IEnumerable<OrganismDto> organisms, string message = "", bool success = false) : base(requestId, message, success)
         {
             Organisms = organisms ?? new List<OrganismDto>();
+        }
+        
+        /// <summary>
+        /// Initializes an instance of the <see cref="GetOrganismsResponse"/> class.
+        /// SERIALIZATION CONSTRUCTOR.
+        /// </summary>
+        public GetOrganismsResponse()
+        {
+            
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Neuralm.Services.Common.Messages.Abstractions
     /// <summary>
     /// Represents the <see cref="Response"/> class.
     /// </summary>
-    public abstract class Response : IMessage
+    public abstract class Response : IResponseMessage
     {
         /// <summary>
         /// Gets the id.
@@ -16,7 +16,7 @@ namespace Neuralm.Services.Common.Messages.Abstractions
         /// <summary>
         /// Gets the request id.
         /// </summary>
-        public Guid RequestId { get; }
+        public Guid RequestId { get; set; }
 
         /// <summary>
         /// Gets the date time.
@@ -26,12 +26,12 @@ namespace Neuralm.Services.Common.Messages.Abstractions
         /// <summary>
         /// Gets the message.
         /// </summary>
-        public string Message { get; }
+        public string Message { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the response was successful.
         /// </summary>
-        public bool Success { get; }
+        public bool Success { get; set; }
 
         /// <summary>
         /// Initializes an instance of the <see cref="Response"/> class.
@@ -46,6 +46,16 @@ namespace Neuralm.Services.Common.Messages.Abstractions
             DateTime = DateTime.UtcNow;
             Message = message;
             Success = success;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Response"/> class.
+        /// SERIALIZATION CONSTRUCTOR.
+        /// </summary>
+        protected Response()
+        {
+            Id = Guid.NewGuid();
+            DateTime = DateTime.UtcNow;
         }
     }
 }

@@ -40,7 +40,9 @@ namespace Neuralm.Services.Common.Application.Services
                 Issuer = _jwtConfiguration.Issuer,
                 Audience = _jwtConfiguration.Audience,
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddMinutes(_jwtConfiguration.AccessExpiration),
+                // NOTE: Temporary fix!
+                Expires = DateTime.Now.AddYears(1),
+//                Expires = DateTime.Now.AddMinutes(_jwtConfiguration.AccessExpiration),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_jwtConfiguration.SecretBytes), SecurityAlgorithms.HmacSha256Signature)
             };
             SecurityToken token = _jwtSecurityTokenHandler.CreateToken(tokenDescriptor);

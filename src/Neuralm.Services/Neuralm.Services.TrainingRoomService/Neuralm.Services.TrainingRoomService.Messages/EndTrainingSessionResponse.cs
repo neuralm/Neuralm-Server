@@ -18,5 +18,14 @@ namespace Neuralm.Services.TrainingRoomService.Messages
         {
 
         }
+
+        /// <summary>
+        /// Initializes an instance of the <see cref="EndTrainingSessionResponse"/> class.
+        /// SERIALIZATION CONSTRUCTOR.
+        /// </summary>
+        public EndTrainingSessionResponse()
+        {
+            
+        }
     }
 }

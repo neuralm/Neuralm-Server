@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using Neuralm.Services.Common.Configurations;
 
 namespace Neuralm.Services.MessageQueue.NeuralmMQ
 {
@@ -50,6 +51,7 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
                 .AddConfigurations(configuration)
                 .Configure<MessageQueueConfiguration>(configuration.GetSection("MessageQueue").Bind)
                 .Configure<RegistryConfiguration>(configuration.GetSection("Registry").Bind)
+                .Configure<JwtConfiguration>(configuration.GetSection("Jwt").Bind)
                 .AddApplicationServices()
                 .BuildServiceProvider()
                 .ToGenericServiceProvider();

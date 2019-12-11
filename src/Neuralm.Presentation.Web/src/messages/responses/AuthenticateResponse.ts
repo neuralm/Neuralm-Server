@@ -1,7 +1,7 @@
 import Response from './Response';
 
 /**
- * Represents the AuthenticateResponse interface.
+ * Represents the AuthenticateResponse class.
  */
 export default class AuthenticateResponse extends Response {
   public accessToken: string;

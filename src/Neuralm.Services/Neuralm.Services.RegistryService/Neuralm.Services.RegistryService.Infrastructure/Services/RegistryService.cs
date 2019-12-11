@@ -94,7 +94,6 @@ namespace Neuralm.Services.RegistryService.Infrastructure.Services
             // Link cancellation tokens.
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(5));
             using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cancellationTokenSource.Token);
-
             await _networkConnector.ConnectAsync(cancellationToken);
             _networkConnector.Start();
 

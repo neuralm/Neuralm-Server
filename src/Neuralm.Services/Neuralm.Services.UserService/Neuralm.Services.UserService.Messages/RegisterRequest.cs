@@ -1,11 +1,13 @@
 ﻿using Neuralm.Services.Common.Messages.Abstractions;
 using System.ComponentModel.DataAnnotations;
+using Neuralm.Services.Common.Messages;
 
 namespace Neuralm.Services.UserService.Messages
 {
     /// <summary>
     /// Represents the <see cref="RegisterRequest"/> class.
     /// </summary>
+    [Message("Post", "/register", typeof(RegisterResponse))]
     public class RegisterRequest : Request
     {
         /// <summary>
@@ -25,6 +27,5 @@ namespace Neuralm.Services.UserService.Messages
         /// </summary>
         [Required]
         public string CredentialTypeCode { get; set; }
-
     }
 }

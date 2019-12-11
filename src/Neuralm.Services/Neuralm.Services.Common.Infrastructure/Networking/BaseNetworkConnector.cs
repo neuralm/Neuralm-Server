@@ -6,6 +6,7 @@ using System;
 using System.Buffers;
 using System.Diagnostics;
 using System.Net;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -90,7 +91,7 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <exception cref="NetworkConnectorIsNotYetStartedException">If <see cref="IsRunning"/> is <c>false</c>.</exception>
         /// <returns>Returns a <see cref="Task"/> to await.</returns>
-        public async Task SendMessageAsync<TMessage>(TMessage message, CancellationToken cancellationToken)
+        public async Task SendMessageAsync<TMessage>(TMessage message, CancellationToken cancellationToken) where TMessage : IMessage
         {
             if (!IsRunning)
                 throw new NetworkConnectorIsNotYetStartedException("NetworkConnector has not started yet. Call Start() first");
@@ -159,18 +160,31 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         {
             return Task.Run(async () =>
             {
-                if (_messageTypeCache.TryGetMessageType(typeName, out Type type))
+                Console.WriteLine("ProcessMessageTask started!");
+                try
                 {
-                    object rawMessage = _messageConstructor.DeconstructMessageBody(bodyBufferMemory, type);
-                    if (rawMessage is IMessage message)
+                    Console.WriteLine($"ProcessMessageTask: Message type {typeName}");
+                    Console.WriteLine($"ProcessMessageTask: Message body {Encoding.UTF8.GetString(bodyBufferMemory.Span)}");
+                    if (_messageTypeCache.TryGetMessageType(typeName, out Type type))
                     {
-                        await _messageProcessor.ProcessMessageAsync(message, this);
+                        object rawMessage = _messageConstructor.DeconstructMessageBody(bodyBufferMemory, type);
+                        if (rawMessage is IMessage message)
+                        {
+                            await _messageProcessor.ProcessMessageAsync(message, this);
+                        }
+                        else
+                            throw new ArgumentOutOfRangeException(rawMessage.GetType().Name);
                     }
-                    else
-                        throw new ArgumentOutOfRangeException(rawMessage.GetType().Name);
                 }
-
-                ArrayPool<byte>.Shared.Return(bodyBufferSource);
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(bodyBufferSource);
+                    Console.WriteLine("ProcessMessageTask finished!");
+                }
             }, cancellationToken);
         }
         private static bool TryReadMessageBody(MessageHeader? header, ReadOnlySequence<byte> buffer, out byte[] bodyBufferSource, out Memory<byte> bodyBufferMemory)

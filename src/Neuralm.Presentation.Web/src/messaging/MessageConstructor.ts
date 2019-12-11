@@ -23,6 +23,9 @@ export default class MessageConstructor {
     let dv: DataView = new DataView(bodySizeBytes.buffer);
     dv.setInt32(0, body.length, true);
     const typeName: string = messageTypeCache.getMessageType(message.constructor.name);
+    if (typeName === '') {
+      console.log('Message type not found in cache for: ', message.constructor.name);
+    }
     const typeNameBytes: Uint8Array = this._textEncoder.encode(typeName);
     const headerSizeBytes: Uint8Array = new Uint8Array(4);
     dv = new DataView(headerSizeBytes.buffer);

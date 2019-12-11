@@ -27,6 +27,10 @@ import MessageProcessor from './messaging/MessageProcessor';
 import { INetworkConnector } from './interfaces/INetworkConnector';
 import INeuralmMQClient from './interfaces/INeuralmMQClient';
 import NeuralmMQClient from './messaging/NeuralmMQClient';
+import GetTrainingRoomResponse from './messages/responses/GetTrainingRoomResponse';
+import GetTrainingRoomRequest from './messages/requests/GetTrainingRoomRequest';
+import Guid from './helpers/Guid';
+import ErrorResponseHandler from './handlers/ErrorResponseHandler';
 
 Vue.config.productionTip = false;
 const messageSerializer: IMessageSerializer = new JsonMessageSerializer();
@@ -38,6 +42,8 @@ wsNetworkConnector.connectAsync().then((_) => {
 });
 
 const neuralmMQClient: INeuralmMQClient = new NeuralmMQClient(messageProcessor, wsNetworkConnector);
+const errorResponseHandler: ErrorResponseHandler = new ErrorResponseHandler(messageProcessor);
+neuralmMQClient.addHandler(errorResponseHandler);
 const trainingRoomService: ITrainingRoomService = new TrainingRoomService(neuralmMQClient);
 const userService: IUserService = new UserService(neuralmMQClient);
 const userModule: IUserModule = new UserModule();
@@ -72,6 +78,13 @@ router.beforeEach((to, _, next) => {
   console.log(`Routed to ${to.name}`);
   next();
 });
+
+// NOTE: sanity code.
+// router.afterEach(async (to, from) => {
+//   const request: GetTrainingRoomRequest = new GetTrainingRoomRequest(Guid.newGuid().toString());
+//   console.log('typename: ', request.constructor.name);
+//   const response: GetTrainingRoomResponse = await trainingRoomService.getTrainingRoom(request);
+// });
 
 new Vue({
   vuetify,

@@ -8,6 +8,7 @@ using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Configurations;
 using System;
 using System.Reflection;
+using Microsoft.IdentityModel.Logging;
 
 namespace Neuralm.Services.Common.Mapping
 {
@@ -67,6 +68,8 @@ namespace Neuralm.Services.Common.Mapping
         /// <returns>Returns the service collection to chain further upon.</returns>
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection serviceCollection, JwtConfiguration jwtConfiguration)
         {
+            // NOTE: Temporarily added for debugging.
+            IdentityModelEventSource.ShowPII = true;
             serviceCollection.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

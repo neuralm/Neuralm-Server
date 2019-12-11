@@ -1,11 +1,13 @@
 ﻿using Neuralm.Services.Common.Messages.Abstractions;
 using System.ComponentModel.DataAnnotations;
+using Neuralm.Services.Common.Messages;
 
 namespace Neuralm.Services.UserService.Messages
 {
     /// <summary>
     /// Represents the <see cref="AuthenticateRequest"/> class.
     /// </summary>
+    [Message("Post", "/authenticate", typeof(AuthenticateResponse))]
     public class AuthenticateRequest : Request
     {
         /// <summary>

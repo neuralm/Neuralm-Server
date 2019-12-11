@@ -12,12 +12,12 @@ namespace Neuralm.Services.TrainingRoomService.Messages
         /// <summary>
         /// Gets and sets the training session id.
         /// </summary>
-        public Guid TrainingSessionId { get; }
+        public Guid TrainingSessionId { get; set; }
 
         /// <summary>
         /// Gets and sets the organism scores dictionary.
         /// </summary>
-        public Dictionary<Guid, double> OrganismScores { get; }
+        public Dictionary<Guid, double> OrganismScores { get; set; }
 
         /// <summary>
         /// Initializes an instance of the <see cref="PostOrganismsScoreRequest"/> class.
@@ -28,6 +28,15 @@ namespace Neuralm.Services.TrainingRoomService.Messages
         {
             TrainingSessionId = trainingSessionId;
             OrganismScores = organismScores;
+        }
+
+        /// <summary>
+        /// Initializes an instance of the <see cref="PostOrganismsScoreRequest"/> class.
+        /// SERIALIZATION CONSTRUCTOR.
+        /// </summary>
+        public PostOrganismsScoreRequest()
+        {
+            
         }
     }
 }

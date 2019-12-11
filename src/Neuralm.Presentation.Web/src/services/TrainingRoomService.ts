@@ -4,11 +4,15 @@ import GetEnabledTrainingRoomsResponse from '../messages/responses/GetEnabledTra
 import INeuralmMQClient from '@/interfaces/INeuralmMQClient';
 import { MessageHandler } from '@/messaging/MessageHandler';
 import GetEnabledTrainingRoomsResponseHandler from '@/handlers/GetEnabledTrainingRoomsResponseHandler';
+import GetTrainingRoomResponse from '../messages/responses/GetTrainingRoomResponse';
+import GetTrainingRoomRequest from '../messages/requests/GetTrainingRoomRequest';
+import GetTrainingRoomResponseHandler from '../handlers/GetTrainingRoomResponseHandler';
 
 /**
  * Represents the training room service class.
  */
 export default class TrainingRoomService implements ITrainingRoomService {
+
   private readonly _neuralmMQClient: INeuralmMQClient;
 
   /**
@@ -21,13 +25,34 @@ export default class TrainingRoomService implements ITrainingRoomService {
   public async getEnabledTrainingRooms(
     getEnabledTrainingRoomsRequest: GetEnabledTrainingRoomsRequest
   ): Promise<GetEnabledTrainingRoomsResponse> {
-    return new Promise((resolve, reject) => {
-      const messageHandler: MessageHandler = new GetEnabledTrainingRoomsResponseHandler(
+    let messageHandler: MessageHandler;
+    return new Promise<GetEnabledTrainingRoomsResponse>((resolve, reject) => {
+      messageHandler = new GetEnabledTrainingRoomsResponseHandler(
         resolve,
         reject
       );
       this._neuralmMQClient.addHandler(messageHandler);
       this._neuralmMQClient.sendMessage(getEnabledTrainingRoomsRequest);
+    }).then((response) => {
+        this._neuralmMQClient.removeHandler(messageHandler);
+        return response;
+    });
+  }
+
+  public async getTrainingRoom(
+    getTrainingRoomRequest: GetTrainingRoomRequest
+  ): Promise<GetTrainingRoomResponse> {
+    let messageHandler: MessageHandler;
+    return new Promise<GetTrainingRoomResponse>((resolve, reject) => {
+      messageHandler = new GetTrainingRoomResponseHandler(
+        resolve,
+        reject
+      );
+      this._neuralmMQClient.addHandler(messageHandler);
+      this._neuralmMQClient.sendMessage(getTrainingRoomRequest);
+    }).then((response) => {
+        this._neuralmMQClient.removeHandler(messageHandler);
+        return response;
     });
   }
 }

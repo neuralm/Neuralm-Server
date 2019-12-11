@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Neuralm.Services.Common.Messages.Interfaces;
 
 namespace Neuralm.Services.Common.Application.Interfaces
 {
@@ -39,7 +40,7 @@ namespace Neuralm.Services.Common.Application.Interfaces
         /// <param name="message">The message.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
-        Task SendMessageAsync<TMessage>(TMessage message, CancellationToken cancellationToken);
+        Task SendMessageAsync<TMessage>(TMessage message, CancellationToken cancellationToken) where TMessage : IMessage;
 
         /// <summary>
         /// Starts the network connector.

@@ -18,5 +18,14 @@ namespace Neuralm.Services.UserService.Messages
         {
 
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RegisterResponse"/> class.
+        /// SERIALIZATION CONSTRUCTOR!
+        /// </summary>
+        public RegisterResponse()
+        {
+            
+        }
     }
 }

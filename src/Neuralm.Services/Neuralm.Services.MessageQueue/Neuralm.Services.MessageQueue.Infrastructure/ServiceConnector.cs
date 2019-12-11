@@ -34,7 +34,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         {
             Name = name;
             _networkConnectors = new ConcurrentDictionary<Guid, INetworkConnector>();
-            _networkConnectors .TryAdd(id, networkConnector);
+            _networkConnectors.TryAdd(id, networkConnector);
             _messageQueue = new AsyncConcurrentQueue<IMessage>();
         }
 
