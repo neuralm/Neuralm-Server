@@ -13,61 +13,22 @@ These instructions will get you a copy of the project up and running on your loc
 You will need the following tools:
 
 * [Visual Studio 2019](https://www.visualstudio.com/downloads/)
-* [.NET Core SDK 2.2](https://www.microsoft.com/net/download/dotnet-core/2.2)
-* [SQLServer 2017](https://www.microsoft.com/nl-nl/sql-server/sql-server-downloads)
-
+* [.NET Core SDK 3.0](https://dotnet.microsoft.com/download/dotnet-core/3.0)
+* [Docker](https://www.docker.com/)
 
 ### Setup
 Follow these steps to get your development environment set up:
 
-1. Clone the repository.
-2. Create an `appSettings.json` file at the root of the Presentation.CLI layer with the connectionstring to the new database:
-    ```json
-    {
-        "Jwt": {
-          "Secret": "{YOUR SECRET KEY, MINIMUM LENGTH OF 17!}" 
-        },
-        "Server": {
-          "ClientPort": 9999,
-		  "RestPort": 9998,
-          "Host": "{COMMON NAME OR FULLY QUALLIFIED DOMAIN NAME}"
-        },
-        "NeuralmDb": {
-          "ConnectionString": "{MSSQL/MYSQL CONNECTION STRING}",
-          "UseLazyLoading": true,
-          "DbProvider": "{MSSQL/MYSQL (OR LEAVE IT EMPTY FOR IN MEMORY PROVIDER)}"
-        } 
-    }
-    ```
-	ConnectionString examples:
-	```
-	MSSQL: "Server=(LocalDb)\\MSSQLLocalDB;Database=NeuralmDbContext;Trusted_Connection=True;MultipleActiveResultSets=true"
-	MYSQL: "Server=localhost;Database=NeuralmDbContext;User=root;Password=;"
-	```
-3. Afterwards generate a self signed certificate using the script in powershell (Administrator mode!)
-	```powershell
-	New-SelfSignedCertificate -DnsName "{COMMON NAME OR FULLY QUALLIFIED DOMAIN NAME}" -CertStoreLocation "cert:\LocalMachine\My" -FriendlyName "NeuralmCert"
-	```
-4. Next, go to `Tools > NuGet Package Manager > Package Manager Console` in visual studio, To restore all dependencies:
-    ```
-    dotnet restore
-    ```
-    Followed by:
-    ```
-    dotnet build
-    ```
-    To make sure all dependencies were added succesfully, it should build without dependency warnings else you have probably not installed .NET core 2.2 SDK.
-5. Once the build has run successfully, start the server to confirm that the database connection is successful either by hitting `F5` or go to `Debug > Start`. A console will launch and start initializing. Upon completion, the console will look like this:
-
-  
-    ![Screenshot](https://github.com/neuralm/Neuralm-Server/blob/master/docs/images/Successful%20installation.png?raw=true)
+Soon.
 
 ## Running the tests
-Run the tests using this command:
-```
-dotnet test
-```
+Soon.
+
 ## Deployment
+To deploy the server:
+```
+docker-compose up
+```
 
 ## Contributing
 
