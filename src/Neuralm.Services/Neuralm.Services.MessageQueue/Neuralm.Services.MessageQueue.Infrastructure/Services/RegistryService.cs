@@ -17,7 +17,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
     /// <summary>
     /// Represents the <see cref="RegistryService"/> class.
     /// </summary>
-    public class RegistryService : IRegistryService
+    public class RegistryService : Application.Interfaces.IRegistryService
     {
         private readonly IMessageSerializer _messageSerializer;
         private readonly IServiceMessageProcessor _serviceMessageProcessor;

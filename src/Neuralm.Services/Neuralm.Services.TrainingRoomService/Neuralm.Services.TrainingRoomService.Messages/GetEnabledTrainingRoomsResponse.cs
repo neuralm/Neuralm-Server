@@ -13,7 +13,7 @@ namespace Neuralm.Services.TrainingRoomService.Messages
         /// <summary>
         /// Gets the training rooms. 
         /// </summary>
-        public IList<TrainingRoomDto> TrainingRooms { get; set; }
+        public List<TrainingRoomDto> TrainingRooms { get; set; }
 
         /// <summary>
         /// Initializes an instance of the <see cref="GetEnabledTrainingRoomsResponse"/> class.
@@ -22,7 +22,7 @@ namespace Neuralm.Services.TrainingRoomService.Messages
         /// <param name="trainingRooms">The training rooms.</param>
         /// <param name="message">The message.</param>
         /// <param name="success">The success flag.</param>
-        public GetEnabledTrainingRoomsResponse(Guid requestId, IList<TrainingRoomDto> trainingRooms, string message = "", bool success = false) : base(requestId, message, success)
+        public GetEnabledTrainingRoomsResponse(Guid requestId, List<TrainingRoomDto> trainingRooms, string message = "", bool success = false) : base(requestId, message, success)
         {
             TrainingRooms = trainingRooms;
         }

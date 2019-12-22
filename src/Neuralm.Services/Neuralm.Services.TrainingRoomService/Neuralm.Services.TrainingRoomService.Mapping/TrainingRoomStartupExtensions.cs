@@ -14,6 +14,7 @@ using System.Reflection;
 using Neuralm.Services.Common.Application.Serializers;
 using Neuralm.Services.Common.Infrastructure.Services;
 using Neuralm.Services.Common.Persistence.EFCore;
+using Neuralm.Services.TrainingRoomService.Infrastructure.Services;
 
 namespace Neuralm.Services.TrainingRoomService.Mapping
 {
@@ -51,15 +52,17 @@ namespace Neuralm.Services.TrainingRoomService.Mapping
             serviceCollection.AddTransient<IRepository<TrainingSession>, Repository<TrainingSession, TrainingRoomDbContext>>();
             serviceCollection.AddTransient<IRepository<TrainingRoomSettings>, Repository<TrainingRoomSettings, TrainingRoomDbContext>>();
             #endregion Repositories
+            
+            serviceCollection.AddSingleton<IMessageSerializer, JsonMessageSerializer>();
 
             #region Services
             serviceCollection.AddTransient<IAccessTokenService, JwtAccessTokenService>();
             serviceCollection.AddSingleton<ITrainingRoomService, Application.Services.TrainingRoomService>();
             serviceCollection.AddSingleton<ITrainingSessionService, Application.Services.TrainingSessionService>();
-            #endregion Services
-
-            serviceCollection.AddSingleton<IMessageSerializer, JsonMessageSerializer>();
+            serviceCollection.AddRegistryService("TrainingRoomService");
+            serviceCollection.AddSingleton<IUserService, UserService>();
             serviceCollection.AddSingleton<IStartupService, StartupService>();
+            #endregion Services
 
             serviceCollection.VerifyDatabaseConnection<TrainingRoomDbContext>();
 

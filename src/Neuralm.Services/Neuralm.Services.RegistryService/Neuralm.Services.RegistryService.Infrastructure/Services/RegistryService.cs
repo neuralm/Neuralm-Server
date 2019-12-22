@@ -8,9 +8,9 @@ using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Infrastructure.Networking;
 using Neuralm.Services.RegistryService.Application.Configurations;
 using Neuralm.Services.RegistryService.Application.Dtos;
-using Neuralm.Services.RegistryService.Application.Interfaces;
 using Neuralm.Services.RegistryService.Domain;
 using Neuralm.Services.RegistryService.Messages;
+using IRegistryService = Neuralm.Services.RegistryService.Application.Interfaces.IRegistryService;
 
 namespace Neuralm.Services.RegistryService.Infrastructure.Services
 {

@@ -1,7 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using System.Threading;
@@ -92,7 +95,22 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
                 Console.Write($"REST RESPONSE: {await response.Content.ReadAsStringAsync()}");
                 Console.WriteLine();
                 byte[] bytes = await response.Content.ReadAsByteArrayAsync();
-                object msg = _messageSerializer.Deserialize(bytes, response.StatusCode != HttpStatusCode.OK ? typeof(RestErrorResponse) : messageAttribute.ResponseType);
+                object msg = null;
+                if (messageAttribute.OriginalMethod == "GetAll")
+                {
+                    msg = Activator.CreateInstance(messageAttribute.ResponseType);
+                    PropertyInfo property = messageAttribute.ResponseType.GetProperties()
+                        .Where(p => p.PropertyType.GenericTypeArguments.Length != 0)
+                        .Where(p => p.PropertyType.GenericTypeArguments[0] != typeof(char))
+                        .Single(info => info.PropertyType.GetInterfaces().Count(c => c == typeof(IEnumerable)) == 1);
+                    object e = _messageSerializer.Deserialize(bytes, property.PropertyType);
+                    property.SetValue(msg, e);
+                }
+                else
+                {
+                    msg = _messageSerializer.Deserialize(bytes, !response.IsSuccessStatusCode ? typeof(RestErrorResponse) : messageAttribute.ResponseType);
+                }
+                
                 if (msg is IResponseMessage responseMessage)
                 {
                     if (responseMessage.RequestId != message.Id)
