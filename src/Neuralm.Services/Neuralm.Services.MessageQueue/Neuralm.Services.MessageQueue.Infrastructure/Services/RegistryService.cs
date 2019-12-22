@@ -11,6 +11,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Neuralm.Services.MessageQueue.Infrastructure.Messaging;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure.Services
 {
@@ -35,7 +36,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
         /// <param name="serviceMessageProcessor">The service message processor.</param>
         /// <param name="messageToServiceMapper">The message to service mapper.</param>
         /// <param name="messageTypeCache">The message type cache.</param>
-        /// <param name="accessTokenService">The accesstoken service.</param>
+        /// <param name="accessTokenService">The access token service.</param>
         public RegistryService(
             IOptions<RegistryConfiguration> registryConfigurationOptions,
             IMessageSerializer messageSerializer,

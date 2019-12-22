@@ -43,7 +43,7 @@ namespace Neuralm.Services.Common.Infrastructure.Services
                 StringContent stringContent = new StringContent(json, Encoding.UTF8, "application/json");
                 _logger.LogInformation($"[CONTENT] [AddServiceAsync] StringContent is:  {json}");
                 HttpResponseMessage responseMessage = await _httpClient.PostAsync("registry", stringContent);
-                _logger.LogInformation($"[REQUEST] [AddServiceAsync] Response status code: {responseMessage.StatusCode.ToString()}");
+                _logger.LogInformation($"[Response] [AddServiceAsync] Response status code: {responseMessage.StatusCode.ToString()}");
                 return responseMessage.IsSuccessStatusCode;
             }
             catch (Exception e)
@@ -58,9 +58,26 @@ namespace Neuralm.Services.Common.Infrastructure.Services
         }
 
         /// <inheritdoc cref="IRegistryService.GetServiceAsync(string)"/>
-        public Task<ServiceDto> GetServiceAsync(string serviceName)
+        public async Task<ServiceDto> GetServiceAsync(string serviceName)
         {
-            throw new System.NotImplementedException();
+            _logger.LogInformation("[STARTED] [GetServiceAsync]");
+            try
+            {
+                HttpResponseMessage responseMessage = await _httpClient.GetAsync($"registry/{serviceName}");
+                _logger.LogInformation($"[Response] [GetServiceAsync] Response status code: {responseMessage.StatusCode.ToString()}");
+                responseMessage.EnsureSuccessStatusCode();
+                byte[] bytes = await responseMessage.Content.ReadAsByteArrayAsync();
+                return _messageSerializer.Deserialize<ServiceDto>(bytes);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"[ERROR] [GetServiceAsync] {e.Message}");
+                throw;
+            }
+            finally
+            {
+                _logger.LogInformation("[FINISHED] [GetServiceAsync]");
+            }
         }
     }
 }

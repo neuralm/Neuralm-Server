@@ -14,7 +14,7 @@ using Neuralm.Services.Common.Domain;
 using Neuralm.Services.Common.Messages;
 using Neuralm.Services.Common.Messages.Interfaces;
 
-namespace Neuralm.Services.Common.Infrastructure.Networking
+namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
 {
     /// <summary>
     /// Represents the <see cref="HttpNetworkConnector"/> class.
