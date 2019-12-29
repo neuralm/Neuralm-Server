@@ -52,6 +52,19 @@ namespace Neuralm.Services.Common.Persistence.EFCore.Abstractions
             return (success: saveSuccess, id: entity.Id);
         }
 
+        /// <inheritdoc cref="IRepository{TEntity}.GetPaginationAsync(int, int)"/>
+        public virtual async Task<IEnumerable<TEntity>> GetPaginationAsync(int pageNumber, int pageSize)
+        {
+            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
+            return await DbContext.Set<TEntity>().Skip(pageNumber * pageSize).Take(pageSize).ToListAsync();
+        }
+        
+        /// <inheritdoc cref="IRepository{TEntity}.CountAsync()"/>
+        public virtual async Task<int> CountAsync()
+        {
+            return await DbContext.Set<TEntity>().CountAsync();
+        }
+
         /// <inheritdoc cref="IRepository{TEntity}.DeleteAsync(TEntity)"/>
         public virtual async Task<bool> DeleteAsync(TEntity entity)
         {

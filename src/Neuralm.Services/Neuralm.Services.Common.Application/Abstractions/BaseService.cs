@@ -42,6 +42,19 @@ namespace Neuralm.Services.Common.Application.Abstractions
                 .ContinueWith(entities => Mapper.Map<IEnumerable<TDto>>(entities.Result));
         }
 
+        /// <inheritdoc cref="IService{TEntity}.CountAsync()"/>
+        public virtual Task<int> CountAsync()
+        {
+            return EntityRepository.CountAsync();
+        }
+
+        /// <inheritdoc cref="IService{TEntity}.GetPaginationAsync(int, int)"/>
+        public virtual Task<IEnumerable<TDto>> GetPaginationAsync(int pageNumber, int pageSize)
+        {
+            return EntityRepository.GetPaginationAsync(pageNumber, pageSize)
+                .ContinueWith(entities => Mapper.Map<IEnumerable<TDto>>(entities.Result));
+        }
+
         /// <inheritdoc cref="IService{TEntity}.DeleteAsync(TEntity)"/>
         public virtual async Task<(bool success, bool found)> DeleteAsync(TDto dto)
         {

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Neuralm.Services.Common.Application.Abstractions;
@@ -48,7 +50,54 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             UserDto userDto = await _userService.FindUserAsync(dto.Owner.Id);
             if (userDto is null || await EntityRepository.ExistsAsync(trainingRoom => trainingRoom.Name == dto.Name))
                 return (false, Guid.Empty);
+            dto.OwnerId = userDto.Id;
             return await base.CreateAsync(dto);
+        }
+
+        /// <inheritdoc cref="ITrainingRoomService.GetAllAsync"/>
+        public override async Task<IEnumerable<TrainingRoomDto>> GetAllAsync()
+        {
+            IEnumerable<TrainingRoomDto> trainingRooms = await base.GetAllAsync();
+            return EnsureOwner(trainingRooms);
+        }
+        
+        /// <inheritdoc cref="ITrainingRoomService.GetPaginationAsync(int, int)"/>
+        public override async Task<IEnumerable<TrainingRoomDto>> GetPaginationAsync(int pageNumber, int pageSize)
+        {
+            IEnumerable<TrainingRoomDto> trainingRooms = await base.GetPaginationAsync(pageNumber, pageSize);
+            return EnsureOwner(trainingRooms);
+        }
+
+        /// <inheritdoc cref="ITrainingRoomService.FindSingleOrDefaultAsync(Guid)"/>
+        public override async Task<TrainingRoomDto> FindSingleOrDefaultAsync(Guid id)
+        {
+            TrainingRoomDto trainingRoomDto = await base.FindSingleOrDefaultAsync(id);
+            return await EnsureOwner(trainingRoomDto);
+        }
+
+        /// <summary>
+        /// Ensures that the owner property is set.
+        /// This property can be unset when not in cache.
+        /// </summary>
+        /// <param name="trainingRooms">The training rooms.</param>
+        /// <returns>Returns the fixed training rooms.</returns>
+        private IEnumerable<TrainingRoomDto> EnsureOwner(IEnumerable<TrainingRoomDto> trainingRooms)
+        {
+            return trainingRooms.Select(async dto => await EnsureOwner(dto)).Select(task => task.Result);
+        }
+
+        /// <summary>
+        /// Ensures that the owner property is set.
+        /// This property can be unset when not in cache.
+        /// </summary>
+        /// <param name="trainingRoomDto">The training room.</param>
+        /// <returns>Returns the fixed training room.</returns>
+        private async Task<TrainingRoomDto> EnsureOwner(TrainingRoomDto trainingRoomDto)
+        {
+            if (!(trainingRoomDto.Owner is null)) return trainingRoomDto;
+            UserDto userDto = await _userService.FindUserAsync(trainingRoomDto.OwnerId);
+            trainingRoomDto.Owner = userDto;
+            return trainingRoomDto;
         }
     }
 }

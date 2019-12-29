@@ -7,9 +7,9 @@ import Owner from '../../models/Owner';
  * Represents the CreateTrainingRoomRequest class.
  */
 export default class CreateTrainingRoomRequest extends Request {
-    public owner: Owner;
-    public name: string;
-    public trainingRoomSettings: TrainingRoomSettings;
+  public owner: Owner;
+  public name: string;
+  public trainingRoomSettings: TrainingRoomSettings;
 
   /**
    * Initializes the CreateTrainingRoomRequest class.

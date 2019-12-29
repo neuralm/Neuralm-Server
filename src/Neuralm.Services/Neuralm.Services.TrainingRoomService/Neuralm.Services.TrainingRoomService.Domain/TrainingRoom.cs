@@ -20,6 +20,11 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         public Guid Id { get; private set; }
 
         /// <summary>
+        /// Gets and sets the owner id.
+        /// </summary>
+        public Guid OwnerId { get; private set; }
+        
+        /// <summary>
         /// Gets and sets the owner.
         /// </summary>
         public virtual User Owner { get; private set; }
@@ -84,6 +89,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             Id = Guid.NewGuid();
             Name = name;
             Owner = owner;
+            OwnerId = owner.Id;
             Generation = 0;
             Enabled = true;
             TrainingRoomSettings = trainingRoomSettings;

@@ -20,6 +20,7 @@ using Neuralm.Services.Common.Infrastructure.Services;
 using Neuralm.Services.Common.Messages.Dtos;
 using Neuralm.Services.Common.Persistence.EFCore;
 using Neuralm.Services.TrainingRoomService.Infrastructure.Services;
+using Neuralm.Services.TrainingRoomService.Persistence.Repositories;
 
 namespace Neuralm.Services.TrainingRoomService.Mapping
 {
@@ -54,7 +55,7 @@ namespace Neuralm.Services.TrainingRoomService.Mapping
 
             #region Repositories
             serviceCollection.AddTransient<IRepository<TrainingRoom>, Repository<TrainingRoom, TrainingRoomDbContext>>();
-            serviceCollection.AddTransient<IRepository<TrainingSession>, Repository<TrainingSession, TrainingRoomDbContext>>();
+            serviceCollection.AddTransient<IRepository<TrainingSession>, TrainingSessionRepository>();
             serviceCollection.AddTransient<IRepository<TrainingRoomSettings>, Repository<TrainingRoomSettings, TrainingRoomDbContext>>();
             #endregion Repositories
             
