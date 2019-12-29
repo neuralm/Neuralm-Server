@@ -11,15 +11,14 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-
-const loadCoreComponent = (name: string): any => import(`./components/core/${name}.vue`);
+import ComponentLoader from './helpers/ComponentLoader';
 
 @Component({
   components: {
-    coreAppBar: () => loadCoreComponent('CoreAppBar'),
-    coreDrawer: () => loadCoreComponent('CoreDrawer'),
-    coreView: () => loadCoreComponent('CoreView'),
-    coreFooter: () => loadCoreComponent('CoreFooter')
+    coreAppBar: () => ComponentLoader('core/CoreAppBar'),
+    coreDrawer: () => ComponentLoader('core/CoreDrawer'),
+    coreView: () => ComponentLoader('core/CoreView'),
+    coreFooter: () => ComponentLoader('core/CoreFooter')
   }
 })
 export default class App extends Vue {}

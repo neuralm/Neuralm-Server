@@ -1,5 +1,5 @@
-import User from './User';
 import TrainingRoomSettings from './TrainingRoomSettings';
+import Owner from './Owner';
 
 /**
  * Represents the training room class.
@@ -7,7 +7,7 @@ import TrainingRoomSettings from './TrainingRoomSettings';
 export default interface TrainingRoom {
   id: string;
   name: string;
-  owner: User;
+  owner: Owner;
   generation: number;
   trainingRoomSettings: TrainingRoomSettings;
 }

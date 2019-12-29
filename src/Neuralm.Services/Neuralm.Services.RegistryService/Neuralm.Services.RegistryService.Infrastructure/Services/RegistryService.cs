@@ -106,12 +106,5 @@ namespace Neuralm.Services.RegistryService.Infrastructure.Services
              IEnumerable<Service> services = await base.EntityRepository.FindManyAsync(service => service.Name == serviceName);
              return Mapper.Map<ServiceDto>(services.Last());
         }
-
-        /// <inheritdoc cref="IRegistryService.StartMonitoringAsync(CancellationToken)"/>
-        public Task StartMonitoringAsync(CancellationToken cancellationToken)
-        {
-            // TODO: Pulse each service
-            throw new System.NotImplementedException();
-        }
     }
 }

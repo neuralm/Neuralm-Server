@@ -30,7 +30,7 @@ namespace Neuralm.Services.TrainingRoomService.Infrastructure.Services
         /// <inheritdoc cref="IUserService.FindUserAsync(Guid)"/>
         public async Task<UserDto> FindUserAsync(Guid id)
         {
-            HttpResponseMessage responseMessage = await _httpClient.GetAsync($"{id.ToString()}");
+            HttpResponseMessage responseMessage = await _httpClient.GetAsync($"user/{id.ToString()}");
             if (!responseMessage.IsSuccessStatusCode) 
                 return null;
             _logger.LogInformation($"[RESPONSE] [FindUserAsync] Response: {await responseMessage.Content.ReadAsStringAsync()}");

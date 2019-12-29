@@ -1,23 +1,24 @@
 ﻿using Neuralm.Services.Common.Messages.Abstractions;
 using Neuralm.Services.TrainingRoomService.Messages.Dtos;
-using System;
+using Neuralm.Services.Common.Messages;
 
 namespace Neuralm.Services.TrainingRoomService.Messages
 {
     /// <summary>
     /// Represents the <see cref="CreateTrainingRoomRequest"/> class.
     /// </summary>
+    [Message("Post", "/", typeof(CreateTrainingRoomResponse))]
     public class CreateTrainingRoomRequest : Request
     {
         /// <summary>
-        /// Gets the owner id.
-        /// </summary>
-        public Guid OwnerId { get; set; }
-
-        /// <summary>
         /// Gets the training room name.
         /// </summary>
-        public string TrainingRoomName { get; set; }
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Gets and sets the owner.
+        /// </summary>
+        public UserDto Owner { get; set; }
 
         /// <summary>
         /// Gets the training room settings.

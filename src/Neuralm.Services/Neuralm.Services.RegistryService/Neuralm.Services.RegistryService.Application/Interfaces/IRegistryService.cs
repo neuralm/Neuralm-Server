@@ -23,12 +23,5 @@ namespace Neuralm.Services.RegistryService.Application.Interfaces
         /// <param name="serviceName">The service name.</param>
         /// <returns>Returns the service dto by name.</returns>
         Task<ServiceDto> GetServiceByNameAsync(string serviceName);
-
-        /// <summary>
-        /// Starts to monitor the services asynchronously. 
-        /// </summary>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
-        Task StartMonitoringAsync(CancellationToken cancellationToken);
     }
 }

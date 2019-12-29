@@ -2,6 +2,8 @@ import GetEnabledTrainingRoomsRequest from '@/messages/requests/GetEnabledTraini
 import GetEnabledTrainingRoomsResponse from '@/messages/responses/GetEnabledTrainingRoomsResponse';
 import GetTrainingRoomResponse from '../messages/responses/GetTrainingRoomResponse';
 import GetTrainingRoomRequest from '../messages/requests/GetTrainingRoomRequest';
+import CreateTrainingRoomRequest from '../messages/requests/CreateTrainingRoomRequest';
+import CreateTrainingRoomResponse from '../messages/responses/CreateTrainingRoomResponse';
 
 /**
  * Represents the training room service interface.
@@ -20,4 +22,11 @@ export default interface ITrainingRoomService {
    * @returns The training room.
    */
   getTrainingRoom(getTrainingRoomRequest: GetTrainingRoomRequest): Promise<GetTrainingRoomResponse>;
+
+  /**
+   * Posts a create training room request.
+   * @param createTrainingRoomRequest The create training room request object.
+   * @returns The training room id.
+   */
+  createTrainingRoom(createTrainingRoomRequest: CreateTrainingRoomRequest): Promise<CreateTrainingRoomResponse>;
 }

@@ -10,7 +10,6 @@
     <ProjectReference Include="..\..\Neuralm.Services.RegistryService\Neuralm.Services.RegistryService.Messages\Neuralm.Services.RegistryService.Messages.csproj" />
     <ProjectReference Include="..\..\Neuralm.Services.TrainingRoomService\Neuralm.Services.TrainingRoomService.Messages\Neuralm.Services.TrainingRoomService.Messages.csproj" />
     <ProjectReference Include="..\..\Neuralm.Services.UserService\Neuralm.Services.UserService.Messages\Neuralm.Services.UserService.Messages.csproj" />
-    <ProjectReference Include="..\Neuralm.Services.MessageQueue.Domain\Neuralm.Services.MessageQueue.Domain.csproj" />
   </ItemGroup>
 
 </Project>

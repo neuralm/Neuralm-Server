@@ -62,6 +62,21 @@ import Component from 'vue-class-component';
         text: 'Dashboard'
       },
       {
+        to: '/createtrainingroom',
+        icon: 'mdi-plus-box',
+        text: 'Create Training Room'
+      },
+      {
+        to: '/starttrainingroomsession',
+        icon: 'mdi-play',
+        text: 'Start Session'
+      },
+      {
+        to: '/endtrainingroomsession',
+        icon: 'mdi-stop',
+        text: 'End Session'
+      },
+      {
         to: '/about',
         icon: 'mdi-account',
         text: 'About'

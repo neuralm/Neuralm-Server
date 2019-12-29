@@ -34,7 +34,7 @@ export default class UserModule implements IUserModule, Module<IUserState, User>
   public mutations?: IUserMutations;
 
   /**
-   * Initializes an instance of the AppModule.
+   * Initializes an instance of the UserModule.
    */
   public constructor() {
     this.namespaced = true;

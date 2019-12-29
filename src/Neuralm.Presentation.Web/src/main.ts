@@ -6,10 +6,13 @@ import vuetify from '@/plugins/vuetify';
 import snotify from '@/plugins/vuesnotify';
 import NeuralmRouter from '@/plugins/vuerouter';
 import Vuex from '@/plugins/vuex';
+import '@/plugins/vee-validate';
 
 // Modules
 import UserModule, { IUserModule } from './modules/User.module';
 import AppModule, { IAppModule } from './modules/App.module';
+import TrainingRoomModule, { ITrainingRoomModule } from './modules/TrainingRoom.module';
+import DashboardModule, { IDashboardModule } from './modules/Dashboard.module';
 
 // Services
 import ITrainingRoomService from './interfaces/ITrainingRoomService';
@@ -19,6 +22,8 @@ import IUserService from './interfaces/IUserService';
 
 // Styling
 import 'typeface-nunito';
+
+// Messaging
 import WSNetworkConnector from './messaging/WSNetworkConnector';
 import JsonMessageSerializer from './messaging/JsonMessageSerializer';
 import { IMessageSerializer } from './interfaces/IMessageSerializer';
@@ -27,9 +32,6 @@ import MessageProcessor from './messaging/MessageProcessor';
 import { INetworkConnector } from './interfaces/INetworkConnector';
 import INeuralmMQClient from './interfaces/INeuralmMQClient';
 import NeuralmMQClient from './messaging/NeuralmMQClient';
-import GetTrainingRoomResponse from './messages/responses/GetTrainingRoomResponse';
-import GetTrainingRoomRequest from './messages/requests/GetTrainingRoomRequest';
-import Guid from './helpers/Guid';
 import ErrorResponseHandler from './handlers/ErrorResponseHandler';
 
 Vue.config.productionTip = false;
@@ -48,21 +50,26 @@ const trainingRoomService: ITrainingRoomService = new TrainingRoomService(neural
 const userService: IUserService = new UserService(neuralmMQClient);
 const userModule: IUserModule = new UserModule();
 const appModule: IAppModule = new AppModule();
+const trainingRoomModule: ITrainingRoomModule = new TrainingRoomModule();
+const dashboardModule: IDashboardModule = new DashboardModule();
 
 const store = new Vuex.Store({
   modules: {
     user: userModule,
-    app: appModule
+    app: appModule,
+    trainingRoom: trainingRoomModule,
+    dashboard: dashboardModule
   }
 });
 
 const router = new NeuralmRouter();
 
 router.setRoutes([
-  { name: 'home', props: { trainingRoomService } },
-  { name: 'dashboard' },
+  { name: 'home' },
+  { name: 'dashboard', props: { trainingRoomService } },
   { name: 'login', props: { userService } },
   { name: 'register', props: { userService } },
+  { name: 'createtrainingroom', props: { trainingRoomService } },
   { name: 'about' }
 ], true);
 
