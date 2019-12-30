@@ -1,12 +1,14 @@
 import TrainingRoom from '@/models/TrainingRoom';
 import { Module, MutationTree, ActionTree } from 'vuex';
+import TrainingSession from '../models/TrainingSession';
 
 export interface ITrainingRoomState {
-
+  trainingRoom: TrainingRoom | undefined;
 }
 
 export interface ITrainingRoomMutations extends MutationTree<ITrainingRoomState> {
-
+  setTrainingRoom(trainingRoomState: ITrainingRoomState, trainingRoom: TrainingRoom): void;
+  addTrainingSession(trainingRoomState: ITrainingRoomState, trainingSession: TrainingSession): void;
 }
 
 export interface ITrainingRoomModule {
@@ -33,11 +35,22 @@ export default class TrainingRoomModule implements ITrainingRoomModule, Module<I
   }
 
   private getTrainingRoomState(): ITrainingRoomState {
-    return { };
+    return {
+      trainingRoom: undefined
+    };
   }
 
   private getMutations(): ITrainingRoomMutations {
-    const mutations: ITrainingRoomMutations = { };
+    const mutations: ITrainingRoomMutations = {
+      setTrainingRoom(trainingRoomState: ITrainingRoomState, trainingRoom: TrainingRoom): void {
+        trainingRoomState.trainingRoom = trainingRoom;
+      },
+      addTrainingSession(trainingRoomState: ITrainingRoomState, trainingSession: TrainingSession): void {
+        const trainingRoom: TrainingRoom = trainingRoomState.trainingRoom!;
+        trainingRoom.trainingSessions.push(trainingSession);
+        trainingRoomState.trainingRoom = trainingRoom;
+      }
+    };
     return mutations;
   }
 }

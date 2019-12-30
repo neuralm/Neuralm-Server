@@ -4,7 +4,7 @@ import TrainingSession from './TrainingSession';
 import Trainer from './Trainer';
 
 /**
- * Represents the training room class.
+ * Represents the training room interface.
  */
 export default interface TrainingRoom {
   id: string;

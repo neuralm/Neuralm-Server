@@ -18,6 +18,8 @@ class MessageTypeCache {
       ['GetTrainingRoomRequest']: 'Neuralm.Services.TrainingRoomService.Messages.GetTrainingRoomRequest',
       ['CreateTrainingRoomRequest']: 'Neuralm.Services.TrainingRoomService.Messages.CreateTrainingRoomRequest',
       ['PaginateTrainingRoomRequest']: 'Neuralm.Services.TrainingRoomService.Messages.PaginateTrainingRoomRequest',
+      ['StartTrainingSessionRequest']: 'Neuralm.Services.TrainingRoomService.Messages.StartTrainingSessionRequest',
+      ['EndTrainingSessionRequest']: 'Neuralm.Services.TrainingRoomService.Messages.EndTrainingSessionRequest',
 
       // Responses
       ['AuthenticateResponse']: 'Neuralm.Services.UserService.Messages.AuthenticateResponse',
@@ -27,6 +29,8 @@ class MessageTypeCache {
       ['ErrorResponse']: 'Neuralm.Services.Common.Messages.ErrorResponse',
       ['CreateTrainingRoomResponse']: 'Neuralm.Services.TrainingRoomService.Messages.CreateTrainingRoomResponse',
       ['PaginateTrainingRoomResponse']: 'Neuralm.Services.TrainingRoomService.Messages.PaginateTrainingRoomResponse',
+      ['StartTrainingSessionResponse']: 'Neuralm.Services.TrainingRoomService.Messages.StartTrainingSessionResponse',
+      ['EndTrainingSessionResponse']: 'Neuralm.Services.TrainingRoomService.Messages.EndTrainingSessionResponse',
     };
 
     // instance.constructor.name
