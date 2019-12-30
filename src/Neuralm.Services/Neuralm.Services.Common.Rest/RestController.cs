@@ -39,7 +39,7 @@ namespace Neuralm.Services.Common.Rest
         public virtual async Task<IActionResult> GetAsync(Guid id)
         {
             TDto dto = await _service.FindSingleOrDefaultAsync(id);
-            return dto == null ? (IActionResult)new NotFoundResult() : new OkObjectResult(dto);
+            return dto is null ? (IActionResult)new NotFoundResult() : new OkObjectResult(dto);
         }
 
         /// <summary>

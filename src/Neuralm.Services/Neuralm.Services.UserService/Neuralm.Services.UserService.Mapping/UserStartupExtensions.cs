@@ -76,7 +76,6 @@ namespace Neuralm.Services.UserService.Mapping
             serviceCollection.AddSingleton<IStartupService, StartupService>();
             #endregion Services
 
-
             serviceCollection.VerifyDatabaseConnection<UserDbContext>();
             
             return serviceCollection;

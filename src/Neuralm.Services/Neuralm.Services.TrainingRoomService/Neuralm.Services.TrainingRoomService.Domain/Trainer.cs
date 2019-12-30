@@ -33,8 +33,6 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// </summary>
         public virtual TrainingRoom TrainingRoom { get; set; }
 
-
-
         /// <summary>
         /// EFCore entity constructor.
         /// </summary>
@@ -47,9 +45,10 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// Initializes an instance of the <see cref="Trainer"/> class.
         /// </summary>
         /// <param name="user">The user.</param>
-        /// <param name="trainingRoom">The training room/</param>
+        /// <param name="trainingRoom">The training room.</param>
         public Trainer(User user, TrainingRoom trainingRoom)
         {
+            Id = Guid.NewGuid();
             User = user;
             UserId = user.Id;
             TrainingRoom = trainingRoom;

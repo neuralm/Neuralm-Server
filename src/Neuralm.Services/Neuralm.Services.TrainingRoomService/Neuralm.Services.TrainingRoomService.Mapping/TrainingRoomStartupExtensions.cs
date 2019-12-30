@@ -63,8 +63,8 @@ namespace Neuralm.Services.TrainingRoomService.Mapping
 
             #region Services
             serviceCollection.AddTransient<IAccessTokenService, JwtAccessTokenService>();
-            serviceCollection.AddSingleton<ITrainingRoomService, Application.Services.TrainingRoomService>();
-            serviceCollection.AddSingleton<ITrainingSessionService, Application.Services.TrainingSessionService>();
+            serviceCollection.AddTransient<ITrainingRoomService, Application.Services.TrainingRoomService>();
+            serviceCollection.AddTransient<ITrainingSessionService, Application.Services.TrainingSessionService>();
             serviceCollection.AddRegistryService("TrainingRoomService");
             serviceCollection.AddSingleton<IUserService, UserService>(provider =>
             {
@@ -90,7 +90,6 @@ namespace Neuralm.Services.TrainingRoomService.Mapping
                 httpClient.BaseAddress = new Uri($"http://{serviceDto.Host}:{serviceDto.Port.ToString()}");
                 return new UserService(messageSerializer, httpClient, logger);
             });
-
             serviceCollection.AddSingleton<IStartupService, StartupService>();
             #endregion Services
 

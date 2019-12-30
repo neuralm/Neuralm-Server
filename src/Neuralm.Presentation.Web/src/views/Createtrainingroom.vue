@@ -157,7 +157,6 @@ export default class CreateTrainingRoomView extends Vue {
       (response: CreateTrainingRoomResponse) => {
         if (response.success) {
           this.$snotify.success('Successfully created a training room!');
-          // TODO: reset inputs?
           this.$router.push('/dashboard');
         } else {
           this.$snotify.error('Failed to create training room');

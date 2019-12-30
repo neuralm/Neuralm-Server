@@ -48,9 +48,16 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
              * "User not found."
              */
             UserDto userDto = await _userService.FindUserAsync(dto.Owner.Id);
-            if (userDto is null || await EntityRepository.ExistsAsync(trainingRoom => trainingRoom.Name == dto.Name))
+            if (userDto is null ||
+                await EntityRepository.ExistsAsync(trainingRoom => trainingRoom.Name == dto.Name))
                 return (false, Guid.Empty);
+            dto.Id = Guid.NewGuid();
             dto.OwnerId = userDto.Id;
+            dto.AuthorizedTrainers = new List<TrainerDto>
+            {
+                new TrainerDto() {UserId = dto.OwnerId, TrainingRoomId = dto.Id}
+            };
+            dto.TrainingSessions = new List<TrainingSessionDto>();
             return await base.CreateAsync(dto);
         }
 
@@ -72,6 +79,8 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
         public override async Task<TrainingRoomDto> FindSingleOrDefaultAsync(Guid id)
         {
             TrainingRoomDto trainingRoomDto = await base.FindSingleOrDefaultAsync(id);
+            if (trainingRoomDto is null)
+                return null;
             return await EnsureOwner(trainingRoomDto);
         }
 
@@ -97,7 +106,22 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             if (!(trainingRoomDto.Owner is null)) return trainingRoomDto;
             UserDto userDto = await _userService.FindUserAsync(trainingRoomDto.OwnerId);
             trainingRoomDto.Owner = userDto;
+            trainingRoomDto.AuthorizedTrainers = trainingRoomDto.AuthorizedTrainers.Select(EnsureTrainer).Select(task => task.Result).ToList();
             return trainingRoomDto;
+        }
+
+        /// <summary>
+        /// Ensures that the user property is set.
+        /// This property can be unset when not in cache.
+        /// </summary>
+        /// <param name="trainerDto">The trainer.</param>
+        /// <returns>Returns the fixed trainer.</returns>
+        private async Task<TrainerDto> EnsureTrainer(TrainerDto trainerDto)
+        {
+            if (!(trainerDto.User is null)) return trainerDto;
+            UserDto userDto = await _userService.FindUserAsync(trainerDto.UserId);
+            trainerDto.User = userDto;
+            return trainerDto;
         }
     }
 }
