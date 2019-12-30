@@ -7,7 +7,7 @@ namespace Neuralm.Services.TrainingRoomService.Messages
     /// <summary>
     /// Represents the <see cref="EndTrainingSessionRequest"/> class.
     /// </summary>
-    [Message("Post", "/endTrainingSession", typeof(EndTrainingSessionResponse))]
+    [Message("Put", "/endTrainingSession", typeof(EndTrainingSessionResponse))]
     public class EndTrainingSessionRequest : Request
     {
         /// <summary>

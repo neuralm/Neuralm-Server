@@ -40,8 +40,8 @@ export default class TrainingRoomService implements ITrainingRoomService {
       this._neuralmMQClient.addHandler(messageHandler);
       this._neuralmMQClient.sendMessage(getEnabledTrainingRoomsRequest);
     }).then((response) => {
-        this._neuralmMQClient.removeHandler(messageHandler);
-        return response;
+      this._neuralmMQClient.removeHandler(messageHandler);
+      return response;
     });
   }
 
@@ -57,11 +57,13 @@ export default class TrainingRoomService implements ITrainingRoomService {
       this._neuralmMQClient.addHandler(messageHandler);
       this._neuralmMQClient.sendMessage(getTrainingRoomRequest);
     }).then((response) => {
-        this._neuralmMQClient.removeHandler(messageHandler);
-        return response;
+      this._neuralmMQClient.removeHandler(messageHandler);
+      return response;
     });
   }
-  public async createTrainingRoom(createTrainingRoomRequest: CreateTrainingRoomRequest): Promise<CreateTrainingRoomResponse> {
+  public async createTrainingRoom(
+    createTrainingRoomRequest: CreateTrainingRoomRequest
+  ): Promise<CreateTrainingRoomResponse> {
     let messageHandler: MessageHandler;
     return new Promise<CreateTrainingRoomResponse>((resolve, reject) => {
       messageHandler = new CreateTrainingRoomResponseHandler(
@@ -71,12 +73,14 @@ export default class TrainingRoomService implements ITrainingRoomService {
       this._neuralmMQClient.addHandler(messageHandler);
       this._neuralmMQClient.sendMessage(createTrainingRoomRequest);
     }).then((response) => {
-        this._neuralmMQClient.removeHandler(messageHandler);
-        return response;
+      this._neuralmMQClient.removeHandler(messageHandler);
+      return response;
     });
   }
 
-  public async paginateTrainingRooms(paginateTrainingRoomsRequest: PaginateTrainingRoomRequest): Promise<PaginateTrainingRoomResponse> {
+  public async paginateTrainingRooms(
+    paginateTrainingRoomsRequest: PaginateTrainingRoomRequest
+  ): Promise<PaginateTrainingRoomResponse> {
     let messageHandler: MessageHandler;
     return new Promise<PaginateTrainingRoomResponse>((resolve, reject) => {
       messageHandler = new PaginateTrainingRoomResponseHandler(
@@ -86,8 +90,8 @@ export default class TrainingRoomService implements ITrainingRoomService {
       this._neuralmMQClient.addHandler(messageHandler);
       this._neuralmMQClient.sendMessage(paginateTrainingRoomsRequest);
     }).then((response) => {
-        this._neuralmMQClient.removeHandler(messageHandler);
-        return response;
+      this._neuralmMQClient.removeHandler(messageHandler);
+      return response;
     });
   }
 }

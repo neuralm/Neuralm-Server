@@ -13,12 +13,15 @@ import UserModule, { IUserModule } from './modules/User.module';
 import AppModule, { IAppModule } from './modules/App.module';
 import TrainingRoomModule, { ITrainingRoomModule } from './modules/TrainingRoom.module';
 import DashboardModule, { IDashboardModule } from './modules/Dashboard.module';
+import TrainingSessionModule, { ITrainingSessionModule } from './modules/TrainingSession.module';
 
 // Services
 import ITrainingRoomService from './interfaces/ITrainingRoomService';
-import UserService from './services/UserService';
 import TrainingRoomService from './services/TrainingRoomService';
 import IUserService from './interfaces/IUserService';
+import UserService from './services/UserService';
+import ITrainingSessionService from './interfaces/ITrainingSessionService';
+import TrainingSessionService from './services/TrainingSessionService';
 
 // Styling
 import 'typeface-nunito';
@@ -48,18 +51,21 @@ const neuralmMQClient: INeuralmMQClient = new NeuralmMQClient(messageProcessor, 
 const errorResponseHandler: ErrorResponseHandler = new ErrorResponseHandler(messageProcessor);
 neuralmMQClient.addHandler(errorResponseHandler);
 const trainingRoomService: ITrainingRoomService = new TrainingRoomService(neuralmMQClient);
+const trainingSessionService: ITrainingSessionService = new TrainingSessionService(neuralmMQClient);
 const userService: IUserService = new UserService(neuralmMQClient);
 const userModule: IUserModule = new UserModule();
 const appModule: IAppModule = new AppModule();
 const trainingRoomModule: ITrainingRoomModule = new TrainingRoomModule();
 const dashboardModule: IDashboardModule = new DashboardModule();
+const trainingSessionModule: ITrainingSessionModule = new TrainingSessionModule();
 
 const store = new Vuex.Store<IRootState>({
   modules: {
     user: userModule,
     app: appModule,
     trainingRoom: trainingRoomModule,
-    dashboard: dashboardModule
+    dashboard: dashboardModule,
+    trainingSession: trainingSessionModule
   }
 });
 
@@ -68,6 +74,8 @@ const router = new NeuralmRouter();
 router.setRoutes([
   { name: 'home' },
   { name: 'dashboard', props: { trainingRoomService } },
+  { name: 'trainingroom', props: { trainingSessionService } },
+  { name: 'trainingsession', props: { trainingSessionService } },
   { name: 'login', props: { userService } },
   { name: 'register', props: { userService } },
   { name: 'createtrainingroom', props: { trainingRoomService } },
@@ -86,7 +94,6 @@ router.beforeEach((to, _, next) => {
   console.log(`Routed to ${to.name}`);
   next();
 });
-
 
 new Vue({
   vuetify,

@@ -84,6 +84,9 @@ import PaginateTrainingRoomResponse from '../messages/responses/PaginateTraining
     view.$store.subscribe(async (mutation, payload) => {
       const mutations = ['dashboard/updateItemsPerPage', 'dashboard/nextPage', 'dashboard/formerPage'];
       if (mutations.find((mut) => mut === mutation.type)) {
+        if (dashboardState.loading) {
+          return;
+        }
         await view.paginateTrainingRooms(dashboardState.pagination.page, dashboardState.pagination.itemsPerPage);
       }
     });
@@ -98,6 +101,7 @@ export default class DashboardView extends Vue {
    * @param pageSize The page size.
    */
   public paginateTrainingRooms(pageNumber: number, pageSize: number) {
+    this.$store.commit('dashboard/toggleLoading');
     return this.trainingRoomService.paginateTrainingRooms(
       new PaginateTrainingRoomRequest(pageNumber, pageSize)
     ).then((response: PaginateTrainingRoomResponse) => {
