@@ -457,16 +457,21 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             // Add all output nodes.
             _tempNodes.AddRange(Outputs.Select(p => p.OutputNode));
 
-            // For each node of type OutputNode set the layer to 0, otherwise set the layer to the minimum value and force to true.
+            //Set all nodes to the lowest value so they dont keep older values.
+            foreach (Node node in _tempNodes)
+            {
+                if(!(node is OutputNode))
+                {
+                    SetLayer(node, uint.MinValue, true);
+                }
+            }
+
+            // For each node of type OutputNode set the layer to 0
             foreach (Node node in _tempNodes)
             {
                 if (node is OutputNode)
                 {
                     SetLayer(node, 0);
-                }
-                else
-                {
-                    SetLayer(node, uint.MinValue, true);
                 }
             }
 
