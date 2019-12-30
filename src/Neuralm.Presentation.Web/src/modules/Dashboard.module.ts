@@ -12,6 +12,7 @@ export interface IDashboardState {
     numberOfPages: number,
     totalRecords: number
   };
+  loading: boolean;
 }
 
 export interface IDashboardMutations extends MutationTree<IDashboardState> {
@@ -19,6 +20,7 @@ export interface IDashboardMutations extends MutationTree<IDashboardState> {
   nextPage(dashboardState: IDashboardState): void;
   formerPage(dashboardState: IDashboardState): void;
   updatePaginator(dashboardState: IDashboardState, response: PaginateTrainingRoomResponse): void;
+  toggleLoading(dashboardState: IDashboardState): void;
 }
 
 export interface IDashboardModule {
@@ -53,6 +55,7 @@ export default class DashboardModule implements IDashboardModule, Module<IDashbo
         numberOfPages: 1,
         totalRecords: 0
       },
+      loading: false,
       trainingrooms: []
     };
     return state;
@@ -86,6 +89,10 @@ export default class DashboardModule implements IDashboardModule, Module<IDashbo
           itemsPerPageArray: [5, 8, 12],
           totalRecords: response.totalRecords
         };
+        dashboardState.loading = false;
+      },
+      toggleLoading(dashboardState: IDashboardState): void {
+        dashboardState.loading = !dashboardState.loading;
       }
     };
     return mutations;
