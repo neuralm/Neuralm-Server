@@ -1,4 +1,6 @@
-﻿using Neuralm.Services.Common.Application.Interfaces;
+﻿using System.Threading.Tasks;
+using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.TrainingRoomService.Messages;
 using Neuralm.Services.TrainingRoomService.Messages.Dtos;
 
 namespace Neuralm.Services.TrainingRoomService.Application.Interfaces
@@ -8,19 +10,19 @@ namespace Neuralm.Services.TrainingRoomService.Application.Interfaces
     /// </summary>
     public interface ITrainingSessionService : IService<TrainingSessionDto>
     {
-        ///// <summary>
-        ///// Starts a training session asynchronously.
-        ///// </summary>
-        ///// <param name="startTrainingSessionRequest">The start training session request.</param>
-        ///// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="StartTrainingSessionResponse"/>.</returns>
-        //Task<StartTrainingSessionResponse> StartTrainingSessionAsync(StartTrainingSessionRequest startTrainingSessionRequest);
+        /// <summary>
+        /// Starts a training session asynchronously.
+        /// </summary>
+        /// <param name="startTrainingSessionRequest">The start training session request.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="StartTrainingSessionResponse"/>.</returns>
+        Task<StartTrainingSessionResponse> StartTrainingSessionAsync(StartTrainingSessionRequest startTrainingSessionRequest);
 
-        ///// <summary>
-        ///// Ends a training session asynchronously.
-        ///// </summary>
-        ///// <param name="endTrainingSessionRequest"></param>
-        ///// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="EndTrainingSessionResponse"/>.</returns>
-        //Task<EndTrainingSessionResponse> EndTrainingSessionAsync(EndTrainingSessionRequest endTrainingSessionRequest);
+        /// <summary>
+        /// Ends a training session asynchronously.
+        /// </summary>
+        /// <param name="endTrainingSessionRequest"></param>
+        /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="EndTrainingSessionResponse"/>.</returns>
+        Task<EndTrainingSessionResponse> EndTrainingSessionAsync(EndTrainingSessionRequest endTrainingSessionRequest);
 
         ///// <summary>
         ///// Gets the organisms for a training session asynchronously.

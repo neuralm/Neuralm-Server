@@ -26,6 +26,30 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
 
         }
 
+        public override async Task<(bool success, Guid id)> CreateAsync(TrainingSession entity)
+        {
+            bool saveSuccess = false;
+            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
+            try
+            {
+                EntityValidator.Validate(entity);
+                DbContext.Entry(entity.TrainingRoom).State = EntityState.Unchanged;
+                DbContext.Set<TrainingSession>().Add(entity);
+                int saveResult = await DbContext.SaveChangesAsync();
+                // Force the DbContext to fetch the species anew on next query.
+                foreach (TrainingSession session in entity.TrainingRoom.TrainingSessions)
+                {
+                    DbContext.Entry(session).State = EntityState.Detached;
+                }
+                saveSuccess = Convert.ToBoolean(saveResult);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(new CreatingEntityFailedException($"The entity of type {typeof(TrainingSession).Name} could not be created.", ex));
+            }
+            return (success: saveSuccess, id: entity.Id);
+        }
+
         /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.UpdateAsync(TEntity)"/>
         public override async Task<(bool success, Guid id, bool updated)> UpdateAsync(TrainingSession entity)
         {

@@ -1,8 +1,10 @@
-﻿using AutoMapper;
+﻿using System.Threading.Tasks;
+using AutoMapper;
 using Neuralm.Services.Common.Application.Abstractions;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.TrainingRoomService.Application.Interfaces;
 using Neuralm.Services.TrainingRoomService.Domain;
+using Neuralm.Services.TrainingRoomService.Messages;
 using Neuralm.Services.TrainingRoomService.Messages.Dtos;
 
 namespace Neuralm.Services.TrainingRoomService.Application.Services
@@ -12,55 +14,58 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
     /// </summary>
     public class TrainingSessionService : BaseService<TrainingSession, TrainingSessionDto>, ITrainingSessionService
     {
+        private readonly IRepository<TrainingRoom> _trainingRoomRepository;
+        private readonly IUserService _userService;
+
         /// <summary>
         /// Initializes an instance of the <see cref="TrainingSessionService"/> class.
         /// </summary>
-        /// <param name="trainingSessionRepository"></param>
-        /// <param name="mapper"></param>
+        /// <param name="trainingSessionRepository">The training session repository.</param>
+        /// <param name="trainingRoomRepository">The training room repository.</param>
+        /// <param name="userService">The user service.</param>
+        /// <param name="mapper">The mapper.</param>
         public TrainingSessionService(
             IRepository<TrainingSession> trainingSessionRepository,
+            IRepository<TrainingRoom> trainingRoomRepository,
+            IUserService userService,
             IMapper mapper) : base(trainingSessionRepository, mapper)
         {
-
+            _trainingRoomRepository = trainingRoomRepository;
+            _userService = userService;
         }
-
-        /*
+        
         /// <inheritdoc cref="ITrainingRoomService.StartTrainingSessionAsync(StartTrainingSessionRequest)"/>
         public async Task<StartTrainingSessionResponse> StartTrainingSessionAsync(StartTrainingSessionRequest startTrainingSessionRequest)
         {
             TrainingRoom trainingRoom;
-            Expression<Func<TrainingRoom, bool>> predicate = tr => tr.Id.Equals(startTrainingSessionRequest.TrainingRoomId);
-            if ((trainingRoom = await _trainingRoomRepository.FindSingleOrDefaultAsync(predicate)) == default)
+            if ((trainingRoom = await _trainingRoomRepository.FindSingleOrDefaultAsync(tr => tr.Id.Equals(startTrainingSessionRequest.TrainingRoomId))) == default)
                 return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, null, "Training room does not exist.");
-            if (!await _userRepository.ExistsAsync(usr => usr.Id.Equals(startTrainingSessionRequest.UserId)))
+            UserDto user = await _userService.FindUserAsync(startTrainingSessionRequest.UserId);
+            if (user is null)
                 return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, null, "User does not exist.");
-
             if (!trainingRoom.IsUserAuthorized(startTrainingSessionRequest.UserId))
                 return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, null, "User is not authorized");
             if (!trainingRoom.StartTrainingSession(startTrainingSessionRequest.UserId, out TrainingSession trainingSession))
-                return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, null, "Failed to start a training session.");
-
-            await _trainingRoomRepository.UpdateAsync(trainingRoom);
-
-            TrainingSessionDto trainingSessionDto = EntityToDtoConverter.Convert<TrainingSessionDto, TrainingSession>(trainingSession);
+                return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, null, "Training session already started.");
+            await EntityRepository.CreateAsync(trainingSession);
+            TrainingSessionDto trainingSessionDto = Mapper.Map<TrainingSessionDto>(trainingSession);
             return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, trainingSessionDto, "Successfully started a training session.", true);
         }
-
+        
         /// <inheritdoc cref="ITrainingRoomService.EndTrainingSessionAsync(EndTrainingSessionRequest)"/>
         public async Task<EndTrainingSessionResponse> EndTrainingSessionAsync(EndTrainingSessionRequest endTrainingSessionRequest)
         {
             TrainingSession trainingSession;
-            if ((trainingSession = await _trainingSessionRepository.FindSingleOrDefaultAsync(trs => trs.Id.Equals(endTrainingSessionRequest.TrainingSessionId))) == default)
+            if ((trainingSession = await EntityRepository.FindSingleOrDefaultAsync(trs => trs.Id.Equals(endTrainingSessionRequest.TrainingSessionId))) == default)
                 return new EndTrainingSessionResponse(endTrainingSessionRequest.Id, "Training session does not exist.");
-
             if (trainingSession.EndedTimestamp != default)
                 return new EndTrainingSessionResponse(endTrainingSessionRequest.Id, "Training session was already ended.");
-
             trainingSession.EndTrainingSession();
-            await _trainingSessionRepository.UpdateAsync(trainingSession);
+            await EntityRepository.UpdateAsync(trainingSession);
             return new EndTrainingSessionResponse(endTrainingSessionRequest.Id, "Successfully ended the training session.", true);
         }
-
+        
+        /*
         /// <inheritdoc cref="ITrainingRoomService.GetOrganismsAsync(GetOrganismsRequest)"/>
         public async Task<GetOrganismsResponse> GetOrganismsAsync(GetOrganismsRequest getOrganismsRequest)
         {

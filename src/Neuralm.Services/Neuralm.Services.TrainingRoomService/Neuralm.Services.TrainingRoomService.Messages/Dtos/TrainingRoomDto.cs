@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Neuralm.Services.TrainingRoomService.Messages.Dtos
 {
@@ -36,5 +37,15 @@ namespace Neuralm.Services.TrainingRoomService.Messages.Dtos
         /// Gets and sets the training room settings.
         /// </summary>
         public TrainingRoomSettingsDto TrainingRoomSettings { get; set; }
+        
+        /// <summary>
+        /// Gets and sets the list of training sessions.
+        /// </summary>
+        public List<TrainingSessionDto> TrainingSessions { get; set; }
+        
+        /// <summary>
+        /// Gets and sets the list of authorized trainers.
+        /// </summary>
+        public List<TrainerDto> AuthorizedTrainers { get; set; }
     }
 }

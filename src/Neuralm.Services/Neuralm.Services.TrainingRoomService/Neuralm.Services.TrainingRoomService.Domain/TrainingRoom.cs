@@ -318,7 +318,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         public bool StartTrainingSession(Guid userId, out TrainingSession trainingSession)
         {
             trainingSession = new TrainingSession(this, userId);
-            if (TrainingSessions.Any(user => user.Id.Equals(userId)))
+            if (TrainingSessions.Any(ts => ts.UserId.Equals(userId)))
                 return false;
             TrainingSessions.Add(trainingSession);
             return true;
