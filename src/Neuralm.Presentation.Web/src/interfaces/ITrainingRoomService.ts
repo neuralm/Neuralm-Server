@@ -4,6 +4,8 @@ import GetTrainingRoomResponse from '../messages/responses/GetTrainingRoomRespon
 import GetTrainingRoomRequest from '../messages/requests/GetTrainingRoomRequest';
 import CreateTrainingRoomRequest from '../messages/requests/CreateTrainingRoomRequest';
 import CreateTrainingRoomResponse from '../messages/responses/CreateTrainingRoomResponse';
+import PaginateTrainingRoomRequest from '../messages/requests/PaginateTrainingRoomRequest';
+import PaginateTrainingRoomResponse from '../messages/responses/PaginateTrainingRoomResponse';
 
 /**
  * Represents the training room service interface.
@@ -22,6 +24,13 @@ export default interface ITrainingRoomService {
    * @returns The training room.
    */
   getTrainingRoom(getTrainingRoomRequest: GetTrainingRoomRequest): Promise<GetTrainingRoomResponse>;
+
+  /**
+   * Paginates the training rooms.
+   * @param paginateTrainingRoomRequest The paginate training room request.
+   * @returns The pagination response.
+   */
+  paginateTrainingRooms(paginateTrainingRoomRequest: PaginateTrainingRoomRequest): Promise<PaginateTrainingRoomResponse>;
 
   /**
    * Posts a create training room request.

@@ -8,6 +8,7 @@ export default class GetTrainingRoomRequest extends Request {
 
   /**
    * Initializes the GetTrainingRoomRequest class.
+   * @param getId The get id.
    */
   constructor(getId: string) {
     super();

@@ -33,6 +33,7 @@ import { INetworkConnector } from './interfaces/INetworkConnector';
 import INeuralmMQClient from './interfaces/INeuralmMQClient';
 import NeuralmMQClient from './messaging/NeuralmMQClient';
 import ErrorResponseHandler from './handlers/ErrorResponseHandler';
+import { IRootState } from './interfaces/IRootState';
 
 Vue.config.productionTip = false;
 const messageSerializer: IMessageSerializer = new JsonMessageSerializer();
@@ -53,7 +54,7 @@ const appModule: IAppModule = new AppModule();
 const trainingRoomModule: ITrainingRoomModule = new TrainingRoomModule();
 const dashboardModule: IDashboardModule = new DashboardModule();
 
-const store = new Vuex.Store({
+const store = new Vuex.Store<IRootState>({
   modules: {
     user: userModule,
     app: appModule,
@@ -86,12 +87,6 @@ router.beforeEach((to, _, next) => {
   next();
 });
 
-// NOTE: sanity code.
-// router.afterEach(async (to, from) => {
-//   const request: GetTrainingRoomRequest = new GetTrainingRoomRequest(Guid.newGuid().toString());
-//   console.log('typename: ', request.constructor.name);
-//   const response: GetTrainingRoomResponse = await trainingRoomService.getTrainingRoom(request);
-// });
 
 new Vue({
   vuetify,

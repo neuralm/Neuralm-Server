@@ -13,6 +13,7 @@ export default class CreateTrainingRoomRequest extends Request {
 
   /**
    * Initializes the CreateTrainingRoomRequest class.
+   * @param trainingRoom The training room.
    */
   constructor(trainingRoom: TrainingRoom) {
     super();
