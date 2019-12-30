@@ -16,10 +16,5 @@ namespace Neuralm.Services.TrainingRoomService.Messages.Dtos
         /// Gets and sets the user name.
         /// </summary>
         public string Username { get; set; }
-
-        /// <summary>
-        /// Gets and sets the time stamp created.
-        /// </summary>
-        public DateTime TimestampCreated { get; set; }
     }
 }

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -8,9 +10,9 @@ using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Infrastructure.Networking;
 using Neuralm.Services.RegistryService.Application.Configurations;
 using Neuralm.Services.RegistryService.Application.Dtos;
-using Neuralm.Services.RegistryService.Application.Interfaces;
 using Neuralm.Services.RegistryService.Domain;
 using Neuralm.Services.RegistryService.Messages;
+using IRegistryService = Neuralm.Services.RegistryService.Application.Interfaces.IRegistryService;
 
 namespace Neuralm.Services.RegistryService.Infrastructure.Services
 {
@@ -96,32 +98,13 @@ namespace Neuralm.Services.RegistryService.Infrastructure.Services
             using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cancellationTokenSource.Token);
             await _networkConnector.ConnectAsync(cancellationToken);
             _networkConnector.Start();
-
-//            List<Task> tasks = _neuralmConfiguration.Services.Select(serviceName => StartUpServiceTask(serviceName, cts.Token)).ToList();
-//
-//            // foreach service in the configuration 
-//                // Check repository if service is alive
-//                    // if not, invoke a new instance of the service with a callback url for completion. 
-//                    // (use CancellationToken 5-10 min, if not returned try once more)
-//                        // if it failed to start up again abort and notify administrator.
-//            
-//            await Task.WhenAll(tasks);
         }
 
-        /// <inheritdoc cref="IRegistryService.StartMonitoringAsync(CancellationToken)"/>
-        public async Task StartMonitoringAsync(CancellationToken cancellationToken)
+        /// <inheritdoc cref="IRegistryService.GetServiceByNameAsync(string)"/>
+        public async Task<ServiceDto> GetServiceByNameAsync(string serviceName)
         {
-            // TODO: Pulse each service
-            throw new System.NotImplementedException();
-        }
-
-        private async Task StartUpServiceTask(string serviceName, CancellationToken cancellationToken)
-        {
-            // Check if a service currently exists that is alive
-            if (await _serviceRepository.ExistsAsync(service => service.IsAlive && service.Name == serviceName))
-                return;
-            cancellationToken.ThrowIfCancellationRequested();
-            throw new System.NotImplementedException();
+             IEnumerable<Service> services = await base.EntityRepository.FindManyAsync(service => service.Name == serviceName);
+             return Mapper.Map<ServiceDto>(services.Last());
         }
     }
 }

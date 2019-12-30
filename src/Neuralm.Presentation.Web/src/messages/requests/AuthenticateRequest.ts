@@ -10,6 +10,8 @@ export default class AuthenticateRequest extends Request {
 
   /**
    * Initializes the AuthenticateRequest class.
+   * @param username The user name.
+   * @param password The password.
    */
   constructor(username: string, password: string) {
     super();

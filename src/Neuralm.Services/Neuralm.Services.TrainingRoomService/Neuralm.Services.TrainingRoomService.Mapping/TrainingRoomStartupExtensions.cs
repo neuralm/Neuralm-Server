@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Application.Services;
@@ -11,9 +14,13 @@ using Neuralm.Services.TrainingRoomService.Persistence.Contexts;
 using Neuralm.Services.TrainingRoomService.Persistence.Infrastructure;
 using Neuralm.Services.TrainingRoomService.Persistence.Validators;
 using System.Reflection;
+using System.Security.Claims;
 using Neuralm.Services.Common.Application.Serializers;
 using Neuralm.Services.Common.Infrastructure.Services;
+using Neuralm.Services.Common.Messages.Dtos;
 using Neuralm.Services.Common.Persistence.EFCore;
+using Neuralm.Services.TrainingRoomService.Infrastructure.Services;
+using Neuralm.Services.TrainingRoomService.Persistence.Repositories;
 
 namespace Neuralm.Services.TrainingRoomService.Mapping
 {
@@ -48,18 +55,44 @@ namespace Neuralm.Services.TrainingRoomService.Mapping
 
             #region Repositories
             serviceCollection.AddTransient<IRepository<TrainingRoom>, Repository<TrainingRoom, TrainingRoomDbContext>>();
-            serviceCollection.AddTransient<IRepository<TrainingSession>, Repository<TrainingSession, TrainingRoomDbContext>>();
+            serviceCollection.AddTransient<IRepository<TrainingSession>, TrainingSessionRepository>();
             serviceCollection.AddTransient<IRepository<TrainingRoomSettings>, Repository<TrainingRoomSettings, TrainingRoomDbContext>>();
             #endregion Repositories
+            
+            serviceCollection.AddSingleton<IMessageSerializer, JsonMessageSerializer>();
 
             #region Services
             serviceCollection.AddTransient<IAccessTokenService, JwtAccessTokenService>();
             serviceCollection.AddSingleton<ITrainingRoomService, Application.Services.TrainingRoomService>();
             serviceCollection.AddSingleton<ITrainingSessionService, Application.Services.TrainingSessionService>();
-            #endregion Services
+            serviceCollection.AddRegistryService("TrainingRoomService");
+            serviceCollection.AddSingleton<IUserService, UserService>(provider =>
+            {
+                ILogger<UserService> logger = provider.GetRequiredService<ILogger<UserService>>();
+                IMessageSerializer messageSerializer = provider.GetService<IMessageSerializer>();
+                HttpClient httpClient = provider.GetService<IHttpClientFactory>().CreateClient("UserService");
+                IAccessTokenService accessTokenService = provider.GetService<IAccessTokenService>();
+                IRegistryService registryService = provider.GetService<IRegistryService>();
+                // NOTE: May deadlock
+                ServiceDto serviceDto = registryService.GetServiceAsync("UserService").GetAwaiter().GetResult();
+                // NOTE: What if null? maybe wait before user service is available? several attempts?
+                if (serviceDto is null)
+                {
+                    logger.LogError($"Failed to initialize UserService!");
+                    return null;
+                }
+                List<Claim> claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, "TrainingRoomService"),
+                    new Claim(ClaimTypes.Role, "Service")
+                };
+                httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessTokenService.GenerateAccessToken(claims)}");
+                httpClient.BaseAddress = new Uri($"http://{serviceDto.Host}:{serviceDto.Port.ToString()}");
+                return new UserService(messageSerializer, httpClient, logger);
+            });
 
-            serviceCollection.AddSingleton<IMessageSerializer, JsonMessageSerializer>();
             serviceCollection.AddSingleton<IStartupService, StartupService>();
+            #endregion Services
 
             serviceCollection.VerifyDatabaseConnection<TrainingRoomDbContext>();
 

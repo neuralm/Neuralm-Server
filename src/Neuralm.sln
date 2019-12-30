@@ -65,8 +65,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.MessageQue
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.MessageQueue.Infrastructure", "Neuralm.Services\Neuralm.Services.MessageQueue\Neuralm.Services.MessageQueue.Infrastructure\Neuralm.Services.MessageQueue.Infrastructure.csproj", "{1104D836-4E8F-4108-884B-A6AE4A8897AE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.MessageQueue.Domain", "Neuralm.Services\Neuralm.Services.MessageQueue\Neuralm.Services.MessageQueue.Domain\Neuralm.Services.MessageQueue.Domain.csproj", "{78605888-627B-4BB9-A9BC-490AB75AEEDE}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.UserService.Messages", "Neuralm.Services\Neuralm.Services.UserService\Neuralm.Services.UserService.Messages\Neuralm.Services.UserService.Messages.csproj", "{30449351-E89F-47A1-BD19-50AB7FB96D6B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.Common.Messages", "Neuralm.Services\Neuralm.Services.Common.Messages\Neuralm.Services.Common.Messages.csproj", "{ADE91982-1374-40A6-82D0-14938C9A9B04}"
@@ -80,6 +78,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.RegistryService.Infrastructure", "Neuralm.Services\Neuralm.Services.RegistryService\Neuralm.Services.RegistryService.Infrastructure\Neuralm.Services.RegistryService.Infrastructure.csproj", "{CCE11508-18E1-4024-8E2F-5C2A9657B294}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neuralm.Services.Common.Infrastructure", "Neuralm.Services\Neuralm.Services.Common.Infrastructure\Neuralm.Services.Common.Infrastructure.csproj", "{A61B8277-62E0-47D2-A3F7-93BA33A79379}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Services.TrainingRoomService.Tests", "Neuralm.Services\Neuralm.Services.TrainingRoomService\Neuralm.Services.TrainingRoomService.Tests\Neuralm.Services.TrainingRoomService.Tests.csproj", "{D3E5AA9F-95C7-488E-A300-8A963573BC5E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neuralm.Services.TrainingRoomService.Infrastructure", "Neuralm.Services\Neuralm.Services.TrainingRoomService\Neuralm.Services.TrainingRoomService.Infrastructure\Neuralm.Services.TrainingRoomService.Infrastructure.csproj", "{312A0078-0421-4F87-937A-68C30D457FA8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -297,14 +299,6 @@ Global
 		{1104D836-4E8F-4108-884B-A6AE4A8897AE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1104D836-4E8F-4108-884B-A6AE4A8897AE}.Release|x64.ActiveCfg = Release|Any CPU
 		{1104D836-4E8F-4108-884B-A6AE4A8897AE}.Release|x64.Build.0 = Release|Any CPU
-		{78605888-627B-4BB9-A9BC-490AB75AEEDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{78605888-627B-4BB9-A9BC-490AB75AEEDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{78605888-627B-4BB9-A9BC-490AB75AEEDE}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{78605888-627B-4BB9-A9BC-490AB75AEEDE}.Debug|x64.Build.0 = Debug|Any CPU
-		{78605888-627B-4BB9-A9BC-490AB75AEEDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{78605888-627B-4BB9-A9BC-490AB75AEEDE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{78605888-627B-4BB9-A9BC-490AB75AEEDE}.Release|x64.ActiveCfg = Release|Any CPU
-		{78605888-627B-4BB9-A9BC-490AB75AEEDE}.Release|x64.Build.0 = Release|Any CPU
 		{30449351-E89F-47A1-BD19-50AB7FB96D6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{30449351-E89F-47A1-BD19-50AB7FB96D6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30449351-E89F-47A1-BD19-50AB7FB96D6B}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -361,6 +355,22 @@ Global
 		{A61B8277-62E0-47D2-A3F7-93BA33A79379}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A61B8277-62E0-47D2-A3F7-93BA33A79379}.Release|x64.ActiveCfg = Release|Any CPU
 		{A61B8277-62E0-47D2-A3F7-93BA33A79379}.Release|x64.Build.0 = Release|Any CPU
+		{D3E5AA9F-95C7-488E-A300-8A963573BC5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3E5AA9F-95C7-488E-A300-8A963573BC5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3E5AA9F-95C7-488E-A300-8A963573BC5E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D3E5AA9F-95C7-488E-A300-8A963573BC5E}.Debug|x64.Build.0 = Debug|Any CPU
+		{D3E5AA9F-95C7-488E-A300-8A963573BC5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3E5AA9F-95C7-488E-A300-8A963573BC5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3E5AA9F-95C7-488E-A300-8A963573BC5E}.Release|x64.ActiveCfg = Release|Any CPU
+		{D3E5AA9F-95C7-488E-A300-8A963573BC5E}.Release|x64.Build.0 = Release|Any CPU
+		{312A0078-0421-4F87-937A-68C30D457FA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{312A0078-0421-4F87-937A-68C30D457FA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{312A0078-0421-4F87-937A-68C30D457FA8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{312A0078-0421-4F87-937A-68C30D457FA8}.Debug|x64.Build.0 = Debug|Any CPU
+		{312A0078-0421-4F87-937A-68C30D457FA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{312A0078-0421-4F87-937A-68C30D457FA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{312A0078-0421-4F87-937A-68C30D457FA8}.Release|x64.ActiveCfg = Release|Any CPU
+		{312A0078-0421-4F87-937A-68C30D457FA8}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -396,7 +406,6 @@ Global
 		{4DD46554-4CAF-4F64-B59E-CF0226EBBD07} = {E9E1DEF4-BF22-4468-B695-F122CB2AB159}
 		{82B88CE4-5795-4C45-98DF-FEB45C4C4B1A} = {E9E1DEF4-BF22-4468-B695-F122CB2AB159}
 		{1104D836-4E8F-4108-884B-A6AE4A8897AE} = {E9E1DEF4-BF22-4468-B695-F122CB2AB159}
-		{78605888-627B-4BB9-A9BC-490AB75AEEDE} = {E9E1DEF4-BF22-4468-B695-F122CB2AB159}
 		{30449351-E89F-47A1-BD19-50AB7FB96D6B} = {79154190-8C61-406E-87EA-8A378F5C511C}
 		{ADE91982-1374-40A6-82D0-14938C9A9B04} = {CB3EBA39-DB0E-4F7C-9DEC-B0ECD756D11E}
 		{44A97F31-85F4-4B5F-B311-3E70DA6878CC} = {5AC96FAB-9B63-4162-874F-B81F385861A7}
@@ -404,6 +413,8 @@ Global
 		{0E36FCA7-2B27-4AEF-999F-58E8F3AD9002} = {E9E1DEF4-BF22-4468-B695-F122CB2AB159}
 		{CCE11508-18E1-4024-8E2F-5C2A9657B294} = {002E927A-8DFD-4BC6-A978-3AA0174BAE1F}
 		{A61B8277-62E0-47D2-A3F7-93BA33A79379} = {CB3EBA39-DB0E-4F7C-9DEC-B0ECD756D11E}
+		{D3E5AA9F-95C7-488E-A300-8A963573BC5E} = {5AC96FAB-9B63-4162-874F-B81F385861A7}
+		{312A0078-0421-4F87-937A-68C30D457FA8} = {5AC96FAB-9B63-4162-874F-B81F385861A7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0B434211-311E-4D7B-B548-FCC4B9E78751}

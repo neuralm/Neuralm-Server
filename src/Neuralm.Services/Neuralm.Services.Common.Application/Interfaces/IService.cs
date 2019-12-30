@@ -18,10 +18,24 @@ namespace Neuralm.Services.Common.Application.Interfaces
         Task<TDto> FindSingleOrDefaultAsync(Guid id);
 
         /// <summary>
-        /// Gets all Entities.
+        /// Gets all records as dtos.
         /// </summary>
         /// <returns>Returns all dtos.</returns>
         Task<IEnumerable<TDto>> GetAllAsync();
+        
+        /// <summary>
+        /// Counts the records asynchronously.
+        /// </summary>
+        /// <returns>Returns the number of records.</returns>
+        Task<int> CountAsync();
+        
+        /// <summary>
+        /// Gets paginated records as dtos.
+        /// </summary>
+        /// <param name="pageNumber">The page number.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <returns>Returns all paginated dtos.</returns>
+        Task<IEnumerable<TDto>> GetPaginationAsync(int pageNumber, int pageSize);
 
         /// <summary>
         /// Deletes the provided dto.

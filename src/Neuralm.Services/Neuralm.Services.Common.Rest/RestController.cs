@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Neuralm.Services.Common.Application.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -50,6 +51,27 @@ namespace Neuralm.Services.Common.Rest
         public virtual async Task<IActionResult> GetAllAsync()
         {
             return new OkObjectResult(await _service.GetAllAsync());
+        }
+        
+        /// <summary>
+        /// Gets dtos by pagination asynchronously.
+        /// </summary>
+        /// <returns>Returns the requested dtos by pagination, with pagination headers and with status code OK.</returns>
+        [HttpGet("{pageNumber:int:min(1)}/{pageSize:int:range(5,50)}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public virtual async Task<IActionResult> GetPaginationAsync(int pageNumber = 1, int pageSize = 5)
+        {
+            int actualPageNumber = pageNumber - 1;
+            int total = await _service.CountAsync();
+            int pageCount = total > 0 ? (int) Math.Ceiling(total / (double)pageSize) : 0;
+
+            // Add Paging headers
+            Response.Headers.Add("X-Paging-PageNumber", pageNumber.ToString());
+            Response.Headers.Add("X-Paging-PageSize", pageSize.ToString());
+            Response.Headers.Add("X-Paging-PageCount", pageCount.ToString());
+            Response.Headers.Add("X-Paging-TotalRecordCount", total.ToString());
+            
+            return new OkObjectResult(total > 0 ? await _service.GetPaginationAsync(actualPageNumber, pageSize) : new List<TDto>());
         }
 
         /// <summary>

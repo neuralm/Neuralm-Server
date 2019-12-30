@@ -14,27 +14,41 @@ namespace Neuralm.Services.Common.Application.Interfaces
     public interface IRepository<TEntity> where TEntity : class, IEntity
     {
         /// <summary>
-        /// Finds a single Entity by an expression.
+        /// Finds a single Entity by an expression asynchronously.
         /// </summary>
         /// <param name="predicate">The expression.</param>
         /// <returns>Returns the result of the expression.</returns>
         Task<TEntity> FindSingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
 
         /// <summary>
-        /// Finds many Entities using an expression.
+        /// Finds many Entities using an expression asynchronously.
         /// </summary>
         /// <param name="predicate">The expression.</param>
         /// <returns>The results of the expression.</returns>
         Task<IEnumerable<TEntity>> FindManyAsync(Expression<Func<TEntity, bool>> predicate);
 
         /// <summary>
-        /// Gets all Entities.
+        /// Gets all Entities asynchronously.
         /// </summary>
         /// <returns>Returns all Entities.</returns>
         Task<IEnumerable<TEntity>> GetAllAsync();
+        
+        /// <summary>
+        /// Gets pagination asynchronously.
+        /// </summary>
+        /// <param name="pageNumber">The page number.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <returns>Returns all paginated entities.</returns>
+        Task<IEnumerable<TEntity>> GetPaginationAsync(int pageNumber, int pageSize);
 
         /// <summary>
-        /// Deletes the provided Entity.
+        /// Counts the Entities asynchronously.
+        /// </summary>
+        /// <returns>Returns the number of Entities.</returns>
+        Task<int> CountAsync();
+        
+        /// <summary>
+        /// Deletes the provided Entity asynchronously.
         /// </summary>
         /// <param name="entity">The entity.</param>
         /// <exception cref="EntityNotFoundException">If the provided Entity cannot be found.</exception>
@@ -43,7 +57,7 @@ namespace Neuralm.Services.Common.Application.Interfaces
         Task<bool> DeleteAsync(TEntity entity);
 
         /// <summary>
-        /// Updates the provided Entity.
+        /// Updates the provided Entity asynchronously.
         /// </summary>
         /// <param name="entity">The entity.</param>
         /// <exception cref="UpdatingEntityFailedException">If it fails to the save changes.</exception>
@@ -55,7 +69,7 @@ namespace Neuralm.Services.Common.Application.Interfaces
         Task<(bool success, Guid id, bool updated)> UpdateAsync(TEntity entity);
 
         /// <summary>
-        /// Saves the provided Entity.
+        /// Saves the provided Entity asynchronously.
         /// </summary>
         /// <param name="entity">The entity.</param>
         /// <exception cref="CreatingEntityFailedException">If it fails to the save changes.</exception>
@@ -63,7 +77,7 @@ namespace Neuralm.Services.Common.Application.Interfaces
         Task<(bool success, Guid id)> CreateAsync(TEntity entity);
 
         /// <summary>
-        /// Determines whether a predicate exists.
+        /// Determines whether a predicate exists asynchronously.
         /// </summary>
         /// <param name="predicate">The predicate.</param>
         /// <returns>Returns <c>true</c> If the predicate returns successful; otherwise, <c>false</c>.</returns>

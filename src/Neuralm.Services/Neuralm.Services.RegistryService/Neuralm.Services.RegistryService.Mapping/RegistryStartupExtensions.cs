@@ -73,7 +73,7 @@ namespace Neuralm.Services.RegistryService.Mapping
             
             #region Services
             serviceCollection.AddTransient<IAccessTokenService, JwtAccessTokenService>();
-            serviceCollection.AddSingleton<IRegistryService, Infrastructure.Services.RegistryService>();
+            serviceCollection.AddSingleton<Application.Interfaces.IRegistryService, Infrastructure.Services.RegistryService>();
             #endregion Services
             
             serviceCollection.VerifyDatabaseConnection<ServiceDbContext>();
@@ -88,7 +88,7 @@ namespace Neuralm.Services.RegistryService.Mapping
         /// <returns>Returns the application builder.</returns>
         public static IApplicationBuilder StartRegistryServiceAsync(this IApplicationBuilder app)
         {
-            IRegistryService registryService = app.ApplicationServices.GetService(typeof(IRegistryService)) as IRegistryService;
+            Application.Interfaces.IRegistryService registryService = app.ApplicationServices.GetService(typeof(Application.Interfaces.IRegistryService)) as Application.Interfaces.IRegistryService;
             Task.Run(async () => await registryService.StartupAsync(CancellationToken.None));
             return app;
         }

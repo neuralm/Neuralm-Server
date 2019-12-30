@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Application.Services;
@@ -14,7 +13,6 @@ using Neuralm.Services.UserService.Persistence.Contexts;
 using Neuralm.Services.UserService.Persistence.Infrastructure;
 using Neuralm.Services.UserService.Persistence.Validators;
 using System.Reflection;
-using System.Threading;
 using Neuralm.Services.Common.Application.Serializers;
 using Neuralm.Services.Common.Infrastructure.Services;
 using Neuralm.Services.Common.Persistence.EFCore;
@@ -68,14 +66,16 @@ namespace Neuralm.Services.UserService.Mapping
             serviceCollection.AddTransient<IRepository<RolePermission>, Repository<RolePermission, UserDbContext>>();
             serviceCollection.AddTransient<IRepository<Permission>, Repository<Permission, UserDbContext>>();
             #endregion Repositories
+            
+            serviceCollection.AddTransient<IMessageSerializer, JsonMessageSerializer>();
 
             #region Services
             serviceCollection.AddTransient<IAccessTokenService, JwtAccessTokenService>();
             serviceCollection.AddTransient<IUserService, Application.Services.UserService>();
+            serviceCollection.AddRegistryService("UserService");
+            serviceCollection.AddSingleton<IStartupService, StartupService>();
             #endregion Services
 
-            serviceCollection.AddTransient<IMessageSerializer, JsonMessageSerializer>();
-            serviceCollection.AddSingleton<IStartupService, StartupService>();
 
             serviceCollection.VerifyDatabaseConnection<UserDbContext>();
             

@@ -10,6 +10,8 @@ export default class RegisterRequest extends Request {
 
   /**
    * Initializes the RegisterRequest class.
+   * @param username The user name.
+   * @param password The password.
    */
   constructor(username: string, password: string) {
     super();

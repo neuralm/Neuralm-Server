@@ -18,6 +18,11 @@ namespace Neuralm.Services.TrainingRoomService.Messages.Dtos
         public string Name { get; set; }
 
         /// <summary>
+        /// Gets and sets the owner id.
+        /// </summary>
+        public Guid OwnerId { get; set; }
+        
+        /// <summary>
         /// Gets and sets the owner.
         /// </summary>
         public UserDto Owner { get; set; }

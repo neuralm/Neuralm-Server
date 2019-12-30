@@ -13,6 +13,7 @@
     <ProjectReference Include="..\..\Neuralm.Services.Common.Infrastructure\Neuralm.Services.Common.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Neuralm.Services.Common.Mapping\Neuralm.Services.Common.Mapping.csproj" />
     <ProjectReference Include="..\Neuralm.Services.TrainingRoomService.Application\Neuralm.Services.TrainingRoomService.Application.csproj" />
+    <ProjectReference Include="..\Neuralm.Services.TrainingRoomService.Infrastructure\Neuralm.Services.TrainingRoomService.Infrastructure.csproj" />
     <ProjectReference Include="..\Neuralm.Services.TrainingRoomService.Persistence\Neuralm.Services.TrainingRoomService.Persistence.csproj" />
   </ItemGroup>
 

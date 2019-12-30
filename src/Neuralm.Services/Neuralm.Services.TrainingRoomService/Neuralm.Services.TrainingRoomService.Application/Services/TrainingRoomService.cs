@@ -1,4 +1,8 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
 using Neuralm.Services.Common.Application.Abstractions;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.TrainingRoomService.Application.Interfaces;
@@ -13,52 +17,87 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
     public class TrainingRoomService : BaseService<TrainingRoom, TrainingRoomDto>, ITrainingRoomService
     {
         private readonly IRepository<TrainingSession> _trainingSessionRepository;
+        private readonly IUserService _userService;
 
         /// <summary>
         /// Initializes an instance of the <see cref="TrainingRoomService"/> class.
         /// </summary>
         /// <param name="trainingRoomRepository">The training room repository.</param>
         /// <param name="trainingSessionRepository">The training session repository.</param>
+        /// <param name="userService">The user service.</param>
         /// <param name="mapper">The mapper.</param>
         public TrainingRoomService(
             IRepository<TrainingRoom> trainingRoomRepository,
             IRepository<TrainingSession> trainingSessionRepository,
+            IUserService userService,
             IMapper mapper) : base(trainingRoomRepository, mapper)
         {
             _trainingSessionRepository = trainingSessionRepository;
+            _userService = userService;
         }
 
-        /*
-        /// <inheritdoc cref="ITrainingRoomService.CreateTrainingRoomAsync(CreateTrainingRoomRequest)"/>
-        public async Task<CreateTrainingRoomResponse> CreateTrainingRoomAsync(CreateTrainingRoomRequest createTrainingRoomRequest)
+        /// <inheritdoc cref="ITrainingRoomService.CreateAsync"/>
+        public override async Task<(bool success, Guid id)> CreateAsync(TrainingRoomDto dto)
         {
-            if (createTrainingRoomRequest.OwnerId.Equals(Guid.Empty))
-                return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "The ownerId must not be an empty guid.");
-
-            if (string.IsNullOrWhiteSpace(createTrainingRoomRequest.TrainingRoomName))
-                return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "The training room name cannot be null or be empty");
-
-            if (await _trainingRoomRepository.ExistsAsync(tr => tr.Name.Equals(createTrainingRoomRequest.TrainingRoomName, StringComparison.CurrentCultureIgnoreCase)))
-                return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "A training room with the requested name already exists.");
-
-            if (!await _userRepository.ExistsAsync(user => user.Id.Equals(createTrainingRoomRequest.OwnerId)))
-                return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "User not found.");
-
-            User owner = await _userRepository.FindSingleOrDefaultAsync(user => user.Id.Equals(createTrainingRoomRequest.OwnerId));
-            TrainingRoom trainingRoom = new TrainingRoom(owner, createTrainingRoomRequest.TrainingRoomName, createTrainingRoomRequest.TrainingRoomSettings);
-            if (!await _trainingRoomRepository.CreateAsync(trainingRoom))
-                return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, Guid.Empty, "Failed to create training room.");
-
-            return new CreateTrainingRoomResponse(createTrainingRoomRequest.Id, trainingRoom.Id, "Successfully created a training room.", true);
+            /**
+             * NOTE: It is now unclear how the request could have failed...
+             * Previous validation messages:
+             * "The ownerId must not be an empty guid."
+             * "The training room name cannot be null or be empty"
+             * "A training room with the requested name already exists."
+             * "User not found."
+             */
+            UserDto userDto = await _userService.FindUserAsync(dto.Owner.Id);
+            if (userDto is null || await EntityRepository.ExistsAsync(trainingRoom => trainingRoom.Name == dto.Name))
+                return (false, Guid.Empty);
+            dto.OwnerId = userDto.Id;
+            return await base.CreateAsync(dto);
         }
 
-        /// <inheritdoc cref="ITrainingRoomService.GetEnabledTrainingRoomsAsync(GetEnabledTrainingRoomsRequest)"/>
-        public async Task<GetEnabledTrainingRoomsResponse> GetEnabledTrainingRoomsAsync(GetEnabledTrainingRoomsRequest getEnabledTrainingRoomsRequest)
+        /// <inheritdoc cref="ITrainingRoomService.GetAllAsync"/>
+        public override async Task<IEnumerable<TrainingRoomDto>> GetAllAsync()
         {
-            IEnumerable<TrainingRoom> trainingRooms = await _trainingRoomRepository.FindManyAsync(trainingRoom => trainingRoom.Enabled);
-            List<TrainingRoomDto> trainingRoomDtos = trainingRooms.Select(EntityToDtoConverter.Convert<TrainingRoomDto, TrainingRoom>).ToList();
-            return new GetEnabledTrainingRoomsResponse(getEnabledTrainingRoomsRequest.Id, trainingRoomDtos, success: true);
+            IEnumerable<TrainingRoomDto> trainingRooms = await base.GetAllAsync();
+            return EnsureOwner(trainingRooms);
         }
-        */
+        
+        /// <inheritdoc cref="ITrainingRoomService.GetPaginationAsync(int, int)"/>
+        public override async Task<IEnumerable<TrainingRoomDto>> GetPaginationAsync(int pageNumber, int pageSize)
+        {
+            IEnumerable<TrainingRoomDto> trainingRooms = await base.GetPaginationAsync(pageNumber, pageSize);
+            return EnsureOwner(trainingRooms);
+        }
+
+        /// <inheritdoc cref="ITrainingRoomService.FindSingleOrDefaultAsync(Guid)"/>
+        public override async Task<TrainingRoomDto> FindSingleOrDefaultAsync(Guid id)
+        {
+            TrainingRoomDto trainingRoomDto = await base.FindSingleOrDefaultAsync(id);
+            return await EnsureOwner(trainingRoomDto);
+        }
+
+        /// <summary>
+        /// Ensures that the owner property is set.
+        /// This property can be unset when not in cache.
+        /// </summary>
+        /// <param name="trainingRooms">The training rooms.</param>
+        /// <returns>Returns the fixed training rooms.</returns>
+        private IEnumerable<TrainingRoomDto> EnsureOwner(IEnumerable<TrainingRoomDto> trainingRooms)
+        {
+            return trainingRooms.Select(async dto => await EnsureOwner(dto)).Select(task => task.Result);
+        }
+
+        /// <summary>
+        /// Ensures that the owner property is set.
+        /// This property can be unset when not in cache.
+        /// </summary>
+        /// <param name="trainingRoomDto">The training room.</param>
+        /// <returns>Returns the fixed training room.</returns>
+        private async Task<TrainingRoomDto> EnsureOwner(TrainingRoomDto trainingRoomDto)
+        {
+            if (!(trainingRoomDto.Owner is null)) return trainingRoomDto;
+            UserDto userDto = await _userService.FindUserAsync(trainingRoomDto.OwnerId);
+            trainingRoomDto.Owner = userDto;
+            return trainingRoomDto;
+        }
     }
 }

@@ -1,7 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using System.Threading;
@@ -11,7 +14,7 @@ using Neuralm.Services.Common.Domain;
 using Neuralm.Services.Common.Messages;
 using Neuralm.Services.Common.Messages.Interfaces;
 
-namespace Neuralm.Services.Common.Infrastructure.Networking
+namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
 {
     /// <summary>
     /// Represents the <see cref="HttpNetworkConnector"/> class.
@@ -82,6 +85,8 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
                         new HttpRequestMessage(messageAttribute.Method, httpClientBaseAddress),
                     "Get" when message is IGetRequest getRequest => 
                         new HttpRequestMessage(messageAttribute.Method,$"{httpClientBaseAddress}{getRequest.GetId.ToString()}"),
+                    "Get" when message is PaginationRequest paginationRequest => 
+                        new HttpRequestMessage(messageAttribute.Method,$"{httpClientBaseAddress}{paginationRequest.PageNumber.ToString()}/{paginationRequest.PageSize.ToString()}"),
                     _ => 
                         new HttpRequestMessage(messageAttribute.Method, httpClientBaseAddress)
                     {
@@ -92,34 +97,66 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
                 Console.Write($"REST RESPONSE: {await response.Content.ReadAsStringAsync()}");
                 Console.WriteLine();
                 byte[] bytes = await response.Content.ReadAsByteArrayAsync();
-                object msg = _messageSerializer.Deserialize(bytes, response.StatusCode != HttpStatusCode.OK ? typeof(RestErrorResponse) : messageAttribute.ResponseType);
-                if (msg is IResponseMessage responseMessage)
+                object msg = null;
+                if (messageAttribute.OriginalMethod == "GetAll" || message is IPaginationRequest)
                 {
-                    if (responseMessage.RequestId != message.Id)
-                    {
-                        responseMessage.RequestId = message.Id;
-                        responseMessage.DateTime = DateTime.UtcNow;
-                        responseMessage.Success = true;
-                    }
-                    await _messageProcessor.ProcessMessageAsync(responseMessage, this);
+                    msg = Activator.CreateInstance(messageAttribute.ResponseType);
+                    PropertyInfo property = messageAttribute.ResponseType.GetProperties()
+                        .Where(p => p.PropertyType.GenericTypeArguments.Length != 0)
+                        .Where(p => p.PropertyType.GenericTypeArguments[0] != typeof(char))
+                        .Single(info => info.PropertyType.GetInterfaces().Count(c => c == typeof(IEnumerable)) == 1);
+                    object e = _messageSerializer.Deserialize(bytes, property.PropertyType);
+                    property.SetValue(msg, e);
                 }
                 else
                 {
-                    ErrorResponse errorResponse = new ErrorResponse
-                    {
-                        Id = Guid.NewGuid(),
-                        RequestId = message.Id,
-                        RequestName = message.GetType().FullName,
-                        ResponseName = messageAttribute.ResponseType.FullName,
-                        DateTime = DateTime.UtcNow,
-                        Success = false,
-                        Message = msg is RestErrorResponse restErrorResponse
-                            ? restErrorResponse.title
-                            : "Unknown error."
-                    };
-                    await _messageProcessor.ProcessMessageAsync(errorResponse, this);
-                    Console.WriteLine($"REST API error: {errorResponse}");
+                    msg = _messageSerializer.Deserialize(bytes, !response.IsSuccessStatusCode ? typeof(RestErrorResponse) : messageAttribute.ResponseType);
                 }
+                
+                switch (msg)
+                {
+                    case IPaginationResponse paginationResponse:
+                        paginationResponse.RequestId = message.Id;
+                        paginationResponse.DateTime = DateTime.UtcNow;
+                        paginationResponse.Success = true;
+                        paginationResponse.PageNumber = GetIntegerHeaderValue("X-Paging-PageNumber");
+                        paginationResponse.PageSize = GetIntegerHeaderValue("X-Paging-PageSize");
+                        paginationResponse.PageCount = GetIntegerHeaderValue("X-Paging-PageCount");
+                        paginationResponse.TotalRecords = GetIntegerHeaderValue("X-Paging-TotalRecordCount");
+                        await _messageProcessor.ProcessMessageAsync(paginationResponse, this);
+                        break;
+                    case IResponseMessage responseMessage:
+                    {
+                        if (responseMessage.RequestId != message.Id)
+                        {
+                            responseMessage.RequestId = message.Id;
+                            responseMessage.DateTime = DateTime.UtcNow;
+                            responseMessage.Success = true;
+                        }
+                        await _messageProcessor.ProcessMessageAsync(responseMessage, this);
+                        break;
+                    }
+                    default:
+                    {
+                        ErrorResponse errorResponse = new ErrorResponse
+                        {
+                            Id = Guid.NewGuid(),
+                            RequestId = message.Id,
+                            RequestName = message.GetType().FullName,
+                            ResponseName = messageAttribute.ResponseType.FullName,
+                            DateTime = DateTime.UtcNow,
+                            Success = false,
+                            Message = msg is RestErrorResponse restErrorResponse
+                                ? restErrorResponse.title
+                                : "Unknown error."
+                        };
+                        await _messageProcessor.ProcessMessageAsync(errorResponse, this);
+                        Console.WriteLine($"REST API error: {errorResponse}");
+                        break;
+                    }
+                }
+                
+                int GetIntegerHeaderValue(string headerName) => int.Parse(response.Headers.First(header => header.Key == headerName).Value.First());
             }
             catch (Exception e)
             {

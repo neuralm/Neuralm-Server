@@ -4,6 +4,7 @@ using Neuralm.Services.Common.Rest;
 using Neuralm.Services.RegistryService.Application.Dtos;
 using Neuralm.Services.RegistryService.Application.Interfaces;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Neuralm.Services.RegistryService.Rest.Controllers
 {
@@ -14,6 +15,15 @@ namespace Neuralm.Services.RegistryService.Rest.Controllers
         public RegistryController(IRegistryService registryService) : base(registryService)
         {
             _registryService = registryService;
+        }
+
+        [Authorize(Roles = "Service"), HttpGet("{serviceName}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetAsync(string serviceName)
+        {
+            ServiceDto serviceDto = await _registryService.GetServiceByNameAsync(serviceName);
+            return serviceDto == null ? (IActionResult)new NotFoundResult() : new OkObjectResult(serviceDto);
         }
 
         [Authorize(Roles = "Service"), HttpPost("")]

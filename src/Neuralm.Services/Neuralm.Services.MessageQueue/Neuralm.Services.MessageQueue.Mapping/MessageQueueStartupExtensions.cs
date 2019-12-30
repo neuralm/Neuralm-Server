@@ -65,7 +65,7 @@ namespace Neuralm.Services.MessageQueue.Mapping
             serviceCollection.AddSingleton<IClientMessageProcessor, ClientMessageProcessor>();
 
             #region Services
-            serviceCollection.AddSingleton<IRegistryService, Infrastructure.Services.RegistryService>();
+            serviceCollection.AddSingleton<Application.Interfaces.IRegistryService, Infrastructure.Services.RegistryService>();
             #endregion Services
             
             return serviceCollection;

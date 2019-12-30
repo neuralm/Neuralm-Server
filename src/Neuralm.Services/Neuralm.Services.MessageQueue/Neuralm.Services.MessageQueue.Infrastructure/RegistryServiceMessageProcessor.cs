@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using IRegistryService = Neuralm.Services.MessageQueue.Application.Interfaces.IRegistryService;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure
 {

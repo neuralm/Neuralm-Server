@@ -17,10 +17,5 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// Gets and sets the username.
         /// </summary>
         public string Username { get; set; }
-
-        /// <summary>
-        /// Gets and sets the timestamp created.
-        /// </summary>
-        public DateTime TimestampCreated { get; set; }
     }
 }

@@ -7,8 +7,12 @@ using Microsoft.IdentityModel.Tokens;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Configurations;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
+using System.Security.Claims;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
+using Neuralm.Services.Common.Infrastructure.Services;
 
 namespace Neuralm.Services.Common.Mapping
 {
@@ -102,6 +106,29 @@ namespace Neuralm.Services.Common.Mapping
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseAuthentication();
             return app;
+        }
+
+        /// <summary>
+        /// Adds the registry service for the given service name.
+        /// </summary>
+        /// <param name="serviceCollection">The service collection.</param>
+        /// <param name="serviceName">The service name.</param>
+        /// <returns>Returns the service collection to chain further upon.</returns>
+        public static IServiceCollection AddRegistryService(this IServiceCollection serviceCollection, string serviceName)
+        {
+            serviceCollection.AddHttpClient<IRegistryService, RegistryService>((provider, client) =>
+            {
+                IAccessTokenService accessTokenService = provider.GetService<IAccessTokenService>();
+                RegistryServiceConfiguration registryServiceConfiguration = provider.GetService<IOptions<RegistryServiceConfiguration>>().Value;
+                List<Claim> claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, serviceName),
+                    new Claim(ClaimTypes.Role, "Service")
+                };
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessTokenService.GenerateAccessToken(claims)}");
+                client.BaseAddress = new Uri($"http://{registryServiceConfiguration.Host}:{registryServiceConfiguration.Port.ToString()}");
+            });
+            return serviceCollection;
         }
 
         /// <summary>
