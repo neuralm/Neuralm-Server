@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Neuralm.Services.Common.Application.Abstractions;
 using Neuralm.Services.Common.Application.Interfaces;
@@ -16,6 +18,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
     {
         private readonly IRepository<TrainingRoom> _trainingRoomRepository;
         private readonly IUserService _userService;
+        private readonly ITrainingSessionRepository _trainingSessionRepository;
 
         /// <summary>
         /// Initializes an instance of the <see cref="TrainingSessionService"/> class.
@@ -25,11 +28,12 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
         /// <param name="userService">The user service.</param>
         /// <param name="mapper">The mapper.</param>
         public TrainingSessionService(
-            IRepository<TrainingSession> trainingSessionRepository,
+            ITrainingSessionRepository trainingSessionRepository,
             IRepository<TrainingRoom> trainingRoomRepository,
             IUserService userService,
             IMapper mapper) : base(trainingSessionRepository, mapper)
         {
+            _trainingSessionRepository = trainingSessionRepository;
             _trainingRoomRepository = trainingRoomRepository;
             _userService = userService;
         }
@@ -65,19 +69,18 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             return new EndTrainingSessionResponse(endTrainingSessionRequest.Id, "Successfully ended the training session.", true);
         }
         
-        /*
         /// <inheritdoc cref="ITrainingRoomService.GetOrganismsAsync(GetOrganismsRequest)"/>
         public async Task<GetOrganismsResponse> GetOrganismsAsync(GetOrganismsRequest getOrganismsRequest)
         {
             string message = "Successfully fetched all requested organisms.";
             TrainingSession trainingSession;
-            if (getOrganismsRequest.TrainingSessionId.Equals(Guid.Empty))
-                return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training room id cannot be an empty guid.");
             if (getOrganismsRequest.Amount < 1)
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Amount cannot be smaller than 1.");
-            if ((trainingSession = await _trainingSessionRepository.FindSingleOrDefaultAsync(ts => ts.Id.Equals(getOrganismsRequest.TrainingSessionId))) == default)
+            if ((trainingSession = await EntityRepository.FindSingleOrDefaultAsync(ts => ts.Id.Equals(getOrganismsRequest.TrainingSessionId))) == default)
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training session does not exist.");
-
+            if (!trainingSession.TrainingRoom.IsUserAuthorized(getOrganismsRequest.UserId) || trainingSession.UserId != getOrganismsRequest.UserId)
+                return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "User is not authorized.");
+            
             // if the list is empty then get new ones from the training room
             if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.Evaluated) == 0)
             {
@@ -86,12 +89,12 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                     TrainingRoomSettings trainingRoomSettings = trainingSession.TrainingRoom.TrainingRoomSettings;
                     for (int i = 0; i < trainingRoomSettings.OrganismCount; i++)
                     {
-                        Organism organism = new Organism(trainingSession.TrainingRoom.Generation, trainingRoomSettings) { Leased = true };
+                        Organism organism = new Organism(trainingRoomSettings, trainingSession.TrainingRoom.GetAndIncreaseNodeId, trainingSession.TrainingRoom.GetInnovationNumber) { Leased = true };
                         trainingSession.TrainingRoom.AddOrganism(organism);
-                        trainingSession.LeasedOrganisms.Add(new LeasedOrganism(organism));
+                        trainingSession.LeasedOrganisms.Add(new LeasedOrganism(organism, trainingSession.Id));
                     }
                     trainingSession.TrainingRoom.IncreaseNodeIdTo(trainingRoomSettings.InputCount + trainingRoomSettings.OutputCount);
-                    message = $"First generation; generated {trainingSession.TrainingRoom.TrainingRoomSettings.OrganismCount} organisms.";
+                    message = $"First generation; generated {trainingSession.TrainingRoom.TrainingRoomSettings.OrganismCount.ToString()} organisms.";
                 }
                 else
                 {
@@ -109,17 +112,25 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.Evaluated) < getOrganismsRequest.Amount)
                 message = "The requested amount of organisms are not all available. The training room is probably close to a new generation or is waiting on other training sessions to complete.";
 
-            await _trainingSessionRepository.UpdateAsync(trainingSession);
+            if (message.StartsWith("First generation;"))
+            {
+                await _trainingSessionRepository.InsertFirstGenerationAsync(trainingSession);
+            }
+            else
+            {
+//                await _trainingRoomRepository.UpdateAsync(trainingSession.TrainingRoom);
+                await EntityRepository.UpdateAsync(trainingSession);
+            }
 
             List<OrganismDto> organismDtos = trainingSession.LeasedOrganisms
                 .Where(lo => !lo.Organism.Evaluated)
                 .Take(getOrganismsRequest.Amount)
                 .Select(lo =>
                 {
-                    OrganismDto organismDto = EntityToDtoConverter.Convert<OrganismDto, Organism>(lo.Organism);
+                    OrganismDto organismDto = Mapper.Map<OrganismDto>(lo.Organism);
                     // Because the input and output nodes are set using a Many To Many relation the nodes are converted separately.
-                    organismDto.InputNodes = lo.Organism.Inputs.Select(input => EntityToDtoConverter.Convert<NodeDto, InputNode>(input.InputNode)).ToList();
-                    organismDto.OutputNodes = lo.Organism.Outputs.Select(input => EntityToDtoConverter.Convert<NodeDto, OutputNode>(input.OutputNode)).ToList();
+                    organismDto.InputNodes = lo.Organism.Inputs.Select(input => Mapper.Map<NodeDto>(input.InputNode)).ToList();
+                    organismDto.OutputNodes = lo.Organism.Outputs.Select(input => Mapper.Map<NodeDto>(input.OutputNode)).ToList();
                     return organismDto;
                 }).ToList();
 
@@ -127,15 +138,17 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
 
             List<LeasedOrganism> GetNewLeasedOrganisms(int take)
             {
-                return trainingSession.TrainingRoom.Species.SelectMany(sp => sp.Organisms).Where(lo => !lo.Leased)
+                return trainingSession.TrainingRoom.Species
+                    .SelectMany(sp => sp.Organisms)
+                    .Where(lo => !lo.Leased)
                     .Take(take).Select(o =>
                     {
                         o.Leased = true;
-                        return new LeasedOrganism(o);
+                        return new LeasedOrganism(o, trainingSession.Id);
                     }).ToList();
             }
         }
-
+/*
         /// <inheritdoc cref="ITrainingRoomService.PostOrganismsScoreAsync(PostOrganismsScoreRequest)"/>
         public async Task<PostOrganismsScoreResponse> PostOrganismsScoreAsync(PostOrganismsScoreRequest postOrganismsScoreRequest)
         {

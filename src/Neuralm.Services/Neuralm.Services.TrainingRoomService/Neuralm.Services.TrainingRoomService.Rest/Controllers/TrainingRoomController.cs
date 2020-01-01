@@ -9,12 +9,10 @@ namespace Neuralm.Services.TrainingRoomService.Rest.Controllers
 {
     public class TrainingRoomController : RestController<TrainingRoomDto>
     {
-        private readonly ITrainingRoomService _trainingRoomService;
         private readonly ITrainingSessionService _trainingSessionService;
 
         public TrainingRoomController(ITrainingRoomService trainingRoomService, ITrainingSessionService trainingSessionService) : base(trainingRoomService)
         {
-            _trainingRoomService = trainingRoomService;
             _trainingSessionService = trainingSessionService;
         }
 
@@ -31,6 +29,22 @@ namespace Neuralm.Services.TrainingRoomService.Rest.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState.GetErrorMessages());
             StartTrainingSessionResponse response = await _trainingSessionService.StartTrainingSessionAsync(startTrainingSessionRequest);
+            return new OkObjectResult(response);
+        }
+        
+        /// <summary>
+        /// Gets organisms asynchronously.
+        /// </summary>
+        /// <param name="getOrganismsRequest">The get organisms request object.</param>
+        /// <returns>
+        /// Returns OkObject with response.
+        /// </returns>
+        [HttpPost("organisms")]
+        public async Task<IActionResult> OrganismsAsync(GetOrganismsRequest getOrganismsRequest)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState.GetErrorMessages());
+            GetOrganismsResponse response = await _trainingSessionService.GetOrganismsAsync(getOrganismsRequest);
             return new OkObjectResult(response);
         }
         

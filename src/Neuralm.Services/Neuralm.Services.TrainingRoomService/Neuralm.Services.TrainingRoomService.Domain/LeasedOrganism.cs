@@ -21,7 +21,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <summary>
         /// Gets and sets the organism.
         /// </summary>
-        public Organism Organism { get; set; }
+        public virtual Organism Organism { get; set; }
 
         /// <summary>
         /// Gets and sets the lease start date time.
@@ -32,11 +32,16 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// Gets and sets the lease end date time.
         /// </summary>
         public DateTime LeaseEnd { get; private set; }
+        
+        /// <summary>
+        /// Gets and sets the training session id.
+        /// </summary>
+        public Guid TrainingSessionId { get; private set; }
 
         /// <summary>
         /// EFCore Entity constructor IGNORE!
         /// </summary>
-        private LeasedOrganism()
+        protected LeasedOrganism()
         {
 
         }
@@ -45,10 +50,12 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// Initializes an instance of the <see cref="LeasedOrganism"/> class.
         /// </summary>
         /// <param name="organism">The organism.</param>
-        public LeasedOrganism(Organism organism)
+        /// <param name="trainingSessionId">The training session id.</param>
+        public LeasedOrganism(Organism organism, Guid trainingSessionId)
         {
             Id = Guid.NewGuid();
             Organism = organism;
+            TrainingSessionId = trainingSessionId;
             OrganismId = organism.Id;
             LeaseStart = DateTime.UtcNow;
             LeaseEnd = DateTime.UtcNow.AddHours(2);

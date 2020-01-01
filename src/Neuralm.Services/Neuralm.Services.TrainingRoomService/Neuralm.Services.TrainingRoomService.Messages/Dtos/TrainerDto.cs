@@ -8,11 +8,6 @@ namespace Neuralm.Services.TrainingRoomService.Messages.Dtos
     public class TrainerDto
     {
         /// <summary>
-        /// Gets and sets the id.
-        /// </summary>
-        public Guid Id { get; set; }
-
-        /// <summary>
         /// Gets and sets the user id.
         /// </summary>
         public Guid UserId { get; set; }

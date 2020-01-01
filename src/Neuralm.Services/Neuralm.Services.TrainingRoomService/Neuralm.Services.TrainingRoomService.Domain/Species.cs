@@ -24,7 +24,12 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// Gets and sets the species score.
         /// </summary>
         public double SpeciesScore { get; private set; }
-
+        
+        /// <summary>
+        /// Gets and sets the training room id.
+        /// </summary>
+        public Guid TrainingRoomId { get; set; }
+        
         /// <summary>
         /// EFCore entity constructor IGNORE!
         /// </summary>
@@ -37,13 +42,17 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// Initializes an instance of the <see cref="Species"/> class with the given organism as its first representative.
         /// </summary>
         /// <param name="organism">The organism which this species is created for.</param>
-        public Species(Organism organism)
+        /// <param name="trainingRoomId">The training room id.</param>
+        public Species(Organism organism, Guid trainingRoomId)
         {
             // Generates a new guid for the species, this is needed so EF can set the foreign shadow key: SpeciesId, on Organism.
             Id = Guid.NewGuid();
 
             // Adds the organism to the species.
             Organisms = new List<Organism> { organism };
+            
+            // Initialize the training room id.
+            TrainingRoomId = trainingRoomId;
         }
 
         /// <summary>

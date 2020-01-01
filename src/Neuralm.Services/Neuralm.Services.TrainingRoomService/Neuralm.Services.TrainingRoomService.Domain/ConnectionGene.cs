@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace Neuralm.Services.TrainingRoomService.Domain
 {
     /// <summary>
-    /// Represents the <see cref="ConnectionGene"/> class used for connecting <see cref="Node"/>s in a <see cref="Brain"/>.
+    /// Represents the <see cref="ConnectionGene"/> class used for connecting <see cref="Node"/>s in an <see cref="Organism"/>.
     /// </summary>
     [DebuggerDisplay("{ToString()}")]
     public class ConnectionGene : IEquatable<ConnectionGene>, IEntity

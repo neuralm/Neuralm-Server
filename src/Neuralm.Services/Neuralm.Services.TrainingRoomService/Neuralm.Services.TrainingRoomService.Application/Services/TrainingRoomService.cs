@@ -16,23 +16,19 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
     /// </summary>
     public class TrainingRoomService : BaseService<TrainingRoom, TrainingRoomDto>, ITrainingRoomService
     {
-        private readonly IRepository<TrainingSession> _trainingSessionRepository;
         private readonly IUserService _userService;
 
         /// <summary>
         /// Initializes an instance of the <see cref="TrainingRoomService"/> class.
         /// </summary>
         /// <param name="trainingRoomRepository">The training room repository.</param>
-        /// <param name="trainingSessionRepository">The training session repository.</param>
         /// <param name="userService">The user service.</param>
         /// <param name="mapper">The mapper.</param>
         public TrainingRoomService(
             IRepository<TrainingRoom> trainingRoomRepository,
-            IRepository<TrainingSession> trainingSessionRepository,
             IUserService userService,
             IMapper mapper) : base(trainingRoomRepository, mapper)
         {
-            _trainingSessionRepository = trainingSessionRepository;
             _userService = userService;
         }
 
@@ -48,8 +44,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
              * "User not found."
              */
             UserDto userDto = await _userService.FindUserAsync(dto.Owner.Id);
-            if (userDto is null ||
-                await EntityRepository.ExistsAsync(trainingRoom => trainingRoom.Name == dto.Name))
+            if (userDto is null || await EntityRepository.ExistsAsync(trainingRoom => trainingRoom.Name == dto.Name))
                 return (false, Guid.Empty);
             dto.Id = Guid.NewGuid();
             dto.OwnerId = userDto.Id;

@@ -25,25 +25,24 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
 
         }
 
-        /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.CreateAsync(TEntity)"/>
-        public override async Task<(bool success, Guid id)> CreateAsync(TrainingRoom entity)
-        {
-            bool saveSuccess = false;
-            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
-            try
-            {
-                DbContext.Entry(entity.Owner).State = EntityState.Unchanged;
-                EntityValidator.Validate(entity);
-                DbContext.Set<TrainingRoom>().Add(entity);
-                int saveResult = await DbContext.SaveChangesAsync();
-                saveSuccess = Convert.ToBoolean(saveResult);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(new CreatingEntityFailedException($"The entity of type {typeof(TrainingRoom).Name} could not be created.", ex));
-            }
-
-            return (saveSuccess, entity.Id);
-        }
+       /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.CreateAsync(TEntity)"/>
+       public override async Task<(bool success, Guid id)> CreateAsync(TrainingRoom entity)
+       {
+           bool saveSuccess = false;
+           using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
+           try
+           {
+               EntityValidator.Validate(entity);
+               DbContext.Entry(entity.Owner).State = EntityState.Unchanged;
+               DbContext.Set<TrainingRoom>().Add(entity);
+               int saveResult = await DbContext.SaveChangesAsync();
+               saveSuccess = Convert.ToBoolean(saveResult);
+           }
+           catch (Exception ex)
+           {
+               Console.WriteLine(new CreatingEntityFailedException($"The entity of type {typeof(TrainingRoom).Name} could not be created.", ex));
+           }
+           return (saveSuccess, entity.Id);
+       }
     }
 }

@@ -26,6 +26,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
+                    OwnerId = table.Column<Guid>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Generation = table.Column<long>(nullable: false),
                     HighestInnovationNumber = table.Column<long>(nullable: false),
@@ -42,7 +43,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(nullable: false),
                     SpeciesScore = table.Column<double>(nullable: false),
-                    TrainingRoomId = table.Column<Guid>(nullable: true)
+                    TrainingRoomId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -153,27 +154,6 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LeasedOrganism",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    OrganismId = table.Column<Guid>(nullable: false),
-                    LeaseStart = table.Column<DateTime>(nullable: false),
-                    LeaseEnd = table.Column<DateTime>(nullable: false),
-                    TrainingSessionId = table.Column<Guid>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LeasedOrganism", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_LeasedOrganism_TrainingSession_TrainingSessionId",
-                        column: x => x.TrainingSessionId,
-                        principalTable: "TrainingSession",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ConnectionGene",
                 columns: table => new
                 {
@@ -192,6 +172,32 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                         name: "FK_ConnectionGene_Organism_OrganismId",
                         column: x => x.OrganismId,
                         principalTable: "Organism",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LeasedOrganism",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    OrganismId = table.Column<Guid>(nullable: false),
+                    LeaseStart = table.Column<DateTime>(nullable: false),
+                    LeaseEnd = table.Column<DateTime>(nullable: false),
+                    TrainingSessionId = table.Column<Guid>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LeasedOrganism", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LeasedOrganism_Organism_OrganismId",
+                        column: x => x.OrganismId,
+                        principalTable: "Organism",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_LeasedOrganism_TrainingSession_TrainingSessionId",
+                        column: x => x.TrainingSessionId,
+                        principalTable: "TrainingSession",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -248,6 +254,12 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                 name: "IX_ConnectionGene_OrganismId",
                 table: "ConnectionGene",
                 column: "OrganismId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LeasedOrganism_OrganismId",
+                table: "LeasedOrganism",
+                column: "OrganismId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_LeasedOrganism_TrainingSessionId",
