@@ -116,7 +116,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             }
 
             // If the organism does not belong to any of the species create a new species and add it to the species.
-            Species.Add(new Species(organism));
+            Species.Add(new Species(organism, Id));
         }
 
         /// <summary>

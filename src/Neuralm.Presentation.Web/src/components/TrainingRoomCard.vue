@@ -1,7 +1,15 @@
 <template>
   <div>
     <v-card class="mx-auto">
-      <v-card-title class="subheading font-weight-bold">{{ item.name }}</v-card-title>
+      <v-card-title class="subheading font-weight-bold">
+        <v-toolbar>
+          <v-toolbar-title>{{ item.name }}</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-toolbar-items>
+            <v-btn @click="showSettings = !showSettings">Toggle settings</v-btn>
+          </v-toolbar-items>
+        </v-toolbar>
+      </v-card-title>
       <v-divider></v-divider>
       <v-list dense>
         <v-list-item color="white">
@@ -14,7 +22,7 @@
         </v-list-item>
       </v-list>
       <v-divider></v-divider>
-      <v-list dense>
+      <v-list v-if="showSettings" dense>
         <v-list-item v-for="(key, index) in propnames(item.trainingRoomSettings)" :key="index" color="white">
           <v-list-item-content>{{ toCap(key) }}:</v-list-item-content>
           <v-list-item-content class="align-end">{{ item.trainingRoomSettings[key] }}</v-list-item-content>
@@ -32,9 +40,12 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import TrainingSession from '../models/TrainingSession';
 import TrainingRoom from '../models/TrainingRoom';
-import { mapMutations } from 'vuex';
+import { mapMutations, mapState } from 'vuex';
 
 @Component({
+  data: () => ({
+    showSettings: false
+  }),
   props: [
     'item'
   ],

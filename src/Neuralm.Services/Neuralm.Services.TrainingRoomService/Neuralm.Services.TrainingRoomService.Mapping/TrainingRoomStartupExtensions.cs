@@ -55,7 +55,7 @@ namespace Neuralm.Services.TrainingRoomService.Mapping
 
             #region Repositories
             serviceCollection.AddTransient<IRepository<TrainingRoom>, Repository<TrainingRoom, TrainingRoomDbContext>>();
-            serviceCollection.AddTransient<IRepository<TrainingSession>, TrainingSessionRepository>();
+            serviceCollection.AddTransient<ITrainingSessionRepository, TrainingSessionRepository>();
             serviceCollection.AddTransient<IRepository<TrainingRoomSettings>, Repository<TrainingRoomSettings, TrainingRoomDbContext>>();
             #endregion Repositories
             

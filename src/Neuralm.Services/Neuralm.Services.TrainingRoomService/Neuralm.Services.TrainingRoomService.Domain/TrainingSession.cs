@@ -49,7 +49,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// </summary>
         protected TrainingSession()
         {
-
+            LeasedOrganisms = new List<LeasedOrganism>();
         }
 
         /// <summary>

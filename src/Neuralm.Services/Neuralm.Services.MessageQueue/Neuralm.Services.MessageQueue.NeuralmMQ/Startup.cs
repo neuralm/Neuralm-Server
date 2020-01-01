@@ -55,7 +55,7 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
                 .AddApplicationServices()
                 .BuildServiceProvider()
                 .ToGenericServiceProvider();
-            
+
             List<Task> tasks = new List<Task>
             {
                 //Task.Run(() => CreateServerCertificate(_cancellationTokenSourceTimed.Token), cancellationToken)

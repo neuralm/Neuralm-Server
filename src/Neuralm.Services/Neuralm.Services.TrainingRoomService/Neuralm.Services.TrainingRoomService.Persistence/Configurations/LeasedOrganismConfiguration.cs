@@ -14,8 +14,10 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Configurations
         {
             builder.HasKey(p => p.Id);
 
-            // NOTE: ???
-            builder.Ignore(p => p.Organism);
+            builder
+                .HasOne(p => p.Organism)
+                .WithOne()
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

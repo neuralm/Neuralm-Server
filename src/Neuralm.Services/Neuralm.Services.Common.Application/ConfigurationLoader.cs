@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using Microsoft.Extensions.Configuration;
 using System.IO;
 
 namespace Neuralm.Services.Common.Application
@@ -19,10 +20,12 @@ namespace Neuralm.Services.Common.Application
         {
             if (_currentConfiguration != null)
                 return _currentConfiguration;
+            string env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             string basePath = Directory.GetCurrentDirectory();
             IConfigurationBuilder builder = new ConfigurationBuilder()
                 .SetBasePath(basePath)
-                .AddJsonFile($"{configuration}.json", optional: false, reloadOnChange: false);
+                .AddJsonFile($"{configuration}.json", optional: false, reloadOnChange: false)
+                .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: false);
             return _currentConfiguration = builder.Build();
         }
     }

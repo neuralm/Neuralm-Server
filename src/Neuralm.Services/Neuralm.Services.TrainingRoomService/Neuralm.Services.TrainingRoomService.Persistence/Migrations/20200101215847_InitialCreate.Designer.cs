@@ -10,7 +10,7 @@ using Neuralm.Services.TrainingRoomService.Persistence.Contexts;
 namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
 {
     [DbContext(typeof(TrainingRoomDbContext))]
-    [Migration("20191120191427_InitialCreate")]
+    [Migration("20200101215847_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -67,10 +67,13 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                     b.Property<Guid>("OrganismId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("TrainingSessionId")
+                    b.Property<Guid>("TrainingSessionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrganismId")
+                        .IsUnique();
 
                     b.HasIndex("TrainingSessionId");
 
@@ -170,7 +173,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                     b.Property<double>("SpeciesScore")
                         .HasColumnType("float");
 
-                    b.Property<Guid?>("TrainingRoomId")
+                    b.Property<Guid>("TrainingRoomId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -197,6 +200,9 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -253,10 +259,17 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
 
             modelBuilder.Entity("Neuralm.Services.TrainingRoomService.Domain.LeasedOrganism", b =>
                 {
+                    b.HasOne("Neuralm.Services.TrainingRoomService.Domain.Organism", "Organism")
+                        .WithOne()
+                        .HasForeignKey("Neuralm.Services.TrainingRoomService.Domain.LeasedOrganism", "OrganismId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Neuralm.Services.TrainingRoomService.Domain.TrainingSession", null)
                         .WithMany("LeasedOrganisms")
                         .HasForeignKey("TrainingSessionId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Neuralm.Services.TrainingRoomService.Domain.Organism", b =>
@@ -302,7 +315,8 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                     b.HasOne("Neuralm.Services.TrainingRoomService.Domain.TrainingRoom", null)
                         .WithMany("Species")
                         .HasForeignKey("TrainingRoomId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Neuralm.Services.TrainingRoomService.Domain.TrainingRoom", b =>

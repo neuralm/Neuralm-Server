@@ -2,7 +2,6 @@ import { Module, MutationTree, ActionTree } from 'vuex';
 import TrainingRoom from '../models/TrainingRoom';
 import PaginateTrainingRoomResponse from '../messages/responses/PaginateTrainingRoomResponse';
 
-
 export interface IDashboardState {
   trainingrooms: TrainingRoom[];
   pagination: {

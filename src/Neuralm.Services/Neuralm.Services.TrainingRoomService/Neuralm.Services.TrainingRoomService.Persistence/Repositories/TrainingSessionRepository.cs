@@ -7,14 +7,16 @@ using Neuralm.Services.Common.Persistence.EFCore.Abstractions;
 using Neuralm.Services.TrainingRoomService.Domain;
 using Neuralm.Services.TrainingRoomService.Persistence.Contexts;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Neuralm.Services.TrainingRoomService.Application.Interfaces;
 
 namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
 {
     /// <summary>
     /// Represents the <see cref="TrainingSessionRepository"/> class.
     /// </summary>
-    public sealed class TrainingSessionRepository : RepositoryBase<TrainingSession, TrainingRoomDbContext>
+    public sealed class TrainingSessionRepository : RepositoryBase<TrainingSession, TrainingRoomDbContext>, ITrainingSessionRepository
     {
         /// <summary>
         /// Initializes an instance of the <see cref="TrainingSessionRepository"/> class.
@@ -48,6 +50,52 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
                 Console.WriteLine(new CreatingEntityFailedException($"The entity of type {typeof(TrainingSession).Name} could not be created.", ex));
             }
             return (success: saveSuccess, id: entity.Id);
+        }
+
+        /// <inheritdoc cref="ITrainingSessionRepository.InsertFirstGenerationAsync(TrainingRoom)"/>
+        public async Task InsertFirstGenerationAsync(TrainingSession trainingSession)
+        {
+            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
+            try
+            {
+                foreach (Species species in trainingSession.TrainingRoom.Species.Where(species => DbContext.Entry(species).State != EntityState.Unchanged))
+                {
+                    DbContext.Entry(species).State = EntityState.Added;
+                    foreach (Organism organism in species.Organisms)
+                    {
+                        DbContext.Entry(organism).State = EntityState.Added;
+                        foreach (OrganismInputNode inputNode in organism.Inputs)
+                        {
+                            DbContext.Entry(inputNode).State = EntityState.Added;
+                            DbContext.Entry(inputNode.InputNode).State = EntityState.Added;
+                        }
+                        foreach (OrganismOutputNode outputNode in organism.Outputs)
+                        {
+                            DbContext.Entry(outputNode).State = EntityState.Added;
+                            DbContext.Entry(outputNode.OutputNode).State = EntityState.Added;
+                        }
+                        foreach (ConnectionGene connectionGene in organism.ConnectionGenes)
+                        {
+                            DbContext.Entry(connectionGene).State = EntityState.Added;
+                        }
+                    }
+                }
+
+                foreach (LeasedOrganism leasedOrganism in trainingSession.LeasedOrganisms)
+                {
+                    DbContext.Entry(leasedOrganism).State = EntityState.Added;
+                }
+
+                await DbContext.SaveChangesAsync();
+
+                DbContext.Update(trainingSession.TrainingRoom);
+                
+                await DbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(new CreatingEntityFailedException($"The entity of type {typeof(TrainingRoom).Name} could not be created.", ex));
+            }
         }
 
         /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.UpdateAsync(TEntity)"/>

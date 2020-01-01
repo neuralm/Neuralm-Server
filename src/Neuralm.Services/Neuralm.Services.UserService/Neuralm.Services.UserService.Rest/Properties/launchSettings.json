@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Neuralm.Services.UserService": {
+    "Neuralm.Services.UserService.Rest": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "user",

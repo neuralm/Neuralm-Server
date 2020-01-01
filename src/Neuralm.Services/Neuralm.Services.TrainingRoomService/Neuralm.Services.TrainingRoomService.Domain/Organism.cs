@@ -76,9 +76,25 @@ namespace Neuralm.Services.TrainingRoomService.Domain
 
         /// <summary>
         /// Initializes an instance of the <see cref="Organism"/> class.
+        /// With an initial generation of 0.
+        /// </summary>
+        /// <param name="trainingRoomSettings">The training room settings.</param>
+        /// <param name="getAndIncreaseNodeIdFunction">The get and increase node id function.</param>
+        /// <param name="innovationFunction">The innovation function.</param>
+        public Organism(TrainingRoomSettings trainingRoomSettings, Func<uint> getAndIncreaseNodeIdFunction, Func<uint, uint, uint> innovationFunction) : this(0, trainingRoomSettings)
+        {
+            // if the generation is 0, add initial mutations.
+            AddConnectionMutation(trainingRoomSettings, innovationFunction);
+//            Mutate(trainingRoomSettings, getAndIncreaseNodeIdFunction, innovationFunction);
+        }
+        
+        /// <summary>
+        /// Initializes an instance of the <see cref="Organism"/> class.
         /// </summary>
         /// <param name="generation">The current generation.</param>
         /// <param name="trainingRoomSettings">The training room settings.</param>
+        /// <param name="getAndIncreaseNodeIdFunction">The get and increase node id function.</param>
+        /// <param name="innovationFunction">The innovation function.</param>
         public Organism(uint generation, TrainingRoomSettings trainingRoomSettings)
         {
             // Generates a new guid for the organism, this is needed so EF can set the
