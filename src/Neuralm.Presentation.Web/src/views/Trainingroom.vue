@@ -94,8 +94,12 @@ export default class TrainingRoomView extends Vue {
     const user: User = JSON.parse(localStorage.getItem('user')!) as User;
     this.trainingSessionService.startTrainingSession(new StartTrainingSessionRequest(user.userId, trainingRoomId))
     .then((response: StartTrainingSessionResponse) => {
-      this.$store.commit('trainingRoom/addTrainingSession', response.trainingSession);
-      this.$snotify.success(response.message);
+      if (response.success) {
+        this.$store.commit('trainingRoom/addTrainingSession', response.trainingSession);
+        this.$snotify.success(response.message);
+      } else {
+        this.$snotify.error(response.message);
+      }
     },
     (error: Promise<StartTrainingSessionResponse>) => {
       error.then((value: StartTrainingSessionResponse) => {

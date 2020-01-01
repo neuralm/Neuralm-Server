@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <v-data-iterator :items="trainingrooms" :items-per-page.sync="pagination.itemsPerPage" :page="pagination.page" hide-default-footer>
+    <v-data-iterator :items="trainingrooms" :items-per-page.sync="pagination.itemsPerPage" :page="pagination.page" :loading="loading" loading-text="Loading... Please wait" hide-default-footer>
       <template v-slot:header>
         <v-toolbar dark color="blue darken-3" class="mb-1">
           <v-toolbar-title>Training Rooms</v-toolbar-title>
@@ -68,7 +68,7 @@ import PaginateTrainingRoomResponse from '../messages/responses/PaginateTraining
     trainingRoomCard: () => ComponentLoader('TrainingRoomCard')
   },
   computed: {
-    ...mapState('dashboard', ['pagination', 'trainingrooms'])
+    ...mapState('dashboard', ['pagination', 'trainingrooms', 'loading'])
   },
   methods: {
     ...mapMutations('dashboard', ['updateItemsPerPage', 'nextPage', 'formerPage', 'updatePaginator'])
