@@ -74,9 +74,10 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
             {
                 configuration = ConfigurationLoader.GetConfiguration("appsettings");
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 Console.WriteLine("Please check if you have a valid appsettings.json!");
+                Console.WriteLine(e.Message);
                 CancellationTokenSource.Cancel();
                 return;
             }
