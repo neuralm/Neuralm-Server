@@ -10,6 +10,9 @@ import EndTrainingSessionResponseHandler from '../handlers/EndTrainingSessionRes
 import GetOrganismsRequest from '../messages/requests/GetOrganismsRequest';
 import GetOrganismsResponse from '../messages/responses/GetOrganismsResponse';
 import GetOrganismsResponseHandler from '../handlers/GetOrganismsResponseHandler';
+import PostOrganismsScoreRequest from '../messages/requests/PostOrganismsScoreRequest';
+import PostOrganismsScoreResponse from '../messages/responses/PostOrganismsScoreResponse';
+import PostOrganismsScoreResponseHandler from '../handlers/PostOrganismsScoreResponseHandler';
 
 /**
  * Represents the training session service class.
@@ -70,6 +73,23 @@ export default class TrainingSessionService implements ITrainingSessionService {
       );
       this._neuralmMQClient.addHandler(messageHandler);
       this._neuralmMQClient.sendMessage(getOrganismsRequest);
+    }).then((response) => {
+      this._neuralmMQClient.removeHandler(messageHandler);
+      return response;
+    });
+  }
+
+  public async postOrganismsScores(
+    postOrganismsScoreRequest: PostOrganismsScoreRequest
+  ): Promise<PostOrganismsScoreResponse> {
+    let messageHandler: MessageHandler;
+    return new Promise<PostOrganismsScoreResponse>((resolve, reject) => {
+      messageHandler = new PostOrganismsScoreResponseHandler(
+        resolve,
+        reject
+      );
+      this._neuralmMQClient.addHandler(messageHandler);
+      this._neuralmMQClient.sendMessage(postOrganismsScoreRequest);
     }).then((response) => {
       this._neuralmMQClient.removeHandler(messageHandler);
       return response;

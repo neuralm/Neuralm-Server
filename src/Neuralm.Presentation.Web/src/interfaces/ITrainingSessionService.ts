@@ -4,6 +4,8 @@ import EndTrainingSessionRequest from '../messages/requests/EndTrainingSessionRe
 import EndTrainingSessionResponse from '../messages/responses/EndTrainingSessionResponse';
 import GetOrganismsRequest from '../messages/requests/GetOrganismsRequest';
 import GetOrganismsResponse from '../messages/responses/GetOrganismsResponse';
+import PostOrganismsScoreRequest from '../messages/requests/PostOrganismsScoreRequest';
+import PostOrganismsScoreResponse from '../messages/responses/PostOrganismsScoreResponse';
 
 /**
  * Represents the training session service interface.
@@ -29,4 +31,10 @@ export default interface ITrainingSessionService {
    * @returns The get organisms response.
    */
   getOrganisms(getOrganismsRequest: GetOrganismsRequest): Promise<GetOrganismsResponse>;
+
+  /**
+   * Updates the organisms scores.
+   * @param postOrganismsScoresRquest The post organisms score request.
+   */
+  postOrganismsScores(postOrganismsScoresRquest: PostOrganismsScoreRequest): Promise<PostOrganismsScoreResponse>;
 }
