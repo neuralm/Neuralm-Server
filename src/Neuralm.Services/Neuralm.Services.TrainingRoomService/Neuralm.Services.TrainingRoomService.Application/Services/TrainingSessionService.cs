@@ -38,7 +38,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             _userService = userService;
         }
         
-        /// <inheritdoc cref="ITrainingRoomService.StartTrainingSessionAsync(StartTrainingSessionRequest)"/>
+        /// <inheritdoc cref="ITrainingSessionService.StartTrainingSessionAsync(StartTrainingSessionRequest)"/>
         public async Task<StartTrainingSessionResponse> StartTrainingSessionAsync(StartTrainingSessionRequest startTrainingSessionRequest)
         {
             TrainingRoom trainingRoom;
@@ -56,7 +56,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, trainingSessionDto, "Successfully started a training session.", true);
         }
         
-        /// <inheritdoc cref="ITrainingRoomService.EndTrainingSessionAsync(EndTrainingSessionRequest)"/>
+        /// <inheritdoc cref="ITrainingSessionService.EndTrainingSessionAsync(EndTrainingSessionRequest)"/>
         public async Task<EndTrainingSessionResponse> EndTrainingSessionAsync(EndTrainingSessionRequest endTrainingSessionRequest)
         {
             TrainingSession trainingSession;
@@ -69,7 +69,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             return new EndTrainingSessionResponse(endTrainingSessionRequest.Id, "Successfully ended the training session.", true);
         }
         
-        /// <inheritdoc cref="ITrainingRoomService.GetOrganismsAsync(GetOrganismsRequest)"/>
+        /// <inheritdoc cref="ITrainingSessionService.GetOrganismsAsync(GetOrganismsRequest)"/>
         public async Task<GetOrganismsResponse> GetOrganismsAsync(GetOrganismsRequest getOrganismsRequest)
         {
             string message = "Successfully fetched all requested organisms.";
@@ -150,8 +150,8 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                     }).ToList();
             }
         }
-/*
-        /// <inheritdoc cref="ITrainingRoomService.PostOrganismsScoreAsync(PostOrganismsScoreRequest)"/>
+
+        /// <inheritdoc cref="ITrainingSessionService.PostOrganismsScoreAsync(PostOrganismsScoreRequest)"/>
         public async Task<PostOrganismsScoreResponse> PostOrganismsScoreAsync(PostOrganismsScoreRequest postOrganismsScoreRequest)
         {
             TrainingSession trainingSession = await _trainingSessionRepository.FindSingleOrDefaultAsync(p => p.Id.Equals(postOrganismsScoreRequest.TrainingSessionId));
@@ -187,6 +187,5 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             await _trainingSessionRepository.UpdateAsync(trainingSession);
             return new PostOrganismsScoreResponse(postOrganismsScoreRequest.Id, message, true);
         }
-        */
     }
 }

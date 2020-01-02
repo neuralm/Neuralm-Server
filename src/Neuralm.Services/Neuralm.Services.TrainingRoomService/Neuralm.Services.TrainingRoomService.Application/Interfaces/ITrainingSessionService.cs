@@ -31,11 +31,11 @@ namespace Neuralm.Services.TrainingRoomService.Application.Interfaces
         /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="GetOrganismsResponse"/>.</returns>
         Task<GetOrganismsResponse> GetOrganismsAsync(GetOrganismsRequest getOrganismsRequest);
 
-        ///// <summary>
-        ///// Posts the scores of the organisms for a training session asynchronously.
-        ///// </summary>
-        ///// <param name="postOrganismsScoreRequest">The post organisms score request.</param>
-        ///// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="PostOrganismsScoreResponse"/>.</returns>
-        //Task<PostOrganismsScoreResponse> PostOrganismsScoreAsync(PostOrganismsScoreRequest postOrganismsScoreRequest);
+        /// <summary>
+        /// Posts the scores of the organisms for a training session asynchronously.
+        /// </summary>
+        /// <param name="postOrganismsScoreRequest">The post organisms score request.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/> with parameter type <see cref="PostOrganismsScoreResponse"/>.</returns>
+        Task<PostOrganismsScoreResponse> PostOrganismsScoreAsync(PostOrganismsScoreRequest postOrganismsScoreRequest);
     }
 }
