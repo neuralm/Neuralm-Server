@@ -1,5 +1,5 @@
 /**
- * Represents the training session class.
+ * Represents the training session interface.
  */
 export default interface TrainingSession {
   id: string;

@@ -82,5 +82,12 @@ namespace Neuralm.Services.Common.Application.Interfaces
         /// <param name="predicate">The predicate.</param>
         /// <returns>Returns <c>true</c> If the predicate returns successful; otherwise, <c>false</c>.</returns>
         Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
+
+        /// <summary>
+        /// Saves changes asynchronously.
+        /// </summary>
+        /// <exception cref="SavingChangesFailedException">If it fails to the save changes.</exception>
+        /// <returns>Returns <c>true</c> If the changes are successful; otherwise, <c>false</c>.</returns>
+        Task<bool> SaveChangesAsync();
     }
 }

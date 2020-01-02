@@ -38,7 +38,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             _userService = userService;
         }
         
-        /// <inheritdoc cref="ITrainingRoomService.StartTrainingSessionAsync(StartTrainingSessionRequest)"/>
+        /// <inheritdoc cref="ITrainingSessionService.StartTrainingSessionAsync(StartTrainingSessionRequest)"/>
         public async Task<StartTrainingSessionResponse> StartTrainingSessionAsync(StartTrainingSessionRequest startTrainingSessionRequest)
         {
             TrainingRoom trainingRoom;
@@ -56,7 +56,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             return new StartTrainingSessionResponse(startTrainingSessionRequest.Id, trainingSessionDto, "Successfully started a training session.", true);
         }
         
-        /// <inheritdoc cref="ITrainingRoomService.EndTrainingSessionAsync(EndTrainingSessionRequest)"/>
+        /// <inheritdoc cref="ITrainingSessionService.EndTrainingSessionAsync(EndTrainingSessionRequest)"/>
         public async Task<EndTrainingSessionResponse> EndTrainingSessionAsync(EndTrainingSessionRequest endTrainingSessionRequest)
         {
             TrainingSession trainingSession;
@@ -69,7 +69,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             return new EndTrainingSessionResponse(endTrainingSessionRequest.Id, "Successfully ended the training session.", true);
         }
         
-        /// <inheritdoc cref="ITrainingRoomService.GetOrganismsAsync(GetOrganismsRequest)"/>
+        /// <inheritdoc cref="ITrainingSessionService.GetOrganismsAsync(GetOrganismsRequest)"/>
         public async Task<GetOrganismsResponse> GetOrganismsAsync(GetOrganismsRequest getOrganismsRequest)
         {
             string message = "Successfully fetched all requested organisms.";
@@ -80,6 +80,8 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training session does not exist.");
             if (!trainingSession.TrainingRoom.IsUserAuthorized(getOrganismsRequest.UserId) || trainingSession.UserId != getOrganismsRequest.UserId)
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "User is not authorized.");
+            if (trainingSession.EndedTimestamp != default)
+                return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training session has ended and can not be used any more.");
             
             // if the list is empty then get new ones from the training room
             if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.Evaluated) == 0)
@@ -110,7 +112,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             }
 
             if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.Evaluated) < getOrganismsRequest.Amount)
-                message = "The requested amount of organisms are not all available. The training room is probably close to a new generation or is waiting on other training sessions to complete.";
+                message = "The requested amount of organisms are not all available. The training room is close to a new generation.";
 
             if (message.StartsWith("First generation;"))
             {
@@ -118,8 +120,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             }
             else
             {
-//                await _trainingRoomRepository.UpdateAsync(trainingSession.TrainingRoom);
-                await EntityRepository.UpdateAsync(trainingSession);
+                await EntityRepository.SaveChangesAsync();
             }
 
             List<OrganismDto> organismDtos = trainingSession.LeasedOrganisms
@@ -148,8 +149,8 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                     }).ToList();
             }
         }
-/*
-        /// <inheritdoc cref="ITrainingRoomService.PostOrganismsScoreAsync(PostOrganismsScoreRequest)"/>
+
+        /// <inheritdoc cref="ITrainingSessionService.PostOrganismsScoreAsync(PostOrganismsScoreRequest)"/>
         public async Task<PostOrganismsScoreResponse> PostOrganismsScoreAsync(PostOrganismsScoreRequest postOrganismsScoreRequest)
         {
             TrainingSession trainingSession = await _trainingSessionRepository.FindSingleOrDefaultAsync(p => p.Id.Equals(postOrganismsScoreRequest.TrainingSessionId));
@@ -171,7 +172,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
 
             foreach (LeasedOrganism leasedOrganism in orgs)
             {
-                trainingSession.TrainingRoom.PostScore(leasedOrganism.Organism, postOrganismsScoreRequest.OrganismScores[leasedOrganism.OrganismId]);
+                trainingSession.TrainingRoom.PostScore(leasedOrganism.Organism, postOrganismsScoreRequest.OrganismScores.Find(o => o.Key == leasedOrganism.OrganismId).Value);
             }
 
             string message = "Successfully updated the organisms scores.";
@@ -182,9 +183,8 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                     : "Successfully updated the organisms but failed to advance a generation!";
                 trainingSession.LeasedOrganisms.Clear();
             }
-            await _trainingSessionRepository.UpdateAsync(trainingSession);
+            await _trainingSessionRepository.UpdateOrganismsAsync(trainingSession);
             return new PostOrganismsScoreResponse(postOrganismsScoreRequest.Id, message, true);
         }
-        */
     }
 }

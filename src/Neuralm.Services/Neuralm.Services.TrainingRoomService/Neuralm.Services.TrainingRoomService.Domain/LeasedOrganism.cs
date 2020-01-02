@@ -16,7 +16,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <summary>
         /// Gets and sets the organism id.
         /// </summary>
-        public Guid OrganismId { get; private set; }
+        public Guid? OrganismId { get; private set; }
 
         /// <summary>
         /// Gets and sets the organism.

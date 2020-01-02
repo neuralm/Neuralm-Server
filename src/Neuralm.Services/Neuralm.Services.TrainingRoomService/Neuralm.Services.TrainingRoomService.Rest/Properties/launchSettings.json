@@ -19,7 +19,7 @@
     },
     "Neuralm.Services.TrainingRoomService.Rest": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "trainingroom",
       "applicationUrl": "http://localhost:5004",
       "environmentVariables": {

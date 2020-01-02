@@ -1,13 +1,17 @@
 import { Module, MutationTree, ActionTree } from 'vuex';
 import TrainingSession from '../models/TrainingSession';
+import Organism from '../models/Organism';
 
 export interface ITrainingSessionState {
   trainingSession: TrainingSession | undefined;
   name: string;
+  organisms: Organism[];
+  tested: boolean;
 }
 
 export interface ITrainingSessionMutations extends MutationTree<ITrainingSessionState> {
   setTrainingSession(trainingSessionState: ITrainingSessionState, payload: { trainingSession: TrainingSession, name: string }): void;
+  setOrganisms(trainingSessionState: ITrainingSessionState, payload: { organisms: Organism[], tested: boolean }): void;
 }
 
 export interface ITrainingSessionModule {
@@ -36,7 +40,9 @@ export default class TrainingSessionModule implements ITrainingSessionModule, Mo
   private getTrainingSessionState(): ITrainingSessionState {
     return {
       trainingSession: undefined,
-      name: ''
+      name: '',
+      organisms: [],
+      tested: false
     };
   }
 
@@ -45,6 +51,12 @@ export default class TrainingSessionModule implements ITrainingSessionModule, Mo
       setTrainingSession(trainingSessionState: ITrainingSessionState, payload: { trainingSession: TrainingSession, name: string }): void {
         trainingSessionState.trainingSession = payload.trainingSession;
         trainingSessionState.name = payload.name;
+        trainingSessionState.organisms = [];
+        trainingSessionState.tested = false;
+      },
+      setOrganisms(trainingSessionState: ITrainingSessionState, payload: { organisms: Organism[], tested: boolean }): void {
+        trainingSessionState.organisms = payload.organisms;
+        trainingSessionState.tested = payload.tested;
       }
     };
     return mutations;

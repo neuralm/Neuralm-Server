@@ -92,6 +92,24 @@ namespace Neuralm.Services.Common.Persistence.EFCore.Abstractions
             using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
             return await DbContext.Set<TEntity>().AnyAsync(predicate);
         }
+        
+        /// <inheritdoc cref="IRepository{TEntity}.ExistsAsync(Expression{Func{TEntity, bool}})"/>
+        public async Task<bool> SaveChangesAsync()
+        {
+            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
+            bool saveSuccess = false;
+            try
+            {
+                int saveResult = await DbContext.SaveChangesAsync();
+                saveSuccess = Convert.ToBoolean(saveResult);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(new SavingChangesFailedException("The changes failed to save.", ex));
+            }
+
+            return saveSuccess;
+        }
 
         /// <inheritdoc cref="IRepository{TEntity}.FindManyAsync(Expression{Func{TEntity, bool}})"/>
         public virtual async Task<IEnumerable<TEntity>> FindManyAsync(Expression<Func<TEntity, bool>> predicate)

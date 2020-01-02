@@ -7,7 +7,7 @@ namespace Neuralm.Services.TrainingRoomService.Messages
     /// <summary>
     /// Represents the <see cref="GetOrganismsRequest"/> class.
     /// </summary>
-    [Message("Get", "organisms", typeof(GetOrganismsResponse))]
+    [Message("Post", "/organisms", typeof(GetOrganismsResponse))]
     public class GetOrganismsRequest: Request
     {
         /// <summary>

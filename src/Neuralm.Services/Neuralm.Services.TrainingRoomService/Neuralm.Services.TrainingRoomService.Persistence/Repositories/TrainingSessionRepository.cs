@@ -28,6 +28,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
 
         }
 
+        /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.CreateAsync(TEntity)"/>
         public override async Task<(bool success, Guid id)> CreateAsync(TrainingSession entity)
         {
             bool saveSuccess = false;
@@ -52,7 +53,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
             return (success: saveSuccess, id: entity.Id);
         }
 
-        /// <inheritdoc cref="ITrainingSessionRepository.InsertFirstGenerationAsync(TrainingRoom)"/>
+        /// <inheritdoc cref="ITrainingSessionRepository.InsertFirstGenerationAsync(TrainingSession)"/>
         public async Task InsertFirstGenerationAsync(TrainingSession trainingSession)
         {
             using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
@@ -94,31 +95,23 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
             }
             catch (Exception ex)
             {
-                Console.WriteLine(new CreatingEntityFailedException($"The entity of type {typeof(TrainingRoom).Name} could not be created.", ex));
+                Console.WriteLine(new CreatingEntityFailedException($"The entity of type {typeof(TrainingSession).Name} could not be created.", ex));
             }
         }
 
-        /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.UpdateAsync(TEntity)"/>
-        public override async Task<(bool success, Guid id, bool updated)> UpdateAsync(TrainingSession entity)
+        /// <inheritdoc cref="ITrainingSessionRepository.UpdateOrganismsAsync(TrainingSession)"/>
+        public async Task UpdateOrganismsAsync(TrainingSession trainingSession)
         {
-            bool saveSuccess = false;
             using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
-            EntityEntry<TrainingSession> entry = DbContext.Update(entity);
             try
             {
-                int saveResult = await DbContext.SaveChangesAsync();
-                // Force the DbContext to fetch the species anew on next query.
-                foreach (Species species in entity.TrainingRoom.Species)
-                {
-                    DbContext.Entry(species).State = EntityState.Detached;
-                }
-                saveSuccess = Convert.ToBoolean(saveResult);
+                // TODO: implement fix
+                await DbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                Console.WriteLine(new UpdatingEntityFailedException($"The entity of type {typeof(TrainingSession).Name} failed to update.", ex));
+                Console.WriteLine(new CreatingEntityFailedException($"The entity of type {typeof(TrainingSession).Name} could not be created.", ex));
             }
-            return (success: saveSuccess, id: entity.Id, updated: entry.State == EntityState.Modified);
         }
     }
 }
