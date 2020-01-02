@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="trainingSession !== undefined" class="fill-height" fluid>
+  <v-container v-if="trainingSession !== undefined" class="fill-height" fluid style="margin-bottom: 75px;">
     <v-row align="center" justify="center">
       <v-col cols="12" sm="8" md="8">
         <v-card class="mx-auto">
@@ -13,6 +13,8 @@
             <v-btn v-if="trainingSession.endedTimestamp === '0001-01-01T00:00:00'" @click="endTrainingSession(trainingSession.id)">End TrainingSession</v-btn>
             <v-btn v-if="trainingSession.endedTimestamp === '0001-01-01T00:00:00'" @click="getOrganisms(trainingSession.id)">Get Organisms</v-btn>
           </v-card-actions>
+          <v-divider></v-divider>
+          <v-data-table v-if="organisms.length > 0" :headers="headers" :items="organisms" class="elevation-1"></v-data-table>
         </v-card>
       </v-col>
     </v-row>
@@ -32,8 +34,19 @@ import GetOrganismsRequest from '../messages/requests/GetOrganismsRequest';
 import GetOrganismsResponse from '../messages/responses/GetOrganismsResponse';
 
 @Component({
+  data: () => ({
+    headers: [
+      {
+        text: 'Name',
+        align: 'left',
+        value: 'name',
+      },
+      { text: 'Score', value: 'score' },
+      { text: 'ConnectionGenes', value: 'connectionGenes.length' }
+    ]
+  }),
   computed: {
-    ...mapState('trainingSession', ['trainingSession', 'name'])
+    ...mapState('trainingSession', ['trainingSession', 'name', 'organisms'])
   }
 })
 export default class TrainingSessionView extends Vue {
@@ -59,7 +72,7 @@ export default class TrainingSessionView extends Vue {
     this.trainingSessionService.getOrganisms(new GetOrganismsRequest(user.userId, trainingSessionId, amount))
     .then((response: GetOrganismsResponse) => {
       this.$snotify.success(response.message);
-      console.log('Organisms:', response.organisms);
+      this.$store.commit('trainingSession/setOrganisms', response.organisms);
     },
     (error: Promise<GetOrganismsResponse>) => {
       error.then((value: GetOrganismsResponse) => {

@@ -19,7 +19,7 @@
     },
     "Neuralm.Services.UserService.Rest": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "user",
       "applicationUrl": "http://localhost:5003",
       "environmentVariables": {

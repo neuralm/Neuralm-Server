@@ -1,13 +1,16 @@
 import { Module, MutationTree, ActionTree } from 'vuex';
 import TrainingSession from '../models/TrainingSession';
+import Organism from '../models/Organism';
 
 export interface ITrainingSessionState {
   trainingSession: TrainingSession | undefined;
   name: string;
+  organisms: Organism[];
 }
 
 export interface ITrainingSessionMutations extends MutationTree<ITrainingSessionState> {
   setTrainingSession(trainingSessionState: ITrainingSessionState, payload: { trainingSession: TrainingSession, name: string }): void;
+  setOrganisms(trainingSessionState: ITrainingSessionState, organisms: Organism[]): void;
 }
 
 export interface ITrainingSessionModule {
@@ -36,7 +39,8 @@ export default class TrainingSessionModule implements ITrainingSessionModule, Mo
   private getTrainingSessionState(): ITrainingSessionState {
     return {
       trainingSession: undefined,
-      name: ''
+      name: '',
+      organisms: []
     };
   }
 
@@ -45,6 +49,10 @@ export default class TrainingSessionModule implements ITrainingSessionModule, Mo
       setTrainingSession(trainingSessionState: ITrainingSessionState, payload: { trainingSession: TrainingSession, name: string }): void {
         trainingSessionState.trainingSession = payload.trainingSession;
         trainingSessionState.name = payload.name;
+        trainingSessionState.organisms = [];
+      },
+      setOrganisms(trainingSessionState: ITrainingSessionState, organisms: Organism[]): void {
+        trainingSessionState.organisms = organisms;
       }
     };
     return mutations;
