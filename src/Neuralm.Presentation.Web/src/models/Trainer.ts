@@ -1,7 +1,7 @@
 import Owner from './Owner';
 
 /**
- * Represents the trainer class.
+ * Represents the trainer interface.
  */
 export default interface Trainer {
   userId: string;

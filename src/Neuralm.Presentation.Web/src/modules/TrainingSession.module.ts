@@ -6,11 +6,12 @@ export interface ITrainingSessionState {
   trainingSession: TrainingSession | undefined;
   name: string;
   organisms: Organism[];
+  tested: boolean;
 }
 
 export interface ITrainingSessionMutations extends MutationTree<ITrainingSessionState> {
   setTrainingSession(trainingSessionState: ITrainingSessionState, payload: { trainingSession: TrainingSession, name: string }): void;
-  setOrganisms(trainingSessionState: ITrainingSessionState, organisms: Organism[]): void;
+  setOrganisms(trainingSessionState: ITrainingSessionState, payload: { organisms: Organism[], tested: boolean }): void;
 }
 
 export interface ITrainingSessionModule {
@@ -40,7 +41,8 @@ export default class TrainingSessionModule implements ITrainingSessionModule, Mo
     return {
       trainingSession: undefined,
       name: '',
-      organisms: []
+      organisms: [],
+      tested: false
     };
   }
 
@@ -50,9 +52,11 @@ export default class TrainingSessionModule implements ITrainingSessionModule, Mo
         trainingSessionState.trainingSession = payload.trainingSession;
         trainingSessionState.name = payload.name;
         trainingSessionState.organisms = [];
+        trainingSessionState.tested = false;
       },
-      setOrganisms(trainingSessionState: ITrainingSessionState, organisms: Organism[]): void {
-        trainingSessionState.organisms = organisms;
+      setOrganisms(trainingSessionState: ITrainingSessionState, payload: { organisms: Organism[], tested: boolean }): void {
+        trainingSessionState.organisms = payload.organisms;
+        trainingSessionState.tested = payload.tested;
       }
     };
     return mutations;
