@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -80,6 +81,8 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training session does not exist.");
             if (!trainingSession.TrainingRoom.IsUserAuthorized(getOrganismsRequest.UserId) || trainingSession.UserId != getOrganismsRequest.UserId)
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "User is not authorized.");
+            if (trainingSession.EndedTimestamp != default)
+                return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training session has ended and can not be used any more.");
             
             // if the list is empty then get new ones from the training room
             if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.Evaluated) == 0)

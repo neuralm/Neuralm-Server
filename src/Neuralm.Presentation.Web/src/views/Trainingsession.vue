@@ -11,6 +11,7 @@
           <v-divider></v-divider>
           <v-card-actions>
             <v-btn v-if="trainingSession.endedTimestamp === '0001-01-01T00:00:00'" @click="endTrainingSession(trainingSession.id)">End TrainingSession</v-btn>
+            <v-btn v-if="trainingSession.endedTimestamp === '0001-01-01T00:00:00'" @click="getOrganisms(trainingSession.id)">Get Organisms</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -26,6 +27,9 @@ import { mapState } from 'vuex';
 import ITrainingSessionService from '../interfaces/ITrainingSessionService';
 import EndTrainingSessionRequest from '../messages/requests/EndTrainingSessionRequest';
 import EndTrainingSessionResponse from '../messages/responses/EndTrainingSessionResponse';
+import User from '../models/User';
+import GetOrganismsRequest from '../messages/requests/GetOrganismsRequest';
+import GetOrganismsResponse from '../messages/responses/GetOrganismsResponse';
 
 @Component({
   computed: {
@@ -43,6 +47,22 @@ export default class TrainingSessionView extends Vue {
     },
     (error: Promise<EndTrainingSessionResponse>) => {
       error.then((value: EndTrainingSessionResponse) => {
+        this.$snotify.error(value.message);
+      });
+    });
+  }
+
+  public getOrganisms(trainingSessionId: string): void {
+    const amount: number = 20;
+    const user: User = JSON.parse(localStorage.getItem('user')!) as User;
+
+    this.trainingSessionService.getOrganisms(new GetOrganismsRequest(user.userId, trainingSessionId, amount))
+    .then((response: GetOrganismsResponse) => {
+      this.$snotify.success(response.message);
+      console.log('Organisms:', response.organisms);
+    },
+    (error: Promise<GetOrganismsResponse>) => {
+      error.then((value: GetOrganismsResponse) => {
         this.$snotify.error(value.message);
       });
     });
