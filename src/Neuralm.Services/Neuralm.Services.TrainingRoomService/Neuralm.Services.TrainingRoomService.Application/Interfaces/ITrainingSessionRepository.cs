@@ -13,7 +13,14 @@ namespace Neuralm.Services.TrainingRoomService.Application.Interfaces
         /// Inserts the first generation asynchronously.
         /// </summary>
         /// <param name="trainingSession">The training session.</param>
-        /// <returns>Returns <c>true</c> If the training session's first generation is successfully inserted; otherwise, <c>false</c>.</returns>
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         Task InsertFirstGenerationAsync(TrainingSession trainingSession);
+        
+        /// <summary>
+        /// Updates the organisms asynchronously.
+        /// </summary>
+        /// <param name="trainingSession">The training session.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
+        Task UpdateOrganismsAsync(TrainingSession trainingSession);
     }
 }

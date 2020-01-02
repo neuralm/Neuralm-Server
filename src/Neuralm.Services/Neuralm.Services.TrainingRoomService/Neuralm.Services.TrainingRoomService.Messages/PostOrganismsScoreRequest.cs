@@ -19,6 +19,6 @@ namespace Neuralm.Services.TrainingRoomService.Messages
         /// <summary>
         /// Gets and sets the organism scores dictionary.
         /// </summary>
-        public Dictionary<Guid, double> OrganismScores { get; set; }
+        public List<DictionaryEntry<Guid, double>> OrganismScores { get; set; }
     }
 }

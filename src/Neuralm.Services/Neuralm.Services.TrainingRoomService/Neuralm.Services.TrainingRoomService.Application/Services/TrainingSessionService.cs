@@ -112,7 +112,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             }
 
             if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.Evaluated) < getOrganismsRequest.Amount)
-                message = "The requested amount of organisms are not all available. The training room is probably close to a new generation or is waiting on other training sessions to complete.";
+                message = "The requested amount of organisms are not all available. The training room is close to a new generation.";
 
             if (message.StartsWith("First generation;"))
             {
@@ -120,8 +120,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             }
             else
             {
-//                await _trainingRoomRepository.UpdateAsync(trainingSession.TrainingRoom);
-                await EntityRepository.UpdateAsync(trainingSession);
+                await EntityRepository.SaveChangesAsync();
             }
 
             List<OrganismDto> organismDtos = trainingSession.LeasedOrganisms
@@ -173,7 +172,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
 
             foreach (LeasedOrganism leasedOrganism in orgs)
             {
-                trainingSession.TrainingRoom.PostScore(leasedOrganism.Organism, postOrganismsScoreRequest.OrganismScores[leasedOrganism.OrganismId]);
+                trainingSession.TrainingRoom.PostScore(leasedOrganism.Organism, postOrganismsScoreRequest.OrganismScores.Find(o => o.Key == leasedOrganism.OrganismId).Value);
             }
 
             string message = "Successfully updated the organisms scores.";
@@ -184,7 +183,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                     : "Successfully updated the organisms but failed to advance a generation!";
                 trainingSession.LeasedOrganisms.Clear();
             }
-            await _trainingSessionRepository.UpdateAsync(trainingSession);
+            await _trainingSessionRepository.UpdateOrganismsAsync(trainingSession);
             return new PostOrganismsScoreResponse(postOrganismsScoreRequest.Id, message, true);
         }
     }
