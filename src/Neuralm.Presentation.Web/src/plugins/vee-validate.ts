@@ -1,4 +1,4 @@
-import { required, email, max, min } from 'vee-validate/dist/rules';
+import { required, max, min } from 'vee-validate/dist/rules';
 import { extend } from 'vee-validate';
 
 extend('required', {

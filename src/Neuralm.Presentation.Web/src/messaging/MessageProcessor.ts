@@ -34,7 +34,6 @@ export default class MessageProcessor implements IMessageProcessor {
         this._messageHandlers.set(messageHandler.messageName, filteredMessageHandlers);
       }
     }
-    console.log(this._messageHandlers);
   }
 
   public handlerDestructor(): MessageHandlerDestructor {

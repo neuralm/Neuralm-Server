@@ -123,7 +123,6 @@ export default class TrainingSessionView extends Vue {
           fakeConnectionGene.organismId,
           fakeConnectionGene.inNodeIdentifier,
           fakeConnectionGene.outNodeIdentifier,
-          fakeConnectionGene.innovationNumber,
           fakeConnectionGene.weight,
           fakeConnectionGene.enabled
         );

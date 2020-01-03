@@ -82,19 +82,6 @@ router.setRoutes([
   { name: 'about' }
 ], true);
 
-router.beforeEach((to, _, next) => {
-  // redirect to login page if not logged in and trying to access a restricted page.
-  const publicPages = ['/login', '/register'];
-  const authRequired = !publicPages.includes(to.path);
-  const loggedIn = localStorage.getItem('user');
-  if (authRequired && !loggedIn) {
-    console.log('redirected to login!');
-    return next('/login');
-  }
-  console.log(`Routed to ${to.name}`);
-  next();
-});
-
 new Vue({
   vuetify,
   snotify,

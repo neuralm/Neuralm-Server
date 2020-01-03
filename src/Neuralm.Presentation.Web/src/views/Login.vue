@@ -17,7 +17,7 @@
           <div v-show="submitted && !password" class="invalid-feedback">Password is required</div>
         </div>
         <div class="form-group">
-          <button class="btn btn-primary" :disabled="!username && !password">Login</button>
+          <button id="loginBtn" class="btn btn-primary" :disabled="!username && !password">Login</button>
           <router-link to="/register" class="btn btn-link">Register</router-link>
         </div>
       </form>
@@ -54,17 +54,19 @@ export default class LoginView extends Vue {
           const user: User = { username, userId: response.userId, accessToken: response.accessToken };
           this.$store.commit('user/loginSuccess', user);
           this.$snotify.success('Successfully logged in!');
-          this.$router.push('/');
+          this.$router.push('/home');
         } else {
           this.$store.commit('user/loginFailure');
           this.$snotify.error('Incorrect credentials!');
         }
-      },
-      (error: Promise<AuthenticateResponse>) => {
+      })
+      .catch((error: Promise<AuthenticateResponse> | AuthenticateResponse) => {
         this.$store.commit('user/loginFailure');
-        error.then((value: AuthenticateResponse) => {
-          this.$snotify.error(value.message);
-        });
+        if (error instanceof AuthenticateResponse) {
+          this.$snotify.error(error.message);
+        } else {
+          this.$snotify.error('Something happened try again later.');
+        }
       }
     );
   }
