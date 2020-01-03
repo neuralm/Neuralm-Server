@@ -28,11 +28,6 @@ namespace Neuralm.Services.TrainingRoomService.Messages.Dtos
         public uint OutNodeIdentifier { get; set; }
 
         /// <summary>
-        /// Gets and sets the innovation number.
-        /// </summary>
-        public uint InnovationNumber { get; set; }
-
-        /// <summary>
         /// Gets and sets the weight.
         /// </summary>
         public double Weight { get; set; }

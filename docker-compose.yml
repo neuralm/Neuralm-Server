@@ -81,4 +81,4 @@ services:
             - neuralm-network
 networks:
     neuralm-network:
-        external: true
+        driver: bridge

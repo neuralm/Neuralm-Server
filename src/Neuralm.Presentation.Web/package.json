@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "node_modules/.bin/vue-cli-service serve",
     "build": "node_modules/.bin/vue-cli-service build",
-    "lint": "node_modules/.bin/vue-cli-service lint"
+    "lint": "node_modules/.bin/vue-cli-service lint",
+    "test:unit": "node_modules/.bin/vue-cli-service test:unit --watch"
   },
   "dependencies": {
     "@types/vue": "^2.0.0",
@@ -23,10 +24,14 @@
   },
   "devDependencies": {
     "@mdi/font": "^4.4.95",
+    "@types/jest": "^24.0.19",
     "@vue/cli-plugin-babel": "^3.11.0",
     "@vue/cli-plugin-typescript": "^3.11.0",
-    "@vue/cli-service": "^3.11.0",
+    "@vue/cli-plugin-unit-jest": "^4.1.2",
+    "@vue/cli-service": "^4.1.2",
+    "@vue/test-utils": "1.0.0-beta.29",
     "css-loader": "^3.2.0",
+    "flush-promises": "^1.0.2",
     "node-sass": "^4.9.0",
     "sass": "^1.17.4",
     "sass-loader": "^7.1.0",

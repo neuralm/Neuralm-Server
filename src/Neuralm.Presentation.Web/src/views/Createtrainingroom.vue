@@ -152,6 +152,7 @@ export default class CreateTrainingRoomView extends Vue {
 
   public onSubmit(e: Event): void {
     const trainingRoom: TrainingRoom = this.$data.trainingroom as TrainingRoom;
+    // TODO: Manually convert training room properties to integers
     console.log('trainingroom:', trainingRoom);
     this.trainingRoomService.createTrainingRoom(new CreateTrainingRoomRequest(trainingRoom)).then(
       (response: CreateTrainingRoomResponse) => {
