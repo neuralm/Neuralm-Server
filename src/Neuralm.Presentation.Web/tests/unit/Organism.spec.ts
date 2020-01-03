@@ -24,13 +24,13 @@ describe('Organism', () => {
     ];
     const connectionGenes: ConnectionGene[] = [
       new ConnectionGene(Guid.newGuid().toString(), organismId, 0, 3, 1, true),
-      new ConnectionGene(Guid.newGuid().toString(), organismId, 1, 3, 1, true),
+      new ConnectionGene(Guid.newGuid().toString(), organismId, 1, 3, 1, false),
       new ConnectionGene(Guid.newGuid().toString(), organismId, 2, 3, 1, true),
       new ConnectionGene(Guid.newGuid().toString(), organismId, 1, 4, 1, true),
       new ConnectionGene(Guid.newGuid().toString(), organismId, 4, 3, 1, true),
       new ConnectionGene(Guid.newGuid().toString(), organismId, 0, 4, 1, true)
     ];
     const organism: Organism = new Organism(organismId, connectionGenes, 0, 0, 'coolio', inputNodes, outputNodes);
-    expect(organism.evaluate([inA, inB, inC])).toBe([expected]);
+    expect(organism.evaluate([inA, inB, inC])[0]).toBeCloseTo(expected, 15);
   })
 });
