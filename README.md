@@ -19,19 +19,41 @@ You will need the following tools:
 ### Setup
 Follow these steps to get your development environment set up:
 
-1. The docker-compose file requires a network to be created:
+1. Update the `appsettings.Development.json` files in UserService, TrainingRoomService & RegistryService to valid database connection strings (example):
 ```
-docker network create -d bridge neuralm-network
+"Database": {
+    "ConnectionString": "Server=(LocalDb)\\MSSQLLocalDB;Database={SERVICE}DbContext;User=sa;Password=<PASSWORD>;",
+    "UseLazyLoading": true,
+    "DbProvider": "mssql"
+ }
+```
+For `DbProvider` mssql and mysql are supported.
+NOTE: leaving the connection string and db provider empty will result in using an in memory db context.
+## Running the tests
+There are front-end and back-end tests.
+
+### Running the front-end tests
+1. Navigate to the `src/Neuralm.Presentation.Web/`folder.
+2. Run the command: 
+```
+npm run test:unit
 ```
 
-## Running the tests
-Soon.
+### Running the back-end tests
+1. Navigate to the `src/` folder.
+2. Run the command: 
+```
+dotnet test
+```
 
 ## Deployment
 To deploy the server:
 ```
 docker-compose up
 ```
+
+The website will be available at localhost/login.
+
 
 ## Contributing
 
