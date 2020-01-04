@@ -95,11 +95,6 @@ import PaginateTrainingRoomResponse from '../messages/responses/PaginateTraining
 export default class DashboardView extends Vue {
   @Prop() private trainingRoomService!: ITrainingRoomService;
 
-  /**
-   * Paginate training rooms.
-   * @param pageNumber The page number.
-   * @param pageSize The page size.
-   */
   public paginateTrainingRooms(pageNumber: number, pageSize: number) {
     this.$store.commit('dashboard/toggleLoading');
     return this.trainingRoomService.paginateTrainingRooms(

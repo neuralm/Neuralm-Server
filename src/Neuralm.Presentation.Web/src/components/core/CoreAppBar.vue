@@ -1,54 +1,12 @@
 <template>
   <v-app-bar id="core-app-bar" absolute app color="transparent" flat height="88">
     <v-toolbar-title class="tertiary--text font-weight-light align-self-center">
-      <v-btn v-if="responsive" dark icon @click.stop="onClick">
+      <v-btn dark icon @click.stop="onClick">
         <v-icon>mdi-view-list</v-icon>
       </v-btn>
       {{ title }}
     </v-toolbar-title>
-
     <v-spacer />
-
-    <v-toolbar-items>
-      <v-row align="center" class="mx-0">
-        <v-text-field class="mr-4 purple-input" color="purple" label="Search..." hide-details />
-
-        <v-btn icon to="/">
-          <v-icon color="tertiary">
-            mdi-view-dashboard
-          </v-icon>
-        </v-btn>
-
-        <v-menu bottom left offset-y transition="slide-y-transition">
-          <template v-slot:activator="{ attrs, on }">
-            <v-btn class="toolbar-items" icon to="/notifications" v-bind="attrs" v-on="on">
-              <v-badge color="error" overlap>
-                <template slot="badge">
-                  {{ notifications.length }}
-                </template>
-                <v-icon color="tertiary">
-                  mdi-bell
-                </v-icon>
-              </v-badge>
-            </v-btn>
-          </template>
-
-          <v-card>
-            <v-list dense>
-              <v-list-item v-for="notification in notifications" :key="notification" @click="onClick">
-                <v-list-item-title v-text="notification" />
-              </v-list-item>
-            </v-list>
-          </v-card>
-        </v-menu>
-
-        <v-btn to="/user-profile" icon>
-          <v-icon color="tertiary">
-            mdi-account
-          </v-icon>
-        </v-btn>
-      </v-row>
-    </v-toolbar-items>
   </v-app-bar>
 </template>
 
@@ -59,12 +17,12 @@ import { mapMutations } from 'vuex';
 
 @Component({
   data: () => ({
-    notifications: ['Trainingroom "cool" advanced to generation 2!'],
-    title: null,
+    title: localStorage.getItem('currentPage'),
     responsive: false
   }),
   watch: {
     $route(val) {
+      localStorage.setItem('currentPage', val.name);
       this.title = val.name;
     }
   },

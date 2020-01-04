@@ -106,6 +106,7 @@ import CreateTrainingRoomResponse from '../messages/responses/CreateTrainingRoom
 import Guid from '../helpers/Guid';
 import Owner from '../models/Owner';
 import User from '../models/User';
+import { ensureNumbers } from '@/helpers/Numbers';
 
 function getOwner(): Owner {
   const user: User = JSON.parse(localStorage.getItem('user')!);
@@ -118,7 +119,7 @@ function getOwner(): Owner {
     VTextFieldWithValidation: () => ComponentLoader('inputs/VTextFieldWithValidation'),
     ValidationObserver
   },
-  data: () => ({
+  data: (): { trainingroom: TrainingRoom } => ({
     trainingroom: {
       id: '',
       name: '',
@@ -143,7 +144,9 @@ function getOwner(): Owner {
         topAmountToSurvive: 0.5,
         enableConnectionChance: 0.25,
         seed: 1
-      }
+      },
+      trainingSessions: [],
+      authorizedTrainers: []
     }
   })
 })
@@ -152,8 +155,7 @@ export default class CreateTrainingRoomView extends Vue {
 
   public onSubmit(e: Event): void {
     const trainingRoom: TrainingRoom = this.$data.trainingroom as TrainingRoom;
-    // TODO: Manually convert training room properties to integers
-    console.log('trainingroom:', trainingRoom);
+    trainingRoom.trainingRoomSettings = ensureNumbers(trainingRoom.trainingRoomSettings);
     this.trainingRoomService.createTrainingRoom(new CreateTrainingRoomRequest(trainingRoom)).then(
       (response: CreateTrainingRoomResponse) => {
         if (response.success) {
@@ -162,8 +164,8 @@ export default class CreateTrainingRoomView extends Vue {
         } else {
           this.$snotify.error('Failed to create training room');
         }
-      },
-      (error: Promise<CreateTrainingRoomResponse>) => {
+      })
+      .catch((error: Promise<CreateTrainingRoomResponse> | CreateTrainingRoomResponse) => {
         this.$snotify.error('Failed to create training room');
       }
     );

@@ -72,8 +72,8 @@ function createMockedNeuralmMQClient(messages: IMessage[]): {
  */
 function getLastSnotifyNotification(vm: Vue): SnotifyToast {
   const lastNotification = vm.$snotify.notifications.length;
-  if (lastNotification == 0) {
-    throw new Error('Snotify does not have any notifications.')
+  if (lastNotification === 0) {
+    throw new Error('Snotify does not have any notifications.');
   }
   return vm.$snotify.notifications[lastNotification - 1];
 }

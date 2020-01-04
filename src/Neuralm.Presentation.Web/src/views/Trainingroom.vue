@@ -100,11 +100,13 @@ export default class TrainingRoomView extends Vue {
       } else {
         this.$snotify.error(response.message);
       }
-    },
-    (error: Promise<StartTrainingSessionResponse>) => {
-      error.then((value: StartTrainingSessionResponse) => {
-        this.$snotify.error(value.message);
-      });
+    })
+    .catch((error: Promise<StartTrainingSessionResponse> | StartTrainingSessionResponse) => {
+      if (error instanceof StartTrainingSessionResponse) {
+        this.$snotify.error(error.message);
+      } else {
+        this.$snotify.error('Something happened try again later.');
+      }
     });
   }
 }
