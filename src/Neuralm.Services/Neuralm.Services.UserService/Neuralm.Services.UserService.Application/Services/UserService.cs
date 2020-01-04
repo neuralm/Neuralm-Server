@@ -75,7 +75,7 @@ namespace Neuralm.Services.UserService.Application.Services
             };
             User user = await EntityRepository.FindSingleOrDefaultAsync(usr => usr.Username == authenticateRequest.Username);
             string accessToken = _accessTokenService.GenerateAccessToken(claims);
-            return new AuthenticateResponse(authenticateRequest.Id, user.Id, accessToken, success: true);
+            return new AuthenticateResponse(authenticateRequest.Id, user.Id, accessToken, "Login successful!", true);
         }
 
         /// <inheritdoc cref="IUserService.RegisterAsync(RegisterRequest)"/>

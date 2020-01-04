@@ -13,7 +13,7 @@ import MessageWrapper from '@/messaging/MessageWrapper';
 import messageTypeCache from '@/messaging/MessageTypeCache';
 import AuthenticateResponse from '@/messages/responses/AuthenticateResponse';
 import Guid from '@/helpers/Guid';
-import { flush, registerPlugins, createMockedNeuralmMQClient } from '../utilities/TestUtility';
+import { flush, registerPlugins, createMockedNeuralmMQClient, getLastSnotifyNotification } from '../utilities/TestUtility';
 
 jest.useFakeTimers();
 registerPlugins();
@@ -50,6 +50,8 @@ describe('Login.vue', () => {
       },
       sync: false
     });
+    wrapper.vm.$router.push('/login');
+    wrapper.vm.$snotify.clear();
     await flush();
   });
 
@@ -97,6 +99,30 @@ describe('Login.vue', () => {
     expect(userModule.state!.status.loggedIn).toBe(true);
   });
 
+  it('after an unsuccessful authenticate response status.loggedIn should be false.', async () => {
+    wrapper.vm.$data.username = 'mario';
+    wrapper.vm.$data.password = 'password';
+    await flush();
+    wrapper.find('button').trigger('submit');
+    await flush();
+    const response: AuthenticateResponse = new AuthenticateResponse(
+      Guid.newGuid().toString(),
+      messages[0].id,
+      new Date(),
+      'empty message',
+      false,
+      Guid.newGuid().toString(),
+      'access token'
+    );
+    const messageWrapper: MessageWrapper = {
+      name: messageTypeCache.getMessageType('AuthenticateResponse'),
+      message: response
+    };
+    messageProcessor.processMessage(messageWrapper);
+    await flush();
+    expect(userModule.state!.status.loggedIn).toBe(false);
+  });
+
   it('after a successful login the user should be redirected to home', async () => {
     wrapper.vm.$data.username = 'mario';
     wrapper.vm.$data.password = 'password';
@@ -119,6 +145,54 @@ describe('Login.vue', () => {
     messageProcessor.processMessage(messageWrapper);
     await flush();
     expect(wrapper.vm.$route.name).toBe('home');
+  });
+
+  it('after a successful login the user should receive a successful login notification', async () => {
+    wrapper.vm.$data.username = 'mario';
+    wrapper.vm.$data.password = 'password';
+    await flush();
+    wrapper.find('button').trigger('submit');
+    await flush();
+    const response: AuthenticateResponse = new AuthenticateResponse(
+      Guid.newGuid().toString(),
+      messages[0].id,
+      new Date(),
+      'Successfully logged in!',
+      true,
+      Guid.newGuid().toString(),
+      'access token'
+    );
+    const messageWrapper: MessageWrapper = {
+      name: messageTypeCache.getMessageType('AuthenticateResponse'),
+      message: response
+    };
+    messageProcessor.processMessage(messageWrapper);
+    await flush();
+    expect(getLastSnotifyNotification(wrapper.vm).body).toBe('Successfully logged in!');
+  });
+
+  it('after an unsuccessful authenticate response the user should receive a unsuccessful login notification', async () => {
+    wrapper.vm.$data.username = 'mario';
+    wrapper.vm.$data.password = 'password';
+    await flush();
+    wrapper.find('button').trigger('submit');
+    await flush();
+    const response: AuthenticateResponse = new AuthenticateResponse(
+      Guid.newGuid().toString(),
+      messages[0].id,
+      new Date(),
+      'Incorrect credentials!',
+      false,
+      Guid.newGuid().toString(),
+      'access token'
+    );
+    const messageWrapper: MessageWrapper = {
+      name: messageTypeCache.getMessageType('AuthenticateResponse'),
+      message: response
+    };
+    messageProcessor.processMessage(messageWrapper);
+    await flush();
+    expect(getLastSnotifyNotification(wrapper.vm).body).toBe('Incorrect credentials!');
   });
 
   it('is able to navigate to register page', async () => {

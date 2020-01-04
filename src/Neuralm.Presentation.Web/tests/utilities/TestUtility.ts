@@ -1,6 +1,6 @@
 import flushPromises from 'flush-promises';
 import Vuetify from 'vuetify';
-import Snotify from 'vue-snotify';
+import Snotify, { SnotifyToast } from 'vue-snotify';
 import Router from 'vue-router';
 import Vue from 'vue';
 import MessageProcessor from '@/messaging/MessageProcessor';
@@ -64,4 +64,18 @@ function createMockedNeuralmMQClient(messages: IMessage[]): {
   neuralmMQClient.addHandler(errorResponseHandler);
   return { processor: messageProcessor, mq: neuralmMQClient };
 }
-export { flush, registerPlugins, createMockedNeuralmMQClient };
+
+/**
+ * Gets the last notification in the Snotify notifications array.
+ * @param vm The vue instance.
+ * @returns Returns the last notification.
+ */
+function getLastSnotifyNotification(vm: Vue): SnotifyToast {
+  const lastNotification = vm.$snotify.notifications.length;
+  if (lastNotification == 0) {
+    throw new Error('Snotify does not have any notifications.')
+  }
+  return vm.$snotify.notifications[lastNotification - 1];
+}
+
+export { flush, registerPlugins, createMockedNeuralmMQClient, getLastSnotifyNotification };
