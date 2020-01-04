@@ -15,36 +15,26 @@ export interface NeuralmRoute {
  * Represents the NeuralmRouter class.
  */
 export default class NeuralmRouter extends Router {
-
   /**
    * Initializes an instance of the NeuralmRouter class.
+   * @param routes The routes the router is allowed to go to.
+   * @param addRedirect Whether to add a redirect on unknown routes to the first route in the routes array.
    */
-  constructor() {
+  constructor(routes: NeuralmRoute[], addRedirect: boolean) {
     super({ mode: 'history' });
+
+    // redirect to login page if not logged in and trying to access a restricted page.
     this.beforeEach((to, _, next) => {
-      // redirect to login page if not logged in and trying to access a restricted page.
-      // console.log(`Routed to ${to.name}`);
       const publicPages = ['/login', '/register'];
       const authRequired = !publicPages.includes(to.path);
       const loggedIn = localStorage.getItem('user');
       if (authRequired && !loggedIn) {
-        // console.log('redirected to login!');
         return next('/login');
       }
       next();
     });
-  }
 
-  public push(location: RawLocation): Promise<Route> {
-    return super.push(location).catch((err) => {
-      if (err.name !== 'NavigationDuplicated') {
-        throw err;
-      }
-      return Promise.resolve(undefined as any);
-    });
-  }
-
-  public setRoutes(routes: NeuralmRoute[], addRedirect: boolean): void {
+    // set the routes.
     const actualRoutes: RouteConfig[] = new Array();
     routes.forEach((route) => {
       const view: string = route.name.replace(/^\w/, (c) => c.toUpperCase());
@@ -55,6 +45,24 @@ export default class NeuralmRouter extends Router {
       actualRoutes.push({ path: '*', redirect: actualRoutes[0].path });
     }
     super.addRoutes(actualRoutes);
+  }
+
+  /**
+   * Pushes the location to the router stack.
+   * Overridden to ignore NavigationDuplicated error.
+   * @param location The raw location.
+   * @returns Returns the promised route.
+   */
+  public push(location: RawLocation): Promise<Route> {
+    return super.push(location).catch((err) => {
+      if (err === undefined) {
+        return Promise.resolve(undefined as any);
+      } else if (err.name !== 'NavigationDuplicated') {
+        throw err;
+      } else {
+        return Promise.resolve({ message: 'Router failsafe triggered' } as any);
+      }
+    });
   }
 
   /* tslint:disable */

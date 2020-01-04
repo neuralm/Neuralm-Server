@@ -69,9 +69,7 @@ const store = new Vuex.Store<IRootState>({
   }
 });
 
-const router = new NeuralmRouter();
-
-router.setRoutes([
+const router = new NeuralmRouter([
   { name: 'home' },
   { name: 'dashboard', props: { trainingRoomService } },
   { name: 'trainingroom', props: { trainingSessionService } },

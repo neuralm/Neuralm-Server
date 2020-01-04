@@ -109,9 +109,10 @@ namespace Neuralm.Services.UserService.Application.Services
                 Secret = _hasher.Hash(registerRequest.Password, salt),
                 Extra = Convert.ToBase64String(salt)
             };
-
             (bool success, _) = await _credentialRepository.CreateAsync(credential);
-            return new RegisterResponse(registerRequest.Id, success: success);
+            return !success
+                ? new RegisterResponse(registerRequest.Id, "Failed to persist data.")
+                : new RegisterResponse(registerRequest.Id, "Registration successful!", true);
         }
 
         /// <inheritdoc cref="IService{TEntity}.CreateAsync(TEntity)"/>

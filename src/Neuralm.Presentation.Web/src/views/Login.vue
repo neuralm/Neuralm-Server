@@ -5,22 +5,20 @@
       <p>By logging in you agree to the ridiculously long terms that you didn't bother to read.</p>
     </div>
     <div id="form">
-      <form @submit.prevent="handleSubmit">
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input type="text" v-model="username" name="username" class="form-control" :class="{ 'is-invalid': submitted && !username }" autocomplete="off" />
-          <div v-show="submitted && !username" class="invalid-feedback">Username is required</div>
-        </div>
-        <div class="form-group">
-          <label htmlFor="password">Password</label>
-          <input type="password" v-model="password" name="password" class="form-control" :class="{ 'is-invalid': submitted && !password }" />
-          <div v-show="submitted && !password" class="invalid-feedback">Password is required</div>
-        </div>
-        <div class="form-group">
-          <button id="loginBtn" class="btn btn-primary" :disabled="!username && !password">Login</button>
-          <router-link to="/register" class="btn btn-link">Register</router-link>
-        </div>
-      </form>
+      <ValidationObserver v-slot="{ handleSubmit }">
+        <form @submit.prevent="handleSubmit(onSubmit)">
+          <div class="form-group">
+            <v-text-field-with-validation rules="required|min:3" v-model="username" label="Username" autocomplete="off"/>
+          </div>
+          <div class="form-group">
+            <v-text-field-with-validation rules="required|min:6" v-model="password" label="Password" type="password"/>
+          </div>
+          <div class="form-group">
+            <button id="loginBtn" class="btn btn-primary" :disabled="!username && !password">Login</button>
+            <router-link to="/register" class="btn btn-link">Register</router-link>
+          </div>
+        </form>
+      </ValidationObserver>
     </div>
   </div>
 </template>
@@ -32,8 +30,14 @@ import IUserService from '../interfaces/IUserService';
 import User from '../models/User';
 import AuthenticateRequest from '../messages/requests/AuthenticateRequest';
 import AuthenticateResponse from '../messages/responses/AuthenticateResponse';
+import { ValidationObserver } from 'vee-validate';
+import ComponentLoader from '@/helpers/ComponentLoader';
 
 @Component({
+  components: {
+    VTextFieldWithValidation: () => ComponentLoader('inputs/VTextFieldWithValidation'),
+    ValidationObserver
+  },
   data: () => ({
     username: '',
     password: '',
@@ -71,7 +75,7 @@ export default class LoginView extends Vue {
     );
   }
 
-  public handleSubmit(e: Event): void {
+  public onSubmit(e: Event): void {
     this.$data.submitted = true;
     const { username, password } = this.$data;
     if (username && password) {

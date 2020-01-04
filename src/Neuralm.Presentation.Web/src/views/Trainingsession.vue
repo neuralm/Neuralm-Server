@@ -67,11 +67,9 @@ export default class TrainingSessionView extends Vue {
     .then((response: EndTrainingSessionResponse) => {
       this.$snotify.success(response.message);
       this.$router.push('dashboard');
-    },
-    (error: Promise<EndTrainingSessionResponse>) => {
-      error.then((value: EndTrainingSessionResponse) => {
-        this.$snotify.error(value.message);
-      });
+    })
+    .catch((error: EndTrainingSessionResponse) => {
+      this.$snotify.error(error.message);
     });
   }
 

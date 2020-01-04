@@ -115,7 +115,7 @@ function getOwner(): Owner {
 
 @Component({
   components: {
-    vTextFieldWithValidation: () => ComponentLoader('inputs/VTextFieldWithValidation'),
+    VTextFieldWithValidation: () => ComponentLoader('inputs/VTextFieldWithValidation'),
     ValidationObserver
   },
   data: () => ({
