@@ -3,5 +3,12 @@ module.exports = {
   transform: {
     'vee-validate/dist/rules': 'babel-jest'
   },
-  transformIgnorePatterns: ['/node_modules/(?!vee-validate/dist/rules)']
+  transformIgnorePatterns: [
+    '/node_modules/(?!vee-validate/dist/rules)'
+  ],
+  collectCoverage: true,
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '/tests/utilities/'
+  ]
 }

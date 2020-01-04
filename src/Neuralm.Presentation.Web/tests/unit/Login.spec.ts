@@ -13,7 +13,7 @@ import MessageWrapper from '@/messaging/MessageWrapper';
 import messageTypeCache from '@/messaging/MessageTypeCache';
 import AuthenticateResponse from '@/messages/responses/AuthenticateResponse';
 import Guid from '@/helpers/Guid';
-import { flush, registerPlugins, createMockedNeuralmMQClient } from '../../tests/TestUtility';
+import { flush, registerPlugins, createMockedNeuralmMQClient } from '../utilities/TestUtility';
 
 jest.useFakeTimers();
 registerPlugins();
