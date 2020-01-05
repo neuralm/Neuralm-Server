@@ -11,7 +11,7 @@
             <v-text-field-with-validation rules="required|min:3" v-model="username" label="Username" autocomplete="off"/>
           </div>
           <div class="form-group">
-            <v-text-field-with-validation rules="required|min:6" v-model="password" label="Password" type="password"/>
+            <v-text-field-with-validation rules="required|password" v-model="password" label="Password" type="password"/>
           </div>
           <div class="form-group">
             <button class="btn btn-primary" :disabled="!username && !password">Register</button>

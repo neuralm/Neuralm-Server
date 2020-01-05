@@ -89,7 +89,8 @@ namespace Neuralm.Services.Common.Mapping
                     ValidIssuer = jwtConfiguration.Issuer,
                     ValidAudience = jwtConfiguration.Audience,
                     ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateAudience = false,
+                    ValidateLifetime = true
                 };
             });
 

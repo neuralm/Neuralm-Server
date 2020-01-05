@@ -66,7 +66,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
             return Task.CompletedTask;
         }
 
-        /// <inheritdoc cref="INetworkConnector.SendMessage{TMessage}(TMessage, CancellationToken)"/> 
+        /// <inheritdoc cref="INetworkConnector.SendMessageAsync{TMessage}(TMessage, CancellationToken)"/> 
         public async Task SendMessageAsync<TMessage>(TMessage message, CancellationToken cancellationToken) where TMessage : IMessage
         {
             try

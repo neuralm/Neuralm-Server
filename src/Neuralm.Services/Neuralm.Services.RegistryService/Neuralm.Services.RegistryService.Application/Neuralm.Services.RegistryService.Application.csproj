@@ -5,12 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Neuralm.Services.Common.Application\Neuralm.Services.Common.Application.csproj" />
-    <ProjectReference Include="..\Neuralm.Services.RegistryService.Domain\Neuralm.Services.RegistryService.Domain.csproj" />
+    <Compile Remove="Services\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <None Remove="Services\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services" />
+    <ProjectReference Include="..\..\Neuralm.Services.Common.Application\Neuralm.Services.Common.Application.csproj" />
+    <ProjectReference Include="..\Neuralm.Services.RegistryService.Domain\Neuralm.Services.RegistryService.Domain.csproj" />
   </ItemGroup>
 
 </Project>

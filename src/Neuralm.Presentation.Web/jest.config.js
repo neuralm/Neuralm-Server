@@ -16,7 +16,7 @@ module.exports = {
     [
       "jest-trx-results-processor",
       {
-        "outputFile": "./src/jestTestresults.trx"
+        "outputFile": "./coverage/jestTestresults.trx"
       }
     ] 
   ]

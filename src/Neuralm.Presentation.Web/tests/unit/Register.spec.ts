@@ -59,9 +59,27 @@ describe('Register.vue', () => {
     expect(wrapper.find('button').attributes('disabled')).toBe('disabled');
   });
 
-  it('register button click should initiate a RegisterRequest.', async () => {
-    wrapper.vm.$data.username = 'mario';
-    wrapper.vm.$data.password = 'password';
+  it('register button click should not initiate request because password does not meet the validation requirement (length & number).', async () => {
+    wrapper.vm.$data.username = 'Mario12345';
+    wrapper.vm.$data.password = 'Mario';
+    await flush();
+    wrapper.find('button').trigger('submit');
+    await flush();
+    expect(messages).toStrictEqual([]);
+  });
+
+  it('register button click should not initiate request because password does not meet the validation requirement (length).', async () => {
+    wrapper.vm.$data.username = 'Mario12345';
+    wrapper.vm.$data.password = 'Mario12';
+    await flush();
+    wrapper.find('button').trigger('submit');
+    await flush();
+    expect(messages).toStrictEqual([]);
+  });
+
+  it('register button click should initiate a RegisterRequest with valid password.', async () => {
+    wrapper.vm.$data.username = 'Mario12345';
+    wrapper.vm.$data.password = 'Mario12345';
     await flush();
     wrapper.find('button').trigger('submit');
     await flush();
@@ -69,8 +87,8 @@ describe('Register.vue', () => {
   });
 
   it('register button click should initiate a successful register response and redirect to the login page', async () => {
-    wrapper.vm.$data.username = 'mario';
-    wrapper.vm.$data.password = 'password';
+    wrapper.vm.$data.username = 'Mario12345';
+    wrapper.vm.$data.password = 'Mario12345';
     await flush();
     wrapper.find('button').trigger('submit');
     await flush();
@@ -91,8 +109,8 @@ describe('Register.vue', () => {
   });
 
   it('after a successful register response the user should receive a successful registration notification', async () => {
-    wrapper.vm.$data.username = 'mario';
-    wrapper.vm.$data.password = 'password';
+    wrapper.vm.$data.username = 'Mario12345';
+    wrapper.vm.$data.password = 'Mario12345';
     await flush();
     wrapper.find('button').trigger('submit');
     await flush();
@@ -113,8 +131,8 @@ describe('Register.vue', () => {
   });
 
   it('after an unsuccessful register response the user should receive a failed registration notification', async () => {
-    wrapper.vm.$data.username = 'mario';
-    wrapper.vm.$data.password = 'password';
+    wrapper.vm.$data.username = 'Mario12345';
+    wrapper.vm.$data.password = 'Mario12345';
     await flush();
     wrapper.find('button').trigger('submit');
     await flush();

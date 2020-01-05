@@ -71,13 +71,15 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
             return Task.Run(() =>
             {
                 Console.WriteLine($"Started Processing message: {message} from {networkConnector.EndPoint}");
+                // TODO: Detect RateLimiting here
+
                 if (_messageToServiceMapper.MessageToServiceMap.TryGetValue(message.GetType(), out IServiceConnector serviceConnector))
                 {
                     _serviceMessageProcessor.AddClientMessage(message.Id, networkConnector);
                     serviceConnector.EnqueueMessage(message);
                 }
                 else
-                    throw new ArgumentOutOfRangeException(nameof(message), "Unknown message of type: {message.GetType().Name}");
+                    throw new ArgumentOutOfRangeException(nameof(message), $"Unknown message of type: {message.GetType().Name}");
             });
         }
     }

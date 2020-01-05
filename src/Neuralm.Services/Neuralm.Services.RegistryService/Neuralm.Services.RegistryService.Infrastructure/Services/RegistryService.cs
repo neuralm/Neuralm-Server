@@ -47,6 +47,7 @@ namespace Neuralm.Services.RegistryService.Infrastructure.Services
             _networkConnector = new TcpNetworkConnector(messageTypeCache, messageSerializer, messageProcessor, _neuralmConfiguration.Host, _neuralmConfiguration.Port);
         }
 
+        /// <inheritdoc cref="IService{TDto}.CreateAsync(TDto)"/>
         public override Task<(bool success, Guid id)> CreateAsync(ServiceDto dto)
         {
             return base.CreateAsync(dto)
@@ -63,7 +64,7 @@ namespace Neuralm.Services.RegistryService.Infrastructure.Services
                                 Id = dto.Id,
                                 Host = dto.Host,
                                 Port = dto.Port,
-                                Name = dto.Name,
+                                Name = dto.Name
                             }
                         };
                         Task.Run(async () =>  await _networkConnector.SendMessageAsync(addServiceCommand, CancellationToken.None));
@@ -72,6 +73,7 @@ namespace Neuralm.Services.RegistryService.Infrastructure.Services
                 });
         }
 
+        /// <inheritdoc cref="IService{TDto}.DeleteAsync(TDto)"/>
         public override Task<(bool success, bool found)> DeleteAsync(ServiceDto dto)
         {
             return base.DeleteAsync(dto).ContinueWith(task =>
@@ -103,7 +105,7 @@ namespace Neuralm.Services.RegistryService.Infrastructure.Services
         /// <inheritdoc cref="IRegistryService.GetServiceByNameAsync(string)"/>
         public async Task<ServiceDto> GetServiceByNameAsync(string serviceName)
         {
-             IEnumerable<Service> services = await base.EntityRepository.FindManyAsync(service => service.Name == serviceName);
+             IEnumerable<Service> services = await _serviceRepository.FindManyAsync(service => service.Name == serviceName);
              return Mapper.Map<ServiceDto>(services.Last());
         }
     }

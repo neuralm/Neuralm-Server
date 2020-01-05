@@ -19,7 +19,7 @@ namespace Neuralm.Services.UserService.Messages
         /// <summary>
         /// Gets the password.
         /// </summary>
-        [Required, StringLength(128, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 6), DataType(DataType.Password)]
+        [Required, RegularExpression("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{9,64}$", ErrorMessage = "Password must contain 1 Uppercase, 1 Lowercase, 1 Number, and a minimum length of 9."), DataType(DataType.Password)]
         public string Password { get; set; }
 
         /// <summary>

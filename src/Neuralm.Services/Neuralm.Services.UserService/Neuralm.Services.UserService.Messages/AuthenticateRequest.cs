@@ -19,7 +19,7 @@ namespace Neuralm.Services.UserService.Messages
         /// <summary>
         /// Gets the password.
         /// </summary>
-        [Required, StringLength(128, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 6), DataType(DataType.Password)]
+        [Required, StringLength(64, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 9), DataType(DataType.Password)]
         public string Password { get; set; }
 
         /// <summary>

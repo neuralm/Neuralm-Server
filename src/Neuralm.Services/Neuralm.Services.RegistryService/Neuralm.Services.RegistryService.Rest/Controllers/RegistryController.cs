@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Neuralm.Services.RegistryService.Rest.Controllers
 {
+    [Authorize(Roles = "Service")]
     public class RegistryController : RestController<ServiceDto>
     {
         private readonly IRegistryService _registryService;
@@ -17,7 +18,7 @@ namespace Neuralm.Services.RegistryService.Rest.Controllers
             _registryService = registryService;
         }
 
-        [Authorize(Roles = "Service"), HttpGet("{serviceName}")]
+        [HttpGet("{serviceName}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAsync(string serviceName)
@@ -26,19 +27,19 @@ namespace Neuralm.Services.RegistryService.Rest.Controllers
             return serviceDto == null ? (IActionResult)new NotFoundResult() : new OkObjectResult(serviceDto);
         }
 
-        [Authorize(Roles = "Service"), HttpPost("")]
+        [HttpPost("")]
         public override Task<IActionResult> CreateAsync(ServiceDto dto)
         {
             return base.CreateAsync(dto);
         }
 
-        [Authorize(Roles = "Service"), HttpPut("")]
+        [HttpPut("")]
         public override Task<IActionResult> UpdateAsync(ServiceDto dto)
         {
             return base.UpdateAsync(dto);
         }
 
-        [Authorize(Roles = "Service"), HttpDelete("")]
+        [HttpDelete("")]
         public override Task<IActionResult> DeleteAsync(ServiceDto dto)
         {
             return base.DeleteAsync(dto);

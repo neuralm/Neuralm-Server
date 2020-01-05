@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Neuralm.Services.Common.Rest;
 using Neuralm.Services.TrainingRoomService.Application.Interfaces;
@@ -7,6 +8,7 @@ using Neuralm.Services.TrainingRoomService.Messages.Dtos;
 
 namespace Neuralm.Services.TrainingRoomService.Rest.Controllers
 {
+    [Authorize(Roles = "MessageQueue")]
     public class TrainingRoomController : RestController<TrainingRoomDto>
     {
         private readonly ITrainingSessionService _trainingSessionService;

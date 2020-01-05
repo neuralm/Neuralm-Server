@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Neuralm.Services.Common.Rest;
 using Neuralm.Services.UserService.Application.Interfaces;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Neuralm.Services.UserService.Rest.Controllers
 {
+    [Authorize(Roles = "MessageQueue")]
     public class UserController : RestController<UserDto>
     {
         private readonly IUserService _userService;
@@ -15,6 +17,12 @@ namespace Neuralm.Services.UserService.Rest.Controllers
         public UserController(IUserService userService) : base(userService)
         {
             _userService = userService;
+        }
+
+        [Authorize(Roles = "MessageQueue, Service")]
+        public override Task<IActionResult> GetAsync(Guid id)
+        {
+            return base.GetAsync(id);
         }
 
         [AllowAnonymous, HttpPost("authenticate")]
