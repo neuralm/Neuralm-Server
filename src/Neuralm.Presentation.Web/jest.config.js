@@ -10,5 +10,14 @@ module.exports = {
   coveragePathIgnorePatterns: [
     '/node_modules/',
     '/tests/utilities/'
+  ],
+  reporters: [
+    "default",
+    [
+      "jest-trx-results-processor",
+      {
+        "outputFile": "./src/jestTestresults.trx"
+      }
+    ] 
   ]
 }

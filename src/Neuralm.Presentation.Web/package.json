@@ -32,6 +32,7 @@
     "@vue/test-utils": "1.0.0-beta.29",
     "css-loader": "^3.4.1",
     "flush-promises": "^1.0.2",
+    "jest-trx-results-processor": "^1.0.3",
     "node-sass": "^4.13.0",
     "sass": "^1.24.2",
     "sass-loader": "^7.1.0",
