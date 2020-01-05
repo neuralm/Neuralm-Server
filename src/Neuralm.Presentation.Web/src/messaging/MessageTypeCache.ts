@@ -1,10 +1,8 @@
-import { Dictionary } from 'vuex';
-
 /**
  * Represents the MessageTypeCache class.
  */
 class MessageTypeCache {
-  private _messageTypes: Dictionary<string>;
+  private _messageTypes: { [key: string]: string };
 
   /**
    * Initializes a new instance of the MessageTypeCache class.

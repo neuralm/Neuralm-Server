@@ -78,7 +78,7 @@ import PaginateTrainingRoomResponse from '../messages/responses/PaginateTraining
     const dashboardState: IDashboardState = (view.$store as Store<IRootState>).state.dashboard as IDashboardState;
     await view.paginateTrainingRooms(dashboardState.pagination.page, dashboardState.pagination.itemsPerPage);
   },
-  created() {
+  async created() {
     const view: DashboardView = (this as unknown as DashboardView);
     const dashboardState: IDashboardState = (view.$store as Store<IRootState>).state.dashboard as IDashboardState;
     view.$store.subscribe(async (mutation, payload) => {
@@ -101,11 +101,11 @@ export default class DashboardView extends Vue {
       new PaginateTrainingRoomRequest(pageNumber, pageSize)
     ).then((response: PaginateTrainingRoomResponse) => {
       this.$store.commit('dashboard/updatePaginator', response);
-    },
-    (error: Promise<PaginateTrainingRoomResponse>) => {
-      error.then((value: PaginateTrainingRoomResponse) => {
-        this.$snotify.error(value.message);
-      });
+    })
+    .catch((error: Promise<PaginateTrainingRoomResponse> | PaginateTrainingRoomResponse) => {
+      if (error instanceof PaginateTrainingRoomResponse) {
+        this.$snotify.error(error.message);
+      }
     });
   }
 }

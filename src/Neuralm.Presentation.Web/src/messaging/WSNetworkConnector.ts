@@ -12,6 +12,7 @@ export default class WSNetworkConnector extends BaseNetworkConnector {
   private _websocket!: WebSocket;
   private _isConnected: boolean = false;
   private _messageHeader: MessageHeader | null = null;
+  private _maxAttempts: number = 200;
 
   public get isConnected(): boolean {
     return this._isConnected;
@@ -54,14 +55,17 @@ export default class WSNetworkConnector extends BaseNetworkConnector {
   }
 
   public write(packet: Uint8Array): void {
-    this._websocket.send(packet);
+    if (this.isConnected) {
+      this._websocket.send(packet);
+    } else {
+      this.attemptWrite(packet);
+    }
   }
 
   public read(packet: Uint8Array): void {
     if (!this.isConnected) {
-      throw Error('The network connector is not connected.');
+      throw new Error('The network connector is not connected.');
     }
-
     if (this._messageHeader === null) {
       this._messageHeader = MessageHeader.tryParseHeader(packet);
       if (this._messageHeader === null) {
@@ -75,8 +79,21 @@ export default class WSNetworkConnector extends BaseNetworkConnector {
       name: this._messageHeader!.typeName,
       message: this._messsageSeriliazer.deserialize(packet)
     };
-
     this._messageProcessor.processMessage(messageWrapper);
     this._messageHeader = null;
+  }
+
+  private async attemptWrite(packet: Uint8Array): Promise<void> {
+    let attempt: number = 0;
+    while (this._maxAttempts > attempt) {
+      if (this.isConnected) {
+        this._websocket.send(packet);
+        return Promise.resolve();
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        attempt++;
+      }
+    }
+    throw new Error(`There was an attempt to write a message but the network connector is still not connected after ${attempt} attempts, waiting a total of ${attempt * 50}ms.`);
   }
 }

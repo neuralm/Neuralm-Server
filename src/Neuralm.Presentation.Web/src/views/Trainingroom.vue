@@ -65,8 +65,15 @@ import ITrainingSessionService from '../interfaces/ITrainingSessionService';
 import StartTrainingSessionRequest from '../messages/requests/StartTrainingSessionRequest';
 import User from '../models/User';
 import StartTrainingSessionResponse from '../messages/responses/StartTrainingSessionResponse';
+import { ITrainingRoomState } from '../modules/TrainingRoom.module';
 
 @Component({
+  async created() {
+    const trainingRoomState: ITrainingRoomState = (this.$store as Store<IRootState>).state.trainingRoom as ITrainingRoomState;
+    if (trainingRoomState.trainingRoom === undefined) {
+      this.$router.push('/dashboard');
+    }
+  },
   data: () => ({
     showSettings: true
   }),

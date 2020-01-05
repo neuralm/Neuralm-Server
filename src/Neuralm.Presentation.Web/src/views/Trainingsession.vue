@@ -44,6 +44,12 @@ import PostOrganismsScoreRequest from '../messages/requests/PostOrganismsScoreRe
 import PostOrganismsScoreResponse from '../messages/responses/PostOrganismsScoreResponse';
 
 @Component({
+  async created() {
+    const trainingSessionState: ITrainingSessionState = (this.$store as Store<IRootState>).state.trainingSession as ITrainingSessionState;
+    if (trainingSessionState.trainingSession === undefined) {
+      this.$router.push('/dashboard');
+    }
+  },
   data: () => ({
     headers: [
       {
