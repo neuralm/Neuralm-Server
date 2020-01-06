@@ -55,7 +55,7 @@ namespace Neuralm.Services.Common.Persistence.EFCore.Infrastructure
         {
             // If both empty, continue.
             // The in memory database will be selected.
-            if (!string.IsNullOrEmpty(providerName) && !string.IsNullOrEmpty(connectionString))
+            if (!string.IsNullOrEmpty(providerName) || !string.IsNullOrEmpty(connectionString))
             {
                 if (string.IsNullOrEmpty(connectionString))
                     throw new ArgumentException($"Connection string '{connectionString}' is null or empty.", nameof(connectionString));
