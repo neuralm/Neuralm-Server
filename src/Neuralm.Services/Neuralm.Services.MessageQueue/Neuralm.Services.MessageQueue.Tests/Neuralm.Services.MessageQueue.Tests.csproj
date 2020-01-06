@@ -5,6 +5,10 @@
     <ProjectGuid>DE02CCE2-7363-4D2E-8659-9758037EC811</ProjectGuid>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="coverlet.msbuild" Version="2.8.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.0.0" />
     <PackageReference Include="MSTest.TestFramework" Version="2.0.0" />
