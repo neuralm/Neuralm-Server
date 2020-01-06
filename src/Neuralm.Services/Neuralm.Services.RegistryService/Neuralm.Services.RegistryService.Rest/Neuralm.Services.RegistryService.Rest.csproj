@@ -1,12 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <ProjectGuid>3E2627AC-17A4-4D8B-96BF-7FF54DDD3B3B</ProjectGuid>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Neuralm.Services.Common.Rest\Neuralm.Services.Common.Rest.csproj" />
     <ProjectReference Include="..\Neuralm.Services.RegistryService.Mapping\Neuralm.Services.RegistryService.Mapping.csproj" />
   </ItemGroup>
-
 </Project>

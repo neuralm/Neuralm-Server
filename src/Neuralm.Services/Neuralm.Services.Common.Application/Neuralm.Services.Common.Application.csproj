@@ -1,26 +1,22 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <LangVersion>8</LangVersion>
+    <ProjectGuid>CD0D21E7-6D12-438C-905E-092A8DAF8688</ProjectGuid>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.6.0" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Neuralm.Services.Common.Domain\Neuralm.Services.Common.Domain.csproj" />
     <ProjectReference Include="..\Neuralm.Services.Common.Messages\Neuralm.Services.Common.Messages.csproj" />
     <ProjectReference Include="..\Neuralm.Services.Common\Neuralm.Services.Common.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="Microsoft.Extensions.Options">
       <HintPath>..\..\..\..\..\Program Files\dotnet\packs\Microsoft.AspNetCore.App.Ref\3.0.0\ref\netcoreapp3.0\Microsoft.Extensions.Options.dll</HintPath>
     </Reference>
   </ItemGroup>
-
 </Project>
