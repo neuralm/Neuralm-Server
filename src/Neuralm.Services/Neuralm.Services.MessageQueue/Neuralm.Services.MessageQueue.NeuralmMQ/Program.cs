@@ -14,7 +14,6 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
     public class Program
     {
         private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
-        private IGenericServiceProvider _genericServiceProvider;
         private static int _canReadConsole;
         private static int _canExit;
 
@@ -27,21 +26,6 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
             Task task = new Program().RunAsync(CancellationTokenSource.Token);
             _ = Task.Run(() => task);
 
-//            while (!CancellationTokenSource.IsCancellationRequested)
-//            {
-//                if (Interlocked.CompareExchange(ref _canReadConsole, 0, 0) == 0)
-//                {
-//                    await Task.Delay(500);
-//                    continue;
-//                }
-//
-//                if (Console.ReadKey().Key == ConsoleKey.Q)
-//                {
-//                    CancellationTokenSource.Cancel();
-//                    continue;
-//                }
-//                Console.WriteLine("\nPress Q to shut down the message queue.");
-//            }
             if (Interlocked.CompareExchange(ref _canExit, 1, 1) == 0)
             {
                 try
@@ -88,13 +72,13 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
             cancellationToken.ThrowIfCancellationRequested();
             Console.WriteLine("Finished initializing!");
 
-            _genericServiceProvider = startup.GetGenericServiceProvider();
+            IGenericServiceProvider genericServiceProvider = startup.GetGenericServiceProvider();
 
-            IRegistryService registryService = _genericServiceProvider.GetService<IRegistryService>();
+            IRegistryService registryService = genericServiceProvider.GetService<IRegistryService>();
             _ = Task.Run(async () => await registryService.StartReceivingServiceEndPointsAsync(cancellationToken), cancellationToken);
             Console.WriteLine("Started RegistryService EndPoint.");
 
-            IClientMessageProcessor clientMessageProcessor = _genericServiceProvider.GetService<IClientMessageProcessor>();
+            IClientMessageProcessor clientMessageProcessor = genericServiceProvider.GetService<IClientMessageProcessor>();
             _ = Task.Run(async () => await clientMessageProcessor.StartAsync(cancellationToken), cancellationToken);
             Console.WriteLine("Started client messaging EndPoint.");
 

@@ -12,13 +12,14 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Neuralm.Services.MessageQueue.Infrastructure.Messaging;
+using IRegistryService = Neuralm.Services.MessageQueue.Application.Interfaces.IRegistryService;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure.Services
 {
     /// <summary>
     /// Represents the <see cref="RegistryService"/> class.
     /// </summary>
-    public class RegistryService : Application.Interfaces.IRegistryService
+    public class RegistryService : IRegistryService
     {
         private readonly IMessageSerializer _messageSerializer;
         private readonly IServiceMessageProcessor _serviceMessageProcessor;
@@ -88,7 +89,6 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
 
         private async Task AddService(Guid id, string name, string host, int port)
         {
-//            INetworkConnector networkConnector = new TcpNetworkConnector(_messageTypeCache, _messageSerializer, _serviceMessageProcessor, host, port);
             Uri baseUrl = new Uri($"http://{host}:{port.ToString()}/{name.ToLower().Replace("service", "")}");
             INetworkConnector networkConnector = new HttpNetworkConnector(_messageSerializer, _serviceMessageProcessor, baseUrl, _accessTokenService);
             await networkConnector.ConnectAsync(CancellationToken.None);

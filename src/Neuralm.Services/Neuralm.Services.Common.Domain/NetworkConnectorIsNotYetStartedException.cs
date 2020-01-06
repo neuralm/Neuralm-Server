@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace Neuralm.Services.Common.Domain
 {
@@ -14,6 +15,10 @@ namespace Neuralm.Services.Common.Domain
         /// </summary>
         /// <param name="message"></param>
         public NetworkConnectorIsNotYetStartedException(string message) : base(message)
+        {
+        }
+
+        protected NetworkConnectorIsNotYetStartedException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

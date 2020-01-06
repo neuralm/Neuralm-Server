@@ -34,10 +34,6 @@ namespace Neuralm.Services.MessageQueue.Mapping
             if (StartupExtensions.IsDebug)
                 serviceCollection.AddLogging(p => p.AddDebug());
 
-            // Instead of using .AddDbContext, .AddTransient is used because, the IFactory<MessageDbContext>
-            // needs to be used for creating an instance of the UserDbContext.
-            //serviceCollection.AddTransient<MessageDbContext>(p => p.GetService<IFactory<MessageDbContext>>().Create());
-            
             serviceCollection.AddSingleton<IFactory<IMessageTypeCache, IEnumerable<Type>>, MessageTypeCacheFactory>();
             serviceCollection.AddSingleton<IClientMessageTypeCache, ClientMessageTypeCache>(serviceCollection =>
             {

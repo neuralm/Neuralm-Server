@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace Neuralm.Services.MessageQueue.NeuralmMQ
 {
@@ -7,13 +8,17 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
     /// Thrown when the certificate collection is empty.
     /// </summary>
     [Serializable]
-    internal class EmptyCertificateCollectionException : Exception
+    public class EmptyCertificateCollectionException : Exception
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EmptyCertificateCollectionException"/> class.
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="message">The message.</param>
         public EmptyCertificateCollectionException(string message) : base(message)
+        {
+        }
+
+        protected EmptyCertificateCollectionException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

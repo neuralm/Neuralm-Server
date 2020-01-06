@@ -38,14 +38,23 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         }
 
         /// <inheritdoc cref="IMessageProcessor.ProcessMessageAsync(IMessage, INetworkConnector)"/>
-        public async Task ProcessMessageAsync(IMessage message, INetworkConnector networkConnector)
+        public Task ProcessMessageAsync(IMessage message, INetworkConnector networkConnector)
         {
             Console.WriteLine($"Started processing RegistryService({networkConnector.EndPoint}) message.");
             if (!_messageToMethodMap.TryGetValue(message.GetType(), out MethodInfo methodInfo))
                 throw new ArgumentOutOfRangeException(nameof(message), $"Unknown Request message of type: {message.GetType().FullName}");
-            dynamic task = methodInfo.Invoke(_registryService, new object[] {message});
+            return InvokeMethodAsync(message, methodInfo)
+                .ContinueWith((task) =>
+                    {
+                        Console.WriteLine($"Finished processing RegistryService({networkConnector.EndPoint}) message {(task.IsCompletedSuccessfully ? "successfully" : "unsuccessfully.")}.");
+                        return task;
+                    });
+        }
+
+        private async Task InvokeMethodAsync(IMessage message, MethodInfo methodInfo)
+        {
+            dynamic task = methodInfo.Invoke(_registryService, new object[] { message });
             await task;
-            Console.WriteLine($"Finished processing RegistryService({networkConnector.EndPoint}) message.");
         }
     }
 }

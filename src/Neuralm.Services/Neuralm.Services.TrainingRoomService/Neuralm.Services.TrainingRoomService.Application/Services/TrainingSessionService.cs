@@ -91,7 +91,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                     TrainingRoomSettings trainingRoomSettings = trainingSession.TrainingRoom.TrainingRoomSettings;
                     for (int i = 0; i < trainingRoomSettings.OrganismCount; i++)
                     {
-                        Organism organism = new Organism(trainingRoomSettings, trainingSession.TrainingRoom.GetAndIncreaseNodeId, trainingSession.TrainingRoom.GetInnovationNumber) { Leased = true };
+                        Organism organism = new Organism(trainingRoomSettings, trainingSession.TrainingRoom.GetInnovationNumber) { Leased = true };
                         trainingSession.TrainingRoom.AddOrganism(organism);
                         trainingSession.LeasedOrganisms.Add(new LeasedOrganism(organism, trainingSession.Id));
                     }

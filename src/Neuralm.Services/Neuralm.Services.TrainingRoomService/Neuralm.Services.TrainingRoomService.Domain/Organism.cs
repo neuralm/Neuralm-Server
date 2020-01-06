@@ -79,13 +79,11 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// With an initial generation of 0.
         /// </summary>
         /// <param name="trainingRoomSettings">The training room settings.</param>
-        /// <param name="getAndIncreaseNodeIdFunction">The get and increase node id function.</param>
         /// <param name="innovationFunction">The innovation function.</param>
-        public Organism(TrainingRoomSettings trainingRoomSettings, Func<uint> getAndIncreaseNodeIdFunction, Func<uint, uint, uint> innovationFunction) : this(0, trainingRoomSettings)
+        public Organism(TrainingRoomSettings trainingRoomSettings, Func<uint, uint, uint> innovationFunction) : this(0, trainingRoomSettings)
         {
             // if the generation is 0, add initial mutations.
             AddConnectionMutation(trainingRoomSettings, innovationFunction);
-//            Mutate(trainingRoomSettings, getAndIncreaseNodeIdFunction, innovationFunction);
         }
         
         /// <summary>
@@ -93,8 +91,6 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// </summary>
         /// <param name="generation">The current generation.</param>
         /// <param name="trainingRoomSettings">The training room settings.</param>
-        /// <param name="getAndIncreaseNodeIdFunction">The get and increase node id function.</param>
-        /// <param name="innovationFunction">The innovation function.</param>
         public Organism(uint generation, TrainingRoomSettings trainingRoomSettings)
         {
             // Generates a new guid for the organism, this is needed so EF can set the
@@ -500,11 +496,14 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             void SetLayer(Node node, uint layer, bool force = false)
             {
                 // Set the layer depending on force and if the current layer is higher than the layer given.
-                node.Layer = force ? layer : (layer > node.Layer ? layer : node.Layer);
-
-                // If force is true, return early.
                 if (force)
+                {
+                    node.Layer = layer;
+                    // If force is true, return early.
                     return;
+                }
+
+                node.Layer = layer > node.Layer ? layer : node.Layer;
 
                 // For each connection gene where the out node identifier is the same as the given node identifier
                 // set the layer to the node's layer plus one.

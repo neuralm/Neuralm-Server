@@ -16,7 +16,6 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
     public class MessageToServiceMapper : IMessageToServiceMapper
     {
         private readonly CancellationTokenSource _cancellationTokenSource;
-        private readonly IClientMessageTypeCache _messageTypeCache;
         private static readonly ConcurrentDictionary<string, List<Type>> ServiceTypeCache = new ConcurrentDictionary<string, List<Type>>();
         private readonly ConcurrentDictionary<Type, IServiceConnector> _messageToServiceMap = new ConcurrentDictionary<Type, IServiceConnector>();
         private readonly ConcurrentDictionary<Guid, IServiceConnector> _serviceMap = new ConcurrentDictionary<Guid, IServiceConnector>();
@@ -31,9 +30,8 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         /// <param name="messageTypeCache">The message type cache.</param>
         public MessageToServiceMapper(IClientMessageTypeCache messageTypeCache)
         {
-            _messageTypeCache = messageTypeCache;
             Console.WriteLine("Mapping messages to services...");
-            foreach (Type type in _messageTypeCache.GetMessageTypes())
+            foreach (Type type in messageTypeCache.GetMessageTypes())
             {
                 string typename = type.FullName ?? "";
                 Match match = _regex.Match(typename);

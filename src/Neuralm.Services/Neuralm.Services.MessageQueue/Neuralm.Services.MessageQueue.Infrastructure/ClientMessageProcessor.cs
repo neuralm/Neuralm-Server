@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Neuralm.Services.Common.Exceptions;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure
 {
@@ -21,7 +22,6 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         private readonly IServiceMessageProcessor _serviceMessageProcessor;
         private readonly IClientMessageTypeCache _messageTypeCache;
         private readonly IMessageToServiceMapper _messageToServiceMapper;
-        private readonly MessageQueueConfiguration _messageQueueConfiguration;
         private readonly TcpListener _tcpListener;
 
         /// <summary>
@@ -43,8 +43,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
             _messageSerializer = messageSerializer;
             _serviceMessageProcessor = serviceMessageProcessor;
             _messageTypeCache = messageTypeCache;
-            _messageQueueConfiguration = messageQueueConfigurationOptions.Value;
-            _tcpListener = new TcpListener(IPAddress.Any, _messageQueueConfiguration.Port);
+            _tcpListener = new TcpListener(IPAddress.Any, messageQueueConfigurationOptions.Value.Port);
         }
 
         /// <inheritdoc cref="IClientMessageProcessor.StartAsync(CancellationToken)"/>
@@ -56,9 +55,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
                 TcpClient tcpClient = await _tcpListener.AcceptTcpClientAsync();
                 _ = Task.Run(async () =>
                 {
-                    //SslTcpNetworkConnector networkConnector = new SslTcpNetworkConnector(_messageSerializer, this, tcpClient);
                     WSNetworkConnector networkConnector = new WSNetworkConnector(_messageTypeCache, _messageSerializer, this, tcpClient);
-                    //await networkConnector.AuthenticateAsServer(_messageQueueConfiguration.Certificate, CancellationToken.None);
                     await networkConnector.StartHandshakeAsServerAsync();
                     networkConnector.Start();
                 }, cancellationToken);
@@ -79,7 +76,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
                     serviceConnector.EnqueueMessage(message);
                 }
                 else
-                    throw new ArgumentOutOfRangeException(nameof(message), $"Unknown message of type: {message.GetType().Name}");
+                    throw new InvalidMessageException($"Unknown message of type: {message.GetType().Name}");
             });
         }
     }

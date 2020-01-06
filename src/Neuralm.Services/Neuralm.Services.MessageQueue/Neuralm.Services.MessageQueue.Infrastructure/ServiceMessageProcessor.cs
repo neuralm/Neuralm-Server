@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Exceptions;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure
 {
@@ -24,23 +25,30 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         }
 
         /// <inheritdoc cref="IMessageProcessor.ProcessMessageAsync(IMessage, INetworkConnector)"/>
-        public async Task ProcessMessageAsync(IMessage message, INetworkConnector networkConnector)
+        public Task ProcessMessageAsync(IMessage message, INetworkConnector networkConnector)
         {
             if (!(message is IResponseMessage msg))
-                throw new ArgumentNullException(nameof(msg),"Only response messages are supported from a service endpoint.");
+                throw new InvalidMessageException("Only response messages are supported from a service endpoint.");
 
-            if (_messageToClientDictionary.TryRemove(msg.RequestId, out INetworkConnector clientNetworkConnector))
-                await clientNetworkConnector.SendMessageAsync(message, CancellationToken.None);
-            else
-                throw new ArgumentOutOfRangeException(nameof(msg), $"Unknown message of type: {message.GetType().Name}");
+            if (!_messageToClientDictionary.TryRemove(msg.RequestId, out INetworkConnector clientNetworkConnector))
+                throw new ArgumentOutOfRangeException(nameof(message), $"Unknown message of type: {message.GetType().Name}");
 
-            Console.WriteLine($"Finished Processing message: {msg.Id.ToString()} from {networkConnector.EndPoint}");
+            return SendMessageToClientAsync(message, clientNetworkConnector)
+                .ContinueWith((task) =>
+                {
+                    Console.WriteLine($"Finished Processing message: {msg.Id.ToString()} from {networkConnector.EndPoint}");
+                    return task;
+                });
         }
 
         /// <inheritdoc cref="IServiceMessageProcessor.AddClientMessage(Guid, INetworkConnector)"/>
         public void AddClientMessage(Guid messageId, INetworkConnector networkConnector)
         {
             _messageToClientDictionary.TryAdd(messageId, networkConnector);
+        }
+        private static async Task SendMessageToClientAsync(IMessage message, INetworkConnector clientNetworkConnector)
+        {
+            await clientNetworkConnector.SendMessageAsync(message, CancellationToken.None);
         }
     }
 }

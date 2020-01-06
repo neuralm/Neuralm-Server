@@ -22,7 +22,6 @@ namespace Neuralm.Services.RegistryService.Infrastructure.Services
     public class RegistryService : BaseService<Service, ServiceDto>, IRegistryService
     {
         private readonly IRepository<Service> _serviceRepository;
-        private readonly NeuralmConfiguration _neuralmConfiguration;
         private readonly INetworkConnector _networkConnector;
         
         /// <summary>
@@ -43,8 +42,8 @@ namespace Neuralm.Services.RegistryService.Infrastructure.Services
             IMessageProcessor messageProcessor) : base(serviceRepository, mapper)
         {
             _serviceRepository = serviceRepository;
-            _neuralmConfiguration = neuralmConfigurationOptions.Value;
-            _networkConnector = new TcpNetworkConnector(messageTypeCache, messageSerializer, messageProcessor, _neuralmConfiguration.Host, _neuralmConfiguration.Port);
+            NeuralmConfiguration neuralmConfiguration = neuralmConfigurationOptions.Value;
+            _networkConnector = new TcpNetworkConnector(messageTypeCache, messageSerializer, messageProcessor, neuralmConfiguration.Host, neuralmConfiguration.Port);
         }
 
         /// <inheritdoc cref="IService{TDto}.CreateAsync(TDto)"/>

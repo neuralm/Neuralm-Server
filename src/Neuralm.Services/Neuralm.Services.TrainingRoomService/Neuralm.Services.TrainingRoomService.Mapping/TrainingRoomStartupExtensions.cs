@@ -16,6 +16,7 @@ using Neuralm.Services.TrainingRoomService.Persistence.Validators;
 using System.Reflection;
 using System.Security.Claims;
 using Neuralm.Services.Common.Application.Serializers;
+using Neuralm.Services.Common.Exceptions;
 using Neuralm.Services.Common.Infrastructure.Services;
 using Neuralm.Services.Common.Messages.Dtos;
 using Neuralm.Services.Common.Persistence.EFCore;
@@ -79,7 +80,7 @@ namespace Neuralm.Services.TrainingRoomService.Mapping
                 if (serviceDto is null)
                 {
                     logger.LogError($"Failed to initialize UserService!");
-                    return null;
+                    throw new InitializationException("Failed to initialize UserService!");
                 }
                 List<Claim> claims = new List<Claim>
                 {

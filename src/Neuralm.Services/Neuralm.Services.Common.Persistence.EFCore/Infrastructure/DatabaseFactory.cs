@@ -31,12 +31,6 @@ namespace Neuralm.Services.Common.Persistence.EFCore.Infrastructure
 
         }
 
-        ///// <inheritdoc cref="DesignTimeDbContextFactoryBase{TContext}.CreateNewInstance"/>
-        //protected override TDbContext CreateNewInstance(DbContextOptions<TDbContext> options)
-        //{
-        //    return (TDbContext) new DbContext(options);
-        //}
-
         /// <inheritdoc cref="IFactory{TResult}.Create"/>
         public TDbContext Create()
         {

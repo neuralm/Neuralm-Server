@@ -1,15 +1,23 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Neuralm.Services.MessageQueue.NeuralmMQ
+namespace Neuralm.Services.Common.Exceptions
 {
+    /// <summary>
+    /// Represents the <see cref="InitializationException"/> class.
+    /// Thrown when the initialization goes awry.
+    /// </summary>
     [Serializable]
-    internal class InitializationException : Exception
+    public class InitializationException : Exception
     {
         public InitializationException()
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InitializationException"/> class.
+        /// </summary>
+        /// <param name="message">The message.</param>
         public InitializationException(string message) : base(message)
         {
         }

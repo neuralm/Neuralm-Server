@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Domain;
+using Neuralm.Services.Common.Exceptions;
 using Neuralm.Services.Common.Messages;
 using Neuralm.Services.Common.Messages.Interfaces;
 
@@ -19,7 +20,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
     /// <summary>
     /// Represents the <see cref="HttpNetworkConnector"/> class.
     /// </summary>
-    public class HttpNetworkConnector : INetworkConnector
+    public class HttpNetworkConnector : INetworkConnector, IDisposable
     {
         private readonly IMessageSerializer _messageSerializer;
         private readonly IMessageProcessor _messageProcessor;
@@ -75,7 +76,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
                     throw new NetworkConnectorIsNotYetStartedException("NetworkConnector has not started yet. Call Start() first");
 
                 if (!(Attribute.GetCustomAttribute(message.GetType(), typeof(MessageAttribute)) is MessageAttribute messageAttribute))
-                    throw new Exception("Invalid message");
+                    throw new InvalidMessageException("Invalid message");
 
                 HttpRequestMessage httpRequestMessage = null;
                 string httpClientBaseAddress = _httpClient.BaseAddress + messageAttribute.Path;
@@ -179,10 +180,10 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
             IsRunning = false;
         }
         
-        /// <inheritdoc cref="INetworkConnector.Dispose"/> 
+        /// <inheritdoc cref="IDisposable.Dispose"/> 
         public void Dispose()
         {
-            _httpClient.Dispose();
+            _httpClient?.Dispose();
         }
         
         /// <summary>
@@ -209,15 +210,6 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
             /// Gets and sets the trace id,
             /// </summary>
             public string traceId { get; set; }
-            
-            /// <summary>
-            /// Gets the string representation of the <see cref="RestErrorResponse"/> class.
-            /// </summary>
-            /// <returns>The string representation.</returns>
-            public override string ToString()
-            {
-                return $"Title: {title}, Status: {status.ToString()}";
-            }
         }
     }
 }
