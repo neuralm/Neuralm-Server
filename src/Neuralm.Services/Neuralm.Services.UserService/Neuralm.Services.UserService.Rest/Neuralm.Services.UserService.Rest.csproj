@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
+  <ProjectGuid>81150B46-97AB-40D3-AE66-479184E95E07</ProjectGuid>
+  
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <LangVersion>8</LangVersion>
