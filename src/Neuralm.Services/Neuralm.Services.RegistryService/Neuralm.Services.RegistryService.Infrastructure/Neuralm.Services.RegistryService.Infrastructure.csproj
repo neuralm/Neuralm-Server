@@ -1,15 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFramework>netcoreapp3.0</TargetFramework>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\Neuralm.Services.Common.Application\Neuralm.Services.Common.Application.csproj" />
-      <ProjectReference Include="..\..\Neuralm.Services.Common.Infrastructure\Neuralm.Services.Common.Infrastructure.csproj" />
-      <ProjectReference Include="..\Neuralm.Services.RegistryService.Application\Neuralm.Services.RegistryService.Application.csproj" />
-      <ProjectReference Include="..\Neuralm.Services.RegistryService.Domain\Neuralm.Services.RegistryService.Domain.csproj" />
-      <ProjectReference Include="..\Neuralm.Services.RegistryService.Messages\Neuralm.Services.RegistryService.Messages.csproj" />
-    </ItemGroup>
-
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <ProjectGuid>C093891F-6A77-437A-96C9-E92ABEB53371</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Neuralm.Services.Common.Application\Neuralm.Services.Common.Application.csproj" />
+    <ProjectReference Include="..\..\Neuralm.Services.Common.Infrastructure\Neuralm.Services.Common.Infrastructure.csproj" />
+    <ProjectReference Include="..\Neuralm.Services.RegistryService.Application\Neuralm.Services.RegistryService.Application.csproj" />
+    <ProjectReference Include="..\Neuralm.Services.RegistryService.Domain\Neuralm.Services.RegistryService.Domain.csproj" />
+    <ProjectReference Include="..\Neuralm.Services.RegistryService.Messages\Neuralm.Services.RegistryService.Messages.csproj" />
+  </ItemGroup>
 </Project>

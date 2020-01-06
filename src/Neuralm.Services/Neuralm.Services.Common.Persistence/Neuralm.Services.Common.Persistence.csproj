@@ -1,12 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <LangVersion>8</LangVersion>
+    <ProjectGuid>24DA3C0D-62A6-4504-AF05-BD0CD99D03FB</ProjectGuid>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Neuralm.Services.Common.Domain\Neuralm.Services.Common.Domain.csproj" />
   </ItemGroup>
-
 </Project>

@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <ProjectGuid>E6104252-13F3-4D27-A238-9CD417D55493</ProjectGuid>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Neuralm.Services.Common.Mapping\Neuralm.Services.Common.Mapping.csproj" />
     <ProjectReference Include="..\Neuralm.Services.RegistryService.Application\Neuralm.Services.RegistryService.Application.csproj" />
@@ -11,5 +10,4 @@
     <ProjectReference Include="..\Neuralm.Services.RegistryService.Messages\Neuralm.Services.RegistryService.Messages.csproj" />
     <ProjectReference Include="..\Neuralm.Services.RegistryService.Persistence\Neuralm.Services.RegistryService.Persistence.csproj" />
   </ItemGroup>
-
 </Project>

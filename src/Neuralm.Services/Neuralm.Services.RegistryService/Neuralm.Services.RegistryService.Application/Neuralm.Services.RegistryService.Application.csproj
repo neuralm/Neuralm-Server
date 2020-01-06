@@ -1,18 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <ProjectGuid>AD576527-8710-4762-A9F7-E13FA38A404F</ProjectGuid>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="Services\**" />
     <EmbeddedResource Remove="Services\**" />
     <None Remove="Services\**" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Neuralm.Services.Common.Application\Neuralm.Services.Common.Application.csproj" />
     <ProjectReference Include="..\Neuralm.Services.RegistryService.Domain\Neuralm.Services.RegistryService.Domain.csproj" />
   </ItemGroup>
-
 </Project>

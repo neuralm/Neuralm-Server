@@ -1,11 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-
     <IsPackable>false</IsPackable>
+    <ProjectGuid>DE02CCE2-7363-4D2E-8659-9758037EC811</ProjectGuid>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.0.0" />
@@ -15,10 +13,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Neuralm.Services.MessageQueue.Application\Neuralm.Services.MessageQueue.Application.csproj" />
     <ProjectReference Include="..\Neuralm.Services.MessageQueue.Infrastructure\Neuralm.Services.MessageQueue.Infrastructure.csproj" />
   </ItemGroup>
-
 </Project>

@@ -1,13 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <ProjectGuid>3342B950-782E-4128-B93D-36569D31DCF5</ProjectGuid>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Neuralm.Services.Common.Mapping\Neuralm.Services.Common.Mapping.csproj" />
     <ProjectReference Include="..\Neuralm.Services.MessageQueue.Application\Neuralm.Services.MessageQueue.Application.csproj" />
     <ProjectReference Include="..\Neuralm.Services.MessageQueue.Infrastructure\Neuralm.Services.MessageQueue.Infrastructure.csproj" />
   </ItemGroup>
-
 </Project>
