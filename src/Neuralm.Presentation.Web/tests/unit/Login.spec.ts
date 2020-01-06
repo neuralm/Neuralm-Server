@@ -61,14 +61,14 @@ describe('Login.vue', () => {
 
   it('login button should be enabled because username and password are set.', async () => {
     wrapper.vm.$data.username = 'mario';
-    wrapper.vm.$data.password = 'password';
+    wrapper.vm.$data.password = 'password112';
     await flush();
     expect(wrapper.find('button').attributes('disabled')).toBeUndefined();
   });
 
   it('login button click should initiate an AuthenticateRequest.', async () => {
     wrapper.vm.$data.username = 'mario';
-    wrapper.vm.$data.password = 'password';
+    wrapper.vm.$data.password = 'password112';
     await flush();
     wrapper.find('button').trigger('submit');
     await flush();
@@ -77,7 +77,7 @@ describe('Login.vue', () => {
 
   it('login button click should initiate a successful authenticate response setting status.loggedIn to true.', async () => {
     wrapper.vm.$data.username = 'mario';
-    wrapper.vm.$data.password = 'password';
+    wrapper.vm.$data.password = 'password112';
     await flush();
     wrapper.find('button').trigger('submit');
     await flush();
@@ -101,7 +101,7 @@ describe('Login.vue', () => {
 
   it('after an unsuccessful authenticate response status.loggedIn should be false.', async () => {
     wrapper.vm.$data.username = 'mario';
-    wrapper.vm.$data.password = 'password';
+    wrapper.vm.$data.password = 'password112';
     await flush();
     wrapper.find('button').trigger('submit');
     await flush();
@@ -125,7 +125,7 @@ describe('Login.vue', () => {
 
   it('after a successful login the user should be redirected to home', async () => {
     wrapper.vm.$data.username = 'mario';
-    wrapper.vm.$data.password = 'password';
+    wrapper.vm.$data.password = 'password112';
     await flush();
     wrapper.find('button').trigger('submit');
     await flush();
@@ -149,7 +149,7 @@ describe('Login.vue', () => {
 
   it('after a successful login the user should receive a successful login notification', async () => {
     wrapper.vm.$data.username = 'mario';
-    wrapper.vm.$data.password = 'password';
+    wrapper.vm.$data.password = 'password112';
     await flush();
     wrapper.find('button').trigger('submit');
     await flush();
@@ -173,7 +173,7 @@ describe('Login.vue', () => {
 
   it('after an unsuccessful authenticate response the user should receive a unsuccessful login notification', async () => {
     wrapper.vm.$data.username = 'mario';
-    wrapper.vm.$data.password = 'password';
+    wrapper.vm.$data.password = 'password112';
     await flush();
     wrapper.find('button').trigger('submit');
     await flush();
