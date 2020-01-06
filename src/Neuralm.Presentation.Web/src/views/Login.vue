@@ -11,7 +11,7 @@
             <v-text-field-with-validation rules="required|min:3" v-model="username" label="Username" autocomplete="off"/>
           </div>
           <div class="form-group">
-            <v-text-field-with-validation rules="required|min:6" v-model="password" label="Password" type="password"/>
+            <v-text-field-with-validation rules="required|min:9" v-model="password" label="Password" type="password"/>
           </div>
           <div class="form-group">
             <button id="loginBtn" class="btn btn-primary" :disabled="!username && !password">Login</button>
@@ -31,7 +31,7 @@ import User from '../models/User';
 import AuthenticateRequest from '../messages/requests/AuthenticateRequest';
 import AuthenticateResponse from '../messages/responses/AuthenticateResponse';
 import { ValidationObserver } from 'vee-validate';
-import ComponentLoader from '@/helpers/ComponentLoader';
+import ComponentLoader from '../helpers/ComponentLoader';
 
 @Component({
   components: {
