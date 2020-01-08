@@ -7,7 +7,7 @@ services:
         depends_on: 
             - "messagequeue"
         ports:
-            - "80:80"
+            - "3333:80"
         networks:
             - neuralm-network
         image: glovali/web:latest
