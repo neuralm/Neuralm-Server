@@ -7,9 +7,10 @@ services:
         depends_on: 
             - "messagequeue"
         ports:
-            - "80:80"
+            - "3333:80"
         networks:
             - neuralm-network
+        image: glovali/web:latest
     messagequeue:
         build: 
             context: .
@@ -19,6 +20,7 @@ services:
             - "5001:5001"
         networks:
             - neuralm-network
+        image: glovali/messagequeue:latest
     registryservice:
         build: 
             context: .
@@ -32,6 +34,7 @@ services:
             WAIT_HOSTS: messagequeue:5001, registrydb:1433
         networks:
             - neuralm-network
+        image: glovali/registryservice:latest
     userservice:
         build: 
             context: .
@@ -45,6 +48,7 @@ services:
             WAIT_HOSTS: userdb:1433
         networks:
             - neuralm-network
+        image: glovali/userservice:latest
     trainingroomservice:
         build: 
             context: .
@@ -58,6 +62,7 @@ services:
             WAIT_HOSTS: trainingroomdb:1433
         networks:
             - neuralm-network
+        image: glovali/trainingroomservice:latest
     userdb:
         image: "mcr.microsoft.com/mssql/server"
         environment:
