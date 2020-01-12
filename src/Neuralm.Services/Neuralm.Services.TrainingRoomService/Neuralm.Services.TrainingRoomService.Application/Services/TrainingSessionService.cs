@@ -82,13 +82,12 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "User is not authorized.");
             if (trainingSession.EndedTimestamp != default)
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training session has ended and can not be used any more.");
-            
+            TrainingRoomSettings trainingRoomSettings = trainingSession.TrainingRoom.TrainingRoomSettings;
             // if the list is empty then get new ones from the training room
             if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.Evaluated) == 0)
             {
                 if (trainingSession.TrainingRoom.Generation == 0)
                 {
-                    TrainingRoomSettings trainingRoomSettings = trainingSession.TrainingRoom.TrainingRoomSettings;
                     for (int i = 0; i < trainingRoomSettings.OrganismCount; i++)
                     {
                         Organism organism = new Organism(trainingRoomSettings, trainingSession.TrainingRoom.GetInnovationNumber) { Leased = true };
@@ -111,7 +110,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                 trainingSession.LeasedOrganisms.AddRange(newLeasedOrganisms);
             }
 
-            if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.Evaluated) < getOrganismsRequest.Amount)
+            if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.Evaluated) < getOrganismsRequest.Amount && getOrganismsRequest.Amount < trainingRoomSettings.OrganismCount)
                 message = "The requested amount of organisms are not all available. The training room is close to a new generation.";
 
             if (message.StartsWith("First generation;"))
@@ -174,6 +173,8 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             {
                 trainingSession.TrainingRoom.PostScore(leasedOrganism.Organism, postOrganismsScoreRequest.OrganismScores.Find(o => o.Key == leasedOrganism.OrganismId).Value);
             }
+
+            await _trainingSessionRepository.SaveChangesAsync();
 
             string message = "Successfully updated the organisms scores.";
             if (trainingSession.TrainingRoom.Species.SelectMany(p => p.Organisms).All(lo => lo.Evaluated))

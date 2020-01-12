@@ -111,7 +111,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             {
                 if (!species.IsSameSpecies(organism, TrainingRoomSettings))
                     continue;
-                species.Organisms.Add(organism);
+                species.AddOrganism(organism);
                 return;
             }
 
@@ -335,6 +335,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         {
             // Gets a random organism as child.
             Organism child = species.GetRandomOrganism(Generation, TrainingRoomSettings);
+            Organism temp;
 
             // If the random value is lower than the training room settings cross over chance,
             // perform a cross over. Otherwise, clone the child.
@@ -347,24 +348,31 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                     : species.GetRandomOrganism(Generation, TrainingRoomSettings);
 
                 // Cross over the two organisms with the training room settings.
-                child = child.Crossover(parent2, TrainingRoomSettings);
+                temp = child.Crossover(parent2, TrainingRoomSettings);
             }
             else
             {
                 // Clone the current child.
-                child = child.Clone(TrainingRoomSettings);
+                temp = child.Clone(TrainingRoomSettings);
 
                 // Increment generation, crossover does that automatically, but if no crossover happens we need to do it here.
-                child.Generation++;
+                temp.Generation++;
             }
 
             // If the random value is lower than the training room settings mutation chance,
             // mutate the child with the training room settings.
             if (TrainingRoomSettings.Random.NextDouble() < TrainingRoomSettings.MutationChance)
-                child.Mutate(TrainingRoomSettings, GetAndIncreaseNodeId, GetInnovationNumber);
+                temp.Mutate(TrainingRoomSettings, GetAndIncreaseNodeId, GetInnovationNumber);
 
             // Return the child.
-            return child;
+            return temp;
+        }
+
+        public override string ToString()
+        {
+            return
+                $"Id: {Id}, OwnerId: {OwnerId}, AuthorizedTrainers: {AuthorizedTrainers.Count}, TrainingSessions: {TrainingSessions}, Species: {Species.Count}, " +
+                $"Name: {Name}, Generation: {Generation}, HighestInnovationNumber: {HighestInnovationNumber}, Enabled: {Enabled}";
         }
     }
 }

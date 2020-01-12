@@ -53,6 +53,11 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 return (OrganismId.GetHashCode() * 397) ^ InputNodeId.GetHashCode();
             }
         }
+
+        public override string ToString()
+        {
+            return $"OrganismId: {OrganismId}, InputNodeId: {InputNodeId}";
+        }
     }
 
     public class OrganismOutputNode : IEquatable<OrganismOutputNode>, IEntity
@@ -103,6 +108,11 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             {
                 return (OrganismId.GetHashCode() * 397) ^ OutputNodeId.GetHashCode();
             }
+        }
+
+        public override string ToString()
+        {
+            return $"OrganismId: {OrganismId}, OutputNodeId: {OutputNodeId}";
         }
     }
 }

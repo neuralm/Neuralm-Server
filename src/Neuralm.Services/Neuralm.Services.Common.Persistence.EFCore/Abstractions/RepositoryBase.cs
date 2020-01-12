@@ -107,7 +107,6 @@ namespace Neuralm.Services.Common.Persistence.EFCore.Abstractions
             {
                 Console.WriteLine(new SavingChangesFailedException("The changes failed to save.", ex));
             }
-
             return saveSuccess;
         }
 

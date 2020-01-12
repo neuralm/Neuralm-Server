@@ -135,12 +135,12 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
+                    SpeciesId = table.Column<Guid>(nullable: false),
                     Score = table.Column<double>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Generation = table.Column<long>(nullable: false),
                     Leased = table.Column<bool>(nullable: false),
-                    Evaluated = table.Column<bool>(nullable: false),
-                    SpeciesId = table.Column<Guid>(nullable: true)
+                    Evaluated = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -181,7 +181,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    OrganismId = table.Column<Guid>(nullable: false),
+                    OrganismId = table.Column<Guid>(nullable: true),
                     LeaseStart = table.Column<DateTime>(nullable: false),
                     LeaseEnd = table.Column<DateTime>(nullable: false),
                     TrainingSessionId = table.Column<Guid>(nullable: false)
@@ -259,7 +259,8 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                 name: "IX_LeasedOrganism_OrganismId",
                 table: "LeasedOrganism",
                 column: "OrganismId",
-                unique: true);
+                unique: true,
+                filter: "[OrganismId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LeasedOrganism_TrainingSessionId",

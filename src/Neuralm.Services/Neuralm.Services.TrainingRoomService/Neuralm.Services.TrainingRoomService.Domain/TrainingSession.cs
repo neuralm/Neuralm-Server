@@ -74,5 +74,12 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         {
             EndedTimestamp = DateTime.UtcNow;
         }
+
+        public override string ToString()
+        {
+            return
+                $"Id: {Id}, StartedTimestamp: {StartedTimestamp}, EndedTimestamp: {EndedTimestamp}, UserId: {UserId}, TrainingRoomId: {TrainingRoomId}, " +
+                $"LeasedOrganisms: {LeasedOrganisms.Count}";
+        }
     }
 }

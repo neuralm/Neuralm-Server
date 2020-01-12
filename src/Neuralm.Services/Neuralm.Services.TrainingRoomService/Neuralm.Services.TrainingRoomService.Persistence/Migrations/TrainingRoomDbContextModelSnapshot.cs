@@ -15,7 +15,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.0.0")
+                .HasAnnotation("ProductVersion", "3.1.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -123,7 +123,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                     b.Property<double>("Score")
                         .HasColumnType("float");
 
-                    b.Property<Guid?>("SpeciesId")
+                    b.Property<Guid>("SpeciesId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -275,7 +275,8 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                     b.HasOne("Neuralm.Services.TrainingRoomService.Domain.Species", null)
                         .WithMany("Organisms")
                         .HasForeignKey("SpeciesId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Neuralm.Services.TrainingRoomService.Domain.OrganismInputNode", b =>

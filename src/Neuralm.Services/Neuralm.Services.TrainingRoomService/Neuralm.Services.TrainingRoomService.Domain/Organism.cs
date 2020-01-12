@@ -25,6 +25,11 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         public Guid Id { get; private set; }
 
         /// <summary>
+        /// Gets and sets the species id.
+        /// </summary>
+        public Guid SpeciesId { get; set; }
+
+        /// <summary>
         /// Gets and sets the list of inputs.
         /// </summary>
         public virtual List<OrganismInputNode> Inputs { get; set; }
@@ -236,11 +241,11 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             // Clears the temporary child genes list for re-use.
             _childGenes.Clear();
 
-            // Copies the organisms from parent2.
-            List<ConnectionGene> parent2 = new List<ConnectionGene>(parent2Organism.ConnectionGenes);
-
             // Pre-generates a child id for creating connection genes.
             Guid childId = Guid.NewGuid();
+
+            // Copies the organisms from parent2.
+            List<ConnectionGene> parent2 = parent2Organism.ConnectionGenes.Select(gene => gene.Clone(childId)).ToList();
 
             foreach (ConnectionGene gene in ConnectionGenes)
             {
@@ -607,6 +612,14 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             return randomNext(name.Length) == 0
                 ? name + GenerateName(randomNext)
                 : name + Consonants[randomNext(Consonants.Length)];
+        }
+
+        public override string ToString()
+        {
+            return
+                $"Id: {Id}, SpeciesId: {SpeciesId}, Generation: {Generation}, Score: {Score}, Inputs: {Inputs.Count}, " +
+                $" Outputs: {Outputs.Count}, ConnectionGenes: {ConnectionGenes.Count}, Name: {Name}, " +
+                $"Leased: {Leased}, Evaluated: {Evaluated}";
         }
     }
 }

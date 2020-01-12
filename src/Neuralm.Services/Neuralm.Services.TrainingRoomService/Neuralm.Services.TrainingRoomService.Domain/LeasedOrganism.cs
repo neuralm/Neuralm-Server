@@ -60,5 +60,10 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             LeaseStart = DateTime.UtcNow;
             LeaseEnd = DateTime.UtcNow.AddHours(2);
         }
+
+        public override string ToString()
+        {
+            return $"Id: {Id}, OrganismId: {OrganismId}, TrainingSessionId: {TrainingSessionId}, LeaseStart: {LeaseStart}, LeaseEnd: {LeaseEnd}";
+        }
     }
 }

@@ -48,6 +48,9 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             // Generates a new guid for the species, this is needed so EF can set the foreign shadow key: SpeciesId, on Organism.
             Id = Guid.NewGuid();
 
+            // Sets the species id for the organism.
+            organism.SpeciesId = Id;
+            
             // Adds the organism to the species.
             Organisms = new List<Organism> { organism };
             
@@ -117,7 +120,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             int organismsToSurvive = (int)Math.Ceiling(Organisms.Count * topAmountToSurvive);
 
             // Sets the current organisms to a certain amount of the top organisms that have been sorted before.
-            Organisms = Organisms.Take(organismsToSurvive).ToList();
+            Organisms.RemoveRange(organismsToSurvive - 1, Organisms.Count - organismsToSurvive);
         }
 
         /// <summary>
@@ -139,6 +142,22 @@ namespace Neuralm.Services.TrainingRoomService.Domain
 
             // Should never happen!
             throw new Exception($"The organisms does not contain a organism at the generation: {generation}");
+        }
+
+        /// <summary>
+        /// Adds the organism to the list of organisms and sets it species id.
+        /// </summary>
+        /// <param name="organism">The organism to add.</param>
+        internal void AddOrganism(Organism organism)
+        {
+            organism.SpeciesId = Id;
+            Organisms.Add(organism);
+        }
+
+        public override string ToString()
+        {
+            return
+                $"Id: {Id}, Organisms: {Organisms.Count}, SpeciesScore: {SpeciesScore}, TrainingRoomId: {TrainingRoomId}";
         }
     }
 }
