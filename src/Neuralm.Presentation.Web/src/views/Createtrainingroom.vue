@@ -21,13 +21,13 @@
                 <v-divider></v-divider>
                 <v-row>
                   <v-col>
-                    <v-text-field-with-validation rules="required" v-model="trainingroom.trainingRoomSettings.organismCount" label="OrganismCount" type="number"/>
+                    <v-text-field-with-validation rules="required|max_value:100|min_value:10" v-model="trainingroom.trainingRoomSettings.organismCount" label="OrganismCount" type="number"/>
                   </v-col>
                   <v-col>
-                    <v-text-field-with-validation rules="required" v-model="trainingroom.trainingRoomSettings.inputCount" label="InputCount" type="number"/>
+                    <v-text-field-with-validation rules="required" v-model="trainingroom.trainingRoomSettings.inputCount" label="InputCount" type="number" disabled/>
                   </v-col>
                   <v-col>
-                    <v-text-field-with-validation rules="required" v-model="trainingroom.trainingRoomSettings.outputCount" label="OutputCount" type="number"/>
+                    <v-text-field-with-validation rules="required" v-model="trainingroom.trainingRoomSettings.outputCount" label="OutputCount" type="number" disabled/>
                   </v-col>
                 </v-row>
                 <v-row>
