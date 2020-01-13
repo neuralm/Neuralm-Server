@@ -1,5 +1,5 @@
 <template>
-  <v-container class="fill-height" fluid>
+  <v-container class="fill-height" fluid style="margin-bottom: 75px;">
     <v-row align="center" justify="center">
       <v-col cols="12" sm="8" md="8">
         <ValidationObserver v-slot="{ handleSubmit }">
