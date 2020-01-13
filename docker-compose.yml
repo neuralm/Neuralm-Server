@@ -5,7 +5,7 @@ services:
             context: .
             dockerfile: neuralm-web.DockerFile
         environment:
-            - VUE_APP_MESSAGEQUEUE_HOST: ${VUE_APP_MESSAGEQUEUE_HOST}
+            - VUE_APP_MESSAGEQUEUE_HOST: "${VUE_APP_MESSAGEQUEUE_HOST}"
             - VUE_APP_MESSAGEQUEUE_PORT: ${VUE_APP_MESSAGEQUEUE_PORT}
         depends_on: 
             - "messagequeue"
