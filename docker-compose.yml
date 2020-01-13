@@ -69,21 +69,21 @@ services:
     userdb:
         image: "mcr.microsoft.com/mssql/server:2019-CU1-ubuntu-16.04"
         environment:
-            SA_PASSWORD: "Your_password123"
+            SA_PASSWORD: ${USER_DB_SA_PASSWORD}
             ACCEPT_EULA: "Y"
         networks:
             - neuralm-network
     registrydb:
         image: "mcr.microsoft.com/mssql/server:2019-CU1-ubuntu-16.04"
         environment:
-            SA_PASSWORD: "Your_password123"
+            SA_PASSWORD: ${REGISTRY_DB_SA_PASSWORD}
             ACCEPT_EULA: "Y"
         networks:
             - neuralm-network
     trainingroomdb:
         image: "mcr.microsoft.com/mssql/server:2019-CU1-ubuntu-16.04"
         environment:
-            SA_PASSWORD: "Your_password123"
+            SA_PASSWORD: ${TRAININGROOM_DB_SA_PASSWORD}
             ACCEPT_EULA: "Y"
         networks:
             - neuralm-network
