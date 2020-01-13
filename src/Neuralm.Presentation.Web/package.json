@@ -9,9 +9,11 @@
     "test:unit": "node_modules/.bin/vue-cli-service test:unit --coverage"
   },
   "dependencies": {
+    "@types/dotenv": "^8.2.0",
     "@types/vue": "^2.0.0",
     "axios": "^0.19.0",
     "core-js": "^2.6.11",
+    "dotenv": "^8.2.0",
     "typeface-nunito": "0.0.72",
     "vee-validate": "^3.2.1",
     "vue": "^2.6.11",

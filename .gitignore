@@ -346,3 +346,7 @@ src/Neuralm.Presentation.CLI/appSettings.json
 
 # Exclude certificate pfx
 *.pfx
+
+# Exlude env files but keep example
+src/Neuralm.Presentation.Web/.env.*
+!src/Neuralm.Presentation.Web/.env.EXAMPLE

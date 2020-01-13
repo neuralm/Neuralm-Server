@@ -1,6 +1,9 @@
 import Vue from 'vue';
 import App from './App.vue';
 
+// Config
+import { HOST, PORT } from './config';
+
 // Plugins
 import vuetify from '@/plugins/vuetify';
 import snotify from '@/plugins/vuesnotify';
@@ -41,7 +44,7 @@ import { IRootState } from './interfaces/IRootState';
 Vue.config.productionTip = false;
 const messageSerializer: IMessageSerializer = new JsonMessageSerializer();
 const messageProcessor: IMessageProcessor = new MessageProcessor();
-const url: string = 'ws://localhost:5000/neuralm';
+const url: string = `ws://${HOST}:${PORT}/neuralm`;
 const wsNetworkConnector: INetworkConnector = new WSNetworkConnector(messageSerializer, messageProcessor, url);
 wsNetworkConnector.connectAsync().then((_) => {
   wsNetworkConnector.start();
