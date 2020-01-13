@@ -4,9 +4,9 @@ services:
         build: 
             context: .
             dockerfile: neuralm-web.DockerFile
-        environment:
-            VUE_APP_MESSAGEQUEUE_HOST: ${VUE_APP_MESSAGEQUEUE_HOST}
-            VUE_APP_MESSAGEQUEUE_PORT: ${VUE_APP_MESSAGEQUEUE_PORT}
+            args:
+                - VUE_APP_MESSAGEQUEUE_HOST=${VUE_APP_MESSAGEQUEUE_HOST}
+                - VUE_APP_MESSAGEQUEUE_PORT=${VUE_APP_MESSAGEQUEUE_PORT}
         depends_on: 
             - "messagequeue"
         ports:
@@ -67,21 +67,21 @@ services:
             - neuralm-network
         image: glovali/trainingroomservice:latest
     userdb:
-        image: "mcr.microsoft.com/mssql/server"
+        image: "mcr.microsoft.com/mssql/server:2019-CU1-ubuntu-16.04"
         environment:
             SA_PASSWORD: "Your_password123"
             ACCEPT_EULA: "Y"
         networks:
             - neuralm-network
     registrydb:
-        image: "mcr.microsoft.com/mssql/server"
+        image: "mcr.microsoft.com/mssql/server:2019-CU1-ubuntu-16.04"
         environment:
             SA_PASSWORD: "Your_password123"
             ACCEPT_EULA: "Y"
         networks:
             - neuralm-network
     trainingroomdb:
-        image: "mcr.microsoft.com/mssql/server"
+        image: "mcr.microsoft.com/mssql/server:2019-CU1-ubuntu-16.04"
         environment:
             SA_PASSWORD: "Your_password123"
             ACCEPT_EULA: "Y"
