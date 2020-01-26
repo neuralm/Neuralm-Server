@@ -12,6 +12,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Validators
         /// <inheritdoc cref="IEntityValidator{T}.Validate(T)"/>
         public bool Validate(TrainingRoomSettings entity)
         {
+            // TODO: determine the limits for each parameter.
             throw new NotImplementedException();
         }
     }

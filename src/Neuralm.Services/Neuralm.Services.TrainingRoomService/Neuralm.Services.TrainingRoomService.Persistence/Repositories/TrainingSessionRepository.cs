@@ -27,7 +27,11 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
         /// </summary>
         /// <param name="dbContext">The database context.</param>
         /// <param name="entityValidator">The entity validator.</param>
-        public TrainingSessionRepository(TrainingRoomDbContext dbContext, IEntityValidator<TrainingSession> entityValidator) : base(dbContext, entityValidator)
+        /// <param name="logger">The logger.</param>
+        public TrainingSessionRepository(
+            TrainingRoomDbContext dbContext, 
+            IEntityValidator<TrainingSession> entityValidator, 
+            ILogger<TrainingRoomDbContext> logger) : base(dbContext, entityValidator, logger)
         {
 
         }
@@ -52,7 +56,8 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
             }
             catch (Exception ex)
             {
-                Console.WriteLine(new CreatingEntityFailedException($"The entity of type {typeof(TrainingSession).Name} could not be created.", ex));
+                CreatingEntityFailedException creatingEntityFailedException = new CreatingEntityFailedException($"The entity of type {typeof(TrainingSession).Name} could not be created.", ex);
+                Logger.LogError(creatingEntityFailedException, creatingEntityFailedException.Message);
             }
             return (success: saveSuccess, id: entity.Id);
         }
@@ -99,7 +104,8 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
             }
             catch (Exception ex)
             {
-                Console.WriteLine(new CreatingEntityFailedException($"The entity of type {typeof(TrainingSession).Name} could not be created.", ex));
+                CreatingEntityFailedException creatingEntityFailedException = new CreatingEntityFailedException($"The entity of type {typeof(TrainingSession).Name} could not be created.", ex);
+                Logger.LogError(creatingEntityFailedException, creatingEntityFailedException.Message);
             }
         }
 
@@ -145,8 +151,8 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
                 {
                     if (!(change.Entity is IEntity item))
                         throw new NullReferenceException($"Entity: {change}");
-                    Console.WriteLine($"{change.Entity.GetType().Name} {change.State}: {item.Id}");
-                    Console.WriteLine(change.Entity.ToString());
+                    Logger.LogInformation($"{change.Entity.GetType().Name} {change.State}: {item.Id}");
+                    Logger.LogInformation(change.Entity.ToString());
                     switch (change.State)
                     {
                         case EntityState.Added:
@@ -161,7 +167,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
                                         continue;
                                     string originalString = original is null ? "NULL" : original.ToString();
                                     string currentString = current is null ? "NULL" : current.ToString();
-                                    Console.WriteLine($"\t{property.Name}: {originalString} --> {currentString}");
+                                    Logger.LogInformation($"\t{property.Name}: {originalString} --> {currentString}");
                                 }
                                 break;
                             }
@@ -179,7 +185,8 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
             }
             catch (DbUpdateException ex)
             {
-                Console.WriteLine(new CreatingEntityFailedException($"The entity of type {typeof(TrainingSession).Name} could not be created.", ex));
+                CreatingEntityFailedException creatingEntityFailedException = new CreatingEntityFailedException($"The entity of type {typeof(TrainingSession).Name} could not be created.", ex);
+                Logger.LogError(creatingEntityFailedException, creatingEntityFailedException.Message);
             }
         }
     }

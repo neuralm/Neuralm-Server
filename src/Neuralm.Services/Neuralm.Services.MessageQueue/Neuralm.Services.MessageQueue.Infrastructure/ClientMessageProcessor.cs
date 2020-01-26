@@ -1,15 +1,15 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Exceptions;
 using Neuralm.Services.Common.Infrastructure.Networking;
 using Neuralm.Services.Common.Messages.Interfaces;
 using Neuralm.Services.MessageQueue.Application.Configurations;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
-using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Neuralm.Services.Common.Exceptions;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure
 {
@@ -21,6 +21,8 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         private readonly IMessageSerializer _messageSerializer;
         private readonly IServiceMessageProcessor _serviceMessageProcessor;
         private readonly IClientMessageTypeCache _messageTypeCache;
+        private readonly ILogger<ClientMessageProcessor> _clientMessageProcessorLogger;
+        private readonly ILogger<WSNetworkConnector> _wsNetworkConnectorLogger;
         private readonly IMessageToServiceMapper _messageToServiceMapper;
         private readonly TcpListener _tcpListener;
 
@@ -32,17 +34,23 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         /// <param name="messageQueueConfigurationOptions">The message queue configuration options.</param>
         /// <param name="serviceMessageProcessor">The service message processor.</param>
         /// <param name="messageTypeCache">The message type cache.</param>
+        /// <param name="clientMessageProcessorLogger">The client message processor logger.</param>
+        /// <param name="wsNetworkConnectorLogger">The websocket network connector logger.</param>
         public ClientMessageProcessor(
             IMessageToServiceMapper messageToServiceMapper, 
             IMessageSerializer messageSerializer,
             IOptions<MessageQueueConfiguration> messageQueueConfigurationOptions,
             IServiceMessageProcessor serviceMessageProcessor,
-            IClientMessageTypeCache messageTypeCache)
+            IClientMessageTypeCache messageTypeCache,
+            ILogger<ClientMessageProcessor> clientMessageProcessorLogger,
+            ILogger<WSNetworkConnector> wsNetworkConnectorLogger)
         {
             _messageToServiceMapper = messageToServiceMapper;
             _messageSerializer = messageSerializer;
             _serviceMessageProcessor = serviceMessageProcessor;
             _messageTypeCache = messageTypeCache;
+            _clientMessageProcessorLogger = clientMessageProcessorLogger;
+            _wsNetworkConnectorLogger = wsNetworkConnectorLogger;
             _tcpListener = new TcpListener(IPAddress.Any, messageQueueConfigurationOptions.Value.Port);
         }
 
@@ -55,7 +63,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
                 TcpClient tcpClient = await _tcpListener.AcceptTcpClientAsync();
                 _ = Task.Run(async () =>
                 {
-                    WSNetworkConnector networkConnector = new WSNetworkConnector(_messageTypeCache, _messageSerializer, this, tcpClient);
+                    WSNetworkConnector networkConnector = new WSNetworkConnector(_messageTypeCache, _messageSerializer, this, _wsNetworkConnectorLogger, tcpClient);
                     await networkConnector.StartHandshakeAsServerAsync();
                     networkConnector.Start();
                 }, cancellationToken);
@@ -67,7 +75,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         {
             return Task.Run(() =>
             {
-                Console.WriteLine($"Started Processing message: {message} from {networkConnector.EndPoint}");
+                _clientMessageProcessorLogger.LogInformation($"Started Processing message: {message} from {networkConnector.EndPoint}");
                 // TODO: Detect RateLimiting here
 
                 if (_messageToServiceMapper.MessageToServiceMap.TryGetValue(message.GetType(), out IServiceConnector serviceConnector))

@@ -6,6 +6,7 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Application.Interfaces;
 
 namespace Neuralm.Services.Common.Infrastructure.Networking
@@ -36,9 +37,15 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         /// <param name="messageTypeCache">The message type cache.</param>
         /// <param name="messageSerializer">The message serializer.</param>
         /// <param name="messageProcessor">The message processor.</param>
+        /// <param name="logger">The logger.</param>
         /// <param name="host">The host string.</param>
         /// <param name="port">The port.</param>
-        public SslTcpNetworkConnector(IMessageTypeCache messageTypeCache, IMessageSerializer messageSerializer, IMessageProcessor messageProcessor, string host, int port) : base(messageTypeCache, messageSerializer, messageProcessor)
+        public SslTcpNetworkConnector(
+            IMessageTypeCache messageTypeCache,
+            IMessageSerializer messageSerializer,
+            IMessageProcessor messageProcessor,
+            ILogger<SslTcpNetworkConnector> logger,
+            string host, int port) : base(messageTypeCache, messageSerializer, messageProcessor, logger)
         {
             _tcpClient = new TcpClient();
             _host = host;
@@ -51,8 +58,14 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         /// <param name="messageTypeCache">The message type cache.</param>
         /// <param name="messageSerializer">The message serializer.</param>
         /// <param name="messageProcessor">The message processor.</param>
+        /// <param name="logger">The logger.</param>
         /// <param name="tcpClient">The tcp client.</param>
-        public SslTcpNetworkConnector(IMessageTypeCache messageTypeCache, IMessageSerializer messageSerializer, IMessageProcessor messageProcessor, TcpClient tcpClient) : base(messageTypeCache, messageSerializer, messageProcessor)
+        public SslTcpNetworkConnector(
+            IMessageTypeCache messageTypeCache,
+            IMessageSerializer messageSerializer,
+            IMessageProcessor messageProcessor,
+            ILogger<SslTcpNetworkConnector> logger,
+            TcpClient tcpClient) : base(messageTypeCache, messageSerializer, messageProcessor, logger)
         {
             _tcpClient = tcpClient;
             _sslStream = new SslStream(_tcpClient.GetStream(), false);
@@ -80,8 +93,8 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
             }
             catch (AuthenticationException e)
             {
-                Console.WriteLine($"Authentication failed - closing the connection!\n\t{e.Message}");
-                Console.WriteLine("AuthenticateAsClient is cancelled.");
+                Logger.LogError($"Authentication failed - closing the connection!\n\t{e.Message}");
+                Logger.LogError("AuthenticateAsClient is cancelled.");
                 _tcpClient.Close();
                 Dispose();
                 await Task.FromCanceled(cancellationToken);
@@ -102,8 +115,8 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Authentication failed - closing the connection!\n\t{e.Message}");
-                Console.WriteLine($"AuthenticateAsServer is cancelled for: {_tcpClient.Client.RemoteEndPoint}.");
+                Logger.LogError($"Authentication failed - closing the connection!\n\t{e.Message}");
+                Logger.LogError($"AuthenticateAsServer is cancelled for: {_tcpClient.Client.RemoteEndPoint}.");
                 _tcpClient.Close();
                 Dispose();
                 await Task.FromCanceled(cancellationToken);
@@ -129,12 +142,12 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         /// <param name="chain">The x509 chain.</param>
         /// <param name="sslPolicyErrors">The ssl policy errors.</param>
         /// <returns>Returns <c>true</c> if <paramref name="sslPolicyErrors"/> equals <see cref="SslPolicyErrors.None"/>; otherwise, <c>false</c>.</returns>
-        private static bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        private bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
             if (sslPolicyErrors == SslPolicyErrors.None)
                 return true;
 
-            Console.WriteLine("Certificate error: {0}", sslPolicyErrors);
+            Logger.LogError("Certificate error: {0}", sslPolicyErrors);
 
             // Do not allow this client to communicate with unauthenticated servers.
             return false;

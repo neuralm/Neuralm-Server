@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Domain;
 using Neuralm.Services.Common.Persistence.EFCore.Abstractions;
 
@@ -17,7 +18,8 @@ namespace Neuralm.Services.Common.Persistence.EFCore.Repositories
         /// </summary>
         /// <param name="dbContext">The database context.</param>
         /// <param name="entityValidator">The entity validator.</param>
-        public Repository(TDbContext dbContext, IEntityValidator<TEntity> entityValidator) : base(dbContext, entityValidator)
+        /// <param name="logger">The logger.</param>
+        public Repository(TDbContext dbContext, IEntityValidator<TEntity> entityValidator, ILogger<TDbContext> logger) : base(dbContext, entityValidator, logger)
         {
 
         }

@@ -33,8 +33,7 @@ namespace Neuralm.Services.UserService.Mapping
         {
             serviceCollection.AddAutoMapper(Assembly.GetAssembly(typeof(UserStartupExtensions)));
 
-            if (StartupExtensions.IsDebug)
-                serviceCollection.AddLogging(p => p.AddDebug());
+            serviceCollection.AddLogging(p => p.AddConsole());
 
             serviceCollection.AddSingleton<IFactory<UserDbContext>, UserDatabaseFactory>();
 

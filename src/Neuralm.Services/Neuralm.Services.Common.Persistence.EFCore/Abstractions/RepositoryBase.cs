@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Neuralm.Services.Common.Persistence.EFCore.Abstractions
 {
@@ -21,16 +22,19 @@ namespace Neuralm.Services.Common.Persistence.EFCore.Abstractions
     {
         protected readonly TDbContext DbContext;
         protected readonly IEntityValidator<TEntity> EntityValidator;
+        protected readonly ILogger<TDbContext> Logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RepositoryBase{TEntity, TDbContext}"/> class.
         /// </summary>
         /// <param name="dbContext">The DbContext.</param>
         /// <param name="entityValidator">The entity validator.</param>
-        protected RepositoryBase(TDbContext dbContext, IEntityValidator<TEntity> entityValidator)
+        /// <param name="logger">The logger.</param>
+        protected RepositoryBase(TDbContext dbContext, IEntityValidator<TEntity> entityValidator, ILogger<TDbContext> logger)
         {
             DbContext = dbContext;
             EntityValidator = entityValidator;
+            Logger = logger;
         }
 
         /// <inheritdoc cref="IRepository{TEntity}.CreateAsync(TEntity)"/>
@@ -47,7 +51,8 @@ namespace Neuralm.Services.Common.Persistence.EFCore.Abstractions
             }
             catch (Exception ex)
             {
-                Console.WriteLine(new CreatingEntityFailedException($"The entity of type {typeof(TEntity).Name} could not be created.", ex));
+                CreatingEntityFailedException creatingEntityFailedException = new CreatingEntityFailedException($"The entity of type {typeof(TEntity).Name} could not be created.", ex);
+                Logger.LogError(creatingEntityFailedException, creatingEntityFailedException.Message);
             }
             return (success: saveSuccess, id: entity.Id);
         }
@@ -81,7 +86,8 @@ namespace Neuralm.Services.Common.Persistence.EFCore.Abstractions
             }
             catch (Exception ex)
             {
-                Console.WriteLine(new DeletingEntityFailedException($"The entity of type {typeof(TEntity).Name} could not be deleted.", ex));
+                DeletingEntityFailedException deletingEntityFailedException = new DeletingEntityFailedException($"The entity of type {typeof(TEntity).Name} could not be deleted.", ex);
+                Logger.LogError(deletingEntityFailedException, deletingEntityFailedException.Message);
             }
             return saveSuccess;
         }
@@ -105,7 +111,8 @@ namespace Neuralm.Services.Common.Persistence.EFCore.Abstractions
             }
             catch (Exception ex)
             {
-                Console.WriteLine(new SavingChangesFailedException("The changes failed to save.", ex));
+                SavingChangesFailedException savingChangesFailedException = new SavingChangesFailedException("The changes failed to save.", ex);
+                Logger.LogError(savingChangesFailedException, savingChangesFailedException.Message);
             }
             return saveSuccess;
         }
@@ -144,7 +151,8 @@ namespace Neuralm.Services.Common.Persistence.EFCore.Abstractions
             }
             catch (Exception ex)
             {
-                Console.WriteLine(new UpdatingEntityFailedException($"The entity of type {typeof(TEntity).Name} failed to update.", ex));
+                UpdatingEntityFailedException updatingEntityFailedException = new UpdatingEntityFailedException($"The entity of type {typeof(TEntity).Name} failed to update.", ex);
+                Logger.LogError(updatingEntityFailedException, updatingEntityFailedException.Message);
             }
             return (success: saveSuccess, id: entity.Id, updated: entry.State == EntityState.Modified);
         }

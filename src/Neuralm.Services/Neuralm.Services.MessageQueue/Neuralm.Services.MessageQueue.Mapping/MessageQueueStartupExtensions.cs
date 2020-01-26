@@ -31,8 +31,7 @@ namespace Neuralm.Services.MessageQueue.Mapping
         {
             serviceCollection.AddAutoMapper(Assembly.GetAssembly(typeof(MessageQueueStartupExtensions)));
 
-            if (StartupExtensions.IsDebug)
-                serviceCollection.AddLogging(p => p.AddDebug());
+            serviceCollection.AddLogging(p => p.AddConsole());
 
             serviceCollection.AddSingleton<IFactory<IMessageTypeCache, IEnumerable<Type>>, MessageTypeCacheFactory>();
             serviceCollection.AddSingleton<IClientMessageTypeCache, ClientMessageTypeCache>(serviceCollection =>

@@ -39,8 +39,7 @@ namespace Neuralm.Services.TrainingRoomService.Mapping
         {
             serviceCollection.AddAutoMapper(Assembly.GetAssembly(typeof(TrainingRoomStartupExtensions)));
 
-            if (StartupExtensions.IsDebug)
-                serviceCollection.AddLogging(p => p.AddDebug());
+            serviceCollection.AddLogging(p => p.AddConsole());
 
             serviceCollection.AddSingleton<IFactory<TrainingRoomDbContext>, TrainingRoomDatabaseFactory>();
 

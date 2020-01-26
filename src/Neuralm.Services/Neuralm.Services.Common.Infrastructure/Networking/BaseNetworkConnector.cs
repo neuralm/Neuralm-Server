@@ -4,11 +4,11 @@ using Neuralm.Services.Common.Domain;
 using Neuralm.Services.Common.Infrastructure.Messaging;
 using System;
 using System.Buffers;
-using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Neuralm.Services.Common.Infrastructure.Networking
 {
@@ -23,6 +23,7 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private int _minimumBufferSizeHint = 512;
         private const int AbsoluteMinimumBufferSizeHint = 512;
+        protected readonly ILogger<BaseNetworkConnector> Logger;
 
         /// <summary>
         /// Gets and sets a value indicating whether <see cref="Start"/> has ran.
@@ -54,10 +55,16 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         /// <param name="messageTypeCache">The message type cache.</param>
         /// <param name="messageSerializer">The message serializer.</param>
         /// <param name="messageProcessor">The message processor.</param>
-        protected BaseNetworkConnector(IMessageTypeCache messageTypeCache, IMessageSerializer messageSerializer, IMessageProcessor messageProcessor)
+        /// <param name="logger">The logger.</param>
+        protected BaseNetworkConnector(
+            IMessageTypeCache messageTypeCache,
+            IMessageSerializer messageSerializer,
+            IMessageProcessor messageProcessor,
+            ILogger<BaseNetworkConnector> logger)
         {
             _messageConstructor = new MessageConstructor(messageSerializer);
             _messageProcessor = messageProcessor ?? throw new ArgumentNullException(nameof(messageProcessor));
+            Logger = logger;
             _messageTypeCache = messageTypeCache ?? throw new ArgumentNullException(nameof(messageTypeCache));
         }
 
@@ -134,7 +141,7 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
                 do
                 {
                     bytesReceived = await ReceivePacketAsync(readBuffer, _cancellationTokenSource.Token);
-                    Debug.WriteLine($"Bytes received: {bytesReceived}");
+                    Logger.LogInformation($"Bytes received: {bytesReceived}");
                 } while (IsDataAvailable && bytesReceived == 0);
 
                 ReadOnlySequence<byte> buffer = new ReadOnlySequence<byte>(readBuffer.AsMemory(0, bytesReceived));
@@ -160,11 +167,11 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         {
             return Task.Run(async () =>
             {
-                Console.WriteLine("ProcessMessageTask started!");
+                Logger.LogInformation("ProcessMessageTask started!");
                 try
                 {
-                    Console.WriteLine($"ProcessMessageTask: Message type {typeName}");
-                    Console.WriteLine($"ProcessMessageTask: Message body {Encoding.UTF8.GetString(bodyBufferMemory.Span)}");
+                    Logger.LogInformation($"ProcessMessageTask: Message type {typeName}");
+                    Logger.LogInformation($"ProcessMessageTask: Message body {Encoding.UTF8.GetString(bodyBufferMemory.Span)}");
                     if (_messageTypeCache.TryGetMessageType(typeName, out Type type))
                     {
                         object rawMessage = _messageConstructor.DeconstructMessageBody(bodyBufferMemory, type);
@@ -178,12 +185,12 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    Logger.LogError(e, "ProcessMessageTask failed!");
                 }
                 finally
                 {
                     ArrayPool<byte>.Shared.Return(bodyBufferSource);
-                    Console.WriteLine("ProcessMessageTask finished!");
+                    Logger.LogInformation("ProcessMessageTask finished!");
                 }
             }, cancellationToken);
         }

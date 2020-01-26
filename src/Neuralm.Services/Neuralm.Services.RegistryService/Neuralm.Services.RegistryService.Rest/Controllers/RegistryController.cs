@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Neuralm.Services.Common.Rest;
 using Neuralm.Services.RegistryService.Application.Dtos;
 using Neuralm.Services.RegistryService.Application.Interfaces;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace Neuralm.Services.RegistryService.Rest.Controllers
 {

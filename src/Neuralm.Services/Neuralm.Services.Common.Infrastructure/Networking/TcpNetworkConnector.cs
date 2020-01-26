@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Application.Interfaces;
 
 namespace Neuralm.Services.Common.Infrastructure.Networking
@@ -32,9 +33,15 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         /// <param name="messageTypeCache">The message type cache.</param>
         /// <param name="messageSerializer">The message serializer.</param>
         /// <param name="messageProcessor">The message processor.</param>
+        /// <param name="logger">The logger.</param>
         /// <param name="host">The host string.</param>
         /// <param name="port">The port.</param>
-        public TcpNetworkConnector(IMessageTypeCache messageTypeCache, IMessageSerializer messageSerializer, IMessageProcessor messageProcessor, string host, int port) : base(messageTypeCache, messageSerializer, messageProcessor)
+        public TcpNetworkConnector(
+            IMessageTypeCache messageTypeCache,
+            IMessageSerializer messageSerializer,
+            IMessageProcessor messageProcessor,
+            ILogger<TcpNetworkConnector> logger,
+            string host, int port) : base(messageTypeCache, messageSerializer, messageProcessor, logger)
         {
             _host = host;
             _port = port;
@@ -47,8 +54,14 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         /// <param name="messageTypeCache">The message type cache.</param>
         /// <param name="messageSerializer">The message serializer.</param>
         /// <param name="messageProcessor">The message processor.</param>
+        /// <param name="logger">The logger.</param>
         /// <param name="tcpClient">The tcp client.</param>
-        public TcpNetworkConnector(IMessageTypeCache messageTypeCache, IMessageSerializer messageSerializer, IMessageProcessor messageProcessor, TcpClient tcpClient) : base(messageTypeCache, messageSerializer, messageProcessor)
+        public TcpNetworkConnector(
+            IMessageTypeCache messageTypeCache,
+            IMessageSerializer messageSerializer,
+            IMessageProcessor messageProcessor,
+            ILogger<TcpNetworkConnector> logger,
+            TcpClient tcpClient) : base(messageTypeCache, messageSerializer, messageProcessor, logger)
         {
             _tcpClient = tcpClient;
             _tcpClient.Client.NoDelay = true;

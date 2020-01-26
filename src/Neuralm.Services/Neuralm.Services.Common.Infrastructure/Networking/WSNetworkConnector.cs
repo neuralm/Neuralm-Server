@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Domain;
 
@@ -43,9 +44,15 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         /// <param name="messageTypeCache">The message type cache.</param>
         /// <param name="messageSerializer">The message serializer.</param>
         /// <param name="messageProcessor">The message processor.</param>
+        /// <param name="logger">The logger.</param>
         /// <param name="host">The host string.</param>
         /// <param name="port">The port.</param>
-        public WSNetworkConnector(IMessageTypeCache messageTypeCache, IMessageSerializer messageSerializer, IMessageProcessor messageProcessor, string host, int port) : base(messageTypeCache, messageSerializer, messageProcessor)
+        public WSNetworkConnector(
+            IMessageTypeCache messageTypeCache,
+            IMessageSerializer messageSerializer,
+            IMessageProcessor messageProcessor,
+            ILogger<WSNetworkConnector> logger,
+            string host, int port) : base(messageTypeCache, messageSerializer, messageProcessor, logger)
         {
             _host = host;
             _port = port;
@@ -58,8 +65,14 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         /// <param name="messageTypeCache">The message type cache.</param>
         /// <param name="messageSerializer">The message serializer.</param>
         /// <param name="messageProcessor">The message processor.</param>
+        /// <param name="logger">The logger.</param>
         /// <param name="tcpClient">The tcp client.</param>
-        public WSNetworkConnector(IMessageTypeCache messageTypeCache, IMessageSerializer messageSerializer, IMessageProcessor messageProcessor, TcpClient tcpClient) : base(messageTypeCache, messageSerializer, messageProcessor)
+        public WSNetworkConnector(
+            IMessageTypeCache messageTypeCache,
+            IMessageSerializer messageSerializer,
+            IMessageProcessor messageProcessor,
+            ILogger<WSNetworkConnector> logger, 
+            TcpClient tcpClient) : base(messageTypeCache, messageSerializer, messageProcessor, logger)
         {
             _tcpClient = tcpClient;
             _tcpClient.Client.NoDelay = true;
@@ -74,7 +87,7 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         {
             if (!IsConnected)
                 throw new NetworkConnectorIsNotYetConnectedException("Call ConnectAsync first.");
-            Console.WriteLine("Started handshake as server.");
+            Logger.LogInformation("Started handshake as server.");
             string secWebsocketAccept = string.Empty;
             using (StreamReader reader = new StreamReader(_networkStream, Encoding.UTF8, detectEncodingFromByteOrderMarks: false, bufferSize: 1, leaveOpen: true))
             {
@@ -83,7 +96,7 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
                 string requestLine = await reader.ReadLineAsync();
                 if (!requestLine.Equals("GET /neuralm HTTP/1.1"))
                 {
-                    Console.WriteLine("Request-Line was not valid.");
+                    Logger.LogError("Request-Line was not valid.");
                     Dispose();
                     return;
                 }
@@ -104,7 +117,7 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
 
             if (string.IsNullOrEmpty(secWebsocketAccept))
             {
-                Console.WriteLine("Sec-WebSocket-Key is not found.");
+                Logger.LogError("Sec-WebSocket-Key is not found.");
                 Dispose();
                 return;
             }
@@ -121,7 +134,7 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
 
             _webSocket = WebSocket.CreateFromStream(_networkStream, true, "neuralm", Timeout.InfiniteTimeSpan);
             _handshakeComplete = true;
-            Console.WriteLine("Finished handshake as server.");
+            Logger.LogInformation("Finished handshake as server.");
         }
 
         /// <summary>
@@ -133,7 +146,7 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
             if (!IsConnected)
                 throw new NetworkConnectorIsNotYetConnectedException("Call ConnectAsync first.");
 
-            Console.WriteLine("Started handshake as client.");
+            Logger.LogInformation("Started handshake as client.");
             await using (StreamWriter writer = new StreamWriter(_networkStream, Encoding.UTF8, bufferSize: 1, leaveOpen: true))
             {
                 // Write client handshake "Request-Line" format.
@@ -152,7 +165,7 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
                 string statusLine = await reader.ReadLineAsync();
                 if (!statusLine.Equals("HTTP/1.1 101 Switching Protocols"))
                 {
-                    Console.WriteLine("Status-Line was not valid.");
+                    Logger.LogError("Status-Line was not valid.");
                     Dispose();
                     return;
                 }
@@ -162,7 +175,7 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
             }
             _webSocket = WebSocket.CreateFromStream(_networkStream, false, "neuralm", Timeout.InfiniteTimeSpan);
             _handshakeComplete = true;
-            Console.WriteLine("Finished handshake as client.");
+            Logger.LogInformation("Finished handshake as client.");
         }
 
         /// <inheritdoc cref="BaseNetworkConnector.ConnectAsync"/>
