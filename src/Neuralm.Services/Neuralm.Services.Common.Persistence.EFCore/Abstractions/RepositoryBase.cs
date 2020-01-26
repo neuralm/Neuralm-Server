@@ -53,6 +53,7 @@ namespace Neuralm.Services.Common.Persistence.EFCore.Abstractions
             {
                 CreatingEntityFailedException creatingEntityFailedException = new CreatingEntityFailedException($"The entity of type {typeof(TEntity).Name} could not be created.", ex);
                 Logger.LogError(creatingEntityFailedException, creatingEntityFailedException.Message);
+                throw creatingEntityFailedException;
             }
             return (success: saveSuccess, id: entity.Id);
         }
@@ -88,6 +89,7 @@ namespace Neuralm.Services.Common.Persistence.EFCore.Abstractions
             {
                 DeletingEntityFailedException deletingEntityFailedException = new DeletingEntityFailedException($"The entity of type {typeof(TEntity).Name} could not be deleted.", ex);
                 Logger.LogError(deletingEntityFailedException, deletingEntityFailedException.Message);
+                throw deletingEntityFailedException;
             }
             return saveSuccess;
         }
@@ -113,6 +115,7 @@ namespace Neuralm.Services.Common.Persistence.EFCore.Abstractions
             {
                 SavingChangesFailedException savingChangesFailedException = new SavingChangesFailedException("The changes failed to save.", ex);
                 Logger.LogError(savingChangesFailedException, savingChangesFailedException.Message);
+                throw savingChangesFailedException;
             }
             return saveSuccess;
         }
@@ -153,6 +156,7 @@ namespace Neuralm.Services.Common.Persistence.EFCore.Abstractions
             {
                 UpdatingEntityFailedException updatingEntityFailedException = new UpdatingEntityFailedException($"The entity of type {typeof(TEntity).Name} failed to update.", ex);
                 Logger.LogError(updatingEntityFailedException, updatingEntityFailedException.Message);
+                throw updatingEntityFailedException;
             }
             return (success: saveSuccess, id: entity.Id, updated: entry.State == EntityState.Modified);
         }

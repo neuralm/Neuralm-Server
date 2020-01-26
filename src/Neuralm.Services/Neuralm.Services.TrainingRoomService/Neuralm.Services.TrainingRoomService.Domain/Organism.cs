@@ -126,7 +126,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         {
             Id = id;
             Generation = generation;
-            ConnectionGenes = connectionGenes;
+            ConnectionGenes = new List<ConnectionGene>(connectionGenes);
             if (connectionGenes.Any())
                 _maxInnovation = ConnectionGenes.Max(p => p.InnovationNumber);
             GenerateInputAndOutputNodes(trainingRoomSettings);
@@ -238,9 +238,6 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <returns>Returns a child organism based on the genes of this organism and the passed organism.</returns>
         public Organism Crossover(Organism parent2Organism, TrainingRoomSettings trainingRoomSettings)
         {
-            // Clears the temporary child genes list for re-use.
-            _childGenes.Clear();
-
             // Pre-generates a child id for creating connection genes.
             Guid childId = Guid.NewGuid();
 
@@ -251,8 +248,10 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             {
                 // Prepares a gene to remove and add.
                 ConnectionGene geneToRemove = default;
-                ConnectionGene geneToAdd = gene;
 
+                // Clone the gene to add with the new id.
+                ConnectionGene geneToAdd = gene.Clone(childId);
+                
                 // Tries to find a connection gene based on the current connection gene in the parent, and if not found, gives a default.
                 ConnectionGene gene2 = parent2Organism.ConnectionGenes.SingleOrDefault(gen => gen.InnovationNumber == gene.InnovationNumber);
 
@@ -263,11 +262,9 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                     geneToRemove = gene2;
 
                     // Depending on a random set the current gene or a random gene to add.
-                    geneToAdd = trainingRoomSettings.Random.NextDouble() < 0.5 ? gene : gene2;
+                    if (trainingRoomSettings.Random.NextDouble() > 0.5)
+                        geneToAdd = gene2.Clone(childId);
                 }
-
-                // Clone the gene to add with the new id.
-                geneToAdd = geneToAdd.Clone(childId);
 
                 // If the gene to remove is not default, remove it from its parent.
                 if (geneToRemove != default)
@@ -284,8 +281,14 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             // Add all remaining genes in the parent to the child genes.
             _childGenes.AddRange(parent2);
 
-            // Return a new organism with all new genes.
-            return new Organism(childId, trainingRoomSettings, Generation + 1, _childGenes);
+            // Create a new organism with all new genes.
+            Organism organism = new Organism(childId, trainingRoomSettings, Generation + 1, _childGenes);
+
+            // Clears the temporary child genes list for re-use.
+            _childGenes.Clear();
+
+            // Return the newly created organism.
+            return organism;
         }
 
         /// <summary>

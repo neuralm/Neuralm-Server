@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Application.Abstractions;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.TrainingRoomService.Application.Interfaces;
@@ -18,6 +19,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
     {
         private readonly IRepository<TrainingRoom> _trainingRoomRepository;
         private readonly IUserService _userService;
+        private readonly ILogger<TrainingSessionService> _logger;
         private readonly ITrainingSessionRepository _trainingSessionRepository;
 
         /// <summary>
@@ -27,15 +29,18 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
         /// <param name="trainingRoomRepository">The training room repository.</param>
         /// <param name="userService">The user service.</param>
         /// <param name="mapper">The mapper.</param>
+        /// <param name="logger">The logger.</param>
         public TrainingSessionService(
             ITrainingSessionRepository trainingSessionRepository,
             IRepository<TrainingRoom> trainingRoomRepository,
             IUserService userService,
-            IMapper mapper) : base(trainingSessionRepository, mapper)
+            IMapper mapper,
+            ILogger<TrainingSessionService> logger) : base(trainingSessionRepository, mapper)
         {
             _trainingSessionRepository = trainingSessionRepository;
             _trainingRoomRepository = trainingRoomRepository;
             _userService = userService;
+            _logger = logger;
         }
         
         /// <inheritdoc cref="ITrainingSessionService.StartTrainingSessionAsync(StartTrainingSessionRequest)"/>
@@ -175,16 +180,22 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             }
 
             await _trainingSessionRepository.SaveChangesAsync();
+            _logger.LogInformation("UPDATED ORGANISM SCORES!!!");
 
             string message = "Successfully updated the organisms scores.";
             if (trainingSession.TrainingRoom.Species.SelectMany(p => p.Organisms).All(lo => lo.Evaluated))
             {
+                trainingSession.LeasedOrganisms.Clear();
+                await _trainingSessionRepository.SaveChangesAsync();
+                _logger.LogInformation("CLEARED LEASED ORGANISMS AND SAVED CHANGES!!!");
+
                 message = trainingSession.TrainingRoom.EndGeneration()
                     ? "Successfully updated the organisms and advanced a generation!"
                     : "Successfully updated the organisms but failed to advance a generation!";
-                trainingSession.LeasedOrganisms.Clear();
+                await _trainingSessionRepository.SaveChangesAsync();
+                _logger.LogInformation("ENDED THE GENERATION!!!");
             }
-            await _trainingSessionRepository.UpdateOrganismsAsync(trainingSession);
+            //await _trainingSessionRepository.UpdateOrganismsAsync(trainingSession);
             return new PostOrganismsScoreResponse(postOrganismsScoreRequest.Id, message, true);
         }
     }

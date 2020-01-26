@@ -79,6 +79,9 @@ namespace Neuralm.Services.Common.Persistence.EFCore.Infrastructure
                 case "mysql":
                     optionsBuilder.UseMySql(connectionString);
                     break;
+                case "sqlite":
+                    optionsBuilder.UseSqlite(connectionString);
+                    break;
                 default:
                     optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString());
                     break;
