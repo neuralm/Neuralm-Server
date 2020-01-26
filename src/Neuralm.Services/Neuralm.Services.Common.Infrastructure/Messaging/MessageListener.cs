@@ -10,24 +10,24 @@ namespace Neuralm.Services.Common.Infrastructure.Messaging
     /// Represents the <see cref="MessageListener{T}"/> class.
     /// </summary>
     /// <typeparam name="TMessage">The type of message.</typeparam>
-    public sealed class MessageListener<TMessage> : IObserver, IDisposable
+    public abstract class MessageListener<TMessage> : IObserver, IDisposable
     {
-        private readonly AsyncConcurrentQueue<object> _messageQueue = new AsyncConcurrentQueue<object>();
-        private IDisposable _unsubscriber;
+        protected readonly AsyncConcurrentQueue<object> MessageQueue = new AsyncConcurrentQueue<object>();
+        protected IDisposable Unsubscriber;
 
         /// <summary>
         /// Subscribes the message listener to an <see cref="IObservable"/> provider.
         /// </summary>
         /// <param name="provider">The provider.</param>
-        public void Subscribe(IObservable provider)
+        public virtual void Subscribe(IObservable provider)
         {
-            _unsubscriber = provider.Subscribe(typeof(TMessage), this);
+            Unsubscriber = provider.Subscribe(typeof(TMessage), this);
         }
 
         /// <summary>
         /// Unsubscribes the message listener; i.e. disposes the subscription.
         /// </summary>
-        public void Unsubscribe()
+        public virtual void Unsubscribe()
         {
             Dispose();
         }
@@ -35,18 +35,15 @@ namespace Neuralm.Services.Common.Infrastructure.Messaging
         /// <summary>
         /// Method to call on error.
         /// </summary>
-        public void OnError()
-        {
-            Console.WriteLine($"{GetType().FullName}: OnError called.");
-        }
+        public abstract void OnError();
 
         /// <summary>
         /// Adds the message to the queue.
         /// </summary>
         /// <param name="value">The value; in this case the message.</param>
-        public void OnNext(object value)
+        public virtual void OnNext(object value)
         {
-            _messageQueue.Enqueue(value);
+            MessageQueue.Enqueue(value);
         }
 
         /// <summary>
@@ -54,17 +51,17 @@ namespace Neuralm.Services.Common.Infrastructure.Messaging
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Returns an awaitable <see cref="Task"/> with type parameter <see cref="TMessage"/>.</returns>
-        public async Task<TMessage> ReceiveMessageAsync(CancellationToken cancellationToken)
+        public virtual async Task<TMessage> ReceiveMessageAsync(CancellationToken cancellationToken)
         {
-            return (TMessage)await _messageQueue.DequeueAsync(cancellationToken);
+            return (TMessage)await MessageQueue.DequeueAsync(cancellationToken);
         }
 
         /// <summary>
         /// Disposed the subscription.
         /// </summary>
-        public void Dispose()
+        public virtual void Dispose()
         {
-            _unsubscriber?.Dispose();
+            Unsubscriber?.Dispose();
         }
     }
 }

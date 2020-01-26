@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Configurations;
@@ -17,13 +18,16 @@ namespace Neuralm.Services.Common.Application.Services
     {
         private readonly JwtSecurityTokenHandler _jwtSecurityTokenHandler;
         private readonly JwtConfiguration _jwtConfiguration;
+        private readonly ILogger<JwtAccessTokenService> _logger;
 
         /// <summary>
         /// Initializes an instance of the <see cref="JwtAccessTokenService"/> class.
         /// </summary>
         /// <param name="jwtConfigurationOptions">The options.</param>
-        public JwtAccessTokenService(IOptions<JwtConfiguration> jwtConfigurationOptions)
+        /// <param name="logger">The logger.</param>
+        public JwtAccessTokenService(IOptions<JwtConfiguration> jwtConfigurationOptions, ILogger<JwtAccessTokenService> logger)
         {
+            _logger = logger;
             _jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
             _jwtConfiguration = jwtConfigurationOptions.Value;
         }
@@ -69,8 +73,9 @@ namespace Neuralm.Services.Common.Application.Services
                 claimsPrincipal = _jwtSecurityTokenHandler.ValidateToken(accessToken, tokenValidationParameters, out SecurityToken validatedToken);
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "The validation token is invalid.");
                 claimsPrincipal = null;
                 return false;
             }

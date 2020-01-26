@@ -8,11 +8,13 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Application.Serializers;
 using Neuralm.Services.Common.Infrastructure;
 using Neuralm.Services.Common.Infrastructure.Networking;
 using Neuralm.Services.TrainingRoomService.Messages;
+using Microsoft.Extensions.Logging;
 
 namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
 {
@@ -25,6 +27,7 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
         public IMessageTypeCache MessageTypeCache { get; set; }
         public IFactory<IMessageTypeCache, IEnumerable<Type>> MessageTypeCacheFactory { get; set; }
         public string Host { get; set; }
+        public ILogger<WSNetworkConnector> Logger { get; private set; }
 
         [TestInitialize]
         public void Setup()
@@ -38,6 +41,9 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
                 typeof(RegisterRequest), typeof(CreateTrainingRoomRequest)
             };
             MessageTypeCache = MessageTypeCacheFactory.Create(types);
+            IServiceProvider serviceProvider = new ServiceCollection().AddLogging(builder => builder.AddConsole()).BuildServiceProvider();
+            ILoggerFactory factory = serviceProvider.GetService<ILoggerFactory>();
+            Logger = factory.CreateLogger<WSNetworkConnector>();
         }
 
         [TestMethod]
@@ -76,7 +82,7 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
                 Console.WriteLine("Accepted connection!");
                 _ = Task.Run(async () =>
                 {
-                    WSNetworkConnector networkConnector = new WSNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, tcpClient);
+                    WSNetworkConnector networkConnector = new WSNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Logger, tcpClient);
                     await networkConnector.StartHandshakeAsServerAsync();
                     networkConnector.Start();
                     Console.WriteLine("Started websocket network connector");
@@ -86,7 +92,7 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
 
         private async Task<WSNetworkConnector> StartClient(CancellationToken cancellationToken, int port)
         {
-            WSNetworkConnector wsNetworkConnector = new WSNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Host, port);
+            WSNetworkConnector wsNetworkConnector = new WSNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Logger, Host, port);
             await wsNetworkConnector.ConnectAsync(cancellationToken);
             await wsNetworkConnector.StartHandshakeAsClientAsync();
             wsNetworkConnector.Start();

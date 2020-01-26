@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Neuralm.Services.Common.Exceptions;
 using Neuralm.Services.Common.Mapping;
 using Neuralm.Services.MessageQueue.Application.Configurations;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
@@ -11,8 +12,6 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
-using Neuralm.Services.Common.Configurations;
-using Neuralm.Services.Common.Exceptions;
 
 namespace Neuralm.Services.MessageQueue.NeuralmMQ
 {

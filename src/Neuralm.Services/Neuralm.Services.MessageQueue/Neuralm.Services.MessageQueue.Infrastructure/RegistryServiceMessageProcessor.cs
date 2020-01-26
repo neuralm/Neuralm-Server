@@ -1,4 +1,5 @@
-﻿using Neuralm.Services.Common.Application.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Messages.Interfaces;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
 using System;
@@ -18,14 +19,17 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
     {
         private readonly ConcurrentDictionary<Type, MethodInfo> _messageToMethodMap = new ConcurrentDictionary<Type, MethodInfo>();
         private readonly IRegistryService _registryService;
+        private readonly ILogger<RegistryServiceMessageProcessor> _logger;
 
         /// <summary>
         /// Initializes an instance of the <see cref="RegistryServiceMessageProcessor"/> class.
         /// </summary>
         /// <param name="registryService">The registry service fetcher.</param>
-        public RegistryServiceMessageProcessor(IRegistryService registryService)
+        /// <param name="logger">The logger.</param>
+        public RegistryServiceMessageProcessor(IRegistryService registryService, ILogger<RegistryServiceMessageProcessor> logger)
         {
             _registryService = registryService;
+            _logger = logger;
             Type serviceType = registryService.GetType();
             foreach ((MethodInfo methodInfo, Type parameterType) in serviceType
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public)
@@ -40,13 +44,13 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         /// <inheritdoc cref="IMessageProcessor.ProcessMessageAsync(IMessage, INetworkConnector)"/>
         public Task ProcessMessageAsync(IMessage message, INetworkConnector networkConnector)
         {
-            Console.WriteLine($"Started processing RegistryService({networkConnector.EndPoint}) message.");
+            _logger.LogInformation($"Started processing RegistryService({networkConnector.EndPoint}) message.");
             if (!_messageToMethodMap.TryGetValue(message.GetType(), out MethodInfo methodInfo))
                 throw new ArgumentOutOfRangeException(nameof(message), $"Unknown Request message of type: {message.GetType().FullName}");
             return InvokeMethodAsync(message, methodInfo)
                 .ContinueWith((task) =>
                     {
-                        Console.WriteLine($"Finished processing RegistryService({networkConnector.EndPoint}) message {(task.IsCompletedSuccessfully ? "successfully" : "unsuccessfully.")}.");
+                        _logger.LogInformation($"Finished processing RegistryService({networkConnector.EndPoint}) message {(task.IsCompletedSuccessfully ? "successfully" : "unsuccessfully.")}.");
                         return task;
                     });
         }

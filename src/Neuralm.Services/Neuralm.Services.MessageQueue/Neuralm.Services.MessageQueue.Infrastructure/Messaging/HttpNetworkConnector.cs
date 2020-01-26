@@ -1,3 +1,8 @@
+using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Domain;
+using Neuralm.Services.Common.Exceptions;
+using Neuralm.Services.Common.Messages;
+using Neuralm.Services.Common.Messages.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,11 +14,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Neuralm.Services.Common.Application.Interfaces;
-using Neuralm.Services.Common.Domain;
-using Neuralm.Services.Common.Exceptions;
-using Neuralm.Services.Common.Messages;
-using Neuralm.Services.Common.Messages.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
 {
@@ -24,6 +25,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
     {
         private readonly IMessageSerializer _messageSerializer;
         private readonly IMessageProcessor _messageProcessor;
+        private readonly ILogger<HttpNetworkConnector> _logger;
         private readonly HttpClient _httpClient;
         
         /// <inheritdoc cref="INetworkConnector.EndPoint"/> 
@@ -42,14 +44,17 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
         /// <param name="messageProcessor">The message processor.</param>
         /// <param name="baseUrl">The base url for the network connector to send requests to.</param>
         /// <param name="accessTokenService">The access token service.</param>
+        /// <param name="logger">The logger.</param>
         public HttpNetworkConnector(
             IMessageSerializer messageSerializer, 
             IMessageProcessor messageProcessor, 
             Uri baseUrl, 
-            IAccessTokenService accessTokenService)
+            IAccessTokenService accessTokenService,
+            ILogger<HttpNetworkConnector> logger)
         {
             _messageSerializer = messageSerializer ?? throw new ArgumentNullException(nameof(messageSerializer));
             _messageProcessor = messageProcessor ?? throw new ArgumentNullException(nameof(messageProcessor));
+            _logger = logger;
             _httpClient = new HttpClient {BaseAddress = baseUrl};
             List<Claim> claims = new List<Claim>
             {
@@ -95,8 +100,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
                     }
                 };
                 HttpResponseMessage response = await _httpClient.SendAsync(httpRequestMessage, cancellationToken);
-                Console.Write($"REST RESPONSE: {await response.Content.ReadAsStringAsync()}");
-                Console.WriteLine();
+                _logger.LogInformation($"REST RESPONSE: {await response.Content.ReadAsStringAsync()}");
                 byte[] bytes = await response.Content.ReadAsByteArrayAsync();
                 object msg = null;
                 if (messageAttribute.OriginalMethod == "GetAll" || message is IPaginationRequest)
@@ -152,7 +156,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
                                 : "Unknown error."
                         };
                         await _messageProcessor.ProcessMessageAsync(errorResponse, this);
-                        Console.WriteLine($"REST API error: {errorResponse}");
+                        _logger.LogError($"REST API error: {errorResponse}");
                         break;
                     }
                 }
@@ -161,7 +165,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                _logger.LogError(e, "The HttpNetworkConnector failed to send a message.");
                 throw;
             }
         }

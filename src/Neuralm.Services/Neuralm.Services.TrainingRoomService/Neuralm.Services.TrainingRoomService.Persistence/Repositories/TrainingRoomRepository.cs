@@ -7,6 +7,7 @@ using Neuralm.Services.TrainingRoomService.Domain;
 using Neuralm.Services.TrainingRoomService.Persistence.Contexts;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
 {
@@ -20,7 +21,11 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
         /// </summary>
         /// <param name="dbContext">The database context.</param>
         /// <param name="entityValidator">The entity validator.</param>
-        public TrainingRoomRepository(TrainingRoomDbContext dbContext, IEntityValidator<TrainingRoom> entityValidator) : base(dbContext, entityValidator)
+        /// <param name="logger">The logger.</param>
+        public TrainingRoomRepository(
+            TrainingRoomDbContext dbContext,
+            IEntityValidator<TrainingRoom> entityValidator,
+            ILogger<TrainingRoomDbContext> logger) : base(dbContext, entityValidator, logger)
         {
 
         }
@@ -40,7 +45,8 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
            }
            catch (Exception ex)
            {
-               Console.WriteLine(new CreatingEntityFailedException($"The entity of type {typeof(TrainingRoom).Name} could not be created.", ex));
+               CreatingEntityFailedException creatingEntityFailedException = new CreatingEntityFailedException($"The entity of type {typeof(TrainingRoom).Name} could not be created.", ex);
+               Logger.LogError(creatingEntityFailedException, creatingEntityFailedException.Message);
            }
            return (saveSuccess, entity.Id);
        }

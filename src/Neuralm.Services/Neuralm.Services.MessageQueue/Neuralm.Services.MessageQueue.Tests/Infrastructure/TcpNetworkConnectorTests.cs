@@ -1,6 +1,13 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Application.Serializers;
+using Neuralm.Services.Common.Infrastructure;
+using Neuralm.Services.Common.Infrastructure.Networking;
 using Neuralm.Services.Common.Messages.Interfaces;
 using Neuralm.Services.MessageQueue.Tests.Mocks;
+using Neuralm.Services.TrainingRoomService.Messages;
 using Neuralm.Services.UserService.Messages;
 using System;
 using System.Collections.Generic;
@@ -8,11 +15,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Neuralm.Services.Common.Application.Interfaces;
-using Neuralm.Services.Common.Application.Serializers;
-using Neuralm.Services.Common.Infrastructure;
-using Neuralm.Services.Common.Infrastructure.Networking;
-using Neuralm.Services.TrainingRoomService.Messages;
 
 namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
 {
@@ -25,6 +27,7 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
         public IMessageTypeCache MessageTypeCache { get; set; }
         public IFactory<IMessageTypeCache, IEnumerable<Type>> MessageTypeCacheFactory { get; set; }
         public string Host { get; set; }
+        public ILogger<TcpNetworkConnector> Logger { get; set; }
 
         [TestInitialize]
         public void Setup()
@@ -38,6 +41,9 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
                 typeof(RegisterRequest), typeof(CreateTrainingRoomRequest)
             };
             MessageTypeCache = MessageTypeCacheFactory.Create(types);
+            IServiceProvider serviceProvider = new ServiceCollection().AddLogging(builder => builder.AddConsole()).BuildServiceProvider();
+            ILoggerFactory factory = serviceProvider.GetService<ILoggerFactory>();
+            Logger = factory.CreateLogger<TcpNetworkConnector>();
         }
 
         [TestMethod]
@@ -76,16 +82,17 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
                 Console.WriteLine("Accepted connection!");
                 _ = Task.Run(() =>
                 {
-                    TcpNetworkConnector networkConnector = new TcpNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, tcpClient);
+                    TcpNetworkConnector networkConnector = new TcpNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Logger, tcpClient);
                     networkConnector.Start();
                     Console.WriteLine("Started tcp network connector");
                 }, cancellationToken);
             }
         }
 
+
         private async Task<TcpNetworkConnector> StartClient(CancellationToken cancellationToken, int port)
         {
-            TcpNetworkConnector tcpNetworkConnector = new TcpNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Host, port);
+            TcpNetworkConnector tcpNetworkConnector = new TcpNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Logger, Host, port);
             await tcpNetworkConnector.ConnectAsync(cancellationToken);
             tcpNetworkConnector.Start();
             return tcpNetworkConnector;

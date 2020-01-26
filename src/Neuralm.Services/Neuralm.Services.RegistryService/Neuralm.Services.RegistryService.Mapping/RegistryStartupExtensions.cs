@@ -1,28 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Application.Serializers;
 using Neuralm.Services.Common.Application.Services;
+using Neuralm.Services.Common.Infrastructure;
 using Neuralm.Services.Common.Mapping;
 using Neuralm.Services.Common.Persistence;
+using Neuralm.Services.Common.Persistence.EFCore;
 using Neuralm.Services.Common.Persistence.EFCore.Repositories;
-using Neuralm.Services.RegistryService.Application.Interfaces;
+using Neuralm.Services.RegistryService.Application.Configurations;
 using Neuralm.Services.RegistryService.Domain;
+using Neuralm.Services.RegistryService.Infrastructure;
+using Neuralm.Services.RegistryService.Messages;
 using Neuralm.Services.RegistryService.Persistence.Contexts;
 using Neuralm.Services.RegistryService.Persistence.Infrastructure;
 using Neuralm.Services.RegistryService.Persistence.Validators;
+using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Neuralm.Services.Common.Application.Serializers;
-using Neuralm.Services.Common.Infrastructure;
-using Neuralm.Services.Common.Persistence.EFCore;
-using Neuralm.Services.RegistryService.Application.Configurations;
-using Neuralm.Services.RegistryService.Infrastructure;
-using Neuralm.Services.RegistryService.Messages;
 
 namespace Neuralm.Services.RegistryService.Mapping
 {
@@ -40,10 +39,9 @@ namespace Neuralm.Services.RegistryService.Mapping
         public static IServiceCollection AddApplicationServices(this IServiceCollection serviceCollection, IConfiguration configuration)
         {
             serviceCollection.Configure<NeuralmConfiguration>(configuration.GetSection("Neuralm").Bind);
-
             serviceCollection.AddAutoMapper(Assembly.GetAssembly(typeof(RegistryStartupExtensions)));
-            if (StartupExtensions.IsDebug)
-                serviceCollection.AddLogging(p => p.AddDebug());
+
+            serviceCollection.AddLogging(p => p.AddConsole());
 
             serviceCollection.AddSingleton<IFactory<ServiceDbContext>, ServiceDatabaseFactory>();
             serviceCollection.AddSingleton<IFactory<IMessageTypeCache, IEnumerable<Type>>, MessageTypeCacheFactory>();

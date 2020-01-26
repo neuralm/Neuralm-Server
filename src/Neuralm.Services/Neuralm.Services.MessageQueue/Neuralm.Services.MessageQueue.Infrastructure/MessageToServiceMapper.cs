@@ -1,5 +1,5 @@
-﻿using Neuralm.Services.Common.Application.Interfaces;
-using Neuralm.Services.MessageQueue.Application;
+﻿using Microsoft.Extensions.Logging;
+using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
 using System;
 using System.Collections.Concurrent;
@@ -15,6 +15,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
     /// </summary>
     public class MessageToServiceMapper : IMessageToServiceMapper
     {
+        private readonly ILogger<MessageToServiceMapper> _logger;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private static readonly ConcurrentDictionary<string, List<Type>> ServiceTypeCache = new ConcurrentDictionary<string, List<Type>>();
         private readonly ConcurrentDictionary<Type, IServiceConnector> _messageToServiceMap = new ConcurrentDictionary<Type, IServiceConnector>();
@@ -28,9 +29,11 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         /// Initializes an instance of the <see cref="MessageToServiceMapper"/> class.
         /// </summary>
         /// <param name="messageTypeCache">The message type cache.</param>
-        public MessageToServiceMapper(IClientMessageTypeCache messageTypeCache)
+        /// <param name="logger">The logger.</param>
+        public MessageToServiceMapper(IClientMessageTypeCache messageTypeCache, ILogger<MessageToServiceMapper> logger)
         {
-            Console.WriteLine("Mapping messages to services...");
+            _logger = logger;
+            _logger.LogInformation("Mapping messages to services...");
             foreach (Type type in messageTypeCache.GetMessageTypes())
             {
                 string typename = type.FullName ?? "";
@@ -48,7 +51,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
                 }
             }
             _cancellationTokenSource = new CancellationTokenSource();
-            Console.WriteLine("Finished Mapping messages to services!");
+            _logger.LogInformation("Finished Mapping messages to services!");
         }
 
         /// <inheritdoc cref="IMessageToServiceMapper.AddService(Guid, string, INetworkConnector)"/>
@@ -56,7 +59,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         {
             if (!ServiceTypeCache.ContainsKey(name))
             {
-                Console.WriteLine("Service is not added because it has no message types associated with it. ");
+                _logger.LogError("Service is not added because it has no message types associated with it. ");
                 return;
             }
 

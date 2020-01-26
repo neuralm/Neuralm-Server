@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Neuralm.Services.Common.Rest;
 using Neuralm.Services.TrainingRoomService.Application.Interfaces;
 using Neuralm.Services.TrainingRoomService.Messages;
 using Neuralm.Services.TrainingRoomService.Messages.Dtos;
+using System.Threading.Tasks;
 
 namespace Neuralm.Services.TrainingRoomService.Rest.Controllers
 {

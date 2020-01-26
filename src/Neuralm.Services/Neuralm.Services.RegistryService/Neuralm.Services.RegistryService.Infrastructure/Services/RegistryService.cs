@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Neuralm.Services.Common.Application.Abstractions;
 using Neuralm.Services.Common.Application.Interfaces;
@@ -12,6 +8,11 @@ using Neuralm.Services.RegistryService.Application.Configurations;
 using Neuralm.Services.RegistryService.Application.Dtos;
 using Neuralm.Services.RegistryService.Domain;
 using Neuralm.Services.RegistryService.Messages;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using IRegistryService = Neuralm.Services.RegistryService.Application.Interfaces.IRegistryService;
 
 namespace Neuralm.Services.RegistryService.Infrastructure.Services
@@ -23,7 +24,7 @@ namespace Neuralm.Services.RegistryService.Infrastructure.Services
     {
         private readonly IRepository<Service> _serviceRepository;
         private readonly INetworkConnector _networkConnector;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryService"/> class.
         /// </summary>
@@ -33,17 +34,19 @@ namespace Neuralm.Services.RegistryService.Infrastructure.Services
         /// <param name="messageTypeCache">The message type cache.</param>
         /// <param name="messageSerializer">The message serializer.</param>
         /// <param name="messageProcessor">The message processor.</param>
+        /// <param name="tcpNetworkConnectorLogger">The tcp network connector logger.</param>
         public RegistryService(
             IRepository<Service> serviceRepository, 
             IMapper mapper,
             IOptions<NeuralmConfiguration> neuralmConfigurationOptions,
             IMessageTypeCache messageTypeCache,
             IMessageSerializer messageSerializer,
-            IMessageProcessor messageProcessor) : base(serviceRepository, mapper)
+            IMessageProcessor messageProcessor,
+            ILogger<TcpNetworkConnector> tcpNetworkConnectorLogger) : base(serviceRepository, mapper)
         {
             _serviceRepository = serviceRepository;
             NeuralmConfiguration neuralmConfiguration = neuralmConfigurationOptions.Value;
-            _networkConnector = new TcpNetworkConnector(messageTypeCache, messageSerializer, messageProcessor, neuralmConfiguration.Host, neuralmConfiguration.Port);
+            _networkConnector = new TcpNetworkConnector(messageTypeCache, messageSerializer, messageProcessor, tcpNetworkConnectorLogger, neuralmConfiguration.Host, neuralmConfiguration.Port);
         }
 
         /// <inheritdoc cref="IService{TDto}.CreateAsync(TDto)"/>

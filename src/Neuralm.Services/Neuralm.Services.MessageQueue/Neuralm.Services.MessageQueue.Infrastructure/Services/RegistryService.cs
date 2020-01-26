@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Infrastructure.Networking;
 using Neuralm.Services.MessageQueue.Application.Configurations;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
+using Neuralm.Services.MessageQueue.Infrastructure.Messaging;
 using Neuralm.Services.RegistryService.Messages;
 using System;
 using System.Collections.Generic;
@@ -11,7 +13,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Neuralm.Services.MessageQueue.Infrastructure.Messaging;
 using IRegistryService = Neuralm.Services.MessageQueue.Application.Interfaces.IRegistryService;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure.Services
@@ -28,6 +29,9 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
         private readonly TcpListener _tcpListener;
         private readonly IMessageTypeCache _messageTypeCache;
         private readonly IAccessTokenService _accessTokenService;
+        private readonly ILogger<RegistryService> _registryServiceLogger;
+        private readonly ILogger<TcpNetworkConnector> _tcpNetworkConnectorLogger;
+        private readonly ILogger<HttpNetworkConnector> _httpNetworkConnectorLogger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryService"/> class.
@@ -38,22 +42,33 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
         /// <param name="messageToServiceMapper">The message to service mapper.</param>
         /// <param name="messageTypeCache">The message type cache.</param>
         /// <param name="accessTokenService">The access token service.</param>
+        /// <param name="registryServiceLogger">The registry service logger.</param>
+        /// <param name="tcpNetworkConnectorLogger">The tcp network connector logger.</param>
+        /// <param name="registryServiceMessageProcessorLogger">The registry service message processor logger.</param>
+        /// <param name="httpNetworkConnectorLogger">The http network connector logger.</param>
         public RegistryService(
             IOptions<RegistryConfiguration> registryConfigurationOptions,
             IMessageSerializer messageSerializer,
             IServiceMessageProcessor serviceMessageProcessor,
             IMessageToServiceMapper messageToServiceMapper,
             IRegistryServiceMessageTypeCache messageTypeCache,
-            IAccessTokenService accessTokenService)
+            IAccessTokenService accessTokenService,
+            ILogger<RegistryService> registryServiceLogger,
+            ILogger<TcpNetworkConnector> tcpNetworkConnectorLogger,
+            ILogger<RegistryServiceMessageProcessor> registryServiceMessageProcessorLogger,
+            ILogger<HttpNetworkConnector> httpNetworkConnectorLogger)
         {
             _messageSerializer = messageSerializer;
             _serviceMessageProcessor = serviceMessageProcessor;
-            _registryServiceMessageProcessor = new RegistryServiceMessageProcessor(this);
+            _registryServiceMessageProcessor = new RegistryServiceMessageProcessor(this, registryServiceMessageProcessorLogger);
             _messageToServiceMapper = messageToServiceMapper;
             RegistryConfiguration registryConfiguration = registryConfigurationOptions.Value;
             _tcpListener = new TcpListener(IPAddress.Any, registryConfiguration.Port);
             _messageTypeCache = messageTypeCache;
             _accessTokenService = accessTokenService;
+            _registryServiceLogger = registryServiceLogger;
+            _tcpNetworkConnectorLogger = tcpNetworkConnectorLogger;
+            _httpNetworkConnectorLogger = httpNetworkConnectorLogger;
         }
 
         /// <inheritdoc cref="IRegistryService.StartReceivingServiceEndPointsAsync(CancellationToken)"/>
@@ -65,10 +80,10 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
                 TcpClient tcpClient = await _tcpListener.AcceptTcpClientAsync();
                 _ = Task.Run(() =>
                 {
-                    INetworkConnector networkConnector = new TcpNetworkConnector(_messageTypeCache, _messageSerializer, _registryServiceMessageProcessor, tcpClient);
+                    INetworkConnector networkConnector = new TcpNetworkConnector(_messageTypeCache, _messageSerializer, _registryServiceMessageProcessor, _tcpNetworkConnectorLogger, tcpClient);
                     networkConnector.Start();
                 }, cancellationToken);
-                Console.WriteLine("Accepted a new RegistryService!");
+                _registryServiceLogger.LogInformation("Accepted a new RegistryService!");
             }
         }
 
@@ -90,7 +105,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
         private async Task AddService(Guid id, string name, string host, int port)
         {
             Uri baseUrl = new Uri($"http://{host}:{port.ToString()}/{name.ToLower().Replace("service", "")}");
-            INetworkConnector networkConnector = new HttpNetworkConnector(_messageSerializer, _serviceMessageProcessor, baseUrl, _accessTokenService);
+            INetworkConnector networkConnector = new HttpNetworkConnector(_messageSerializer, _serviceMessageProcessor, baseUrl, _accessTokenService, _httpNetworkConnectorLogger);
             await networkConnector.ConnectAsync(CancellationToken.None);
             networkConnector.Start();
             _messageToServiceMapper.AddService(id, name, networkConnector);

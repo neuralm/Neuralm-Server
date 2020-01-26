@@ -1,11 +1,12 @@
-﻿using Neuralm.Services.Common.Messages.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Exceptions;
+using Neuralm.Services.Common.Messages.Interfaces;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-using Neuralm.Services.Common.Application.Interfaces;
-using Neuralm.Services.Common.Exceptions;
 
 namespace Neuralm.Services.MessageQueue.Infrastructure
 {
@@ -14,13 +15,16 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
     /// </summary>
     public class ServiceMessageProcessor : IServiceMessageProcessor
     {
+        private readonly ILogger<ServiceMessageProcessor> _logger;
         private readonly ConcurrentDictionary<Guid, INetworkConnector> _messageToClientDictionary;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceMessageProcessor"/> class.
         /// </summary>
-        public ServiceMessageProcessor()
+        /// <param name="logger">The logger.</param>
+        public ServiceMessageProcessor(ILogger<ServiceMessageProcessor> logger)
         {
+            _logger = logger;
             _messageToClientDictionary = new ConcurrentDictionary<Guid, INetworkConnector>();
         }
 
@@ -36,7 +40,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
             return SendMessageToClientAsync(message, clientNetworkConnector)
                 .ContinueWith((task) =>
                 {
-                    Console.WriteLine($"Finished Processing message: {msg.Id.ToString()} from {networkConnector.EndPoint}");
+                    _logger.LogInformation($"Finished Processing message: {msg.Id.ToString()} from {networkConnector.EndPoint}");
                     return task;
                 });
         }
