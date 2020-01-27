@@ -79,6 +79,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
+                    TrainingRoomId = table.Column<Guid>(nullable: false),
                     OrganismCount = table.Column<long>(nullable: false),
                     InputCount = table.Column<long>(nullable: false),
                     OutputCount = table.Column<long>(nullable: false),
@@ -95,8 +96,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                     WeightReassignChance = table.Column<double>(nullable: false),
                     TopAmountToSurvive = table.Column<double>(nullable: false),
                     EnableConnectionChance = table.Column<double>(nullable: false),
-                    Seed = table.Column<int>(nullable: false),
-                    TrainingRoomId = table.Column<Guid>(nullable: false)
+                    Seed = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {

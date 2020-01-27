@@ -10,14 +10,14 @@ using Neuralm.Services.TrainingRoomService.Persistence.Contexts;
 namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
 {
     [DbContext(typeof(TrainingRoomDbContext))]
-    [Migration("20200112191530_InitialCreate")]
+    [Migration("20200127192340_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.0")
+                .HasAnnotation("ProductVersion", "3.1.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 

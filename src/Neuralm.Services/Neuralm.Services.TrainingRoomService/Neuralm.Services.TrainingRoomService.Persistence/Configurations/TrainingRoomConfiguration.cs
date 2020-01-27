@@ -27,6 +27,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Configurations
                     trainingRoomSettingsBuilder.Property(p => p.Id).ValueGeneratedOnAdd();
                     trainingRoomSettingsBuilder.ToTable("TrainingRoomSettings");
                     trainingRoomSettingsBuilder.Ignore(p => p.Random);
+                    trainingRoomSettingsBuilder.WithOwner().HasForeignKey(p => p.TrainingRoomId);
                 });
 
             builder

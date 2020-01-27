@@ -19,9 +19,10 @@ namespace Neuralm.Services.TrainingRoomService.Tests
             [TestInitialize]
             public void Initialize()
             {
-                _fakeUser = new User();
+                _fakeUser = new User(); 
+                Guid trainingRoomId = Guid.NewGuid();
                 _roomName = "CoolRoom";
-                _trainingRoom = new TrainingRoom(_fakeUser, _roomName, new TrainingRoomSettings(0, 2, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
+                _trainingRoom = new TrainingRoom(trainingRoomId, _fakeUser, _roomName, new TrainingRoomSettings(trainingRoomId, 0, 2, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
             }
 
             [TestMethod]
@@ -83,7 +84,8 @@ namespace Neuralm.Services.TrainingRoomService.Tests
             public void Initialize()
             {
                 _fakeUser = new User();
-                _trainingRoom = new TrainingRoom(_fakeUser, "FakeRoom", new TrainingRoomSettings(0, 2, 3, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
+                Guid trainingRoomId = Guid.NewGuid();
+                _trainingRoom = new TrainingRoom(trainingRoomId, _fakeUser, "FakeRoom", new TrainingRoomSettings(trainingRoomId, 0, 2, 3, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
                 Guid id = Guid.NewGuid();
                 _original = new Organism(id, _trainingRoom.TrainingRoomSettings, 0, new List<ConnectionGene>()
                 {
@@ -139,9 +141,10 @@ namespace Neuralm.Services.TrainingRoomService.Tests
             [TestInitialize]
             public void Initialize()
             {
+                Guid trainingRoomId = Guid.NewGuid();
                 _roomName = "dfsd";
                 _fakeUser = new User();
-                _trainingRoom = new TrainingRoom(_fakeUser, _roomName, new TrainingRoomSettings(0, 3, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
+                _trainingRoom = new TrainingRoom(trainingRoomId, _fakeUser, _roomName, new TrainingRoomSettings(trainingRoomId, 0, 3, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
             }
 
             [TestMethod]

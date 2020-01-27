@@ -62,7 +62,7 @@ namespace Neuralm.Services.Common.Persistence.EFCore
             /// <summary>
             /// Initializes the <see cref="Releaser"/> struct.
             /// </summary>
-            /// <param name="toRelease"></param>
+            /// <param name="toRelease">The entity load lock to release.</param>
             internal Releaser(EntityLoadLock toRelease)
             {
                 _toRelease = toRelease;

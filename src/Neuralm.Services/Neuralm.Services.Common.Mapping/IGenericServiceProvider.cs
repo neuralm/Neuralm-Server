@@ -5,7 +5,7 @@ namespace Neuralm.Services.Common.Mapping
     /// <summary>
     /// Represents the <see cref="IGenericServiceProvider"/> interface.
     /// </summary>
-    public interface IGenericServiceProvider : IServiceProvider
+    public interface IGenericServiceProvider : IAsyncDisposable, IDisposable, IServiceProvider
     {
         /// <summary>
         /// Gets the service by type parameter.

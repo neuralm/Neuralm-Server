@@ -81,12 +81,13 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// Initializes an instance of the <see cref="TrainingRoom"/> class with the given settings.
         /// The training room manages all of the organisms and the settings.
         /// </summary>
+        /// <param name="id">The training room id.</param>
         /// <param name="owner">The user who created this training room.</param>
         /// <param name="name">The name for the room.</param>
         /// <param name="trainingRoomSettings">The settings for this training room.</param>
-        public TrainingRoom(User owner, string name, TrainingRoomSettings trainingRoomSettings)
+        public TrainingRoom(Guid id, User owner, string name, TrainingRoomSettings trainingRoomSettings)
         {
-            Id = Guid.NewGuid();
+            Id = id;
             Name = name;
             Owner = owner;
             OwnerId = owner.Id;

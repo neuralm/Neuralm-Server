@@ -16,6 +16,11 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         public Guid Id { get; private set; }
 
         /// <summary>
+        /// Gets and sets the training room id.
+        /// </summary>
+        public Guid TrainingRoomId { get; private set; }
+
+        /// <summary>
         /// Gets and sets the brain count.
         /// </summary>
         public uint OrganismCount { get; private set; }
@@ -119,6 +124,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <summary>
         /// Initializes an instance of the <see cref="TrainingRoomSettings"/> class
         /// </summary>
+        /// <param name="trainingRoomId">The training room id.</param>
         /// <param name="organismCount">How many organisms each generation has.</param>
         /// <param name="inputCount">How many inputs each brain has.</param>
         /// <param name="outputCount">How many outputs each brain has.</param>
@@ -137,6 +143,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <param name="enableConnectionChance">The chance a disabled connection gets enabled when crossover happens [0,1].</param>
         /// <param name="seed">The seed for the pseudo-random generator.</param>
         public TrainingRoomSettings(
+            Guid trainingRoomId,
             uint organismCount, uint inputCount, uint outputCount,
             double c1, double c2, double c3,
             double threshold, double addConnectionChance, double addNodeChance,
@@ -144,6 +151,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             double mutateWeightChance, double weightReassignChance, double topAmountToSurvive, double enableConnectionChance, int seed)
         {
             Id = Guid.NewGuid();
+            TrainingRoomId = trainingRoomId;
             OrganismCount = organismCount;
             InputCount = inputCount;
             OutputCount = outputCount;
