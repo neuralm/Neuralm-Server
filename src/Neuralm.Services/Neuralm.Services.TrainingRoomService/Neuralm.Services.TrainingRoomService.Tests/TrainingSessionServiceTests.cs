@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -12,16 +10,16 @@ using Neuralm.Services.Common.Persistence.EFCore.Repositories;
 using Neuralm.Services.TrainingRoomService.Application.Interfaces;
 using Neuralm.Services.TrainingRoomService.Domain;
 using Neuralm.Services.TrainingRoomService.Mapping;
+using Neuralm.Services.TrainingRoomService.Messages;
+using Neuralm.Services.TrainingRoomService.Messages.Dtos;
 using Neuralm.Services.TrainingRoomService.Persistence.Contexts;
 using Neuralm.Services.TrainingRoomService.Persistence.Repositories;
 using Neuralm.Services.TrainingRoomService.Persistence.Validators;
 using Neuralm.Services.TrainingRoomService.Tests.Mocks;
+using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
-using Neuralm.Services.Common.Configurations;
-using Neuralm.Services.TrainingRoomService.Messages;
-using Neuralm.Services.TrainingRoomService.Messages.Dtos;
-using Neuralm.Services.TrainingRoomService.Persistence.Infrastructure;
 
 namespace Neuralm.Services.TrainingRoomService.Tests
 {
@@ -39,17 +37,6 @@ namespace Neuralm.Services.TrainingRoomService.Tests
         public async Task Initialize()
         {
             IServiceCollection serviceCollection = new ServiceCollection();
-            serviceCollection.AddOptions();
-            ////InMemory by default
-            //serviceCollection.Configure<DbConfiguration>(dbConfig =>
-            //{
-            //    dbConfig.UseLazyLoading = true;
-            //    dbConfig.ConnectionString = "";
-            //    dbConfig.DbProvider = "";
-            //});
-            //serviceCollection.AddSingleton<IFactory<TrainingRoomDbContext>, TrainingRoomDatabaseFactory>();
-            //serviceCollection.AddTransient<TrainingRoomDbContext>(p => p.GetService<IFactory<TrainingRoomDbContext>>().Create());
-
             serviceCollection.AddLogging(builder => builder.AddConsole());
             serviceCollection.AddAutoMapper(Assembly.GetAssembly(typeof(TrainingRoomStartupExtensions)));
 

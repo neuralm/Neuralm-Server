@@ -1,19 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Exceptions;
 using Neuralm.Services.Common.Persistence;
 using Neuralm.Services.Common.Persistence.EFCore;
 using Neuralm.Services.Common.Persistence.EFCore.Abstractions;
+using Neuralm.Services.TrainingRoomService.Application.Interfaces;
 using Neuralm.Services.TrainingRoomService.Domain;
 using Neuralm.Services.TrainingRoomService.Persistence.Contexts;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.Logging;
-using Neuralm.Services.Common.Domain;
-using Neuralm.Services.TrainingRoomService.Application.Interfaces;
 
 namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
 {
@@ -58,6 +55,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
             {
                 CreatingEntityFailedException creatingEntityFailedException = new CreatingEntityFailedException($"The entity of type {typeof(TrainingSession).Name} could not be created.", ex);
                 Logger.LogError(creatingEntityFailedException, creatingEntityFailedException.Message);
+                throw creatingEntityFailedException;
             }
             return (success: saveSuccess, id: entity.Id);
         }
@@ -104,8 +102,8 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
             }
             catch (Exception ex)
             {
-                CreatingEntityFailedException creatingEntityFailedException = new CreatingEntityFailedException($"The entity of type {typeof(TrainingSession).Name} could not be created.", ex);
-                Logger.LogError(creatingEntityFailedException, creatingEntityFailedException.Message);
+                Logger.LogError(ex, ex.Message);
+                throw;
             }
         }
 
@@ -115,78 +113,35 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
             using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
             try
             {
-                //foreach (Species species in trainingSession.TrainingRoom.Species)
-                //{
-                //    if (species.GetType() != typeof(Species))
-                //    {
-                //        DbContext.Entry(species).State = EntityState.Unchanged;
-                //    }
-                //    else
-                //    {
-                //        Console.WriteLine($"{species.GetType()} -> {DbContext.Entry(species).State} | Organisms: {species.Organisms.Count}");
-                //        DbContext.Entry(species).State = EntityState.Added;
-                //        Console.WriteLine($"{species.GetType()} -> {DbContext.Entry(species).State} | Organisms: {species.Organisms.Count}");
-                //        foreach (Organism organism in species.Organisms)
-                //        {
-                //            Console.WriteLine($"{organism.GetType()} -> {DbContext.Entry(organism).State} | ConnectionGenes: {organism.ConnectionGenes.Count}");
-                //            DbContext.Entry(organism).State = EntityState.Added;
-                //            Console.WriteLine($"{organism.GetType()} -> {DbContext.Entry(organism).State} | ConnectionGenes: {organism.ConnectionGenes.Count}");
-                //            foreach (ConnectionGene connectionGene in organism.ConnectionGenes)
-                //            {
-                //                Console.WriteLine($"{connectionGene.GetType()} -> {DbContext.Entry(connectionGene).State} | ConnectionGene: {connectionGene}");
-                //                DbContext.Entry(connectionGene).State = EntityState.Added;
-                //                Console.WriteLine($"{connectionGene.GetType()} -> {DbContext.Entry(connectionGene).State} | ConnectionGene: {connectionGene}");
-                //            }
-                //        }
-                //    }
-                //}
-
-
-                //// TODO: implement fix
-                IEnumerable<EntityEntry> changes = from e in DbContext.ChangeTracker.Entries()
-                                                   where e.State != EntityState.Unchanged
-                                                   select e;
-
-                foreach (EntityEntry change in changes)
+                foreach (Species species in trainingSession.TrainingRoom.Species)
                 {
-                    if (!(change.Entity is IEntity item))
-                        throw new NullReferenceException($"Entity: {change}");
-                    Logger.LogInformation($"{change.Entity.GetType().Name} {change.State}: {item.Id}");
-                    Logger.LogInformation(change.Entity.ToString());
-                    switch (change.State)
+                    Logger.LogInformation($"{species.GetType()} -> {DbContext.Entry(species).State} | Organisms: {species.Organisms.Count}");
+                    foreach (Organism organism in species.Organisms)
                     {
-                        case EntityState.Added:
+                        bool newGenes = false;
+                        foreach (ConnectionGene connectionGene in organism.ConnectionGenes)
+                        {
+                            if (DbContext.Entry(connectionGene).State != EntityState.Added) 
+                                continue;
+                            newGenes = true;
                             break;
-                        case EntityState.Modified:
-                            {
-                                foreach (IProperty property in change.OriginalValues.Properties)
-                                {
-                                    object original = change.OriginalValues[property];
-                                    object current = change.CurrentValues[property];
-                                    if (Equals(original, current))
-                                        continue;
-                                    string originalString = original is null ? "NULL" : original.ToString();
-                                    string currentString = current is null ? "NULL" : current.ToString();
-                                    Logger.LogInformation($"\t{property.Name}: {originalString} --> {currentString}");
-                                }
-                                break;
-                            }
-                        case EntityState.Deleted:
-                            break;
-                        case EntityState.Detached:
-                            break;
-                        case EntityState.Unchanged:
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
+                        }
+                        if (newGenes)
+                            DbContext.Entry(organism).State = EntityState.Added;
                     }
+                }
+
+                foreach (EntityEntry entityEntry in DbContext.ChangeTracker.Entries()
+                    .Where(e => e.State == EntityState.Modified && (e.Entity.GetType() == typeof(InputNode) || e.Entity.GetType() == typeof(OutputNode))))
+                {
+                    DbContext.Entry(entityEntry.Entity).State = EntityState.Added;
                 }
                 await DbContext.SaveChangesAsync();
             }
             catch (DbUpdateException ex)
             {
-                CreatingEntityFailedException creatingEntityFailedException = new CreatingEntityFailedException($"The entity of type {typeof(TrainingSession).Name} could not be created.", ex);
-                Logger.LogError(creatingEntityFailedException, creatingEntityFailedException.Message);
+                Logger.LogError(ex, ex.Message);
+                throw;
             }
         }
     }

@@ -253,7 +253,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 ConnectionGene geneToAdd = gene.Clone(childId);
                 
                 // Tries to find a connection gene based on the current connection gene in the parent, and if not found, gives a default.
-                ConnectionGene gene2 = parent2Organism.ConnectionGenes.SingleOrDefault(gen => gen.InnovationNumber == gene.InnovationNumber);
+                ConnectionGene gene2 = parent2.SingleOrDefault(gen => gen.InnovationNumber == gene.InnovationNumber);
 
                 // If the gene is not a default connection gene.
                 if (gene2 != default)

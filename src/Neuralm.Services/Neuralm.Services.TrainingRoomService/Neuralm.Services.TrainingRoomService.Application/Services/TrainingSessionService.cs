@@ -192,10 +192,10 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                 message = trainingSession.TrainingRoom.EndGeneration()
                     ? "Successfully updated the organisms and advanced a generation!"
                     : "Successfully updated the organisms but failed to advance a generation!";
-                await _trainingSessionRepository.SaveChangesAsync();
+
+                await _trainingSessionRepository.UpdateOrganismsAsync(trainingSession);
                 _logger.LogInformation("ENDED THE GENERATION!!!");
             }
-            //await _trainingSessionRepository.UpdateOrganismsAsync(trainingSession);
             return new PostOrganismsScoreResponse(postOrganismsScoreRequest.Id, message, true);
         }
     }
