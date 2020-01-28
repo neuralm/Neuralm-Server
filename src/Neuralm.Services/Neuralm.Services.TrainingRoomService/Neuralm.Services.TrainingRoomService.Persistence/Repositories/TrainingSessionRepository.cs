@@ -107,6 +107,46 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
             }
         }
 
+        /// <inheritdoc cref="ITrainingSessionRepository.InsertLeasedOrganismsAsync(TrainingSession)"/>
+        public async Task InsertLeasedOrganismsAsync(TrainingSession trainingSession)
+        {
+            try
+            {
+                foreach (LeasedOrganism leasedOrganism in trainingSession.LeasedOrganisms)
+                {
+                    Logger.LogInformation($"{DbContext.Entry(leasedOrganism).State}");
+                    if (DbContext.Entry(leasedOrganism).State != EntityState.Unchanged)
+                        DbContext.Entry(leasedOrganism).State = EntityState.Added;
+                }
+                await DbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }
+
+        /// <inheritdoc cref="ITrainingSessionRepository.MarkAsAdded(Organism)"/>
+        public void MarkAsAdded(Organism organism)
+        {
+            DbContext.Entry(organism).State = EntityState.Added;
+            foreach (OrganismInputNode inputNode in organism.Inputs)
+            {
+                DbContext.Entry(inputNode).State = EntityState.Added;
+                DbContext.Entry(inputNode.InputNode).State = EntityState.Added;
+            }
+            foreach (OrganismOutputNode outputNode in organism.Outputs)
+            {
+                DbContext.Entry(outputNode).State = EntityState.Added;
+                DbContext.Entry(outputNode.OutputNode).State = EntityState.Added;
+            }
+            foreach (ConnectionGene connectionGene in organism.ConnectionGenes)
+            {
+                DbContext.Entry(connectionGene).State = EntityState.Added;
+            }
+        }
+
         /// <inheritdoc cref="ITrainingSessionRepository.UpdateOrganismsAsync(TrainingSession)"/>
         public async Task UpdateOrganismsAsync(TrainingSession trainingSession)
         {

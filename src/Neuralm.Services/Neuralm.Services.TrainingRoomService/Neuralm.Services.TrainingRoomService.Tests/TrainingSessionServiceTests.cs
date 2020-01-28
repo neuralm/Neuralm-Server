@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -43,26 +44,25 @@ namespace Neuralm.Services.TrainingRoomService.Tests
             serviceCollection.AddAutoMapper(Assembly.GetAssembly(typeof(TrainingRoomStartupExtensions)));
 
             #region Database
-            serviceCollection.AddOptions();
-            serviceCollection.Configure<DbConfiguration>(dbConfig =>
-            {
-                //InMemory by default
-                dbConfig.UseLazyLoading = true;
-                dbConfig.ConnectionString = "";
-                dbConfig.DbProvider = "";
-            });
-            serviceCollection.AddSingleton<IFactory<TrainingRoomDbContext>, TrainingRoomDatabaseFactory>();
-            serviceCollection.AddTransient<TrainingRoomDbContext>(p => p.GetService<IFactory<TrainingRoomDbContext>>().Create());
-
-            // NOTE: In Sqlite this works just fine!
-            //SqliteConnection = new SqliteConnection("Data Source=:memory:");
-            //SqliteConnection.Open();
-
-            //serviceCollection.AddDbContext<TrainingRoomDbContext>(optionsBuilder =>
+            // NOTE: to verify if the test works in memory use code below..
+            //serviceCollection.AddOptions();
+            //serviceCollection.Configure<DbConfiguration>(dbConfig =>
             //{
-            //    optionsBuilder.UseSqlite(SqliteConnection);
-            //    optionsBuilder.EnableSensitiveDataLogging();
+            //    //InMemory by default
+            //    dbConfig.UseLazyLoading = true; 
+            //    dbConfig.ConnectionString = "";
+            //    dbConfig.DbProvider = "";
             //});
+            //serviceCollection.AddSingleton<IFactory<TrainingRoomDbContext>, TrainingRoomDatabaseFactory>();
+            //serviceCollection.AddTransient<TrainingRoomDbContext>(p => p.GetService<IFactory<TrainingRoomDbContext>>().Create());
+            SqliteConnection = new SqliteConnection("Data Source=:memory:");
+            SqliteConnection.Open();
+
+            serviceCollection.AddDbContext<TrainingRoomDbContext>(optionsBuilder =>
+            {
+                optionsBuilder.UseSqlite(SqliteConnection);
+                optionsBuilder.EnableSensitiveDataLogging();
+            });
             #endregion Database
 
             #region Validators

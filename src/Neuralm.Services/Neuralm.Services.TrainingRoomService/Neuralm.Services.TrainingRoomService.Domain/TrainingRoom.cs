@@ -1,4 +1,5 @@
 ﻿using Neuralm.Services.Common.Domain;
+using Neuralm.Services.TrainingRoomService.Domain.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,6 @@ namespace Neuralm.Services.TrainingRoomService.Domain
     public class TrainingRoom : IEntity
     {
         private readonly Dictionary<(uint A, uint B), uint> _mutationToInnovation = new Dictionary<(uint A, uint B), uint>();
-        private readonly List<Organism> _tempOrganisms = new List<Organism>();
         private uint _nodeIdentifier;
 
         /// <summary>
@@ -120,52 +120,46 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             Species.Add(new Species(organism, Id));
         }
 
+        // FIXME: Require Species to have an IsEvaluated property
         /// <summary>
-        /// Sets the organism's scores to what the client sends.
+        /// Loops over all organisms in all species in the current generation to check if they are evaluated or not. 
+        /// If one or more aren't evaluated false is returned.
         /// </summary>
-        /// <param name="organism">The organism.</param>
-        /// <param name="score">The score.</param>
-        public void PostScore(Organism organism, double score)
-        {
-            organism.Score = score;
-            organism.Evaluated = true;
-        }
+        public bool AllOrganismsInCurrentGenerationAreEvaluated()
+            => Species.SelectMany(species => species.Organisms.Where(o => o.Generation == Generation)).All(o => o.IsEvaluated);
 
         /// <summary>
         /// Does 1 generation.
         /// kills the worst ones, mutate and breed and make the system ready for a new generation.
         /// </summary>
-        public bool EndGeneration()
+        public void EndGeneration(Action<Organism> markAsAdded)
         {
-            // Verifies that all organisms of the current generation are evaluated, otherwise return false.
-            if (!Species.TrueForAll(s => s.Organisms.Where(o => o.Generation == Generation).All(o => o.Evaluated)))
-                return false;
+            // Verifies that all organisms of the current generation are evaluated, otherwise throw an exception.
+            if (!AllOrganismsInCurrentGenerationAreEvaluated())
+                throw new UnevaluatedOrganismException("An organism is not evaluated, but end generation was called!");
 
             // Prepares score values.
             double highestScore = double.MinValue;
             double lowestScore = double.MaxValue;
+            double totalScore = 0;
 
-            // For each through all the species and calculate the highest and lowest score.
+            // For each through all the species.
             foreach (Species species in Species)
             {
-                // Remove all previous generation organisms, now only current generation organisms should exist.
-                species.Organisms.RemoveAll(o => o.Generation < Generation);
+                // Calculate the highest and lowest score.
                 foreach (Organism organism in species.Organisms)
                 {
                     organism.Score /= Species.Count;
                     highestScore = Math.Max(organism.Score, highestScore);
                     lowestScore = Math.Min(organism.Score, lowestScore);
                 }
-            }
 
-            // For each species reproduce with the given training room settings.
-            foreach (Species species in Species)
-            {
+                // Reproduce with the given training room settings.
                 species.PostGeneration(TrainingRoomSettings.TopAmountToSurvive, Generation);
+                
+                // Calculate the total score for all species.
+                totalScore += species.SpeciesScore;
             }
-
-            // Calculate the total score for all species.
-            double totalScore = Species.Sum(species => species.SpeciesScore);
 
             // If the total score is 0 than force the total score to be 1.
             if (totalScore == 0)
@@ -173,9 +167,10 @@ namespace Neuralm.Services.TrainingRoomService.Domain
 
             // Prepare rest value.
             double rest = 0;
+            // Prepare total organisms value.
+            double totalOrganisms = 0;
 
-            // For each species determine the amount of organisms that is allowed to survive 
-            // and add them to the temporary organisms list.
+            // For each species determine the amount of organisms that is allowed to survive
             foreach (Species species in Species)
             {
                 double fraction = species.SpeciesScore / totalScore;
@@ -191,39 +186,26 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 amountOfOrganisms = Math.Floor(amountOfOrganisms);
                 for (int i = 0; i < amountOfOrganisms; i++)
                 {
-                    _tempOrganisms.Add(ProduceOrganism(species));
+                    species.AddOrganism(ProduceOrganism(species));
+                    markAsAdded(species.Organisms[species.Organisms.Count - 1]);
                 }
+                totalOrganisms += amountOfOrganisms;
             }
 
-            // If the temporary organisms count is lower than the amount specified in the training room settings then add more.
-            while (_tempOrganisms.Count < TrainingRoomSettings.OrganismCount)
+            // If the total organisms count is lower than the amount specified in the training room settings then add more.
+            while (totalOrganisms < TrainingRoomSettings.OrganismCount)
             {
-                _tempOrganisms.Add(new Organism(Generation + 1, TrainingRoomSettings));
+                AddOrganism(new Organism(Generation + 1, TrainingRoomSettings));
             }
-
-            // Adds the organisms from the temporary list to the species list.
-            foreach (Organism organism in _tempOrganisms)
-            {
-                AddOrganism(organism);
-            }
-
-            // Clears the temporary organisms list.
-            _tempOrganisms.Clear();
 
             // Increases the generation.
             Generation++;
-
-            // Remove all organisms that are not in the current generation.
-            Species.ForEach(s => s.Organisms.RemoveAll(o => o.Generation < Generation));
 
             // Removes any species that have died out.
             Species.RemoveAll(species => !species.Organisms.Any());
 
             // Resets the mutation to innovation map.
             _mutationToInnovation.Clear();
-
-            // Returns true for a successful generation.
-            return true;
         }
 
         /// <summary>

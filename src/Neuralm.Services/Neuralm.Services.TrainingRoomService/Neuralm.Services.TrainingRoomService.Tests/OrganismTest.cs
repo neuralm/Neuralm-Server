@@ -109,9 +109,9 @@ namespace Neuralm.Services.TrainingRoomService.Tests
             [TestMethod]
             public void CloneDoesNotAffectOriginalScoreTest()
             {
-                _trainingRoom.PostScore(_original, 0);
+                _original.Score = 0;
                 Organism clone = _original.Clone(_trainingRoom.TrainingRoomSettings);
-                _trainingRoom.PostScore(clone, 100);
+                clone.Score = 100;
                 Assert.AreEqual(0, _original.Score);
             }
 
