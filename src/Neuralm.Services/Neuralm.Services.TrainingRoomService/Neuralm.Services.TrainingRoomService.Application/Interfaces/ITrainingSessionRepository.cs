@@ -22,6 +22,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Interfaces
         /// <param name="trainingSession">The training session.</param>
         /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         Task InsertLeasedOrganismsAsync(TrainingSession trainingSession);
+        
         /// <summary>
         /// Updates the organisms asynchronously.
         /// </summary>
