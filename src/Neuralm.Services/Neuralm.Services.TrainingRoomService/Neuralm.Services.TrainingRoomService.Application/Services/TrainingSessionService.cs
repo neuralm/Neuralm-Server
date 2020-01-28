@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -83,8 +84,16 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Amount cannot be smaller than 1.");
             if ((trainingSession = await EntityRepository.FindSingleOrDefaultAsync(ts => ts.Id.Equals(getOrganismsRequest.TrainingSessionId))) == default)
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training session does not exist.");
-            if (!trainingSession.TrainingRoom.IsUserAuthorized(getOrganismsRequest.UserId) || trainingSession.UserId != getOrganismsRequest.UserId)
+
+            TrainingRoom trainingRoom;
+            if ((trainingRoom = await ((ITrainingSessionRepository)EntityRepository).FindSingleOrDefaultTrainingRoomAsync(tr => tr.Id.Equals(trainingSession.TrainingRoom.Id))) == default)
+                throw new Exception("..");
+            if (!trainingRoom.IsUserAuthorized(getOrganismsRequest.UserId) || trainingSession.UserId != getOrganismsRequest.UserId)
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "User is not authorized.");
+
+
+            //if (!trainingSession.TrainingRoom.IsUserAuthorized(getOrganismsRequest.UserId) || trainingSession.UserId != getOrganismsRequest.UserId)
+            //    return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "User is not authorized.");
             if (trainingSession.EndedTimestamp != default)
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training session has ended and can not be used any more.");
             TrainingRoomSettings trainingRoomSettings = trainingSession.TrainingRoom.TrainingRoomSettings;
@@ -188,8 +197,8 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                 trainingSession.LeasedOrganisms.Clear();
                 await _trainingSessionRepository.SaveChangesAsync();
                 _logger.LogInformation("CLEARED LEASED ORGANISMS AND SAVED CHANGES!!!");
-
-                message = trainingSession.TrainingRoom.EndGeneration()
+                
+                message = trainingSession.TrainingRoom.EndGeneration(() => { _trainingSessionRepository.SaveChangesAsync().GetAwaiter().GetResult(); }, (organism) => { _trainingSessionRepository.MarkAsAdded(organism); })
                     ? "Successfully updated the organisms and advanced a generation!"
                     : "Successfully updated the organisms but failed to advance a generation!";
                 await _trainingSessionRepository.SaveChangesAsync();

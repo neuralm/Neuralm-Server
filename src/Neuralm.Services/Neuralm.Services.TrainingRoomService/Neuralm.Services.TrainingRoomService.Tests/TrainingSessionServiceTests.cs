@@ -40,7 +40,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
         {
             IServiceCollection serviceCollection = new ServiceCollection();
             serviceCollection.AddOptions();
-            ////InMemory by default
+            //InMemory by default
             //serviceCollection.Configure<DbConfiguration>(dbConfig =>
             //{
             //    dbConfig.UseLazyLoading = true;

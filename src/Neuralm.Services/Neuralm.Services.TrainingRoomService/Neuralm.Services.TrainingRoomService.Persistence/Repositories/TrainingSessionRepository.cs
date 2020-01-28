@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Domain;
 using Neuralm.Services.TrainingRoomService.Application.Interfaces;
+using System.Linq.Expressions;
 
 namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
 {
@@ -34,6 +35,12 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
             ILogger<TrainingRoomDbContext> logger) : base(dbContext, entityValidator, logger)
         {
 
+        }
+
+        public async Task<TrainingRoom> FindSingleOrDefaultTrainingRoomAsync(Expression<Func<TrainingRoom, bool>> predicate)
+        {
+            using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
+            return await DbContext.Set<TrainingRoom>().SingleOrDefaultAsync(predicate);
         }
 
         /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.CreateAsync(TEntity)"/>
@@ -106,6 +113,25 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
             {
                 CreatingEntityFailedException creatingEntityFailedException = new CreatingEntityFailedException($"The entity of type {typeof(TrainingSession).Name} could not be created.", ex);
                 Logger.LogError(creatingEntityFailedException, creatingEntityFailedException.Message);
+            }
+        }
+
+        public void MarkAsAdded(Organism organism)
+        {
+            DbContext.Entry(organism).State = EntityState.Added;
+            foreach (OrganismInputNode inputNode in organism.Inputs)
+            {
+                DbContext.Entry(inputNode).State = EntityState.Added;
+                DbContext.Entry(inputNode.InputNode).State = EntityState.Added;
+            }
+            foreach (OrganismOutputNode outputNode in organism.Outputs)
+            {
+                DbContext.Entry(outputNode).State = EntityState.Added;
+                DbContext.Entry(outputNode.OutputNode).State = EntityState.Added;
+            }
+            foreach (ConnectionGene connectionGene in organism.ConnectionGenes)
+            {
+                DbContext.Entry(connectionGene).State = EntityState.Added;
             }
         }
 

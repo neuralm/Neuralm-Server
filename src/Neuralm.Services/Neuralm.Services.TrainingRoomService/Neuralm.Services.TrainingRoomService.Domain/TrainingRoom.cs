@@ -134,7 +134,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// Does 1 generation.
         /// kills the worst ones, mutate and breed and make the system ready for a new generation.
         /// </summary>
-        public bool EndGeneration()
+        public bool EndGeneration(Action saveChanges, Action<Organism> markAsAdded)
         {
             // Verifies that all organisms of the current generation are evaluated, otherwise return false.
             if (!Species.TrueForAll(s => s.Organisms.Where(o => o.Generation == Generation).All(o => o.Evaluated)))
@@ -190,21 +190,33 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 amountOfOrganisms = Math.Floor(amountOfOrganisms);
                 for (int i = 0; i < amountOfOrganisms; i++)
                 {
-                    _tempOrganisms.Add(ProduceOrganism(species));
+                    ////_tempOrganisms.Add(ProduceOrganism(species));
+                    var temp_organism = ProduceOrganism(species);
+                    //var temp_connection_genes = temp_organism.ConnectionGenes;
+                    //var temp_inputs = temp_organism.Inputs;
+                    //var temp_outputs = temp_organism.Outputs;
+                    //temp_organism.ConnectionGenes.Clear();
+                    //temp_organism.Inputs.Clear();
+                    //temp_organism.Outputs.Clear();
+                    AddOrganism(temp_organism);
+                    markAsAdded(species.Organisms[species.Organisms.Count - 1]);
+                    //saveChanges.Invoke();
+                    //species.Organisms[species.Organisms.Count - 1].ConnectionGenes = temp_connection_genes;
                 }
             }
 
             // If the temporary organisms count is lower than the amount specified in the training room settings then add more.
-            while (_tempOrganisms.Count < TrainingRoomSettings.OrganismCount)
-            {
-                _tempOrganisms.Add(new Organism(Generation + 1, TrainingRoomSettings));
-            }
+            ////while (_tempOrganisms.Count < TrainingRoomSettings.OrganismCount)
+            ////{
+            ////    _tempOrganisms.Add(new Organism(Generation + 1, TrainingRoomSettings));
+            ////}
 
             // Adds the organisms from the temporary list to the species list.
-            foreach (Organism organism in _tempOrganisms)
-            {
-                AddOrganism(organism);
-            }
+            ////foreach (Organism organism in _tempOrganisms)
+            ////{
+            ////    AddOrganism(organism);
+            ////}
+            saveChanges.Invoke();
 
             // Clears the temporary organisms list.
             _tempOrganisms.Clear();
@@ -306,7 +318,18 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <returns>Returns <c>true</c> if the given user id is authorized; otherwise, <c>false</c>.</returns>
         public bool IsUserAuthorized(Guid userId)
         {
-            return AuthorizedTrainers.Exists(user => user.UserId.Equals(userId));
+            bool output = false;
+
+            try
+            {
+                output = AuthorizedTrainers.Exists(user => user.UserId.Equals(userId));
+            } 
+            catch (Exception e)
+            {
+
+            }
+
+            return output; 
         }
 
         /// <summary>
