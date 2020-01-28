@@ -101,11 +101,13 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                     }
                     trainingSession.TrainingRoom.IncreaseNodeIdTo(trainingRoomSettings.InputCount + trainingRoomSettings.OutputCount);
                     message = $"First generation; generated {trainingSession.TrainingRoom.TrainingRoomSettings.OrganismCount.ToString()} organisms.";
+                    await _trainingSessionRepository.InsertFirstGenerationAsync(trainingSession);
                 }
                 else
                 {
                     trainingSession.LeasedOrganisms.AddRange(GetNewLeasedOrganisms(getOrganismsRequest.Amount));
                     message = "Start of new generation.";
+                    await _trainingSessionRepository.InsertLeasedOrganismsAsync(trainingSession);
                 }
             }
             else if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.IsEvaluated) < getOrganismsRequest.Amount)
@@ -113,19 +115,11 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                 int take = getOrganismsRequest.Amount - trainingSession.LeasedOrganisms.Count(o => !o.Organism.IsEvaluated);
                 List<LeasedOrganism> newLeasedOrganisms = GetNewLeasedOrganisms(take);
                 trainingSession.LeasedOrganisms.AddRange(newLeasedOrganisms);
+                await _trainingSessionRepository.SaveChangesAsync();
             }
 
             if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.IsEvaluated) < getOrganismsRequest.Amount && getOrganismsRequest.Amount < trainingRoomSettings.OrganismCount)
                 message = "The requested amount of organisms are not all available. The training room is close to a new generation.";
-
-            if (message.StartsWith("First generation;"))
-            {
-                await _trainingSessionRepository.InsertFirstGenerationAsync(trainingSession);
-            }
-            else
-            {
-                await EntityRepository.SaveChangesAsync();
-            }
 
             List<OrganismDto> organismDtos = trainingSession.LeasedOrganisms
                 .Where(lo => !lo.Organism.IsEvaluated)

@@ -107,6 +107,26 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
             }
         }
 
+        /// <inheritdoc cref="ITrainingSessionRepository.InsertLeasedOrganismsAsync(TrainingSession)"/>
+        public async Task InsertLeasedOrganismsAsync(TrainingSession trainingSession)
+        {
+            try
+            {
+                foreach (LeasedOrganism leasedOrganism in trainingSession.LeasedOrganisms)
+                {
+                    Logger.LogInformation($"{DbContext.Entry(leasedOrganism).State}");
+                    if (DbContext.Entry(leasedOrganism).State != EntityState.Unchanged)
+                        DbContext.Entry(leasedOrganism).State = EntityState.Added;
+                }
+                await DbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }
+
         /// <inheritdoc cref="ITrainingSessionRepository.MarkAsAdded(Organism)"/>
         public void MarkAsAdded(Organism organism)
         {

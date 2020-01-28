@@ -1,8 +1,6 @@
-using System;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.TrainingRoomService.Domain;
+using System.Threading.Tasks;
 
 namespace Neuralm.Services.TrainingRoomService.Application.Interfaces
 {
@@ -17,7 +15,13 @@ namespace Neuralm.Services.TrainingRoomService.Application.Interfaces
         /// <param name="trainingSession">The training session.</param>
         /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         Task InsertFirstGenerationAsync(TrainingSession trainingSession);
-        
+
+        /// <summary>
+        /// Inserts the leased organisms asynchronously.
+        /// </summary>
+        /// <param name="trainingSession">The training session.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
+        Task InsertLeasedOrganismsAsync(TrainingSession trainingSession);
         /// <summary>
         /// Updates the organisms asynchronously.
         /// </summary>
