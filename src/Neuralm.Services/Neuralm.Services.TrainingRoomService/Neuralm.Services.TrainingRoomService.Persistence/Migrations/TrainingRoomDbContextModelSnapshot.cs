@@ -15,7 +15,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.0")
+                .HasAnnotation("ProductVersion", "3.1.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -108,13 +108,13 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("Evaluated")
+                    b.Property<bool>("IsEvaluated")
                         .HasColumnType("bit");
 
                     b.Property<long>("Generation")
                         .HasColumnType("bigint");
 
-                    b.Property<bool>("Leased")
+                    b.Property<bool>("IsLeased")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")

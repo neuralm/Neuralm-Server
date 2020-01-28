@@ -152,7 +152,7 @@ namespace Neuralm.Services.Common.Mapping
         /// </summary>
         /// <param name="serviceProvider">The service provider.</param>
         /// <returns>Returns a <see cref="IGenericServiceProvider"/> implementation.</returns>
-        public static IGenericServiceProvider ToGenericServiceProvider(this IServiceProvider serviceProvider)
+        public static IGenericServiceProvider ToGenericServiceProvider(this ServiceProvider serviceProvider)
         {
             return new GenericServiceProvider(serviceProvider);
         }

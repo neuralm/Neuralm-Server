@@ -1,33 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Configurations;
 using Neuralm.Services.Common.Mapping;
 using Neuralm.Services.Common.Persistence;
 using Neuralm.Services.Common.Persistence.EFCore.Repositories;
 using Neuralm.Services.TrainingRoomService.Application.Interfaces;
 using Neuralm.Services.TrainingRoomService.Domain;
 using Neuralm.Services.TrainingRoomService.Mapping;
+using Neuralm.Services.TrainingRoomService.Messages;
+using Neuralm.Services.TrainingRoomService.Messages.Dtos;
 using Neuralm.Services.TrainingRoomService.Persistence.Contexts;
+using Neuralm.Services.TrainingRoomService.Persistence.Infrastructure;
 using Neuralm.Services.TrainingRoomService.Persistence.Repositories;
 using Neuralm.Services.TrainingRoomService.Persistence.Validators;
 using Neuralm.Services.TrainingRoomService.Tests.Mocks;
+using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
-using Neuralm.Services.Common.Configurations;
-using Neuralm.Services.TrainingRoomService.Messages;
-using Neuralm.Services.TrainingRoomService.Messages.Dtos;
-using Neuralm.Services.TrainingRoomService.Persistence.Infrastructure;
 
 namespace Neuralm.Services.TrainingRoomService.Tests
 {
     [TestClass]
     public class TrainingSessionServiceTests
     {
+        public ILogger<TrainingSessionServiceTests> Logger { get; set; }
         public ITrainingSessionService TrainingSessionService { get; set; }
         public IGenericServiceProvider GenericServiceProvider { get; set; }
         public SqliteConnection SqliteConnection { get; set; }
@@ -39,20 +40,10 @@ namespace Neuralm.Services.TrainingRoomService.Tests
         public async Task Initialize()
         {
             IServiceCollection serviceCollection = new ServiceCollection();
-            serviceCollection.AddOptions();
-            //InMemory by default
-            //serviceCollection.Configure<DbConfiguration>(dbConfig =>
-            //{
-            //    dbConfig.UseLazyLoading = true;
-            //    dbConfig.ConnectionString = "";
-            //    dbConfig.DbProvider = "";
-            //});
-            //serviceCollection.AddSingleton<IFactory<TrainingRoomDbContext>, TrainingRoomDatabaseFactory>();
-            //serviceCollection.AddTransient<TrainingRoomDbContext>(p => p.GetService<IFactory<TrainingRoomDbContext>>().Create());
-
             serviceCollection.AddLogging(builder => builder.AddConsole());
             serviceCollection.AddAutoMapper(Assembly.GetAssembly(typeof(TrainingRoomStartupExtensions)));
 
+            #region Database
             SqliteConnection = new SqliteConnection("Data Source=:memory:");
             SqliteConnection.Open();
 
@@ -61,6 +52,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                 optionsBuilder.UseSqlite(SqliteConnection);
                 optionsBuilder.EnableSensitiveDataLogging();
             });
+            #endregion Database
 
             #region Validators
             serviceCollection.AddTransient<IEntityValidator<TrainingRoom>, TrainingRoomValidator>();
@@ -83,10 +75,12 @@ namespace Neuralm.Services.TrainingRoomService.Tests
             #endregion Services
 
             GenericServiceProvider = serviceCollection.BuildServiceProvider().ToGenericServiceProvider();
+            Logger = GenericServiceProvider.GetService<ILogger<TrainingSessionServiceTests>>();
+            Logger.LogInformation("Started initialization!");
             TrainingSessionService = GenericServiceProvider.GetService<ITrainingSessionService>();
 
             TrainingRoomDbContext context = GenericServiceProvider.GetService<TrainingRoomDbContext>();
-            context.Database.EnsureCreated();
+            await context.Database.EnsureCreatedAsync();
 
             ITrainingRoomService trainingRoomService = GenericServiceProvider.GetService<ITrainingRoomService>();
             IUserService userService = GenericServiceProvider.GetService<IUserService>();
@@ -123,9 +117,20 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                 TrainingSessions = new List<TrainingSessionDto>()
             };
             (bool success, Guid id) = await trainingRoomService.CreateAsync(trainingRoomDto);
-            GenericServiceProvider.GetService<ILogger<TrainingSessionServiceTests>>()
-                .LogInformation($"Created a training room: {success} id: {id}");
+            
+            Logger.LogInformation($"Created a training room: {success} id: {id}");
             TrainingRoomId = id;
+            Logger.LogInformation("Finished initialization!");
+        }
+
+        [TestCleanup]
+        public async Task Cleanup()
+        {
+            Logger.LogInformation("Started cleanup!");
+            TrainingRoomDbContext context = GenericServiceProvider.GetService<TrainingRoomDbContext>();
+            await context.Database.EnsureDeletedAsync();
+            await GenericServiceProvider.DisposeAsync();
+            Logger.LogInformation("Finished cleanup!");
         }
 
         [TestMethod]

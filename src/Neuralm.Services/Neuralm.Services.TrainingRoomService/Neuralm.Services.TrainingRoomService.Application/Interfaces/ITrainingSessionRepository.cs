@@ -25,7 +25,10 @@ namespace Neuralm.Services.TrainingRoomService.Application.Interfaces
         /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         Task UpdateOrganismsAsync(TrainingSession trainingSession);
 
-        Task<TrainingRoom> FindSingleOrDefaultTrainingRoomAsync(Expression<Func<TrainingRoom, bool>> predicate);
+        /// <summary>
+        /// Mark organism as added
+        /// </summary>
+        /// <param name="organism">The organism to mark.</param>
         void MarkAsAdded(Organism organism);
     }
 }

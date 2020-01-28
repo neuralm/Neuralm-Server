@@ -350,3 +350,4 @@ src/Neuralm.Presentation.CLI/appSettings.json
 # Exlude env files but keep example
 src/Neuralm.Presentation.Web/.env.*
 !src/Neuralm.Presentation.Web/.env.EXAMPLE
+/src/Neuralm.Services/Neuralm.Services.TrainingRoomService/Neuralm.Services.TrainingRoomService.Rest/LogFiles

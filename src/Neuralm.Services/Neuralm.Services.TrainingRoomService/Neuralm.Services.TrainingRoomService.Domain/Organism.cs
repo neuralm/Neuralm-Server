@@ -47,7 +47,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <summary>
         /// Gets and sets the score.
         /// </summary>
-        public double Score { get; internal set; }
+        public double Score { get; set; }
 
         /// <summary>
         /// Gets and sets the name.
@@ -62,12 +62,12 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <summary>
         /// Gets and sets a value whether the organism is leased.
         /// </summary>
-        public bool Leased { get; set; }
+        public bool IsLeased { get; set; }
 
         /// <summary>
         /// Gets and sets a value whether the organism is evaluated.
         /// </summary>
-        public bool Evaluated { get; set; }
+        public bool IsEvaluated { get; set; }
 
         /// <summary>
         /// EFCore entity constructor IGNORE!
@@ -253,7 +253,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 ConnectionGene geneToAdd = gene.Clone(childId);
                 
                 // Tries to find a connection gene based on the current connection gene in the parent, and if not found, gives a default.
-                ConnectionGene gene2 = parent2Organism.ConnectionGenes.SingleOrDefault(gen => gen.InnovationNumber == gene.InnovationNumber);
+                ConnectionGene gene2 = parent2.SingleOrDefault(gen => gen.InnovationNumber == gene.InnovationNumber);
 
                 // If the gene is not a default connection gene.
                 if (gene2 != default)
@@ -622,7 +622,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             return
                 $"Id: {Id}, SpeciesId: {SpeciesId}, Generation: {Generation}, Score: {Score}, Inputs: {Inputs.Count}, " +
                 $" Outputs: {Outputs.Count}, ConnectionGenes: {ConnectionGenes.Count}, Name: {Name}, " +
-                $"Leased: {Leased}, Evaluated: {Evaluated}";
+                $"IsLeased: {IsLeased}, IsEvaluated: {IsEvaluated}";
         }
     }
 }

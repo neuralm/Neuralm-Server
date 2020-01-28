@@ -74,8 +74,6 @@ namespace Neuralm.Services.TrainingRoomService.Tests
 
             [TestMethod]
             [DataRow(5)]
-            [DataRow(null)]
-            [DataRow(default)]
             [DataRow("brain")]
             [DataRow(new int[] { 1, 2, 3 })]
             public void DifferentTypeTest(object other)

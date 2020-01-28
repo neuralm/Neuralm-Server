@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Neuralm.Services.Common.Mapping
 {
@@ -7,13 +9,13 @@ namespace Neuralm.Services.Common.Mapping
     /// </summary>
     internal class GenericServiceProvider : IGenericServiceProvider
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly ServiceProvider _serviceProvider;
 
         /// <summary>
         /// Initializes an instance of the <see cref="GenericServiceProvider"/> class.
         /// </summary>
         /// <param name="serviceProvider">The service provider.</param>
-        internal GenericServiceProvider(IServiceProvider serviceProvider)
+        internal GenericServiceProvider(ServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
@@ -32,6 +34,18 @@ namespace Neuralm.Services.Common.Mapping
         public TService GetService<TService>()
         {
             return (TService)GetService(typeof(TService));
+        }
+
+        /// <inheritdoc cref="IAsyncDisposable.DisposeAsync()"/>
+        public ValueTask DisposeAsync()
+        {
+            return _serviceProvider.DisposeAsync();
+        }
+
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
+        public void Dispose()
+        {
+            _serviceProvider.Dispose();
         }
     }
 }

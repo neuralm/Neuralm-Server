@@ -84,27 +84,19 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Amount cannot be smaller than 1.");
             if ((trainingSession = await EntityRepository.FindSingleOrDefaultAsync(ts => ts.Id.Equals(getOrganismsRequest.TrainingSessionId))) == default)
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training session does not exist.");
-
-            TrainingRoom trainingRoom;
-            if ((trainingRoom = await ((ITrainingSessionRepository)EntityRepository).FindSingleOrDefaultTrainingRoomAsync(tr => tr.Id.Equals(trainingSession.TrainingRoom.Id))) == default)
-                throw new Exception("..");
-            if (!trainingRoom.IsUserAuthorized(getOrganismsRequest.UserId) || trainingSession.UserId != getOrganismsRequest.UserId)
+            if (!trainingSession.TrainingRoom.IsUserAuthorized(getOrganismsRequest.UserId) || trainingSession.UserId != getOrganismsRequest.UserId)
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "User is not authorized.");
-
-
-            //if (!trainingSession.TrainingRoom.IsUserAuthorized(getOrganismsRequest.UserId) || trainingSession.UserId != getOrganismsRequest.UserId)
-            //    return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "User is not authorized.");
             if (trainingSession.EndedTimestamp != default)
                 return new GetOrganismsResponse(getOrganismsRequest.Id, new List<OrganismDto>(), "Training session has ended and can not be used any more.");
             TrainingRoomSettings trainingRoomSettings = trainingSession.TrainingRoom.TrainingRoomSettings;
             // if the list is empty then get new ones from the training room
-            if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.Evaluated) == 0)
+            if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.IsEvaluated) == 0)
             {
                 if (trainingSession.TrainingRoom.Generation == 0)
                 {
                     for (int i = 0; i < trainingRoomSettings.OrganismCount; i++)
                     {
-                        Organism organism = new Organism(trainingRoomSettings, trainingSession.TrainingRoom.GetInnovationNumber) { Leased = true };
+                        Organism organism = new Organism(trainingRoomSettings, trainingSession.TrainingRoom.GetInnovationNumber) { IsLeased = true };
                         trainingSession.TrainingRoom.AddOrganism(organism);
                         trainingSession.LeasedOrganisms.Add(new LeasedOrganism(organism, trainingSession.Id));
                     }
@@ -117,14 +109,14 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                     message = "Start of new generation.";
                 }
             }
-            else if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.Evaluated) < getOrganismsRequest.Amount)
+            else if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.IsEvaluated) < getOrganismsRequest.Amount)
             {
-                int take = getOrganismsRequest.Amount - trainingSession.LeasedOrganisms.Count(o => !o.Organism.Evaluated);
+                int take = getOrganismsRequest.Amount - trainingSession.LeasedOrganisms.Count(o => !o.Organism.IsEvaluated);
                 List<LeasedOrganism> newLeasedOrganisms = GetNewLeasedOrganisms(take);
                 trainingSession.LeasedOrganisms.AddRange(newLeasedOrganisms);
             }
 
-            if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.Evaluated) < getOrganismsRequest.Amount && getOrganismsRequest.Amount < trainingRoomSettings.OrganismCount)
+            if (trainingSession.LeasedOrganisms.Count(o => !o.Organism.IsEvaluated) < getOrganismsRequest.Amount && getOrganismsRequest.Amount < trainingRoomSettings.OrganismCount)
                 message = "The requested amount of organisms are not all available. The training room is close to a new generation.";
 
             if (message.StartsWith("First generation;"))
@@ -137,7 +129,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             }
 
             List<OrganismDto> organismDtos = trainingSession.LeasedOrganisms
-                .Where(lo => !lo.Organism.Evaluated)
+                .Where(lo => !lo.Organism.IsEvaluated)
                 .Take(getOrganismsRequest.Amount)
                 .Select(lo =>
                 {
@@ -154,10 +146,10 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             {
                 return trainingSession.TrainingRoom.Species
                     .SelectMany(sp => sp.Organisms)
-                    .Where(lo => !lo.Leased)
+                    .Where(lo => !lo.IsLeased)
                     .Take(take).Select(o =>
                     {
-                        o.Leased = true;
+                        o.IsLeased = true;
                         return new LeasedOrganism(o, trainingSession.Id);
                     }).ToList();
             }
@@ -185,26 +177,33 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
 
             foreach (LeasedOrganism leasedOrganism in orgs)
             {
-                trainingSession.TrainingRoom.PostScore(leasedOrganism.Organism, postOrganismsScoreRequest.OrganismScores.Find(o => o.Key == leasedOrganism.OrganismId).Value);
+                leasedOrganism.Organism.Score = postOrganismsScoreRequest.OrganismScores.Find(o => o.Key == leasedOrganism.OrganismId).Value;
+                leasedOrganism.Organism.IsEvaluated = true;
             }
 
             await _trainingSessionRepository.SaveChangesAsync();
             _logger.LogInformation("UPDATED ORGANISM SCORES!!!");
 
             string message = "Successfully updated the organisms scores.";
-            if (trainingSession.TrainingRoom.Species.SelectMany(p => p.Organisms).All(lo => lo.Evaluated))
+            if (trainingSession.TrainingRoom.Species.SelectMany(p => p.Organisms).All(lo => lo.IsEvaluated))
             {
                 trainingSession.LeasedOrganisms.Clear();
                 await _trainingSessionRepository.SaveChangesAsync();
                 _logger.LogInformation("CLEARED LEASED ORGANISMS AND SAVED CHANGES!!!");
                 
-                message = trainingSession.TrainingRoom.EndGeneration(() => { _trainingSessionRepository.SaveChangesAsync().GetAwaiter().GetResult(); }, (organism) => { _trainingSessionRepository.MarkAsAdded(organism); })
-                    ? "Successfully updated the organisms and advanced a generation!"
-                    : "Successfully updated the organisms but failed to advance a generation!";
-                await _trainingSessionRepository.SaveChangesAsync();
+                if (trainingSession.TrainingRoom.AllOrganismsInCurrentGenerationAreEvaluated())
+                {
+                    trainingSession.TrainingRoom.EndGeneration((organism) => { _trainingSessionRepository.MarkAsAdded(organism); });
+                    message = "Successfully updated the organisms and advanced a generation!";
+                }
+                else
+                {
+                    message = "Successfully updated the organisms but failed to advance a generation!";
+                }
+
+                await _trainingSessionRepository.UpdateOrganismsAsync(trainingSession);
                 _logger.LogInformation("ENDED THE GENERATION!!!");
             }
-            //await _trainingSessionRepository.UpdateOrganismsAsync(trainingSession);
             return new PostOrganismsScoreResponse(postOrganismsScoreRequest.Id, message, true);
         }
     }
