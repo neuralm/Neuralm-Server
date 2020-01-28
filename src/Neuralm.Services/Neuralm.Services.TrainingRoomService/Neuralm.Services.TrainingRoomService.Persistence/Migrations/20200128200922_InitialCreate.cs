@@ -139,8 +139,8 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                     Score = table.Column<double>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Generation = table.Column<long>(nullable: false),
-                    Leased = table.Column<bool>(nullable: false),
-                    Evaluated = table.Column<bool>(nullable: false)
+                    IsLeased = table.Column<bool>(nullable: false),
+                    IsEvaluated = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {

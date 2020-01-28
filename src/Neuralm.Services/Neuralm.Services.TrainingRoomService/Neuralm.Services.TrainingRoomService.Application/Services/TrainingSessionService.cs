@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Application.Abstractions;
 using Neuralm.Services.Common.Application.Interfaces;
@@ -10,6 +6,9 @@ using Neuralm.Services.TrainingRoomService.Application.Interfaces;
 using Neuralm.Services.TrainingRoomService.Domain;
 using Neuralm.Services.TrainingRoomService.Messages;
 using Neuralm.Services.TrainingRoomService.Messages.Dtos;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Neuralm.Services.TrainingRoomService.Application.Services
 {
@@ -185,21 +184,14 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
             _logger.LogInformation("UPDATED ORGANISM SCORES!!!");
 
             string message = "Successfully updated the organisms scores.";
-            if (trainingSession.TrainingRoom.Species.SelectMany(p => p.Organisms).All(lo => lo.IsEvaluated))
+            if (trainingSession.TrainingRoom.AllOrganismsInCurrentGenerationAreEvaluated())
             {
                 trainingSession.LeasedOrganisms.Clear();
                 await _trainingSessionRepository.SaveChangesAsync();
                 _logger.LogInformation("CLEARED LEASED ORGANISMS AND SAVED CHANGES!!!");
-                
-                if (trainingSession.TrainingRoom.AllOrganismsInCurrentGenerationAreEvaluated())
-                {
-                    trainingSession.TrainingRoom.EndGeneration((organism) => { _trainingSessionRepository.MarkAsAdded(organism); });
-                    message = "Successfully updated the organisms and advanced a generation!";
-                }
-                else
-                {
-                    message = "Successfully updated the organisms but failed to advance a generation!";
-                }
+
+                trainingSession.TrainingRoom.EndGeneration((organism) => _trainingSessionRepository.MarkAsAdded(organism));
+                message = "Successfully updated the organisms and advanced a generation!";
 
                 await _trainingSessionRepository.UpdateOrganismsAsync(trainingSession);
                 _logger.LogInformation("ENDED THE GENERATION!!!");

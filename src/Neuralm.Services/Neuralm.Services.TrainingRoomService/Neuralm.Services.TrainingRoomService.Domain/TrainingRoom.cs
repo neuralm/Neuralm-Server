@@ -126,7 +126,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// If one or more aren't evaluated false is returned.
         /// </summary>
         public bool AllOrganismsInCurrentGenerationAreEvaluated()
-            => Species.All(species => species.Organisms.Where(o => o.Generation == Generation).All(o => o.IsEvaluated));
+            => Species.SelectMany(species => species.Organisms.Where(o => o.Generation == Generation)).All(o => o.IsEvaluated);
 
         /// <summary>
         /// Does 1 generation.
@@ -135,11 +135,8 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         public void EndGeneration(Action<Organism> markAsAdded)
         {
             // Verifies that all organisms of the current generation are evaluated, otherwise throw an exception.
-            // FIXME: Require Species to have an IsEvaluated property
-            foreach (var species in Species)
-                foreach (var organism in species.Organisms.Where(o => o.Generation == Generation))
-                    if (!organism.IsEvaluated)
-                        throw new UnevaluatedOrganismException(organism);
+            if (!AllOrganismsInCurrentGenerationAreEvaluated())
+                throw new UnevaluatedOrganismException("An organism is not evaluated, but end generation was called!");
 
             // Prepares score values.
             double highestScore = double.MinValue;
@@ -292,18 +289,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <returns>Returns <c>true</c> if the given user id is authorized; otherwise, <c>false</c>.</returns>
         public bool IsUserAuthorized(Guid userId)
         {
-            bool output = false;
-
-            try
-            {
-                output = AuthorizedTrainers.Exists(user => user.UserId.Equals(userId));
-            } 
-            catch (Exception e)
-            {
-
-            }
-
-            return output; 
+            return AuthorizedTrainers.Exists(user => user.UserId.Equals(userId));
         }
 
         /// <summary>

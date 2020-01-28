@@ -10,7 +10,7 @@ using Neuralm.Services.TrainingRoomService.Persistence.Contexts;
 namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
 {
     [DbContext(typeof(TrainingRoomDbContext))]
-    [Migration("20200127192340_InitialCreate")]
+    [Migration("20200128200922_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -110,11 +110,11 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsEvaluated")
-                        .HasColumnType("bit");
-
                     b.Property<long>("Generation")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("IsEvaluated")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsLeased")
                         .HasColumnType("bit");

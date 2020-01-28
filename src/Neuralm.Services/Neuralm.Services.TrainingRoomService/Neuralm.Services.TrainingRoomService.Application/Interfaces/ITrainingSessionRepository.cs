@@ -26,7 +26,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Interfaces
         Task UpdateOrganismsAsync(TrainingSession trainingSession);
 
         /// <summary>
-        /// Mark organism as added
+        /// Marks the organism as added.
         /// </summary>
         /// <param name="organism">The organism to mark.</param>
         void MarkAsAdded(Organism organism);

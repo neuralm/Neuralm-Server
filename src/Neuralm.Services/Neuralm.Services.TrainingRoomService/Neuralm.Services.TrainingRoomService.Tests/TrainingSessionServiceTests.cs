@@ -44,6 +44,17 @@ namespace Neuralm.Services.TrainingRoomService.Tests
             serviceCollection.AddAutoMapper(Assembly.GetAssembly(typeof(TrainingRoomStartupExtensions)));
 
             #region Database
+            // NOTE: to verify if the test works in memory use code below..
+            //serviceCollection.AddOptions();
+            //serviceCollection.Configure<DbConfiguration>(dbConfig =>
+            //{
+            //    //InMemory by default
+            //    dbConfig.UseLazyLoading = true; 
+            //    dbConfig.ConnectionString = "";
+            //    dbConfig.DbProvider = "";
+            //});
+            //serviceCollection.AddSingleton<IFactory<TrainingRoomDbContext>, TrainingRoomDatabaseFactory>();
+            //serviceCollection.AddTransient<TrainingRoomDbContext>(p => p.GetService<IFactory<TrainingRoomDbContext>>().Create());
             SqliteConnection = new SqliteConnection("Data Source=:memory:");
             SqliteConnection.Open();
 

@@ -10,7 +10,6 @@ using Neuralm.Services.TrainingRoomService.Domain;
 using Neuralm.Services.TrainingRoomService.Persistence.Contexts;
 using System;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
@@ -108,6 +107,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
             }
         }
 
+        /// <inheritdoc cref="ITrainingSessionRepository.MarkAsAdded(Organism)"/>
         public void MarkAsAdded(Organism organism)
         {
             DbContext.Entry(organism).State = EntityState.Added;

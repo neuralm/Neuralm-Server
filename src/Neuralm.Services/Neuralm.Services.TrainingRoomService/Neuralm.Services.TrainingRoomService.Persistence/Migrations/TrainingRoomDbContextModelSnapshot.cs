@@ -108,11 +108,11 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsEvaluated")
-                        .HasColumnType("bit");
-
                     b.Property<long>("Generation")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("IsEvaluated")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsLeased")
                         .HasColumnType("bit");
