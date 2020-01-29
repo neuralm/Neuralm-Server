@@ -11,8 +11,8 @@
           <v-divider></v-divider>
           <v-card-actions>
             <v-btn v-if="trainingSession.endedTimestamp === '0001-01-01T00:00:00'" @click="endTrainingSession(trainingSession.id)">End TrainingSession</v-btn>
-            <v-btn v-if="trainingSession.endedTimestamp === '0001-01-01T00:00:00' && organisms.length == 0 || tested" @click="getOrganisms(trainingSession.id)">Get Organisms</v-btn>
-            <v-btn v-if="trainingSession.endedTimestamp === '0001-01-01T00:00:00' && organisms.length > 0 && !tested" @click="testOrganisms(organisms, trainingSession.id)">Test Organisms XOR</v-btn>
+            <v-btn class="getOrganisms" v-if="trainingSession.endedTimestamp === '0001-01-01T00:00:00' && organisms.length == 0 || tested" @click="getOrganisms(trainingSession.id)">Get Organisms</v-btn>
+            <v-btn class="testOrganisms" v-if="trainingSession.endedTimestamp === '0001-01-01T00:00:00' && organisms.length > 0 && !tested" @click="testOrganisms(organisms, trainingSession.id)">Test Organisms XOR</v-btn>
           </v-card-actions>
           <v-divider></v-divider>
           <v-data-table v-if="organisms.length > 0" :headers="headers" :items="organisms" class="elevation-1"></v-data-table>
@@ -94,16 +94,20 @@ export default class TrainingSessionView extends Vue {
 
   public testOrganisms(organisms: Organism[], trainingSessionId: string): void {
     const xor: Xor = new Xor();
-    const newOrganisms: Organism[] = this.organismObserverToOrganism(organisms);
+    let newOrganisms: Organism[] = [];
+    try {
+      newOrganisms = this.organismObserverToOrganism(organisms);
+    } catch (error) {
+      this.$snotify.error('Faulty network structure, failed to construct network!');
+      return;
+    }
     const organismScores: Map<string, number> = new Map<string, number>();
     for (const organism of newOrganisms) {
       xor.test(organism);
       organismScores.set(organism.id, organism.score);
     }
     this.$store.commit('trainingSession/setOrganisms', { organisms: newOrganisms, tested: true });
-
     const request: PostOrganismsScoreRequest = new PostOrganismsScoreRequest(trainingSessionId, organismScores);
-
     this.trainingSessionService.postOrganismsScores(request)
     .then((response: PostOrganismsScoreResponse) => {
       this.$snotify.success(response.message);
@@ -167,3 +171,11 @@ export default class TrainingSessionView extends Vue {
   }
 }
 </script>
+<style scoped>
+.getOrganisms {
+  /* marker class */
+}
+.testOrganisms {
+  /* marker class */
+}
+</style>
