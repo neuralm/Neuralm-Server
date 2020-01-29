@@ -25,7 +25,7 @@ export interface IMessageProcessor {
 
   /**
    * Processes the message.
-   * @param messageWrapper the message wrapper..
+   * @param messageWrapper the message wrapper.
    */
   processMessage(messageWrapper: MessageWrapper): void;
 }

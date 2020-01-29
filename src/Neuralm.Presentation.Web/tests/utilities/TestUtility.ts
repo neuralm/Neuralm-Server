@@ -78,4 +78,14 @@ function getLastSnotifyNotification(vm: Vue): SnotifyToast {
   return vm.$snotify.notifications[lastNotification - 1];
 }
 
-export { flush, registerPlugins, createMockedNeuralmMQClient, getLastSnotifyNotification };
+/**
+ * Checks if the notifications contains a certain body.
+ * @param vm The vue instance.
+ * @param body The body of the notification.
+ * @returns Returns whether the notifications contains a certain body.
+ */
+function snotifyNotificationsContains(vm: Vue, body: string): boolean {
+  return vm.$snotify.notifications.filter((not) => not.body === body).length > 0;
+}
+
+export { flush, registerPlugins, createMockedNeuralmMQClient, getLastSnotifyNotification, snotifyNotificationsContains };
