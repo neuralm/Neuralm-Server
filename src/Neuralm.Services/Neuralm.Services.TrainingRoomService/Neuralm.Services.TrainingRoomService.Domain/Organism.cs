@@ -551,6 +551,8 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 // Get or create the In and Out nodes based on the given node identifiers.
                 connectionGene.InNode = GetOrCreateNodeForNodeId(connectionGene.InNodeIdentifier);
                 connectionGene.OutNode = GetOrCreateNodeForNodeId(connectionGene.OutNodeIdentifier);
+
+                Debug.Assert(!(connectionGene.OutNode is InputNode), "Output node of connection gene is an InputNode.");
             }
 
             Node GetOrCreateNodeForNodeId(uint nodeIdentifier)
