@@ -14,15 +14,16 @@ namespace Neuralm.Services.TrainingRoomService.Domain
     {
         private static readonly string[] Vowels = { "a", "e", "i", "o", "u", "y", "aa", "ee", "ie", "oo", "ou", "au" };
         private static readonly string[] Consonants = { "b", "c", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "z" };
-        private readonly List<HiddenNode> _hiddenNodes = new List<HiddenNode>();
-        private readonly List<Node> _tempNodes = new List<Node>();
         private readonly List<ConnectionGene> _childGenes = new List<ConnectionGene>();
-        private uint _maxInnovation = 0;
+        protected List<Node> TempNodes { get; set; } = new List<Node>();
+        protected uint _maxInnovation = 0;
+
+        protected List<HiddenNode> HiddenNodes { get; set; } = new List<HiddenNode>();
 
         /// <summary>
         /// Gets and sets the id.
         /// </summary>
-        public Guid Id { get; private set; }
+        public Guid Id { get; protected set; }
 
         /// <summary>
         /// Gets and sets the species id.
@@ -52,12 +53,12 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <summary>
         /// Gets and sets the name.
         /// </summary>
-        public string Name { get; internal set; }
+        public string Name { get; protected set; }
 
         /// <summary>
         /// Gets and sets the generation.
         /// </summary>
-        public uint Generation { get; internal set; }
+        public uint Generation { get; set; }
 
         /// <summary>
         /// Gets and sets a value whether the organism is leased.
@@ -138,20 +139,9 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// An object is the same if it is a organism, and if the organism specific equals method returns true.
         /// </summary>
         /// <param name="obj">The object to compare to.</param>
-        /// <returns>Returns <c>true</c> if it is the same; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object obj)
-        {
-            return Equals(obj, true);
-        }
-
-        /// <summary>
-        /// Checks if an object is the same as this organism.
-        /// An object is the same if it is a organism, and if the organism specific equals method returns true.
-        /// </summary>
-        /// <param name="obj">The object to compare to.</param>
         /// <param name="once">The value that determines whether the inputs and outputs should also be used in the equals equation.</param>
         /// <returns>Returns <c>true</c> if it is the same; otherwise, <c>false</c>.</returns>
-        public bool Equals(object obj, bool once)
+        public virtual bool Equals(object obj, bool once = true)
         {
             if (!(obj is Organism organism))
                 return false;
@@ -236,7 +226,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <param name="parent2Organism">The other parent.</param>
         /// <param name="trainingRoomSettings">The training room settings.</param>
         /// <returns>Returns a child organism based on the genes of this organism and the passed organism.</returns>
-        public Organism Crossover(Organism parent2Organism, TrainingRoomSettings trainingRoomSettings)
+        public Organism Crossover(Organism parent2Organism, TrainingRoomSettings trainingRoomSettings, Func<Guid, TrainingRoomSettings, uint, List<ConnectionGene>, Organism> constructOrganism)
         {
             // Pre-generates a child id for creating connection genes.
             Guid childId = Guid.NewGuid();
@@ -289,7 +279,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             }
 
             // Create a new organism with all new genes.
-            Organism organism = new Organism(childId, trainingRoomSettings, Generation + 1, _childGenes);
+            Organism organism = constructOrganism(childId, trainingRoomSettings, Generation + 1, _childGenes);
 
             // Clears the temporary child genes list for re-use.
             _childGenes.Clear();
@@ -319,7 +309,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 return;
 
             // Find a random connection gene.
-            ConnectionGene connectionGene = ConnectionGenes.ElementAt(trainingRoomSettings.Random.Next(ConnectionGenes.Count));
+            ConnectionGene connectionGene = ConnectionGenes[trainingRoomSettings.Random.Next(ConnectionGenes.Count)];
 
             // If the random value is lower than the weight reassign chance set a new weight else add weight.
             if (trainingRoomSettings.Random.NextDouble() < trainingRoomSettings.WeightReassignChance)
@@ -335,7 +325,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// </summary>
         /// <param name="trainingRoomSettings">The training room settings.</param>
         /// <returns>Returns a clone of the organism.</returns>
-        public Organism Clone(TrainingRoomSettings trainingRoomSettings)
+        public virtual Organism Clone(TrainingRoomSettings trainingRoomSettings)
         {
             // Prepares a new id for the organisms to clone with.
             Guid newGuid = Guid.NewGuid();
@@ -373,8 +363,8 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             uint oldOutId = theChosenOne.OutNodeIdentifier;
 
             // Create a connectionGene from oldIn (a) to new (c) and from new (c) to oldOut (b) 
-            ConnectionGene aToC = new ConnectionGene(Id, innovationFunction(oldInId, newNodeId), oldInId, newNodeId, 1);
-            ConnectionGene cToB = new ConnectionGene(Id, innovationFunction(newNodeId, oldOutId), newNodeId, oldOutId, theChosenOne.Weight);
+            ConnectionGene aToC = CreateConnectionGene(innovationFunction(oldInId, newNodeId), oldInId, newNodeId, 1);
+            ConnectionGene cToB = CreateConnectionGene(innovationFunction(newNodeId, oldOutId), newNodeId, oldOutId, theChosenOne.Weight);
 
             // Add new connection genes.
             ConnectionGenes.Add(aToC);
@@ -393,7 +383,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// </summary>
         /// <param name="trainingRoomSettings">The training room settings.</param>
         /// <param name="innovationFunction">The innovation function.</param>
-        private void AddConnectionMutation(TrainingRoomSettings trainingRoomSettings, Func<uint, uint, uint> innovationFunction)
+        protected void AddConnectionMutation(TrainingRoomSettings trainingRoomSettings, Func<uint, uint, uint> innovationFunction)
         {
             // Set initial attempt counter to 0.
             int attemptsDone = 0;
@@ -410,16 +400,16 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 // Set start node to a random node while start note is of type OutputNode.
                 do
                 {
-                    startNode = GetRandomNode();
-                } while (startNode is OutputNode);
+                    startNode = TempNodes[trainingRoomSettings.Random.Next(TempNodes.Count)];
+                } while (IsNodeAnOutputNode(startNode));
 
 
                 // Set end node to a random node while the layer of the start and end node are the same or
                 // start node is of type InputNode and end node is of type InputNode.
                 do
                 {
-                    endNode = GetRandomNode();
-                } while (endNode.Layer == startNode.Layer || (startNode is InputNode && endNode is InputNode));
+                    endNode = TempNodes[trainingRoomSettings.Random.Next(TempNodes.Count)];
+                } while (endNode.Layer == startNode.Layer || (IsNodeAnInputNode(startNode) && IsNodeAnInputNode(endNode)));
 
                 // If end node layer is higher than start node layer swap them.
                 if (endNode.Layer > startNode.Layer)
@@ -438,9 +428,8 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                     attemptsDone += 1;
                     continue;
                 }
-
                 // Create a new connection gene from the start and end nodes.
-                ConnectionGene connection = new ConnectionGene(Id, innovationFunction(startNode.NodeIdentifier, endNode.NodeIdentifier), startNode.NodeIdentifier, endNode.NodeIdentifier, trainingRoomSettings.Random.NextDouble() * 2 - 1);
+                ConnectionGene connection = CreateConnectionGene(innovationFunction(startNode.NodeIdentifier, endNode.NodeIdentifier), startNode.NodeIdentifier, endNode.NodeIdentifier, trainingRoomSettings.Random.NextDouble() * 2 - 1);
 
                 // Add the connection gene.
                 ConnectionGenes.Add(connection);
@@ -451,17 +440,23 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 // Break the loop.
                 break;
             }
+        }
 
-            Node GetRandomNode()
-            {
-                //TODO: Why not use the hidden nodes list instead of the connection genes?
+        protected virtual ConnectionGene CreateConnectionGene(uint innovationNumber, uint inNodeId, uint outNodeId, double weight, bool enabled = true)
+        {
+            // Create a new connection gene from the start and end nodes.
+            ConnectionGene connection = new ConnectionGene(Id, innovationNumber, inNodeId, outNodeId, weight, enabled);
+            return connection;
+        }
 
-                List<Node> nodes = ConnectionGenes.SelectMany(p => new[] { p.InNode, p.OutNode }).Distinct().ToList();
-                nodes.AddRange(Inputs.Select(p => p.InputNode));
-                nodes.AddRange(Outputs.Select(p => p.OutputNode));
+        protected virtual bool IsNodeAnInputNode(Node node)
+        {
+            return node is InputNode;
+        }
 
-                return nodes[trainingRoomSettings.Random.Next(nodes.Count)];
-            }
+        protected virtual bool IsNodeAnOutputNode(Node node)
+        {
+            return node is OutputNode;
         }
 
         /// <summary>
@@ -485,114 +480,107 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         private void RebuildStructure()
         {
             // Clear the temporary node storage.
-            _tempNodes.Clear();
+            TempNodes.Clear();
 
             // Load all nodes for each connection gene.
             ConnectionGenes.ForEach(LoadNodes);
 
             // Find all the node in the connection genes.
-            _tempNodes.AddRange(ConnectionGenes.SelectMany(p => new[] { p.InNode, p.OutNode }).Distinct());
+            TempNodes.AddRange(ConnectionGenes.SelectMany(p => new[] { p.InNode, p.OutNode }).Distinct());
 
             // Add all input nodes
-            _tempNodes.AddRange(Inputs.Select(p => p.InputNode));
+            TempNodes.AddRange(Inputs.Select(p => p.InputNode));
 
             // Add all output nodes.
-            _tempNodes.AddRange(Outputs.Select(p => p.OutputNode));
+            TempNodes.AddRange(Outputs.Select(p => p.OutputNode));
 
             //Set all nodes to the lowest value so they dont keep older values.
-            foreach (Node node in _tempNodes)
+            foreach (Node node in TempNodes)
             {
-                if(!(node is OutputNode))
+                if (!IsNodeAnOutputNode(node))
                 {
                     SetLayer(node, uint.MinValue, true);
                 }
             }
 
-            foreach (Node node in _tempNodes)
+            foreach (Node node in TempNodes)
             {
-                switch (node)
+                if (IsNodeAnOutputNode(node))
                 {
-                    case OutputNode _:
-                        // For each node of type OutputNode set the layer to 0
-                        SetLayer(node, 0);
-                        break;
-                    case InputNode _:
-                        // For each node of type InputNode set the layer to minimum value and force to true.
-                        SetLayer(node, uint.MaxValue, true);
-                        break;
+                    // For each node of type OutputNode set the layer to 0
+                    SetLayer(node, 0);
+                }
+                else if (IsNodeAnInputNode(node))
+                {
+                    // For each node of type InputNode set the layer to minimum value and force to true.
+                    SetLayer(node, uint.MaxValue, true);
                 }
             }
+        }
 
-            void SetLayer(Node node, uint layer, bool force = false)
+        protected virtual void LoadNodes(ConnectionGene connectionGene)
+        {
+            // Get or create the In and Out nodes based on the given node identifiers.
+            connectionGene.InNode = GetNodeFromIdentifier(connectionGene.InNodeIdentifier);
+            connectionGene.OutNode = GetNodeFromIdentifier(connectionGene.OutNodeIdentifier);
+
+            //Debug.Assert(!connectionGene.OutNode.GetType().IsAssignableFrom(typeof(InputNode)), "Output node of connection gene is an InputNode.");
+        }
+
+        private void SetLayer(Node node, uint layer, bool force = false)
+        {
+            // Set the layer depending on force and if the current layer is higher than the layer given.
+            if (force)
             {
-                // Set the layer depending on force and if the current layer is higher than the layer given.
-                if (force)
-                {
-                    node.Layer = layer;
-                    // If force is true, return early.
-                    return;
-                }
-
-                node.Layer = Math.Max(layer, node.Layer);
-
-                // For each connection gene where the out node identifier is the same as the given node identifier
-                // set the layer to the node's layer plus one.
-                foreach (ConnectionGene connectionGene in ConnectionGenes)
-                {
-                    if (connectionGene.OutNodeIdentifier.Equals(node.NodeIdentifier))
-                    {
-                        SetLayer(connectionGene.InNode, node.Layer + 1);
-                    }
-                }
+                node.Layer = layer;
+                // If force is true, return early.
+                return;
             }
 
-            void LoadNodes(ConnectionGene connectionGene)
-            {
-                // Get or create the In and Out nodes based on the given node identifiers.
-                connectionGene.InNode = GetOrCreateNodeForNodeId(connectionGene.InNodeIdentifier);
-                connectionGene.OutNode = GetOrCreateNodeForNodeId(connectionGene.OutNodeIdentifier);
+            node.Layer = Math.Max(layer, node.Layer);
 
-                Debug.Assert(!(connectionGene.OutNode is InputNode), "Output node of connection gene is an InputNode.");
+            // For each connection gene where the out node identifier is the same as the given node identifier
+            // set the layer to the node's layer plus one.
+            foreach (ConnectionGene connectionGene in ConnectionGenes)
+            {
+                if (connectionGene.OutNodeIdentifier.Equals(node.NodeIdentifier))
+                {
+                    SetLayer(connectionGene.InNode, node.Layer + 1);
+                }
             }
+        }
 
-            Node GetOrCreateNodeForNodeId(uint nodeIdentifier)
-            {
-                // Tries to get a node for the given id, if not found returns a default.
-                Node node = GetNodeForId(nodeIdentifier);
+        public Node GetNodeFromIdentifier(uint nodeIdentifier)
+        {
+            // Tries to find the first relation where the input node has the given identifier or return default.
+            OrganismInputNode organismInputNode = Inputs.FirstOrDefault(n => n.InputNode.NodeIdentifier == nodeIdentifier);
 
-                // If the node is not equal to default return the given node.
-                if (node != default)
-                    return node;
+            // if the organism input node is not default return the input node.
+            if (organismInputNode != default) 
+                return organismInputNode.InputNode;
 
-                // Tries to find the node in the hidden nodes list, if not found returns a default.
-                node = _hiddenNodes.FirstOrDefault(n => n.NodeIdentifier == nodeIdentifier);
+            // Tries to find the first relation where the output node has the given identifier, else return default.
+            OutputNode nodeFromIdentifier = Outputs.FirstOrDefault(n => n.OutputNode.NodeIdentifier == nodeIdentifier)?.OutputNode;
+            return nodeFromIdentifier ?? CreateAndAddNode(nodeIdentifier);
+        }
 
-                // If the node is not equal to default return the given node.
-                if (node != default)
-                    return node;
+        protected virtual Node CreateAndAddNode(uint nodeIdentifier)
+        {
+            // Tries to find the node in the hidden nodes list, if not found returns a default.
+            HiddenNode node = HiddenNodes.FirstOrDefault(n => n.NodeIdentifier == nodeIdentifier);
 
-                // If no node was found then create a hidden node.
-                node = new HiddenNode(nodeIdentifier);
-
-                // Add it to the hidden nodes list.
-                _hiddenNodes.Add((HiddenNode)node);
-
-                // Return the hidden node.
+            // If the node is not equal to default return the given node.
+            if (node != default)
                 return node;
-            }
 
-            Node GetNodeForId(uint nodeIdentifier)
-            {
-                // Tries to find the first relation where the input node has the given identifier or return default.
-                OrganismInputNode organismInputNode = Inputs.FirstOrDefault(n => n.InputNode.NodeIdentifier == nodeIdentifier);
+            // If no node was found then create a hidden node.
+            node = new HiddenNode(nodeIdentifier);
 
-                // if the organism input node is not default return the input node.
-                if (organismInputNode != default)
-                    return organismInputNode.InputNode;
+            // Add it to the hidden nodes list.
+            HiddenNodes.Add(node);
 
-                // Tries to find the first relation where the output node has the given identifier, else return default.
-                return Outputs.FirstOrDefault(n => n.OutputNode.NodeIdentifier == nodeIdentifier)?.OutputNode;
-            }
+            // Return the hidden node.
+            return node;
         }
 
         /// <summary>
@@ -611,7 +599,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// Generates the input and output nodes.
         /// </summary>
         /// <param name="trainingRoomSettings">The training room settings.</param>
-        private void GenerateInputAndOutputNodes(TrainingRoomSettings trainingRoomSettings)
+        protected virtual void GenerateInputAndOutputNodes(TrainingRoomSettings trainingRoomSettings)
         {
             Inputs = new List<OrganismInputNode>((int)trainingRoomSettings.InputCount);
             for (uint nodeIdentifier = 0; nodeIdentifier < trainingRoomSettings.InputCount; nodeIdentifier++)
@@ -630,7 +618,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// </summary>
         /// <param name="randomNext">The function that generates a random number between 0 and x.</param>
         /// <returns>Returns a random generated name.</returns>
-        private static string GenerateName(Func<int, int> randomNext)
+        protected static string GenerateName(Func<int, int> randomNext)
         {
             string name = Consonants[randomNext(Consonants.Length)];
 

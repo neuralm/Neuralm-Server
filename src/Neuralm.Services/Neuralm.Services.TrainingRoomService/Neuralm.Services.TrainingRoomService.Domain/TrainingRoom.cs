@@ -132,7 +132,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// Does 1 generation.
         /// kills the worst ones, mutate and breed and make the system ready for a new generation.
         /// </summary>
-        public void EndGeneration(Action<Organism> markAsAdded)
+        public void EndGeneration(Action<Organism> markAsAdded, Func<Organism> constructOrganism, Func<Guid, TrainingRoomSettings, uint, List<ConnectionGene>, Organism> constructOrganism2)
         {
             // Verifies that all organisms of the current generation are evaluated, otherwise throw an exception.
             if (!AllOrganismsInCurrentGenerationAreEvaluated())
@@ -186,7 +186,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 amountOfOrganisms = Math.Floor(amountOfOrganisms);
                 for (int i = 0; i < amountOfOrganisms; i++)
                 {
-                    species.AddOrganism(ProduceOrganism(species));
+                    species.AddOrganism(ProduceOrganism(species, constructOrganism2));
                     markAsAdded(species.Organisms[species.Organisms.Count - 1]);
                 }
                 totalOrganisms += amountOfOrganisms;
@@ -195,7 +195,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             // If the total organisms count is lower than the amount specified in the training room settings then add more.
             while (totalOrganisms < TrainingRoomSettings.OrganismCount)
             {
-                AddOrganism(new Organism(Generation + 1, TrainingRoomSettings));
+                AddOrganism(constructOrganism());
             }
 
             // Increases the generation.
@@ -314,7 +314,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// </summary>
         /// <param name="species">The species.</param>
         /// <returns>Returns a generated <see cref="Organism"/>.</returns>
-        private Organism ProduceOrganism(Species species)
+        private Organism ProduceOrganism(Species species, Func<Guid, TrainingRoomSettings, uint, List<ConnectionGene>, Organism> constructOrganism)
         {
             // Gets a random organism as child.
             Organism child = species.GetRandomOrganism(Generation, TrainingRoomSettings);
@@ -331,7 +331,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                     : species.GetRandomOrganism(Generation, TrainingRoomSettings);
 
                 // Cross over the two organisms with the training room settings.
-                temp = child.Crossover(parent2, TrainingRoomSettings);
+                temp = child.Crossover(parent2, TrainingRoomSettings, constructOrganism);
             }
             else
             {
