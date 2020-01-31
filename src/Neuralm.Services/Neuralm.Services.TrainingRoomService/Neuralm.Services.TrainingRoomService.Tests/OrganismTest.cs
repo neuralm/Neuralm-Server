@@ -254,7 +254,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                 Guid trainingRoomId = Guid.NewGuid();
                 _roomName = "CoolRoom";
 
-                //Create a trainingroom with really high mutation settings
+                //Create a training room with really high mutation settings
                 TrainingRoomSettings trainingRoomSettings = new TrainingRoomSettings(trainingRoomId: trainingRoomId,
                                                                                      organismCount: 100,
                                                                                      inputCount: 2,
@@ -285,7 +285,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
             }
 
             [TestMethod]
-            public void Mutate()
+            public void Mutate_15_Generations()
             {
                 //Run 15 generations
                 for (int i = 0; i < 15; i++)
@@ -293,6 +293,8 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                     _trainingRoom.Species.ForEach(species => species.Organisms.ForEach(o => { o.Score = 1; o.IsEvaluated = true; }));
                     _trainingRoom.EndGeneration(o => { });
                 }
+
+                Assert.AreEqual(15, (int)_trainingRoom.Generation);
             }
         }
     }

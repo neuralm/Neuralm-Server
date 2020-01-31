@@ -467,17 +467,16 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <summary>
         /// Check if adding a connection between the given nodes causes a loop in the given genes.
         /// </summary>
-        /// <param name="startNodeIdentifier">The new connection's start node</param>
-        /// <param name="endNodeIdentifier">The new connection's end node</param>
-        /// <param name="connectionGenes">The already existing genes</param>
-        /// <returns></returns>
+        /// <param name="startNodeIdentifier">The new connection's start node.</param>
+        /// <param name="endNodeIdentifier">The new connection's end node.</param>
+        /// <param name="connectionGenes">The already existing genes.</param>
+        /// <returns>Returns <c>true</c> if adding a connection between the given nodes causes a loop in the given genes; otherwise, <c>false</c>.</returns>
         private static bool ConnectionLoops(uint startNodeIdentifier, uint endNodeIdentifier, List<ConnectionGene> connectionGenes)
         {
-            return connectionGenes.FindAll(gene => gene.OutNodeIdentifier == startNodeIdentifier).Any(gene =>
-            {
-                return gene.InNodeIdentifier == endNodeIdentifier
-                        || ConnectionLoops(gene.InNodeIdentifier, endNodeIdentifier, connectionGenes);
-            });
+            return connectionGenes
+                .FindAll(gene => gene.OutNodeIdentifier == startNodeIdentifier)
+                .Any(gene => gene.InNodeIdentifier == endNodeIdentifier 
+                             || ConnectionLoops(gene.InNodeIdentifier, endNodeIdentifier, connectionGenes));
         }
 
         /// <summary>
@@ -511,15 +510,16 @@ namespace Neuralm.Services.TrainingRoomService.Domain
 
             foreach (Node node in _tempNodes)
             {
-                if (node is OutputNode)
+                switch (node)
                 {
-                    // For each node of type OutputNode set the layer to 0
-                    SetLayer(node, 0);
-                }
-                else if (node is InputNode)
-                {
-                    // For each node of type InputNode set the layer to minimum value and force to true.
-                    SetLayer(node, uint.MaxValue, true);
+                    case OutputNode _:
+                        // For each node of type OutputNode set the layer to 0
+                        SetLayer(node, 0);
+                        break;
+                    case InputNode _:
+                        // For each node of type InputNode set the layer to minimum value and force to true.
+                        SetLayer(node, uint.MaxValue, true);
+                        break;
                 }
             }
 
@@ -551,8 +551,6 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 // Get or create the In and Out nodes based on the given node identifiers.
                 connectionGene.InNode = GetOrCreateNodeForNodeId(connectionGene.InNodeIdentifier);
                 connectionGene.OutNode = GetOrCreateNodeForNodeId(connectionGene.OutNodeIdentifier);
-
-                Debug.Assert(!(connectionGene.OutNode is InputNode), "Output node of connection gene is an InputNode.");
             }
 
             Node GetOrCreateNodeForNodeId(uint nodeIdentifier)
