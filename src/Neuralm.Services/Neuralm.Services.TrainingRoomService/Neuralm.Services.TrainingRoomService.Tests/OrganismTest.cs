@@ -243,5 +243,57 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                 Assert.IsFalse(organism1.Equals(other));
             }
         }
+    
+        [TestClass]
+        public class MutateTest : OrganismTests
+        {
+            [TestInitialize]
+            public void Initialize()
+            {
+                _fakeUser = new User();
+                Guid trainingRoomId = Guid.NewGuid();
+                _roomName = "CoolRoom";
+
+                //Create a trainingroom with really high mutation settings
+                TrainingRoomSettings trainingRoomSettings = new TrainingRoomSettings(trainingRoomId: trainingRoomId,
+                                                                                     organismCount: 100,
+                                                                                     inputCount: 2,
+                                                                                     outputCount: 1,
+                                                                                     c1: 1,
+                                                                                     c2: 1,
+                                                                                     c3: 0.4,
+                                                                                     threshold: 3,
+                                                                                     addConnectionChance: 1,
+                                                                                     addNodeChance: 1,
+                                                                                     crossOverChance: 0.75,
+                                                                                     interSpeciesChance: 0.001,
+                                                                                     mutationChance: 1,
+                                                                                     mutateWeightChance: 0.8,
+                                                                                     weightReassignChance: 0.1,
+                                                                                     topAmountToSurvive: 0.5,
+                                                                                     enableConnectionChance: 0.25,
+                                                                                     seed: 0);
+
+                _trainingRoom = new TrainingRoom(trainingRoomId, _fakeUser, _roomName, trainingRoomSettings);
+
+                for (int i = 0; i < trainingRoomSettings.OrganismCount; i++)
+                {
+                    Organism organism = new Organism(trainingRoomSettings, _trainingRoom.GetInnovationNumber) { IsLeased = true };
+                    _trainingRoom.AddOrganism(organism);
+                }
+                _trainingRoom.IncreaseNodeIdTo(trainingRoomSettings.InputCount + trainingRoomSettings.OutputCount);
+            }
+
+            [TestMethod]
+            public void Mutate()
+            {
+                //Run 15 generations
+                for (int i = 0; i < 15; i++)
+                {
+                    _trainingRoom.Species.ForEach(species => species.Organisms.ForEach(o => { o.Score = 1; o.IsEvaluated = true; }));
+                    _trainingRoom.EndGeneration(o => { });
+                }
+            }
+        }
     }
 }
