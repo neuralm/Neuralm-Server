@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Neuralm.Services.TrainingRoomService.Domain;
 
 namespace Neuralm.Services.TrainingRoomService.Tests.Evaluatables
@@ -16,18 +17,21 @@ namespace Neuralm.Services.TrainingRoomService.Tests.Evaluatables
 
         public double GetValue()
         {
-            if (ConnectionGenes.Count == 0)
+            if (ConnectionGenes.Count(gene => gene.Enabled) == 0)
                 return ActivationFunction(0);
             double total = 0;
             int count = 0;
 
             foreach (EvaluatableConnectionGene connectionGene in _connectionGenes)
             {
-                total += connectionGene.GetValue();
-                count++;
+                if (connectionGene.Enabled)
+                {
+                    total += connectionGene.GetValue();
+                    count++;
+                }
             }
 
-            return ActivationFunction(total / count);
+            return ActivationFunction(total);
         }
 
         public void SetValue(double value)

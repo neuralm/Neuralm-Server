@@ -9,7 +9,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
     /// <summary>
     /// Represents the <see cref="Organism"/> class.
     /// </summary>
-    [DebuggerDisplay("{Generation}")]
+    [DebuggerDisplay("{Score}")]
     public class Organism : IEntity
     {
         private static readonly string[] Vowels = { "a", "e", "i", "o", "u", "y", "aa", "ee", "ie", "oo", "ou", "au" };
@@ -561,7 +561,13 @@ namespace Neuralm.Services.TrainingRoomService.Domain
 
             // Tries to find the first relation where the output node has the given identifier, else return default.
             OutputNode nodeFromIdentifier = Outputs.FirstOrDefault(n => n.OutputNode.NodeIdentifier == nodeIdentifier)?.OutputNode;
-            return nodeFromIdentifier ?? CreateAndAddNode(nodeIdentifier);
+            
+            if(nodeFromIdentifier != null)
+            {
+                return nodeFromIdentifier;
+            }
+            
+            return HiddenNodes.FirstOrDefault(node => node.NodeIdentifier == nodeIdentifier) ?? CreateAndAddNode(nodeIdentifier);
         }
 
         protected virtual Node CreateAndAddNode(uint nodeIdentifier)

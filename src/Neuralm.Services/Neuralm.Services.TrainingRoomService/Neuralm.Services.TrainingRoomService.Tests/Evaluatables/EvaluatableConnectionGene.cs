@@ -39,6 +39,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests.Evaluatables
 
         public double GetValue()
         {
+            Debug.Assert(Enabled);
             if (InNode is null)
                 throw new NullReferenceException("The input node is default");
             return ((IEvaluatableNode) InNode).GetValue() * Weight;

@@ -11,7 +11,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests.Evaluatables
             {
                 for (int j = 0; j <= 1; j++)
                 {
-                    double[] output = evaluatableOrganism.Evaluate(new double[] {i, j});
+                    double[] output = evaluatableOrganism.Evaluate(new double[] {i, j, 1});
                     double expected = i ^ j;
                     error += Math.Abs(expected - output[0]);
                 }

@@ -314,7 +314,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                 //Create a training room with really high mutation settings
                 TrainingRoomSettings trainingRoomSettings = new TrainingRoomSettings(trainingRoomId: trainingRoomId,
                                                                                      organismCount: 25,
-                                                                                     inputCount: 2,
+                                                                                     inputCount: 3,
                                                                                      outputCount: 1,
                                                                                      c1: 1,
                                                                                      c2: 1,
@@ -329,7 +329,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                                                                                      weightReassignChance: 0.1,
                                                                                      topAmountToSurvive: 0.5,
                                                                                      enableConnectionChance: 0.25,
-                                                                                     seed: 0);
+                                                                                     seed: 1);
 
                 _trainingRoom = new TrainingRoom(trainingRoomId, _fakeUser, _roomName, trainingRoomSettings);
 
@@ -346,7 +346,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
             {
                 Xor xor = new Xor();
                 //Run 15 generations
-                for (int i = 0; i < 2; i++)
+                for (int i = 0; i < 20; i++)
                 {
                     _trainingRoom.Species.ForEach(species => species.Organisms.ForEach(o =>
                     {
@@ -358,7 +358,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                         (guid, settings, generation, childGenes) => new EvaluatableOrganism(guid, settings, generation, childGenes));
                 }
 
-                Assert.AreEqual(2, (int)_trainingRoom.Generation);
+                Assert.AreEqual(20, (int)_trainingRoom.Generation);
             }
         }
     }
