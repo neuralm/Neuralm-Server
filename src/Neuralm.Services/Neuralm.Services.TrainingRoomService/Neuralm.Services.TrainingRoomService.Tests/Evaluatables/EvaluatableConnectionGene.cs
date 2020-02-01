@@ -13,9 +13,6 @@ namespace Neuralm.Services.TrainingRoomService.Tests.Evaluatables
 
         public void BuildStructure(EvaluatableOrganism organism)
         {
-            if (!Enabled)
-                return;
-
             if (!organism.Id.Equals(OrganismId))
                 throw new Exception("The buildStructure function was passed a different organism then its OrganismId.");
 
@@ -23,16 +20,20 @@ namespace Neuralm.Services.TrainingRoomService.Tests.Evaluatables
             if (InNode is null)
                 throw new ArgumentOutOfRangeException();
             OutNode = organism.GetNodeFromIdentifier(OutNodeIdentifier);
-            switch (OutNode)
+
+            if (Enabled)
             {
-                case EvaluatableOutputNode eo:
-                    eo.AddDependency(this);
-                    break;
-                case EvaluatableHiddenNode eh:
-                    eh.AddDependency(this);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                switch (OutNode)
+                {
+                    case EvaluatableOutputNode eo:
+                        eo.AddDependency(this);
+                        break;
+                    case EvaluatableHiddenNode eh:
+                        eh.AddDependency(this);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
         }
 
@@ -40,7 +41,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests.Evaluatables
         {
             if (InNode is null)
                 throw new NullReferenceException("The input node is default");
-            return ((EvaluatableInputNode) InNode).GetValue() * Weight;
+            return ((IEvaluatableNode) InNode).GetValue() * Weight;
         }
 
         public override ConnectionGene Clone(Guid organismId)
