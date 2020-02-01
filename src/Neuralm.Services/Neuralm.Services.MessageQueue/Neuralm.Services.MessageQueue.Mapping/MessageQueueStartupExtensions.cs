@@ -2,18 +2,19 @@
 using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Application.Serializers;
+using Neuralm.Services.Common.Application.Services;
 using Neuralm.Services.Common.Infrastructure;
 using Neuralm.Services.Common.Mapping;
+using Neuralm.Services.Common.Patterns;
+using Neuralm.Services.MessageQueue.Application;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
 using Neuralm.Services.MessageQueue.Infrastructure;
+using Neuralm.Services.RegistryService.Messages;
 using Neuralm.Services.TrainingRoomService.Messages;
 using Neuralm.Services.UserService.Messages;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Neuralm.Services.Common.Application.Services;
-using Neuralm.Services.MessageQueue.Application;
-using Neuralm.Services.RegistryService.Messages;
 
 namespace Neuralm.Services.MessageQueue.Mapping
 {

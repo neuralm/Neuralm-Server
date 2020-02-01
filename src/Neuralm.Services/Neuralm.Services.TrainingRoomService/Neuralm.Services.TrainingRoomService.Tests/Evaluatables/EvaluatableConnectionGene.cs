@@ -1,6 +1,5 @@
-﻿using System;
-using System.Diagnostics;
-using Neuralm.Services.TrainingRoomService.Domain;
+﻿using Neuralm.Services.TrainingRoomService.Domain;
+using System;
 
 namespace Neuralm.Services.TrainingRoomService.Tests.Evaluatables
 {
@@ -17,29 +16,25 @@ namespace Neuralm.Services.TrainingRoomService.Tests.Evaluatables
                 throw new Exception("The buildStructure function was passed a different organism then its OrganismId.");
 
             InNode = organism.GetNodeFromIdentifier(InNodeIdentifier);
-            if (InNode is null)
-                throw new ArgumentOutOfRangeException();
             OutNode = organism.GetNodeFromIdentifier(OutNodeIdentifier);
 
-            if (Enabled)
+            if (!Enabled) 
+                return;
+            switch (OutNode)
             {
-                switch (OutNode)
-                {
-                    case EvaluatableOutputNode eo:
-                        eo.AddDependency(this);
-                        break;
-                    case EvaluatableHiddenNode eh:
-                        eh.AddDependency(this);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                case EvaluatableOutputNode eo:
+                    eo.AddDependency(this);
+                    break;
+                case EvaluatableHiddenNode eh:
+                    eh.AddDependency(this);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
         public double GetValue()
         {
-            Debug.Assert(Enabled);
             if (InNode is null)
                 throw new NullReferenceException("The input node is default");
             return ((IEvaluatableNode) InNode).GetValue() * Weight;

@@ -1,6 +1,14 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Application.Serializers;
+using Neuralm.Services.Common.Infrastructure;
+using Neuralm.Services.Common.Infrastructure.Networking;
 using Neuralm.Services.Common.Messages.Interfaces;
+using Neuralm.Services.Common.Patterns;
 using Neuralm.Services.MessageQueue.Tests.Mocks;
+using Neuralm.Services.TrainingRoomService.Messages;
 using Neuralm.Services.UserService.Messages;
 using System;
 using System.Collections.Generic;
@@ -8,13 +16,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Neuralm.Services.Common.Application.Interfaces;
-using Neuralm.Services.Common.Application.Serializers;
-using Neuralm.Services.Common.Infrastructure;
-using Neuralm.Services.Common.Infrastructure.Networking;
-using Neuralm.Services.TrainingRoomService.Messages;
-using Microsoft.Extensions.Logging;
 
 namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
 {

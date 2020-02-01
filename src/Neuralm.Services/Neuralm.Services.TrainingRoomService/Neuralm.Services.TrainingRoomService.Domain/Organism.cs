@@ -1,4 +1,6 @@
 ﻿using Neuralm.Services.Common.Domain;
+using Neuralm.Services.Common.Patterns;
+using Neuralm.Services.TrainingRoomService.Domain.FactoryArguments;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,9 +17,16 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         private static readonly string[] Vowels = { "a", "e", "i", "o", "u", "y", "aa", "ee", "ie", "oo", "ou", "au" };
         private static readonly string[] Consonants = { "b", "c", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "z" };
         private readonly List<ConnectionGene> _childGenes = new List<ConnectionGene>();
-        protected List<Node> TempNodes { get; set; } = new List<Node>();
         protected uint _maxInnovation = 0;
 
+        /// <summary>
+        /// Gets and sets the temporary nodes list.
+        /// </summary>
+        protected List<Node> TempNodes { get; set; } = new List<Node>();
+
+        /// <summary>
+        /// Gets and sets the hidden nodes list.
+        /// </summary>
         protected List<HiddenNode> HiddenNodes { get; set; } = new List<HiddenNode>();
 
         /// <summary>
@@ -225,8 +234,9 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// </summary>
         /// <param name="parent2Organism">The other parent.</param>
         /// <param name="trainingRoomSettings">The training room settings.</param>
+        /// <param name="organismFactory">The organism factory.</param>
         /// <returns>Returns a child organism based on the genes of this organism and the passed organism.</returns>
-        public Organism Crossover(Organism parent2Organism, TrainingRoomSettings trainingRoomSettings, Func<Guid, TrainingRoomSettings, uint, List<ConnectionGene>, Organism> constructOrganism)
+        public Organism Crossover(Organism parent2Organism, TrainingRoomSettings trainingRoomSettings, IFactory<Organism, OrganismFactoryArgument> organismFactory)
         {
             // Pre-generates a child id for creating connection genes.
             Guid childId = Guid.NewGuid();
@@ -279,7 +289,14 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             }
 
             // Create a new organism with all new genes.
-            Organism organism = constructOrganism(childId, trainingRoomSettings, Generation + 1, _childGenes);
+            Organism organism = organismFactory.Create(new OrganismFactoryArgument
+            { 
+                Id = childId, 
+                TrainingRoomSettings = trainingRoomSettings,
+                ConnectionGenes = _childGenes,
+                Generation = Generation + 1,
+                CreationType = OrganismCreationType.NEW_WITH_GENES
+            });
 
             // Clears the temporary child genes list for re-use.
             _childGenes.Clear();
@@ -494,7 +511,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             // Add all output nodes.
             TempNodes.AddRange(Outputs.Select(p => p.OutputNode));
 
-            //Set all nodes to the lowest value so they dont keep older values.
+            //Set all nodes to the lowest value so they don't keep older values.
             foreach (Node node in TempNodes)
             {
                 if (!IsNodeAnOutputNode(node))
@@ -560,13 +577,13 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 return organismInputNode.InputNode;
 
             // Tries to find the first relation where the output node has the given identifier, else return default.
-            OutputNode nodeFromIdentifier = Outputs.FirstOrDefault(n => n.OutputNode.NodeIdentifier == nodeIdentifier)?.OutputNode;
+            OrganismOutputNode organismOutputNode= Outputs.FirstOrDefault(n => n.OutputNode.NodeIdentifier == nodeIdentifier);
             
-            if(nodeFromIdentifier != null)
-            {
-                return nodeFromIdentifier;
-            }
+            // if the organism output node is not default return the output node.
+            if (organismOutputNode != default)
+                return organismOutputNode.OutputNode;
             
+            // Tries to find a hidden node with the given identifier; otherwise, create and return a new hidden node.
             return HiddenNodes.FirstOrDefault(node => node.NodeIdentifier == nodeIdentifier) ?? CreateAndAddNode(nodeIdentifier);
         }
 
