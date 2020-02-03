@@ -145,13 +145,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
         [TestMethod]
         public async Task StartTrainingSessionAsync_Should_Create_A_New_Session()
         {
-            StartTrainingSessionRequest startTrainingSessionRequest = new StartTrainingSessionRequest
-            {
-                Id = Guid.NewGuid(),
-                DateTime = DateTime.Now,
-                TrainingRoomId = TrainingRoomId, 
-                UserId = UserId
-            };
+            StartTrainingSessionRequest startTrainingSessionRequest = StartTrainingSessionRequest(TrainingRoomId, UserId);
             StartTrainingSessionResponse startTrainingSessionResponse = await TrainingSessionService.StartTrainingSessionAsync(startTrainingSessionRequest);
             Assert.IsTrue(startTrainingSessionResponse.Success);
         }
@@ -159,13 +153,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
         [TestMethod]
         public async Task StartTrainingSessionAsync_Should_Fail_Due_To_Unknown_User_Id()
         {
-            StartTrainingSessionRequest startTrainingSessionRequest = new StartTrainingSessionRequest
-            {
-                Id = Guid.NewGuid(),
-                DateTime = DateTime.Now,
-                TrainingRoomId = TrainingRoomId,
-                UserId = Guid.NewGuid()
-            };
+            StartTrainingSessionRequest startTrainingSessionRequest = StartTrainingSessionRequest(TrainingRoomId, Guid.NewGuid());
             StartTrainingSessionResponse startTrainingSessionResponse = await TrainingSessionService.StartTrainingSessionAsync(startTrainingSessionRequest);
             Assert.IsFalse(startTrainingSessionResponse.Success);
             Assert.AreEqual("User does not exist.", startTrainingSessionResponse.Message);
@@ -174,13 +162,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
         [TestMethod]
         public async Task StartTrainingSessionAsync_Should_Fail_Due_To_Unknown_TrainingRoom_Id()
         {
-            StartTrainingSessionRequest startTrainingSessionRequest = new StartTrainingSessionRequest
-            {
-                Id = Guid.NewGuid(),
-                DateTime = DateTime.Now,
-                TrainingRoomId = Guid.NewGuid(),
-                UserId = UserId
-            };
+            StartTrainingSessionRequest startTrainingSessionRequest = StartTrainingSessionRequest(Guid.NewGuid(), UserId);
             StartTrainingSessionResponse startTrainingSessionResponse = await TrainingSessionService.StartTrainingSessionAsync(startTrainingSessionRequest);
             Assert.IsFalse(startTrainingSessionResponse.Success);
             Assert.AreEqual("Training room does not exist.", startTrainingSessionResponse.Message);
@@ -189,22 +171,10 @@ namespace Neuralm.Services.TrainingRoomService.Tests
         [TestMethod]
         public async Task EndTrainingSessionAsync_Should_Successfully_End_The_TrainingSession()
         {
-            StartTrainingSessionRequest startTrainingSessionRequest = new StartTrainingSessionRequest
-            {
-                Id = Guid.NewGuid(),
-                DateTime = DateTime.Now,
-                TrainingRoomId = TrainingRoomId,
-                UserId = UserId
-            };
+            StartTrainingSessionRequest startTrainingSessionRequest = StartTrainingSessionRequest(TrainingRoomId, UserId);
             StartTrainingSessionResponse startTrainingSessionResponse = await TrainingSessionService.StartTrainingSessionAsync(startTrainingSessionRequest);
             Guid trainingSessionId = startTrainingSessionResponse.TrainingSession.Id;
-
-            EndTrainingSessionRequest endTrainingSessionRequest = new EndTrainingSessionRequest()
-            {
-                Id = Guid.NewGuid(),
-                DateTime = DateTime.Now,
-                TrainingSessionId = trainingSessionId
-            };
+            EndTrainingSessionRequest endTrainingSessionRequest = EndTrainingSessionRequest(trainingSessionId);
             EndTrainingSessionResponse endTrainingSessionResponse = await TrainingSessionService.EndTrainingSessionAsync(endTrainingSessionRequest);
             Assert.IsTrue(endTrainingSessionResponse.Success);
         }
@@ -212,12 +182,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
         [TestMethod]
         public async Task EndTrainingSessionAsync_Should_Fail_Due_To_Unknown_TrainingSession_Id()
         {
-            EndTrainingSessionRequest endTrainingSessionRequest = new EndTrainingSessionRequest()
-            {
-                Id = Guid.NewGuid(),
-                DateTime = DateTime.Now,
-                TrainingSessionId = Guid.NewGuid()
-            };
+            EndTrainingSessionRequest endTrainingSessionRequest = EndTrainingSessionRequest(Guid.NewGuid());
             EndTrainingSessionResponse endTrainingSessionResponse = await TrainingSessionService.EndTrainingSessionAsync(endTrainingSessionRequest);
             Assert.IsFalse(endTrainingSessionResponse.Success);
             Assert.AreEqual("Training session does not exist.", endTrainingSessionResponse.Message);
@@ -236,15 +201,9 @@ namespace Neuralm.Services.TrainingRoomService.Tests
             StartTrainingSessionResponse startTrainingSessionResponse = await TrainingSessionService.StartTrainingSessionAsync(startTrainingSessionRequest);
             Guid trainingSessionId = startTrainingSessionResponse.TrainingSession.Id;
 
-            GetOrganismsRequest getOrganismsRequest = new GetOrganismsRequest()
-            {
-                Id = Guid.NewGuid(),
-                DateTime = DateTime.Now,
-                TrainingSessionId = trainingSessionId,
-                Amount = OrganismCount,
-                UserId = UserId
-            };
+            GetOrganismsRequest getOrganismsRequest = GetOrganismsRequest(trainingSessionId);
             GetOrganismsResponse getOrganismsResponse = await TrainingSessionService.GetOrganismsAsync(getOrganismsRequest);
+
             Assert.IsTrue(getOrganismsResponse.Success);
             Assert.AreEqual(OrganismCount, getOrganismsResponse.Organisms.Count);
         }
@@ -262,7 +221,46 @@ namespace Neuralm.Services.TrainingRoomService.Tests
             StartTrainingSessionResponse startTrainingSessionResponse = await TrainingSessionService.StartTrainingSessionAsync(startTrainingSessionRequest);
             Guid trainingSessionId = startTrainingSessionResponse.TrainingSession.Id;
 
-            GetOrganismsRequest getOrganismsRequest = new GetOrganismsRequest()
+            GetOrganismsRequest getOrganismsRequest = GetOrganismsRequest(trainingSessionId);
+            GetOrganismsResponse getOrganismsResponse = await TrainingSessionService.GetOrganismsAsync(getOrganismsRequest);
+
+            PostOrganismsScoreRequest postOrganismsScoreRequest = PostOrganismsScoreRequest(trainingSessionId, getOrganismsResponse);
+            PostOrganismsScoreResponse postOrganismsScoreResponse = await TrainingSessionService.PostOrganismsScoreAsync(postOrganismsScoreRequest);
+
+            Assert.IsTrue(postOrganismsScoreResponse.Success);
+            Assert.AreEqual("Successfully updated the organisms and advanced a generation!", postOrganismsScoreResponse.Message);
+        }
+
+        [TestMethod]
+        public async Task Run_For_5_Generations()
+        {
+            StartTrainingSessionRequest startTrainingSessionRequest = new StartTrainingSessionRequest
+            {
+                Id = Guid.NewGuid(),
+                DateTime = DateTime.Now,
+                TrainingRoomId = TrainingRoomId,
+                UserId = UserId
+            };
+            StartTrainingSessionResponse startTrainingSessionResponse = await TrainingSessionService.StartTrainingSessionAsync(startTrainingSessionRequest);
+            Guid trainingSessionId = startTrainingSessionResponse.TrainingSession.Id;
+
+            int generations = 5;
+            PostOrganismsScoreResponse postOrganismsScoreResponse = default;
+            for (int i = 1; i < generations; i++)
+            {
+                GetOrganismsRequest getOrganismsRequest = GetOrganismsRequest(trainingSessionId);
+                GetOrganismsResponse getOrganismsResponse = await TrainingSessionService.GetOrganismsAsync(getOrganismsRequest);
+                PostOrganismsScoreRequest postOrganismsScoreRequest = PostOrganismsScoreRequest(trainingSessionId, getOrganismsResponse);
+                postOrganismsScoreResponse = await TrainingSessionService.PostOrganismsScoreAsync(postOrganismsScoreRequest);
+            }
+
+            Assert.IsTrue(postOrganismsScoreResponse.Success);
+            Assert.AreEqual("Successfully updated the organisms and advanced a generation!", postOrganismsScoreResponse.Message);
+        }
+
+        private GetOrganismsRequest GetOrganismsRequest(Guid trainingSessionId)
+        {
+            return new GetOrganismsRequest()
             {
                 Id = Guid.NewGuid(),
                 DateTime = DateTime.Now,
@@ -270,24 +268,40 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                 Amount = OrganismCount,
                 UserId = UserId
             };
-            GetOrganismsResponse getOrganismsResponse = await TrainingSessionService.GetOrganismsAsync(getOrganismsRequest);
-
+        }
+        private static PostOrganismsScoreRequest PostOrganismsScoreRequest(Guid trainingSessionId, GetOrganismsResponse getOrganismsResponse)
+        {
             List<DictionaryEntry<Guid, double>> scores = new List<DictionaryEntry<Guid, double>>();
             foreach (OrganismDto organism in getOrganismsResponse.Organisms)
             {
-                scores.Add(new DictionaryEntry<Guid, double>() { Key = organism.Id, Value = organism.Score + 2 });
+                scores.Add(new DictionaryEntry<Guid, double>() { Key = organism.Id, Value = organism.Score + 1 });
             }
-
-            PostOrganismsScoreRequest postOrganismsScoreRequest = new PostOrganismsScoreRequest()
+            return new PostOrganismsScoreRequest()
             {
                 Id = Guid.NewGuid(),
                 DateTime = DateTime.Now,
                 TrainingSessionId = trainingSessionId,
                 OrganismScores = scores
             };
-            PostOrganismsScoreResponse postOrganismsScoreResponse = await TrainingSessionService.PostOrganismsScoreAsync(postOrganismsScoreRequest);
-            Assert.IsTrue(postOrganismsScoreResponse.Success);
-            Assert.AreEqual("Successfully updated the organisms and advanced a generation!", postOrganismsScoreResponse.Message);
+        }
+        private static EndTrainingSessionRequest EndTrainingSessionRequest(Guid trainingSessionId)
+        {
+            return new EndTrainingSessionRequest()
+            {
+                Id = Guid.NewGuid(),
+                DateTime = DateTime.Now,
+                TrainingSessionId = trainingSessionId
+            };
+        }
+        private static StartTrainingSessionRequest StartTrainingSessionRequest(Guid trainingRoomId, Guid userId)
+        {
+            return new StartTrainingSessionRequest
+            {
+                Id = Guid.NewGuid(),
+                DateTime = DateTime.Now,
+                TrainingRoomId = trainingRoomId,
+                UserId = userId
+            };
         }
     }
 }

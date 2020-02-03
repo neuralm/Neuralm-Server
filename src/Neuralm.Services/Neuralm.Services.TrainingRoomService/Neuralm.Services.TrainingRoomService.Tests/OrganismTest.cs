@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Neuralm.Services.Common.Patterns;
 using Neuralm.Services.TrainingRoomService.Domain;
 using Neuralm.Services.TrainingRoomService.Domain.FactoryArguments;
 using Neuralm.Services.TrainingRoomService.Tests.Evaluatables;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Neuralm.Services.TrainingRoomService.Tests
 {
@@ -300,7 +300,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                     _trainingRoom.Species.ForEach(species => species.Organisms.ForEach(o => { o.Score = 1; o.IsEvaluated = true; }));
                     _trainingRoom.EndGeneration(o => { });
                 }
-
+                
                 Assert.AreEqual(15, (int)_trainingRoom.Generation);
             }
         }
