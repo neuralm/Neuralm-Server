@@ -6,6 +6,7 @@ using Neuralm.Services.Common.Application.Serializers;
 using Neuralm.Services.Common.Infrastructure;
 using Neuralm.Services.Common.Infrastructure.Networking;
 using Neuralm.Services.Common.Messages.Interfaces;
+using Neuralm.Services.Common.Patterns;
 using Neuralm.Services.MessageQueue.Tests.Mocks;
 using Neuralm.Services.TrainingRoomService.Messages;
 using Neuralm.Services.UserService.Messages;

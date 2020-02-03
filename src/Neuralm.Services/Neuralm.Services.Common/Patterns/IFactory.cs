@@ -1,4 +1,4 @@
-﻿namespace Neuralm.Services.Common.Application.Interfaces
+﻿namespace Neuralm.Services.Common.Patterns
 {
     /// <summary>
     /// Represents the <see cref="IFactory{TResult}"/> interface for the Factory pattern.

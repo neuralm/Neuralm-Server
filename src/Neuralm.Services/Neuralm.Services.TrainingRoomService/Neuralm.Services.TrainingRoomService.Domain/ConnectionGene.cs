@@ -83,7 +83,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// Clones this connection gene to produce a gene that equals the original gene but is not the same instance.
         /// </summary>
         /// <returns>Returns a new <see cref="ConnectionGene"/> with the same inID, outID, weight, innovation number and enabled.</returns>
-        public ConnectionGene Clone(Guid organismId)
+        public virtual ConnectionGene Clone(Guid organismId)
         {
             return new ConnectionGene(organismId, InnovationNumber, InNodeIdentifier, OutNodeIdentifier, Weight, Enabled);
         }

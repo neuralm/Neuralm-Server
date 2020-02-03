@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Neuralm.Services.Common.Patterns;
 using Neuralm.Services.TrainingRoomService.Domain;
+using Neuralm.Services.TrainingRoomService.Domain.FactoryArguments;
+using Neuralm.Services.TrainingRoomService.Tests.Evaluatables;
 
 namespace Neuralm.Services.TrainingRoomService.Tests
 {
@@ -10,6 +13,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
     public class OrganismTests
     {
         private TrainingRoom _trainingRoom;
+        private IFactory<Organism, OrganismFactoryArgument> _organismFactory;
         private User _fakeUser;
         private string _roomName;
 
@@ -22,7 +26,8 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                 _fakeUser = new User(); 
                 Guid trainingRoomId = Guid.NewGuid();
                 _roomName = "CoolRoom";
-                _trainingRoom = new TrainingRoom(trainingRoomId, _fakeUser, _roomName, new TrainingRoomSettings(trainingRoomId, 0, 2, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
+                _organismFactory = new OrganismFactory();
+                _trainingRoom = new TrainingRoom(trainingRoomId, _fakeUser, _roomName, new TrainingRoomSettings(trainingRoomId, 0, 2, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0), _organismFactory);
             }
 
             [TestMethod]
@@ -69,7 +74,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                     new ConnectionGene(id2, 10, 0, 5, 1)
                 });
 
-                Organism child = organism1.Crossover(organism2, _trainingRoom.TrainingRoomSettings);
+                Organism child = organism1.Crossover(organism2, _trainingRoom.TrainingRoomSettings, _organismFactory);
                 List<ConnectionGene> childGenes = child.ConnectionGenes.OrderBy(a => a.InnovationNumber).ToList();
                 CollectionAssert.AreEqual(childGenes, expectedGenes);
             }
@@ -85,7 +90,8 @@ namespace Neuralm.Services.TrainingRoomService.Tests
             {
                 _fakeUser = new User();
                 Guid trainingRoomId = Guid.NewGuid();
-                _trainingRoom = new TrainingRoom(trainingRoomId, _fakeUser, "FakeRoom", new TrainingRoomSettings(trainingRoomId, 0, 2, 3, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
+                _organismFactory = new OrganismFactory();
+                _trainingRoom = new TrainingRoom(trainingRoomId, _fakeUser, "FakeRoom", new TrainingRoomSettings(trainingRoomId, 0, 2, 3, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0), _organismFactory);
                 Guid id = Guid.NewGuid();
                 _original = new Organism(id, _trainingRoom.TrainingRoomSettings, 0, new List<ConnectionGene>()
                 {
@@ -144,7 +150,8 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                 Guid trainingRoomId = Guid.NewGuid();
                 _roomName = "dfsd";
                 _fakeUser = new User();
-                _trainingRoom = new TrainingRoom(trainingRoomId, _fakeUser, _roomName, new TrainingRoomSettings(trainingRoomId, 0, 3, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0));
+                _organismFactory = new OrganismFactory();
+                _trainingRoom = new TrainingRoom(trainingRoomId, _fakeUser, _roomName, new TrainingRoomSettings(trainingRoomId, 0, 3, 1, 1, 1, 0.4, 3, 0.05, 0.03, 0.75, 0.001, 1, 0.8, 0.1, 0.5, 0.25, 0), _organismFactory);
             }
 
             [TestMethod]
@@ -241,6 +248,119 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                     });
 
                 Assert.IsFalse(organism1.Equals(other));
+            }
+        }
+    
+        [TestClass]
+        public class MutateTest : OrganismTests
+        {
+            [TestInitialize]
+            public void Initialize()
+            {
+                _fakeUser = new User();
+                Guid trainingRoomId = Guid.NewGuid();
+                _roomName = "CoolRoom";
+                _organismFactory = new OrganismFactory();
+                //Create a training room with really high mutation settings
+                TrainingRoomSettings trainingRoomSettings = new TrainingRoomSettings(trainingRoomId: trainingRoomId,
+                                                                                     organismCount: 100,
+                                                                                     inputCount: 2,
+                                                                                     outputCount: 1,
+                                                                                     c1: 1,
+                                                                                     c2: 1,
+                                                                                     c3: 0.4,
+                                                                                     threshold: 3,
+                                                                                     addConnectionChance: 1,
+                                                                                     addNodeChance: 1,
+                                                                                     crossOverChance: 0.75,
+                                                                                     interSpeciesChance: 0.001,
+                                                                                     mutationChance: 1,
+                                                                                     mutateWeightChance: 0.8,
+                                                                                     weightReassignChance: 0.1,
+                                                                                     topAmountToSurvive: 0.5,
+                                                                                     enableConnectionChance: 0.25,
+                                                                                     seed: 0);
+
+                _trainingRoom = new TrainingRoom(trainingRoomId, _fakeUser, _roomName, trainingRoomSettings, _organismFactory);
+
+                for (int i = 0; i < trainingRoomSettings.OrganismCount; i++)
+                {
+                    Organism organism = new Organism(trainingRoomSettings, _trainingRoom.GetInnovationNumber) { IsLeased = true };
+                    _trainingRoom.AddOrganism(organism);
+                }
+                _trainingRoom.IncreaseNodeIdTo(trainingRoomSettings.InputCount + trainingRoomSettings.OutputCount);
+            }
+
+            [TestMethod]
+            public void Mutate_15_Generations()
+            {
+                //Run 15 generations
+                for (int i = 0; i < 15; i++)
+                {
+                    _trainingRoom.Species.ForEach(species => species.Organisms.ForEach(o => { o.Score = 1; o.IsEvaluated = true; }));
+                    _trainingRoom.EndGeneration(o => { });
+                }
+
+                Assert.AreEqual(15, (int)_trainingRoom.Generation);
+            }
+        }
+
+        [TestClass]
+        public class XorTest : OrganismTests
+        {
+            [TestInitialize]
+            public void Initialize()
+            {
+                _fakeUser = new User();
+                Guid trainingRoomId = Guid.NewGuid();
+                _roomName = "CoolRoom";
+
+                //Create a training room with really high mutation settings
+                TrainingRoomSettings trainingRoomSettings = new TrainingRoomSettings(trainingRoomId: trainingRoomId,
+                                                                                     organismCount: 25,
+                                                                                     inputCount: 3,
+                                                                                     outputCount: 1,
+                                                                                     c1: 1,
+                                                                                     c2: 1,
+                                                                                     c3: 0.4,
+                                                                                     threshold: 3,
+                                                                                     addConnectionChance: 1,
+                                                                                     addNodeChance: 1,
+                                                                                     crossOverChance: 0.75,
+                                                                                     interSpeciesChance: 0.001,
+                                                                                     mutationChance: 1,
+                                                                                     mutateWeightChance: 0.8,
+                                                                                     weightReassignChance: 0.1,
+                                                                                     topAmountToSurvive: 0.5,
+                                                                                     enableConnectionChance: 0.25,
+                                                                                     seed: 1);
+                _organismFactory = new EvaluatableOrganismFactory();
+                _trainingRoom = new TrainingRoom(trainingRoomId, _fakeUser, _roomName, trainingRoomSettings, _organismFactory);
+
+                for (int i = 0; i < trainingRoomSettings.OrganismCount; i++)
+                {
+                    EvaluatableOrganism organism = new EvaluatableOrganism(trainingRoomSettings, _trainingRoom.GetInnovationNumber) { IsLeased = true };
+                    _trainingRoom.AddOrganism(organism);
+                }
+                _trainingRoom.IncreaseNodeIdTo(trainingRoomSettings.InputCount + trainingRoomSettings.OutputCount);
+            }
+
+            [TestMethod]
+            public void Xor()
+            {
+                Xor xor = new Xor();
+                //Run 15 generations
+                for (int i = 0; i < 15; i++)
+                {
+                    _trainingRoom.Species.ForEach(species => species.Organisms.ForEach(o =>
+                    {
+                        xor.Test((EvaluatableOrganism) o);
+                        o.IsEvaluated = true;
+                    }));
+                    _trainingRoom.EndGeneration(o => { });
+                }
+
+                Assert.AreEqual(15, (int)_trainingRoom.Generation);
             }
         }
     }

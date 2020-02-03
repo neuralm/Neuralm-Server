@@ -1,5 +1,7 @@
 ﻿using Neuralm.Services.Common.Domain;
+using Neuralm.Services.Common.Patterns;
 using Neuralm.Services.TrainingRoomService.Domain.Exceptions;
+using Neuralm.Services.TrainingRoomService.Domain.FactoryArguments;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +13,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
     /// </summary>
     public class TrainingRoom : IEntity
     {
+        private readonly IFactory<Organism, OrganismFactoryArgument> _organismFactory;
         private readonly Dictionary<(uint A, uint B), uint> _mutationToInnovation = new Dictionary<(uint A, uint B), uint>();
         private uint _nodeIdentifier;
 
@@ -70,11 +73,29 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         public bool Enabled { get; private set; }
 
         /// <summary>
+        /// Gets and sets the highest organism score.
+        /// </summary>
+        public double HighestOrganismScore { get; set; }
+
+        /// <summary>
+        /// Gets and sets the lowest organism score.
+        /// </summary>
+        public double LowestOrganismScore { get; set; }
+
+        /// <summary>
+        /// Gets and sets the total score.
+        /// </summary>
+        public double TotalScore { get; set; }
+
+        /// <summary>
         /// EFCore entity constructor IGNORE!
         /// </summary>
         protected TrainingRoom()
         {
-
+            // Preset here since all dto's do not have species defined in them.
+            Species = new List<Species>();
+            // Since it is the default domain the factory can be constructed here.
+            _organismFactory = new OrganismFactory();
         }
 
         /// <summary>
@@ -85,8 +106,10 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <param name="owner">The user who created this training room.</param>
         /// <param name="name">The name for the room.</param>
         /// <param name="trainingRoomSettings">The settings for this training room.</param>
-        public TrainingRoom(Guid id, User owner, string name, TrainingRoomSettings trainingRoomSettings)
+        /// <param name="organismFactory">The organism factory.</param>
+        public TrainingRoom(Guid id, User owner, string name, TrainingRoomSettings trainingRoomSettings, IFactory<Organism, OrganismFactoryArgument> organismFactory)
         {
+            _organismFactory = organismFactory;
             Id = id;
             Name = name;
             Owner = owner;
@@ -139,9 +162,9 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 throw new UnevaluatedOrganismException("An organism is not evaluated, but end generation was called!");
 
             // Prepares score values.
-            double highestScore = double.MinValue;
-            double lowestScore = double.MaxValue;
-            double totalScore = 0;
+            HighestOrganismScore = double.MinValue;
+            LowestOrganismScore = double.MaxValue;
+            TotalScore = 0;
 
             // For each through all the species.
             foreach (Species species in Species)
@@ -150,30 +173,31 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 foreach (Organism organism in species.Organisms)
                 {
                     organism.Score /= Species.Count;
-                    highestScore = Math.Max(organism.Score, highestScore);
-                    lowestScore = Math.Min(organism.Score, lowestScore);
+                    HighestOrganismScore = Math.Max(organism.Score, HighestOrganismScore);
+                    LowestOrganismScore = Math.Min(organism.Score, LowestOrganismScore);
                 }
 
                 // Reproduce with the given training room settings.
                 species.PostGeneration(TrainingRoomSettings.TopAmountToSurvive, Generation);
-                
+
                 // Calculate the total score for all species.
-                totalScore += species.SpeciesScore;
+                TotalScore += species.SpeciesScore;
             }
 
             // If the total score is 0 than force the total score to be 1.
-            if (totalScore == 0)
-                totalScore = 1; // TODO: Think about what this really does lol, if the total score is 0 should they have the right to reproduce?
+            if (TotalScore == 0)
+                TotalScore = 1; // TODO: Think about what this really does lol, if the total score is 0 should they have the right to reproduce?
 
             // Prepare rest value.
             double rest = 0;
+
             // Prepare total organisms value.
             double totalOrganisms = 0;
 
             // For each species determine the amount of organisms that is allowed to survive
             foreach (Species species in Species)
             {
-                double fraction = species.SpeciesScore / totalScore;
+                double fraction = species.SpeciesScore / TotalScore;
                 double amountOfOrganisms = TrainingRoomSettings.OrganismCount * fraction;
                 rest += amountOfOrganisms % 1;
 
@@ -195,7 +219,11 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             // If the total organisms count is lower than the amount specified in the training room settings then add more.
             while (totalOrganisms < TrainingRoomSettings.OrganismCount)
             {
-                AddOrganism(new Organism(Generation + 1, TrainingRoomSettings));
+                AddOrganism(_organismFactory.Create(new OrganismFactoryArgument()
+                {
+                    TrainingRoomSettings = TrainingRoomSettings, 
+                    Generation = Generation + 1
+                }));
             }
 
             // Increases the generation.
@@ -331,7 +359,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                     : species.GetRandomOrganism(Generation, TrainingRoomSettings);
 
                 // Cross over the two organisms with the training room settings.
-                temp = child.Crossover(parent2, TrainingRoomSettings);
+                temp = child.Crossover(parent2, TrainingRoomSettings, _organismFactory);
             }
             else
             {

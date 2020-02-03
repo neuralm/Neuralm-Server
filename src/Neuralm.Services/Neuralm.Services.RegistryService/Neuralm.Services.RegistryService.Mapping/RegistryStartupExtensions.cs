@@ -7,6 +7,7 @@ using Neuralm.Services.Common.Application.Serializers;
 using Neuralm.Services.Common.Application.Services;
 using Neuralm.Services.Common.Infrastructure;
 using Neuralm.Services.Common.Mapping;
+using Neuralm.Services.Common.Patterns;
 using Neuralm.Services.Common.Persistence;
 using Neuralm.Services.Common.Persistence.EFCore;
 using Neuralm.Services.Common.Persistence.EFCore.Repositories;

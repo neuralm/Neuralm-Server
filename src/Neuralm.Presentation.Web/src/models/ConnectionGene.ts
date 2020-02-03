@@ -38,7 +38,7 @@ export default class ConnectionGene {
     }
 
     if (this.organismId !== organism.id) {
-      throw new Error('The buildStructure function was passed a different organism then its orgnasmId.');
+      throw new Error('The buildStructure function was passed a different organism then its organismId.');
     }
 
     this.in = organism.getNodeFromIdentifier(this.inNodeIdentifier);
