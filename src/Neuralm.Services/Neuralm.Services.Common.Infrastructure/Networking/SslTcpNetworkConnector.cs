@@ -63,11 +63,11 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         }
 
         /// <summary>
-        /// Authenticates as client.
+        /// Authenticates as client asynchronously.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
-        public async Task AuthenticateAsClient(CancellationToken cancellationToken)
+        public async Task AuthenticateAsClientAsync(CancellationToken cancellationToken)
         {
             try
             {
@@ -75,7 +75,7 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
             }
             catch (AuthenticationException e)
             {
-                Logger.LogError($"Authentication failed - closing the connection!\n\t{e.Message}");
+                Logger.LogError(e, $"Authentication failed - closing the connection!\n\t{e.Message}");
                 Logger.LogError("AuthenticateAsClient is cancelled.");
                 TcpClient.Close();
                 Dispose();
@@ -84,12 +84,12 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         }
 
         /// <summary>
-        /// Authenticates as server.
+        /// Authenticates as server asynchronously.
         /// </summary>
         /// <param name="certificate">The certificate.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
-        public async Task AuthenticateAsServer(X509Certificate certificate, CancellationToken cancellationToken)
+        public async Task AuthenticateAsServerAsync(X509Certificate certificate, CancellationToken cancellationToken)
         {
             try
             {
@@ -97,7 +97,7 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
             }
             catch (Exception e)
             {
-                Logger.LogError($"Authentication failed - closing the connection!\n\t{e.Message}");
+                Logger.LogError(e, $"Authentication failed - closing the connection!\n\t{e.Message}");
                 Logger.LogError($"AuthenticateAsServer is cancelled for: {TcpClient.Client.RemoteEndPoint}.");
                 TcpClient.Close();
                 Dispose();
@@ -115,6 +115,13 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         /// <returns>Returns <c>true</c> if <paramref name="sslPolicyErrors"/> equals <see cref="SslPolicyErrors.None"/>; otherwise, <c>false</c>.</returns>
         private bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
+            // FIXME: Fairly dirty fix for now...
+            if (RunMode.IsTest)
+            {
+                Logger.LogCritical("SSL certificate validation skipped because CODE is in test mode.");
+                return true;
+            }
+
             if (sslPolicyErrors == SslPolicyErrors.None)
                 return true;
 

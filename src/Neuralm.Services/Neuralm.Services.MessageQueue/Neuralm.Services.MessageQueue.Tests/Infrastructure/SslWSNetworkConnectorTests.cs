@@ -14,13 +14,14 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
 {
     [TestClass]
-    public class TcpNetworkConnectorTests
+    public class SslWSNetworkConnectorTests
     {
         private const int DefaultTimeOut = 5;
         public IMessageSerializer MessageSerializer { get; set; }
@@ -28,7 +29,9 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
         public IMessageTypeCache MessageTypeCache { get; set; }
         public IFactory<IMessageTypeCache, IEnumerable<Type>> MessageTypeCacheFactory { get; set; }
         public string Host { get; set; }
-        public ILogger<TcpNetworkConnector> Logger { get; set; }
+        public ILogger<SslWSNetworkConnector> Logger { get; set; }
+        public ILogger<NeuralmWSHandshakeHandler> HandshakeLogger { get; private set; }
+        public X509Certificate2 X509Certificate2 { get; set; }
 
         [TestInitialize]
         public void Setup()
@@ -44,16 +47,18 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
             MessageTypeCache = MessageTypeCacheFactory.Create(types);
             IServiceProvider serviceProvider = new ServiceCollection().AddLogging(builder => builder.AddConsole()).BuildServiceProvider();
             ILoggerFactory factory = serviceProvider.GetService<ILoggerFactory>();
-            Logger = factory.CreateLogger<TcpNetworkConnector>();
+            Logger = factory.CreateLogger<SslWSNetworkConnector>();
+            HandshakeLogger = factory.CreateLogger<NeuralmWSHandshakeHandler>();
+            X509Certificate2 = X509Certificate2Builder.BuildSelfSignedServerCertificate(Host);
         }
 
         [TestMethod]
         public async Task ConnectAsync_Should_Set_IsConnected_To_True()
         {
             using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(DefaultTimeOut * 3));
-            _ = StartServer(cts.Token, 9989);
-            TcpNetworkConnector tcpNetworkConnector = await StartClient(cts.Token, 9989);
-            Assert.IsTrue(tcpNetworkConnector.IsConnected);
+            _ = StartServer(cts.Token, 9992);
+            SslWSNetworkConnector sslWSNetworkConnector = await StartClient(cts.Token, 9992);
+            Assert.IsTrue(sslWSNetworkConnector.IsConnected);
             cts.Cancel();
         }
 
@@ -61,10 +66,10 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
         public async Task SendMessageAsync_Should_Invoke_MessageProcessor()
         {
             using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(DefaultTimeOut * 3));
-            _ = StartServer(cts.Token, 9977);
-            TcpNetworkConnector tcpNetworkConnector = await StartClient(cts.Token, 9977);
+            _ = StartServer(cts.Token, 9993);
+            SslWSNetworkConnector sslWSNetworkConnector = await StartClient(cts.Token, 9993);
             AuthenticateRequest message = new AuthenticateRequest() { CredentialTypeCode = "Name", Password = "Mario", Username = "Mario" };
-            await tcpNetworkConnector.SendMessageAsync(message, cts.Token);
+            await sslWSNetworkConnector.SendMessageAsync(message, cts.Token);
             IMessage messageInMessageProcessor = await MessageProcessor.GetMessageAsync(cts.Token);
             Assert.AreEqual(message.Id, messageInMessageProcessor?.Id);
             cts.Cancel();
@@ -81,21 +86,25 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
                 Console.WriteLine("Awaiting new connection...");
                 TcpClient tcpClient = await tcpListener.AcceptTcpClientAsync();
                 Console.WriteLine("Accepted connection!");
-                _ = Task.Run(() =>
+                _ = Task.Run(async () =>
                 {
-                    TcpNetworkConnector networkConnector = new TcpNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Logger, tcpClient);
-                    networkConnector.Start();
-                    Console.WriteLine("Started tcp network connector");
+                    SslWSNetworkConnector sslWSNetworkConnector = new SslWSNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Logger, new NeuralmWSHandshakeHandler(HandshakeLogger), tcpClient);
+                    await sslWSNetworkConnector.AuthenticateAsServerAsync(X509Certificate2, cancellationToken);
+                    await sslWSNetworkConnector.StartHandshakeAsServerAsync();
+                    sslWSNetworkConnector.Start();
+                    Console.WriteLine("Started ssl ws network connector");
                 }, cancellationToken);
             }
         }
 
-        private async Task<TcpNetworkConnector> StartClient(CancellationToken cancellationToken, int port)
+        private async Task<SslWSNetworkConnector> StartClient(CancellationToken cancellationToken, int port)
         {
-            TcpNetworkConnector tcpNetworkConnector = new TcpNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Logger, Host, port);
-            await tcpNetworkConnector.ConnectAsync(cancellationToken);
-            tcpNetworkConnector.Start();
-            return tcpNetworkConnector;
+            SslWSNetworkConnector sslWSNetworkConnector = new SslWSNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Logger, new NeuralmWSHandshakeHandler(HandshakeLogger),  Host, port);
+            await sslWSNetworkConnector.ConnectAsync(cancellationToken);
+            await sslWSNetworkConnector.AuthenticateAsClientAsync(cancellationToken);
+            await sslWSNetworkConnector.StartHandshakeAsClientAsync();
+            sslWSNetworkConnector.Start();
+            return sslWSNetworkConnector;
         }
     }
 }
