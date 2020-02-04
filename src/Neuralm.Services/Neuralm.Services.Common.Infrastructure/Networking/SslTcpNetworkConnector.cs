@@ -1,36 +1,21 @@
-﻿using System;
-using System.Net;
+﻿using Microsoft.Extensions.Logging;
+using Neuralm.Services.Common.Application.Interfaces;
+using System;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Neuralm.Services.Common.Application.Interfaces;
 
 namespace Neuralm.Services.Common.Infrastructure.Networking
 {
     /// <summary>
-    /// Represents the <see cref="SslTcpNetworkConnector"/> class; an implementation of the abstract <see cref="BaseNetworkConnector"/> class.
+    /// Represents the <see cref="SslTcpNetworkConnector"/> class; a secure implementation of the <see cref="TcpNetworkConnector"/> class.
     /// The <see cref="SslStream"/> version of the <see cref="TcpNetworkConnector"/>.
     /// </summary>
-    public sealed class SslTcpNetworkConnector : BaseNetworkConnector
+    public class SslTcpNetworkConnector : TcpNetworkConnector
     {
-        private readonly TcpClient _tcpClient;
-        private readonly string _host;
-        private readonly int _port;
-        private SslStream _sslStream;
-
-        /// <inheritdoc cref="BaseNetworkConnector.EndPoint"/>
-        public override EndPoint EndPoint => _tcpClient.Client.RemoteEndPoint;
-
-        /// <inheritdoc cref="BaseNetworkConnector.IsConnected"/>
-        public override bool IsConnected => _tcpClient.Connected;
-
-        /// <inheritdoc cref="BaseNetworkConnector.IsDataAvailable"/>
-        protected override bool IsDataAvailable => _tcpClient.Available > 0;
-
         /// <summary>
         /// Initializes an instance of the <see cref="SslTcpNetworkConnector"/> class.
         /// </summary>
@@ -45,11 +30,9 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
             IMessageSerializer messageSerializer,
             IMessageProcessor messageProcessor,
             ILogger<SslTcpNetworkConnector> logger,
-            string host, int port) : base(messageTypeCache, messageSerializer, messageProcessor, logger)
+            string host, int port) : base(messageTypeCache, messageSerializer, messageProcessor, logger, host, port)
         {
-            _tcpClient = new TcpClient();
-            _host = host;
-            _port = port;
+
         }
 
         /// <summary>
@@ -65,10 +48,9 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
             IMessageSerializer messageSerializer,
             IMessageProcessor messageProcessor,
             ILogger<SslTcpNetworkConnector> logger,
-            TcpClient tcpClient) : base(messageTypeCache, messageSerializer, messageProcessor, logger)
+            TcpClient tcpClient) : base(messageTypeCache, messageSerializer, messageProcessor, logger, tcpClient)
         {
-            _tcpClient = tcpClient;
-            _sslStream = new SslStream(_tcpClient.GetStream(), false);
+            Stream = new SslStream(tcpClient.GetStream(), false);
         }
 
         /// <inheritdoc cref="BaseNetworkConnector.ConnectAsync"/>
@@ -76,62 +58,51 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         {
             if (IsConnected)
                 return;
-            await _tcpClient.ConnectAsync(_host, _port);
-            _sslStream = new SslStream(_tcpClient.GetStream(), false, ValidateServerCertificate, null);
+            await TcpClient.ConnectAsync(Host, Port);
+            Stream = new SslStream(TcpClient.GetStream(), false, ValidateServerCertificate, null);
         }
 
         /// <summary>
-        /// Authenticates as client.
+        /// Authenticates as client asynchronously.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
-        public async Task AuthenticateAsClient(CancellationToken cancellationToken)
+        public async Task AuthenticateAsClientAsync(CancellationToken cancellationToken)
         {
             try
             {
-                await _sslStream.AuthenticateAsClientAsync(_host);
+                await ((SslStream) Stream).AuthenticateAsClientAsync(Host);
             }
             catch (AuthenticationException e)
             {
-                Logger.LogError($"Authentication failed - closing the connection!\n\t{e.Message}");
+                Logger.LogError(e, $"Authentication failed - closing the connection!\n\t{e.Message}");
                 Logger.LogError("AuthenticateAsClient is cancelled.");
-                _tcpClient.Close();
+                TcpClient.Close();
                 Dispose();
                 await Task.FromCanceled(cancellationToken);
             }
         }
 
         /// <summary>
-        /// Authenticates as server.
+        /// Authenticates as server asynchronously.
         /// </summary>
         /// <param name="certificate">The certificate.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
-        public async Task AuthenticateAsServer(X509Certificate certificate, CancellationToken cancellationToken)
+        public async Task AuthenticateAsServerAsync(X509Certificate certificate, CancellationToken cancellationToken)
         {
             try
             {
-                await _sslStream.AuthenticateAsServerAsync(certificate, false, SslProtocols.Tls12, false);
+                await ((SslStream) Stream).AuthenticateAsServerAsync(certificate, false, SslProtocols.Tls12, false);
             }
             catch (Exception e)
             {
-                Logger.LogError($"Authentication failed - closing the connection!\n\t{e.Message}");
-                Logger.LogError($"AuthenticateAsServer is cancelled for: {_tcpClient.Client.RemoteEndPoint}.");
-                _tcpClient.Close();
+                Logger.LogError(e, $"Authentication failed - closing the connection!\n\t{e.Message}");
+                Logger.LogError($"AuthenticateAsServer is cancelled for: {TcpClient.Client.RemoteEndPoint}.");
+                TcpClient.Close();
                 Dispose();
                 await Task.FromCanceled(cancellationToken);
             }
-        }
-
-        /// <inheritdoc cref="BaseNetworkConnector.SendPacketAsync"/>
-        protected override ValueTask SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken)
-        {
-            return _sslStream.WriteAsync(packet, cancellationToken);
-        }
-        /// <inheritdoc cref="BaseNetworkConnector.ReceivePacketAsync"/>
-        protected override ValueTask<int> ReceivePacketAsync(Memory<byte> memory, CancellationToken cancellationToken)
-        {
-            return _sslStream.ReadAsync(memory, cancellationToken);
         }
 
         /// <summary>
@@ -144,6 +115,13 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         /// <returns>Returns <c>true</c> if <paramref name="sslPolicyErrors"/> equals <see cref="SslPolicyErrors.None"/>; otherwise, <c>false</c>.</returns>
         private bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
+            // FIXME: Fairly dirty fix for now...
+            if (RunMode.IsTest)
+            {
+                Logger.LogCritical("SSL certificate validation skipped because CODE is in test mode.");
+                return true;
+            }
+
             if (sslPolicyErrors == SslPolicyErrors.None)
                 return true;
 
@@ -151,19 +129,6 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
 
             // Do not allow this client to communicate with unauthenticated servers.
             return false;
-        }
-
-        /// <summary>
-        /// Disposes the tcp client and suppresses the garbage collector.
-        /// </summary>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _tcpClient?.Dispose();
-                _sslStream?.Dispose();
-            }
-            base.Dispose(disposing);
         }
     }
 }

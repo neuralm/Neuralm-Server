@@ -10,16 +10,17 @@ using System.Threading.Tasks;
 namespace Neuralm.Services.Common.Infrastructure.Networking
 {
     /// <summary>
-    /// Represents the <see cref="WSNetworkConnector"/> class.
+    /// Represents the <see cref="SslWSNetworkConnector"/> class.
+    /// The secure version of the <see cref="WSNetworkConnector"/> class.
     /// Implemented according to https://tools.ietf.org/html/rfc6455.
     /// </summary>
-    public class WSNetworkConnector : TcpNetworkConnector
+    public class SslWSNetworkConnector : SslTcpNetworkConnector
     {
         private readonly IWSHandshakeHandler _wsHandshakeHandler;
         private WebSocket _webSocket;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WSNetworkConnector"/> class.
+        /// Initializes a new instance of the <see cref="SslWSNetworkConnector"/> class.
         /// </summary>
         /// <param name="messageTypeCache">The message type cache.</param>
         /// <param name="messageSerializer">The message serializer.</param>
@@ -28,11 +29,11 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         /// <param name="wsHandshakeHandler">The websocket handshake handler.</param>
         /// <param name="host">The host string.</param>
         /// <param name="port">The port.</param>
-        public WSNetworkConnector(
-            IMessageTypeCache messageTypeCache,
+        public SslWSNetworkConnector(
+            IMessageTypeCache messageTypeCache, 
             IMessageSerializer messageSerializer,
-            IMessageProcessor messageProcessor,
-            ILogger<WSNetworkConnector> logger,
+            IMessageProcessor messageProcessor, 
+            ILogger<SslWSNetworkConnector> logger,
             IWSHandshakeHandler wsHandshakeHandler,
             string host, int port) : base(messageTypeCache, messageSerializer, messageProcessor, logger, host, port)
         {
@@ -40,7 +41,7 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WSNetworkConnector"/> class.
+        /// Initializes a new instance of the <see cref="SslWSNetworkConnector"/> class.
         /// </summary>
         /// <param name="messageTypeCache">The message type cache.</param>
         /// <param name="messageSerializer">The message serializer.</param>
@@ -48,11 +49,11 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         /// <param name="logger">The logger.</param>
         /// <param name="wsHandshakeHandler">The websocket handshake handler.</param>
         /// <param name="tcpClient">The tcp client.</param>
-        public WSNetworkConnector(
-            IMessageTypeCache messageTypeCache,
+        public SslWSNetworkConnector(
+            IMessageTypeCache messageTypeCache, 
             IMessageSerializer messageSerializer,
-            IMessageProcessor messageProcessor,
-            ILogger<WSNetworkConnector> logger, 
+            IMessageProcessor messageProcessor, 
+            ILogger<SslWSNetworkConnector> logger,
             IWSHandshakeHandler wsHandshakeHandler,
             TcpClient tcpClient) : base(messageTypeCache, messageSerializer, messageProcessor, logger, tcpClient)
         {

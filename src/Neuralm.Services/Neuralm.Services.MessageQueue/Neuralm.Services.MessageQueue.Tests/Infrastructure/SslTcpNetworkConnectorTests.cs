@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Neuralm.Services.Common;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Application.Serializers;
 using Neuralm.Services.Common.Infrastructure;
@@ -14,13 +15,14 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
 {
     [TestClass]
-    public class TcpNetworkConnectorTests
+    public class SslTcpNetworkConnectorTests
     {
         private const int DefaultTimeOut = 5;
         public IMessageSerializer MessageSerializer { get; set; }
@@ -28,7 +30,8 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
         public IMessageTypeCache MessageTypeCache { get; set; }
         public IFactory<IMessageTypeCache, IEnumerable<Type>> MessageTypeCacheFactory { get; set; }
         public string Host { get; set; }
-        public ILogger<TcpNetworkConnector> Logger { get; set; }
+        public ILogger<SslTcpNetworkConnector> Logger { get; set; }
+        public X509Certificate2 X509Certificate2 { get; set; }
 
         [TestInitialize]
         public void Setup()
@@ -44,16 +47,23 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
             MessageTypeCache = MessageTypeCacheFactory.Create(types);
             IServiceProvider serviceProvider = new ServiceCollection().AddLogging(builder => builder.AddConsole()).BuildServiceProvider();
             ILoggerFactory factory = serviceProvider.GetService<ILoggerFactory>();
-            Logger = factory.CreateLogger<TcpNetworkConnector>();
+            Logger = factory.CreateLogger<SslTcpNetworkConnector>();
+            X509Certificate2 = X509Certificate2Builder.BuildSelfSignedServerCertificate(Host);
+        }
+
+        [AssemblyInitialize]
+        public static void MyTestInitialize(TestContext testContext)
+        {
+            RunMode.IsTest = true;
         }
 
         [TestMethod]
         public async Task ConnectAsync_Should_Set_IsConnected_To_True()
         {
             using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(DefaultTimeOut * 3));
-            _ = StartServer(cts.Token, 9989);
-            TcpNetworkConnector tcpNetworkConnector = await StartClient(cts.Token, 9989);
-            Assert.IsTrue(tcpNetworkConnector.IsConnected);
+            _ = StartServer(cts.Token, 9889);
+            SslTcpNetworkConnector sslTcpNetworkConnector = await StartClient(cts.Token, 9889);
+            Assert.IsTrue(sslTcpNetworkConnector.IsConnected);
             cts.Cancel();
         }
 
@@ -61,10 +71,10 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
         public async Task SendMessageAsync_Should_Invoke_MessageProcessor()
         {
             using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(DefaultTimeOut * 3));
-            _ = StartServer(cts.Token, 9977);
-            TcpNetworkConnector tcpNetworkConnector = await StartClient(cts.Token, 9977);
+            _ = StartServer(cts.Token, 9984);
+            SslTcpNetworkConnector sslTcpNetworkConnector = await StartClient(cts.Token, 9984);
             AuthenticateRequest message = new AuthenticateRequest() { CredentialTypeCode = "Name", Password = "Mario", Username = "Mario" };
-            await tcpNetworkConnector.SendMessageAsync(message, cts.Token);
+            await sslTcpNetworkConnector.SendMessageAsync(message, cts.Token);
             IMessage messageInMessageProcessor = await MessageProcessor.GetMessageAsync(cts.Token);
             Assert.AreEqual(message.Id, messageInMessageProcessor?.Id);
             cts.Cancel();
@@ -81,21 +91,23 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
                 Console.WriteLine("Awaiting new connection...");
                 TcpClient tcpClient = await tcpListener.AcceptTcpClientAsync();
                 Console.WriteLine("Accepted connection!");
-                _ = Task.Run(() =>
+                _ = Task.Run(async () =>
                 {
-                    TcpNetworkConnector networkConnector = new TcpNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Logger, tcpClient);
-                    networkConnector.Start();
-                    Console.WriteLine("Started tcp network connector");
+                    SslTcpNetworkConnector sslTcpNetworkConnector = new SslTcpNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Logger, tcpClient);
+                    await sslTcpNetworkConnector.AuthenticateAsServerAsync(X509Certificate2, cancellationToken);
+                    sslTcpNetworkConnector.Start();
+                    Console.WriteLine("Started ssl tcp network connector");
                 }, cancellationToken);
             }
         }
 
-        private async Task<TcpNetworkConnector> StartClient(CancellationToken cancellationToken, int port)
+        private async Task<SslTcpNetworkConnector> StartClient(CancellationToken cancellationToken, int port)
         {
-            TcpNetworkConnector tcpNetworkConnector = new TcpNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Logger, Host, port);
-            await tcpNetworkConnector.ConnectAsync(cancellationToken);
-            tcpNetworkConnector.Start();
-            return tcpNetworkConnector;
+            SslTcpNetworkConnector sslTcpNetworkConnector = new SslTcpNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Logger, Host, port);
+            await sslTcpNetworkConnector.ConnectAsync(cancellationToken);
+            await sslTcpNetworkConnector.AuthenticateAsClientAsync(cancellationToken);
+            sslTcpNetworkConnector.Start();
+            return sslTcpNetworkConnector;
         }
     }
 }

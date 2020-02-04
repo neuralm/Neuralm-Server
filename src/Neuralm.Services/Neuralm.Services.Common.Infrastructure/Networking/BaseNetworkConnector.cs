@@ -1,14 +1,15 @@
-﻿using Neuralm.Services.Common.Messages.Interfaces;
+﻿using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Domain;
 using Neuralm.Services.Common.Infrastructure.Messaging;
+using Neuralm.Services.Common.Messages.Interfaces;
 using System;
 using System.Buffers;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace Neuralm.Services.Common.Infrastructure.Networking
 {
@@ -24,6 +25,11 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         private int _minimumBufferSizeHint = 512;
         private const int AbsoluteMinimumBufferSizeHint = 512;
         protected readonly ILogger<BaseNetworkConnector> Logger;
+
+        /// <summary>
+        /// Gets and sets the stream in which this network connector reads and writes from.
+        /// </summary>
+        protected Stream Stream { get; set; }
 
         /// <summary>
         /// Gets and sets a value indicating whether <see cref="Start"/> has ran.
@@ -64,8 +70,8 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         {
             _messageConstructor = new MessageConstructor(messageSerializer);
             _messageProcessor = messageProcessor ?? throw new ArgumentNullException(nameof(messageProcessor));
-            Logger = logger;
             _messageTypeCache = messageTypeCache ?? throw new ArgumentNullException(nameof(messageTypeCache));
+            Logger = logger;
         }
 
         /// <summary>
@@ -121,7 +127,10 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         /// <param name="packet">The packet.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Returns an awaitable <see cref="ValueTask"/>.</returns>
-        protected abstract ValueTask SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken);
+        protected virtual ValueTask SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken)
+        {
+            return Stream.WriteAsync(packet, cancellationToken);
+        }
 
         /// <summary>
         /// Receive a packet asynchronously.
@@ -129,7 +138,10 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         /// <param name="memory">The memory.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Returns an awaitable <see cref="ValueTask"/> with <see cref="int"/> as type parameter; with the bytes count received.</returns>
-        protected abstract ValueTask<int> ReceivePacketAsync(Memory<byte> memory, CancellationToken cancellationToken);
+        protected virtual ValueTask<int> ReceivePacketAsync(Memory<byte> memory, CancellationToken cancellationToken)
+        {
+            return Stream.ReadAsync(memory, cancellationToken);
+        }
 
         private async Task StartReadingTask()
         {
@@ -176,9 +188,7 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
                     {
                         object rawMessage = _messageConstructor.DeconstructMessageBody(bodyBufferMemory, type);
                         if (rawMessage is IMessage message)
-                        {
                             await _messageProcessor.ProcessMessageAsync(message, this);
-                        }
                         else
                             throw new ArgumentOutOfRangeException(rawMessage.GetType().Name);
                     }
@@ -223,10 +233,10 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         /// <inheritdoc cref="IDisposable.Dispose()"/>
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                _cancellationTokenSource?.Dispose();
-            }
+            if (!disposing) 
+                return;
+            _cancellationTokenSource?.Dispose();
+            Stream?.Dispose();
         }
 
         /// <inheritdoc cref="IDisposable.Dispose()"/>
