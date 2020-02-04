@@ -90,7 +90,6 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
             }
         }
 
-
         private async Task<TcpNetworkConnector> StartClient(CancellationToken cancellationToken, int port)
         {
             TcpNetworkConnector tcpNetworkConnector = new TcpNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Logger, Host, port);

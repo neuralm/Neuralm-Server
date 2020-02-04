@@ -29,6 +29,7 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
         public IFactory<IMessageTypeCache, IEnumerable<Type>> MessageTypeCacheFactory { get; set; }
         public string Host { get; set; }
         public ILogger<WSNetworkConnector> Logger { get; private set; }
+        public ILogger<NeuralmWSHandshakeHandler> HandshakeLogger { get; private set; }
 
         [TestInitialize]
         public void Setup()
@@ -45,6 +46,7 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
             IServiceProvider serviceProvider = new ServiceCollection().AddLogging(builder => builder.AddConsole()).BuildServiceProvider();
             ILoggerFactory factory = serviceProvider.GetService<ILoggerFactory>();
             Logger = factory.CreateLogger<WSNetworkConnector>();
+            HandshakeLogger = factory.CreateLogger<NeuralmWSHandshakeHandler>();
         }
 
         [TestMethod]
@@ -83,7 +85,7 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
                 Console.WriteLine("Accepted connection!");
                 _ = Task.Run(async () =>
                 {
-                    WSNetworkConnector networkConnector = new WSNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Logger, tcpClient);
+                    WSNetworkConnector networkConnector = new WSNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Logger, new NeuralmWSHandshakeHandler(HandshakeLogger), tcpClient);
                     await networkConnector.StartHandshakeAsServerAsync();
                     networkConnector.Start();
                     Console.WriteLine("Started websocket network connector");
@@ -93,7 +95,7 @@ namespace Neuralm.Services.MessageQueue.Tests.Infrastructure
 
         private async Task<WSNetworkConnector> StartClient(CancellationToken cancellationToken, int port)
         {
-            WSNetworkConnector wsNetworkConnector = new WSNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Logger, Host, port);
+            WSNetworkConnector wsNetworkConnector = new WSNetworkConnector(MessageTypeCache, MessageSerializer, MessageProcessor, Logger, new NeuralmWSHandshakeHandler(HandshakeLogger), Host, port);
             await wsNetworkConnector.ConnectAsync(cancellationToken);
             await wsNetworkConnector.StartHandshakeAsClientAsync();
             wsNetworkConnector.Start();

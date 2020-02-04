@@ -23,6 +23,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         private readonly IClientMessageTypeCache _messageTypeCache;
         private readonly ILogger<ClientMessageProcessor> _clientMessageProcessorLogger;
         private readonly ILogger<WSNetworkConnector> _wsNetworkConnectorLogger;
+        private readonly ILogger<NeuralmWSHandshakeHandler> _wsHandshakeLogger;
         private readonly IMessageToServiceMapper _messageToServiceMapper;
         private readonly TcpListener _tcpListener;
 
@@ -36,6 +37,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         /// <param name="messageTypeCache">The message type cache.</param>
         /// <param name="clientMessageProcessorLogger">The client message processor logger.</param>
         /// <param name="wsNetworkConnectorLogger">The websocket network connector logger.</param>
+        /// <param name="wsHandshakeLogger">The websocket handshake logger.</param>
         public ClientMessageProcessor(
             IMessageToServiceMapper messageToServiceMapper, 
             IMessageSerializer messageSerializer,
@@ -43,7 +45,8 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
             IServiceMessageProcessor serviceMessageProcessor,
             IClientMessageTypeCache messageTypeCache,
             ILogger<ClientMessageProcessor> clientMessageProcessorLogger,
-            ILogger<WSNetworkConnector> wsNetworkConnectorLogger)
+            ILogger<WSNetworkConnector> wsNetworkConnectorLogger,
+            ILogger<NeuralmWSHandshakeHandler> wsHandshakeLogger)
         {
             _messageToServiceMapper = messageToServiceMapper;
             _messageSerializer = messageSerializer;
@@ -51,6 +54,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
             _messageTypeCache = messageTypeCache;
             _clientMessageProcessorLogger = clientMessageProcessorLogger;
             _wsNetworkConnectorLogger = wsNetworkConnectorLogger;
+            _wsHandshakeLogger = wsHandshakeLogger;
             _tcpListener = new TcpListener(IPAddress.Any, messageQueueConfigurationOptions.Value.Port);
         }
 
@@ -63,7 +67,13 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
                 TcpClient tcpClient = await _tcpListener.AcceptTcpClientAsync();
                 _ = Task.Run(async () =>
                 {
-                    WSNetworkConnector networkConnector = new WSNetworkConnector(_messageTypeCache, _messageSerializer, this, _wsNetworkConnectorLogger, tcpClient);
+                    WSNetworkConnector networkConnector = new WSNetworkConnector(
+                        _messageTypeCache, 
+                        _messageSerializer, 
+                        this, 
+                        _wsNetworkConnectorLogger, 
+                        new NeuralmWSHandshakeHandler(_wsHandshakeLogger), 
+                        tcpClient);
                     await networkConnector.StartHandshakeAsServerAsync();
                     networkConnector.Start();
                 }, cancellationToken);

@@ -1,31 +1,40 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using Neuralm.Services.Common.Application.Interfaces;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Neuralm.Services.Common.Application.Interfaces;
 
 namespace Neuralm.Services.Common.Infrastructure.Networking
 {
     /// <summary>
     /// Represents the <see cref="TcpNetworkConnector"/> class; an implementation of the abstract <see cref="BaseNetworkConnector"/> class.
     /// </summary>
-    public sealed class TcpNetworkConnector : BaseNetworkConnector
+    public class TcpNetworkConnector : BaseNetworkConnector
     {
-        private readonly TcpClient _tcpClient;
-        private readonly string _host;
-        private readonly int _port;
-        private NetworkStream _networkStream;
+        /// <summary>
+        /// Gets the tcp client.
+        /// </summary>
+        protected TcpClient TcpClient { get; }
+
+        /// <summary>
+        /// Gets the host.
+        /// </summary>
+        protected string Host { get; }
+
+        /// <summary>
+        /// Gets the port.
+        /// </summary>
+        protected int Port { get; }
 
         /// <inheritdoc cref="BaseNetworkConnector.EndPoint"/>
-        public override EndPoint EndPoint => _tcpClient.Client.RemoteEndPoint;
+        public override EndPoint EndPoint => TcpClient.Client.RemoteEndPoint;
 
         /// <inheritdoc cref="BaseNetworkConnector.IsConnected"/>
-        public override bool IsConnected => _tcpClient.Connected;
+        public override bool IsConnected => TcpClient.Connected;
 
         /// <inheritdoc cref="BaseNetworkConnector.IsDataAvailable"/>
-        protected override bool IsDataAvailable => _networkStream.DataAvailable;
+        protected override bool IsDataAvailable => TcpClient.Available > 0;
 
         /// <summary>
         /// Initializes an instance of the <see cref="TcpNetworkConnector"/> class as client.
@@ -43,9 +52,9 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
             ILogger<TcpNetworkConnector> logger,
             string host, int port) : base(messageTypeCache, messageSerializer, messageProcessor, logger)
         {
-            _host = host;
-            _port = port;
-            _tcpClient = new TcpClient { Client = { NoDelay = true } };
+            Host = host;
+            Port = port;
+            TcpClient = new TcpClient { Client = { NoDelay = true } };
         }
 
         /// <summary>
@@ -63,9 +72,9 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
             ILogger<TcpNetworkConnector> logger,
             TcpClient tcpClient) : base(messageTypeCache, messageSerializer, messageProcessor, logger)
         {
-            _tcpClient = tcpClient;
-            _tcpClient.Client.NoDelay = true;
-            _networkStream = _tcpClient.GetStream();
+            TcpClient = tcpClient;
+            TcpClient.Client.NoDelay = true;
+            Stream = TcpClient.GetStream();
         }
 
         /// <inheritdoc cref="BaseNetworkConnector.ConnectAsync"/>
@@ -73,29 +82,18 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
         {
             if (IsConnected)
                 return;
-            await _tcpClient.ConnectAsync(_host, _port);
-            _networkStream = _tcpClient.GetStream();
-        }
-
-        /// <inheritdoc cref="BaseNetworkConnector.ReceivePacketAsync"/>
-        protected override ValueTask<int> ReceivePacketAsync(Memory<byte> memory, CancellationToken cancellationToken)
-        {
-            return _networkStream.ReadAsync(memory, cancellationToken);
-        }
-
-        /// <inheritdoc cref="BaseNetworkConnector.SendPacketAsync"/>
-        protected override ValueTask SendPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken)
-        {
-            return _networkStream.WriteAsync(packet, cancellationToken);
+            await TcpClient.ConnectAsync(Host, Port);
+            Stream = TcpClient.GetStream();
         }
 
         /// <summary>
         /// Disposes the tcp client and suppresses the garbage collector.
         /// </summary>
-        public new void Dispose()
+        /// <param name="disposing">A boolean indicating whether to dispose.</param>
+        protected override void Dispose(bool disposing)
         {
-            _tcpClient?.Dispose();
-            base.Dispose(true);
+            TcpClient?.Dispose();
+            base.Dispose(disposing);
         }
     }
 }
