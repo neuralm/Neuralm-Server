@@ -44,7 +44,7 @@ import { IRootState } from './interfaces/IRootState';
 Vue.config.productionTip = false;
 const messageSerializer: IMessageSerializer = new JsonMessageSerializer();
 const messageProcessor: IMessageProcessor = new MessageProcessor();
-const url: string = `ws://${HOST}:${PORT}/neuralm`;
+const url: string = `wss://${HOST}:${PORT}/neuralm`;
 const wsNetworkConnector: INetworkConnector = new WSNetworkConnector(messageSerializer, messageProcessor, url);
 wsNetworkConnector.connectAsync().then((_) => {
   wsNetworkConnector.start();

@@ -10,10 +10,12 @@ services:
         depends_on: 
             - "messagequeue"
         ports:
-            - "3333:80"
+            - "3333:443"
         networks:
             - neuralm-network
         image: glovali/web:latest
+        volumes:
+            - /etc/ssl/neuralm.net:/etc/ssl/neuralm.net
     messagequeue:
         build: 
             context: .
@@ -24,6 +26,8 @@ services:
         networks:
             - neuralm-network
         image: glovali/messagequeue:latest
+        volumes:
+            - /etc/ssl/neuralm.net:/etc/ssl/neuralm.net
     registryservice:
         build: 
             context: .

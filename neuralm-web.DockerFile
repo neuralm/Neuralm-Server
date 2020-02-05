@@ -25,5 +25,5 @@ COPY ./src/Neuralm.Presentation.Web/nginx/nginx.conf /temp/prod.conf
 RUN envsubst /app < /temp/prod.conf > /etc/nginx/conf.d/default.conf
 COPY --from=build /usr/src/app/dist /usr/share/nginx/html
 
-EXPOSE 80
+EXPOSE 443
 CMD ["nginx", "-g", "daemon off;"]
