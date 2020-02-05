@@ -150,11 +150,8 @@ namespace Neuralm.Services.Common.Infrastructure.Networking
             {
                 byte[] readBuffer = ArrayPool<byte>.Shared.Rent(_minimumBufferSizeHint);
                 int bytesReceived;
-                do
-                {
-                    bytesReceived = await ReceivePacketAsync(readBuffer, _cancellationTokenSource.Token);
-                    Logger.LogInformation($"Bytes received: {bytesReceived}");
-                } while (IsDataAvailable && bytesReceived == 0);
+                do bytesReceived = await ReceivePacketAsync(readBuffer, _cancellationTokenSource.Token);
+                while (IsDataAvailable && bytesReceived == 0);
 
                 ReadOnlySequence<byte> buffer = new ReadOnlySequence<byte>(readBuffer.AsMemory(0, bytesReceived));
                 ArrayPool<byte>.Shared.Return(readBuffer);

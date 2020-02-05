@@ -57,7 +57,7 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
 
             List<Task> tasks = new List<Task>
             {
-                //Task.Run(() => CreateServerCertificate(_cancellationTokenSourceTimed.Token), cancellationToken)
+                Task.Run(() => CreateServerCertificate(_cancellationTokenSourceTimed.Token), cancellationToken),
                 // Initiate service map..
                 Task.Run(_genericServiceProvider.GetService<IMessageToServiceMapper>, cancellationToken)
             };
@@ -88,51 +88,52 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
         {
             MessageQueueConfiguration configuration = _genericServiceProvider.GetService<IOptions<MessageQueueConfiguration>>().Value;
 
+            X509Store computerCaStore;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                X509Store computerCaStore = new X509Store(StoreName.My, StoreLocation.LocalMachine);
-                try
-                {
-                    computerCaStore.Open(OpenFlags.ReadOnly);
-                    X509Certificate2Collection certificatesInStore = computerCaStore.Certificates.Find(X509FindType.FindBySubjectName, configuration.Host, true);
-                    if (certificatesInStore.Count == 0)
-                        throw new EmptyCertificateCollectionException($"No certificate was found with the given subject name: {configuration.Host}");
-
-                    if (certificatesInStore.Count > 1)
-                    {
-                        foreach (X509Certificate2 cert in certificatesInStore) 
-                            DisplayCertificate(cert);
-                        throw new ArgumentOutOfRangeException(nameof(certificatesInStore), "More than one certificate was found!");
-                    }
-
-                    X509Certificate2 certificate = certificatesInStore[0];
-                    DisplayCertificate(certificate);
-                    configuration.Certificate = certificate;
-                    cancellationToken.ThrowIfCancellationRequested();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"{nameof(CreateServerCertificate)}: {e}");
-                    if (!cancellationToken.IsCancellationRequested)
-                    {
-                        Console.WriteLine($"Please check if you have a valid MessageQueueConfiguration.Host name, also known as the Common Name (CN) or Fully Qualified Domain Name (FQDN)!\n\t{e.Message}");
-                        _cancellationTokenSource.Cancel();
-                    }
-
-                    Console.WriteLine("CreateServerCertificate is cancelled.");
-                    return Task.FromCanceled(cancellationToken);
-                }
-                finally
-                {
-                    computerCaStore.Close();
-                }
-            }
+                computerCaStore = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+            else if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                computerCaStore = new X509Store(StoreName.Root, StoreLocation.LocalMachine);
             else
             {
-                Console.WriteLine($"{new NotImplementedException("For non-Windows operating systems the certificate code is yet to be implemented.")}");
+                Console.WriteLine("Only Windows and Linux are supported Operating Systems.");
                 Console.WriteLine("CreateServerCertificate is cancelled.");
-                _cancellationTokenSource.Cancel();
                 return Task.FromCanceled(cancellationToken);
+            }
+
+            try
+            {
+                computerCaStore.Open(OpenFlags.ReadOnly);
+                X509Certificate2Collection certificatesInStore = computerCaStore.Certificates.Find(X509FindType.FindBySubjectName, configuration.Host, true);
+                if (certificatesInStore.Count == 0)
+                    throw new EmptyCertificateCollectionException($"No certificate was found with the given subject name: {configuration.Host}");
+
+                if (certificatesInStore.Count > 1)
+                {
+                    foreach (X509Certificate2 cert in certificatesInStore) 
+                        DisplayCertificate(cert);
+                    throw new ArgumentOutOfRangeException(nameof(certificatesInStore), "More than one certificate was found!");
+                }
+
+                X509Certificate2 certificate = certificatesInStore[0];
+                DisplayCertificate(certificate);
+                configuration.Certificate = certificate;
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"{nameof(CreateServerCertificate)}: {e}");
+                if (!cancellationToken.IsCancellationRequested)
+                {
+                    Console.WriteLine($"Please check if you have a valid MessageQueueConfiguration.Host name, also known as the Common Name (CN) or Fully Qualified Domain Name (FQDN)!\n\t{e.Message}");
+                    _cancellationTokenSource.Cancel();
+                }
+
+                Console.WriteLine("CreateServerCertificate is cancelled.");
+                return Task.FromCanceled(cancellationToken);
+            }
+            finally
+            {
+                computerCaStore.Close();
             }
 
             return Task.CompletedTask;
