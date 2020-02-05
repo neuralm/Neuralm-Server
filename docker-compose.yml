@@ -20,6 +20,9 @@ services:
         build: 
             context: .
             dockerfile: neuralm-messagequeue.DockerFile
+            args:
+                - CERTIFICATE_PATH=${CERTIFICATE_PATH}
+                - CERTIFICATE_PASSWORD=${CERTIFICATE_PASSWORD}
         ports:
             - "5000:5000"
             - "5001:5001"

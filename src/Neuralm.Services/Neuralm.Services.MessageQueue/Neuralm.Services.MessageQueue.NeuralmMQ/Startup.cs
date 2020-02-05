@@ -92,7 +92,20 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 computerCaStore = new X509Store(StoreName.My, StoreLocation.LocalMachine);
             else if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                computerCaStore = new X509Store(StoreName.Root, StoreLocation.LocalMachine);
+            {
+                try
+                {
+                    X509Certificate2 certificate = new X509Certificate2(Environment.GetEnvironmentVariable("CERTIFICATE_PATH"), Environment.GetEnvironmentVariable("CERTIFICATE_PASSWORD"));
+                    DisplayCertificate(certificate);
+                    configuration.Certificate = certificate;
+                    return Task.CompletedTask;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);   
+                    return Task.FromCanceled(cancellationToken);
+                }
+            }
             else
             {
                 Console.WriteLine("Only Windows and Linux are supported Operating Systems.");
