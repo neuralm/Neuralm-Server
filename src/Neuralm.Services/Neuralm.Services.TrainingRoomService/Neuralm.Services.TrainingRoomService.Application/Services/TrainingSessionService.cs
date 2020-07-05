@@ -100,7 +100,7 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                         trainingSession.LeasedOrganisms.Add(new LeasedOrganism(organism, trainingSession.Id));
                     }
                     trainingSession.TrainingRoom.IncreaseNodeIdTo(trainingRoomSettings.InputCount + trainingRoomSettings.OutputCount);
-                    message = $"First generation; generated {trainingSession.TrainingRoom.TrainingRoomSettings.OrganismCount.ToString()} organisms.";
+                    message = $"First generation; generated {trainingSession.TrainingRoom.TrainingRoomSettings.OrganismCount} organisms.";
                     await _trainingSessionRepository.InsertFirstGenerationAsync(trainingSession);
                 }
                 else

@@ -40,7 +40,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
             return SendMessageToClientAsync(message, clientNetworkConnector)
                 .ContinueWith((task) =>
                 {
-                    _logger.LogInformation($"Finished Processing message: {msg.Id.ToString()} from {networkConnector.EndPoint}");
+                    _logger.LogInformation($"Finished Processing message: {msg.Id} from {networkConnector.EndPoint}");
                     return task;
                 });
         }
@@ -50,6 +50,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         {
             _messageToClientDictionary.TryAdd(messageId, networkConnector);
         }
+
         private static async Task SendMessageToClientAsync(IMessage message, INetworkConnector clientNetworkConnector)
         {
             await clientNetworkConnector.SendMessageAsync(message, CancellationToken.None);

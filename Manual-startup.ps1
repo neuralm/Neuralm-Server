@@ -1,7 +1,7 @@
 Clear-Host
 Write-Host "================ Neuralm manual startup tool ================"
-Write-Host "RegistryService     : Press '1' for this option."
-Write-Host "MessageQueue        : Press '2' for this option."
+Write-Host "MessageQueue        : Press '1' for this option."
+Write-Host "RegistryService     : Press '2' for this option."
 Write-Host "UserService         : Press '3' for this option."
 Write-Host "TrainingRoomService : Press '4' for this option."
 Write-Host "Presentation.Web    : Press '5' for this option."
@@ -25,14 +25,14 @@ $serviceRunner = ""
 
 switch ($service) {
     "1" {
-        $serviceName = "Neuralm.Services.RegistryService.Rest"
-        $servicePath = $currentPath + "\Neuralm.Services\Neuralm.Services.RegistryService\" + $serviceName
-        $serviceRunner = $dotnetLaunchProfileRunner + $serviceName
-    }
-    "2" {
         $serviceName = "Neuralm.Services.MessageQueue.NeuralmMQ"
         $servicePath = $currentPath + "\Neuralm.Services\Neuralm.Services.MessageQueue\" + $serviceName
         $serviceRunner = $defaultDotnetRunner
+    }
+    "2" {
+        $serviceName = "Neuralm.Services.RegistryService.Rest"
+        $servicePath = $currentPath + "\Neuralm.Services\Neuralm.Services.RegistryService\" + $serviceName
+        $serviceRunner = $dotnetLaunchProfileRunner + $serviceName
     }
     "3" {
         $serviceName = "Neuralm.Services.UserService.Rest"

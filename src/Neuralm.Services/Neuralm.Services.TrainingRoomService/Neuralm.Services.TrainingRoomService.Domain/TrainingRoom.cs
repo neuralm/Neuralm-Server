@@ -15,7 +15,6 @@ namespace Neuralm.Services.TrainingRoomService.Domain
     {
         private readonly IFactory<Organism, OrganismFactoryArgument> _organismFactory;
         private readonly Dictionary<(uint A, uint B), uint> _mutationToInnovation = new Dictionary<(uint A, uint B), uint>();
-        private uint _nodeIdentifier;
 
         /// <summary>
         /// Gets and sets the id.
@@ -67,6 +66,11 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// </summary>
         public uint HighestInnovationNumber { get; private set; }
 
+        /// <summary>
+        /// Gets and sets the highest node identifier number.
+        /// </summary>
+        public uint HighestNodeIdentifier { get; private set; }
+        
         /// <summary>
         /// Gets a value indicating whether the training room is enabled.
         /// </summary>
@@ -211,7 +215,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 for (int i = 0; i < amountOfOrganisms; i++)
                 {
                     species.AddOrganism(ProduceOrganism(species));
-                    markAsAdded(species.Organisms[species.Organisms.Count - 1]);
+                    markAsAdded(species.Organisms[^1]);
                 }
                 totalOrganisms += amountOfOrganisms;
             }
@@ -242,7 +246,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <param name="min">The minimum value the nodeId should be.</param>
         public void IncreaseNodeIdTo(uint min)
         {
-            _nodeIdentifier = Math.Max(_nodeIdentifier, min);
+            HighestNodeIdentifier = Math.Max(HighestNodeIdentifier, min);
         }
 
         /// <summary>
@@ -251,7 +255,9 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <returns>Returns the old node id before increasing it.</returns>
         public uint GetAndIncreaseNodeId()
         {
-            return _nodeIdentifier++;
+            uint temp = HighestNodeIdentifier;
+            HighestNodeIdentifier += 1;
+            return temp;
         }
 
         /// <summary>
