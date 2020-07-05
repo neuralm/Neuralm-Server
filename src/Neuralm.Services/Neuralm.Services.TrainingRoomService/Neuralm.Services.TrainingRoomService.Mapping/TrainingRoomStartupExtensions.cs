@@ -88,7 +88,7 @@ namespace Neuralm.Services.TrainingRoomService.Mapping
                     new Claim(ClaimTypes.Role, "Service")
                 };
                 httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessTokenService.GenerateAccessToken(claims)}");
-                httpClient.BaseAddress = new Uri($"http://{serviceDto.Host}:{serviceDto.Port.ToString()}");
+                httpClient.BaseAddress = new Uri($"http://{serviceDto.Host}:{serviceDto.Port}");
                 return new UserService(messageSerializer, httpClient, logger);
             });
             serviceCollection.AddSingleton<IStartupService, StartupService>();

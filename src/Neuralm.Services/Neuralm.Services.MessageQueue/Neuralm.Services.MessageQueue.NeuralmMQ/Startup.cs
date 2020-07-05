@@ -122,7 +122,7 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
 
                 if (certificatesInStore.Count > 1)
                 {
-                    foreach (X509Certificate2 cert in certificatesInStore) 
+                    foreach (X509Certificate2 cert in certificatesInStore)
                         DisplayCertificate(cert);
                     throw new ArgumentOutOfRangeException(nameof(certificatesInStore), "More than one certificate was found!");
                 }
