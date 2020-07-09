@@ -19,6 +19,11 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Configurations
                 .WithMany(p => p.Outputs)
                 .HasForeignKey(p => p.OrganismId)
                 .OnDelete(DeleteBehavior.Cascade);
+            
+            builder
+                .HasOne(p => p.OutputNode)
+                .WithMany(p => p.OrganismOutputNodes)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

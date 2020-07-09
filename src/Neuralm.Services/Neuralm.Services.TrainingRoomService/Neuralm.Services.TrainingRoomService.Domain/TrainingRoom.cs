@@ -159,7 +159,8 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// Does 1 generation.
         /// kills the worst ones, mutate and breed and make the system ready for a new generation.
         /// </summary>
-        public void EndGeneration(Action<Organism> markAsAdded)
+        /// <param name="markForRemoval">The action to mark organisms for removal.</param>
+        public void EndGeneration(Action<Organism> markForRemoval)
         {
             // Verifies that all organisms of the current generation are evaluated, otherwise throw an exception.
             if (!AllOrganismsInCurrentGenerationAreEvaluated())
@@ -182,7 +183,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 }
 
                 // Reproduce with the given training room settings.
-                species.PostGeneration(TrainingRoomSettings.TopAmountToSurvive, Generation);
+                species.PostGeneration(TrainingRoomSettings.TopAmountToSurvive, Generation, markForRemoval);
 
                 // Calculate the total score for all species.
                 TotalScore += species.SpeciesScore;
@@ -215,7 +216,6 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 for (int i = 0; i < amountOfOrganisms; i++)
                 {
                     species.AddOrganism(ProduceOrganism(species));
-                    markAsAdded(species.Organisms[^1]);
                 }
                 totalOrganisms += amountOfOrganisms;
             }

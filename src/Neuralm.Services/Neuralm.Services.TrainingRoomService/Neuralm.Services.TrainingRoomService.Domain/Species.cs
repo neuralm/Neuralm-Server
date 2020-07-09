@@ -95,8 +95,15 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// </summary>
         /// <param name="topAmountToSurvive">The top amount percentage to survive.</param>
         /// <param name="generation">The current generation.</param>
-        internal void PostGeneration(double topAmountToSurvive, uint generation)
+        /// <param name="markForRemoval">The mark for removal action.</param>
+        internal void PostGeneration(double topAmountToSurvive, uint generation, Action<Organism> markForRemoval)
         {
+            // Mark organisms for removal.
+            foreach(Organism organism in Organisms.Where(o => o.Generation == generation - 1))
+            {
+                markForRemoval(organism);
+            }
+
             // Remove all organisms from the last generation.
             Organisms.RemoveAll(o => o.Generation == generation - 1);
 
@@ -118,6 +125,12 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             // Calculate how many organisms should survive, these will later reproduce so it doesn't matter
             // if there are too many surviving (eg 1.5 > 2). But, we want to make sure at least 1 survives.
             int organismsToSurvive = (int)Math.Ceiling(Organisms.Count * topAmountToSurvive);
+
+            // Mark organisms for removal.
+            foreach (Organism organism in Organisms.Skip(organismsToSurvive - 1).Take(Organisms.Count - organismsToSurvive))
+            {
+                markForRemoval(organism);
+            }
 
             // Sets the current organisms to a certain amount of the top organisms that have been sorted before.
             Organisms.RemoveRange(organismsToSurvive - 1, Organisms.Count - organismsToSurvive);

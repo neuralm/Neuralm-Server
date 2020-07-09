@@ -36,8 +36,8 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
         /// <inheritdoc cref="RepositoryBase{TEntity,TDbContext}.CreateAsync(TEntity)"/>
         public override async Task<(bool success, Guid id)> CreateAsync(TrainingSession entity)
         {
-            bool saveSuccess = false;
             using EntityLoadLock.Releaser loadLock = EntityLoadLock.Shared.Lock();
+            bool saveSuccess;
             try
             {
                 EntityValidator.Validate(entity);
@@ -127,23 +127,23 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
             }
         }
 
-        /// <inheritdoc cref="ITrainingSessionRepository.MarkAsAdded(Organism)"/>
-        public void MarkAsAdded(Organism organism)
+        /// <inheritdoc cref="ITrainingSessionRepository.MarkForRemoval(Organism)"/>
+        public void MarkForRemoval(Organism organism)
         {
-            DbContext.Entry(organism).State = EntityState.Added;
+            DbContext.Entry(organism).State = EntityState.Deleted;
             foreach (OrganismInputNode inputNode in organism.Inputs)
             {
-                DbContext.Entry(inputNode).State = EntityState.Added;
-                DbContext.Entry(inputNode.InputNode).State = EntityState.Added;
+                DbContext.Entry(inputNode).State = EntityState.Deleted;
+                DbContext.Entry(inputNode.InputNode).State = EntityState.Deleted;
             }
             foreach (OrganismOutputNode outputNode in organism.Outputs)
             {
-                DbContext.Entry(outputNode).State = EntityState.Added;
-                DbContext.Entry(outputNode.OutputNode).State = EntityState.Added;
+                DbContext.Entry(outputNode).State = EntityState.Deleted;
+                DbContext.Entry(outputNode.OutputNode).State = EntityState.Deleted;
             }
             foreach (ConnectionGene connectionGene in organism.ConnectionGenes)
             {
-                DbContext.Entry(connectionGene).State = EntityState.Added;
+                DbContext.Entry(connectionGene).State = EntityState.Deleted;
             }
         }
 
@@ -161,7 +161,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
                         bool newGenes = false;
                         foreach (ConnectionGene connectionGene in organism.ConnectionGenes)
                         {
-                            if (DbContext.Entry(connectionGene).State != EntityState.Added) 
+                            if (DbContext.Entry(connectionGene).State != EntityState.Added)
                                 continue;
                             newGenes = true;
                             break;
