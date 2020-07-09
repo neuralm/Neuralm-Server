@@ -10,8 +10,8 @@ Write-Host "Q                   : Press 'Q' to quit."
 $service = Read-Host "Please make a selection"
 
 # set location to neuralm source
-Set-Location C:\Neuralm\Neuralm-Server\src
-$currentPath = (Get-Location).Path
+$currentPath = $PSScriptRoot + "\src"
+Set-Location $currentPath
 
 # ensures the services are ran via the Development settings
 $env:ASPNETCORE_ENVIRONMENT = "Development"
