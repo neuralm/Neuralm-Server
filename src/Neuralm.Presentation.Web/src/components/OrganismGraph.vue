@@ -1,6 +1,6 @@
 <template>
   <div class='svg-container'>
-    <svg id='chart' style='background-color:yellow'>
+    <svg id='chart'>
     </svg>
   </div>
 </template>
