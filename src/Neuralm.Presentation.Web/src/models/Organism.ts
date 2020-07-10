@@ -93,6 +93,14 @@ export default class Organism {
   }
 
   /**
+   * Gets the hidden nodes.
+   * @returns Returns the hidden nodes.
+   */
+  public getHiddenNodes(): HiddenNode[] {
+    return this.hiddenNodes;
+  }
+
+  /**
    * Creates and adds a node to the hidden node list.
    * @param nodeIdentifier The node identifier.
    * @returns Returns the created node.

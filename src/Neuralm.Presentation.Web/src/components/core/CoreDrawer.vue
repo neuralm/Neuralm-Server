@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer id="app-drawer" v-model="drawerCP" src="/assets/drawer.png" app color="grey darken-2" dark floating mobile-break-point="991" persistent width="260">
+  <v-navigation-drawer id="app-drawer" v-model="drawerCP" src="/assets/drawer.png" app color="grey darken-2" dark floating mobile-breakpoint="991" persistent width="260">
     <template v-slot:img="attrs">
       <v-img v-bind="attrs" gradient="to top, rgba(0, 0, 0, .5), rgba(0, 0, 0, .5)" />
     </template>

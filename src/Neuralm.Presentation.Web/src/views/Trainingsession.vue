@@ -15,7 +15,7 @@
             <v-btn class="testOrganisms" v-if="trainingSession.endedTimestamp === '0001-01-01T00:00:00' && organisms.length > 0 && !tested" @click="testOrganisms(organisms, trainingSession.id)">Test Organisms XOR</v-btn>
           </v-card-actions>
           <v-divider></v-divider>
-          <v-data-table v-if="organisms.length > 0" :headers="headers" :items="organisms" class="elevation-1"></v-data-table>
+          <v-data-table v-if="organisms.length > 0" :headers="headers" :items="organisms" class="elevation-1" @click:row="showOrganismGraph"></v-data-table>
         </v-card>
       </v-col>
     </v-row>
@@ -42,6 +42,8 @@ import InputNode from '../models/InputNode';
 import OutputNode from '../models/OutputNode';
 import PostOrganismsScoreRequest from '../messages/requests/PostOrganismsScoreRequest';
 import PostOrganismsScoreResponse from '../messages/responses/PostOrganismsScoreResponse';
+import { setModalPayload } from '../modules/Modal.module';
+import OrganismGraph from '@/components/OrganismGraph.vue';
 
 @Component({
   async created() {
@@ -67,6 +69,16 @@ import PostOrganismsScoreResponse from '../messages/responses/PostOrganismsScore
 })
 export default class TrainingSessionView extends Vue {
   @Prop() private trainingSessionService!: ITrainingSessionService;
+
+  public showOrganismGraph(fakeOrganism: Organism) {
+    const organism: Organism = this.observerOrganismToOrganism(fakeOrganism);
+    const payload: setModalPayload = {
+      modalName: 'OrganismGraph',
+      propsData: { organism }
+    };
+    this.$store.commit('modal/setModal', payload);
+    this.$store.commit('modal/toggleModal');
+  }
 
   public endTrainingSession(trainingSessionId: string): void {
     this.trainingSessionService.endTrainingSession(new EndTrainingSessionRequest(trainingSessionId))
@@ -96,7 +108,7 @@ export default class TrainingSessionView extends Vue {
     const xor: Xor = new Xor();
     let newOrganisms: Organism[] = [];
     try {
-      newOrganisms = this.organismObserverToOrganism(organisms);
+      newOrganisms = this.observerOrganismsToOrganisms(organisms);
     } catch (error) {
       this.$snotify.error('Faulty network structure, failed to construct network!');
       return;
@@ -118,14 +130,22 @@ export default class TrainingSessionView extends Vue {
     });
   }
 
-  private organismObserverToOrganism(organisms: Organism[]): Organism[] {
+  private observerOrganismsToOrganisms(organisms: Organism[]): Organism[] {
     const newOrganisms: Organism[] = new Array(organisms.length);
     for (let i = 0; i < organisms.length; i++) {
-      const fakeOrganism: Organism = organisms[i];
+      const organism: Organism = this.observerOrganismToOrganism(organisms[i]);
+      newOrganisms[i] = organism;
+    }
+    return newOrganisms;
+  }
 
-      const connectionGenes: ConnectionGene[] = new Array(fakeOrganism.connectionGenes.length);
+  private observerOrganismToOrganism(fakeOrganism: Organism) {
+    const connectionGenes: ConnectionGene[] = new Array(
+      fakeOrganism.connectionGenes.length
+    );
       for (let j = 0; j < fakeOrganism.connectionGenes.length; j++) {
-        const fakeConnectionGene: ConnectionGene = fakeOrganism.connectionGenes[j];
+      const fakeConnectionGene: ConnectionGene =
+        fakeOrganism.connectionGenes[j];
         const connectionGene: ConnectionGene = new ConnectionGene(
           fakeConnectionGene.id,
           fakeConnectionGene.organismId,
@@ -136,7 +156,6 @@ export default class TrainingSessionView extends Vue {
         );
         connectionGenes[j] = connectionGene;
       }
-
       const inputNodes: InputNode[] = new Array(fakeOrganism.inputNodes.length);
       for (let j = 0; j < fakeOrganism.inputNodes.length; j++) {
         const fakeInputNode: InputNode = fakeOrganism.inputNodes[j];
@@ -146,8 +165,9 @@ export default class TrainingSessionView extends Vue {
         );
         inputNodes[j] = inputnode;
       }
-
-      const outputNodes: OutputNode[] = new Array(fakeOrganism.outputNodes.length);
+    const outputNodes: OutputNode[] = new Array(
+      fakeOrganism.outputNodes.length
+    );
       for (let j = 0; j < fakeOrganism.outputNodes.length; j++) {
         const fakeOutputNode: OutputNode = fakeOrganism.outputNodes[j];
         const outputNode: OutputNode = new OutputNode(
@@ -156,7 +176,6 @@ export default class TrainingSessionView extends Vue {
         );
         outputNodes[j] = outputNode;
       }
-
       const organism: Organism = new Organism(
         fakeOrganism.id,
         connectionGenes,
@@ -164,10 +183,9 @@ export default class TrainingSessionView extends Vue {
         fakeOrganism.generation,
         fakeOrganism.name,
         inputNodes,
-        outputNodes);
-      newOrganisms[i] = organism;
-    }
-    return newOrganisms;
+      outputNodes
+    );
+    return organism;
   }
 }
 </script>

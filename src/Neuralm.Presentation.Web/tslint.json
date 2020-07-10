@@ -10,6 +10,7 @@
   },
   "rules": {
     "max-line-length": [true, 240],
+    "interface-over-type-literal": false,
     "no-console": false,
     "no-empty-interface": false,
     "no-bitwise": false,

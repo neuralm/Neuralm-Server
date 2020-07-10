@@ -17,6 +17,7 @@ import AppModule, { IAppModule } from './modules/App.module';
 import TrainingRoomModule, { ITrainingRoomModule } from './modules/TrainingRoom.module';
 import DashboardModule, { IDashboardModule } from './modules/Dashboard.module';
 import TrainingSessionModule, { ITrainingSessionModule } from './modules/TrainingSession.module';
+import ModalModule, { IModalModule } from './modules/Modal.module';
 
 // Services
 import ITrainingRoomService from './interfaces/ITrainingRoomService';
@@ -61,6 +62,7 @@ const appModule: IAppModule = new AppModule();
 const trainingRoomModule: ITrainingRoomModule = new TrainingRoomModule();
 const dashboardModule: IDashboardModule = new DashboardModule();
 const trainingSessionModule: ITrainingSessionModule = new TrainingSessionModule();
+const modalModule: IModalModule = new ModalModule();
 
 const store = new Vuex.Store<IRootState>({
   modules: {
@@ -68,7 +70,8 @@ const store = new Vuex.Store<IRootState>({
     app: appModule,
     trainingRoom: trainingRoomModule,
     dashboard: dashboardModule,
-    trainingSession: trainingSessionModule
+    trainingSession: trainingSessionModule,
+    modal: modalModule
   }
 });
 

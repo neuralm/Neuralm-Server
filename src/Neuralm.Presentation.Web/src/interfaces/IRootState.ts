@@ -3,6 +3,7 @@ import { IDashboardState } from '../modules/Dashboard.module';
 import { ITrainingRoomState } from '../modules/TrainingRoom.module';
 import { IUserState } from '../modules/User.module';
 import { ITrainingSessionState } from '../modules/TrainingSession.module';
+import { IModalState } from '@/modules/Modal.module';
 
 /**
  * Represents the IRootState interface.
@@ -13,4 +14,5 @@ export interface IRootState {
   trainingRoom: ITrainingRoomState;
   user: IUserState;
   trainingSession: ITrainingSessionState;
+  modal: IModalState;
 }
