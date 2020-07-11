@@ -53,16 +53,21 @@ export default class NeuralmRouter extends Router {
    * @param location The raw location.
    * @returns Returns the promised route.
    */
-  public push(location: RawLocation): Promise<Route> {
-    return super.push(location).catch((err) => {
+  public async push(location: RawLocation): Promise<Route> {
+    try {
+      return super.push(location);
+    }
+    catch (err) {
       if (err === undefined) {
-        return Promise.resolve(undefined as any);
-      } else if (err.name !== 'NavigationDuplicated') {
-        throw err;
-      } else {
-        return Promise.resolve({ message: 'Router failsafe triggered' } as any);
+        return Promise.resolve((undefined as any));
       }
-    });
+      else if (err.name !== 'NavigationDuplicated') {
+        return Promise.reject(err);
+      }
+      else {
+        return Promise.resolve(({ message: 'Router failsafe triggered' } as any));
+      }
+    }
   }
 
   /* tslint:disable */
