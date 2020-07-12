@@ -203,7 +203,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             foreach (Species species in Species)
             {
                 // If the species is stagnant don't let it reproduce 
-                if(species.StagnantCounter >= TrainingRoomSettings.MaxStagnantTime) continue;
+                if (species.StagnantCounter >= TrainingRoomSettings.MaxStagnantTime) continue;
                 
                 double fraction = species.SpeciesScore / TotalScore;
                 double amountOfOrganisms = TrainingRoomSettings.OrganismCount * fraction;
