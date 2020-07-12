@@ -20,4 +20,5 @@ export default interface TrainingRoomSettings {
   topAmountToSurvive: number;
   enableConnectionChance: number;
   seed: number;
+  maxStagnantTime: number;
 }

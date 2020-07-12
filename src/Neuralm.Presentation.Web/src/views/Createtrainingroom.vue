@@ -81,6 +81,9 @@
                   <v-col>
                     <v-text-field-with-validation rules="required" v-model="trainingroom.trainingRoomSettings.seed" label="Seed" type="number"/>
                   </v-col>
+                  <v-col>
+                    <v-text-field-with-validation rules="required" v-model="trainingroom.trainingRoomSettings.maxStagnantTime" label="MaxStagnantTime" type="number"/>
+                  </v-col>
                 </v-row>
             </v-card-text>
             <v-card-actions>
@@ -143,7 +146,8 @@ function getOwner(): Owner {
         weightReassignChance: 0.1,
         topAmountToSurvive: 0.5,
         enableConnectionChance: 0.25,
-        seed: 1
+        seed: 1,
+        maxStagnantTime: 15
       },
       trainingSessions: [],
       authorizedTrainers: []

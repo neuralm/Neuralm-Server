@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Neuralm.Services.TrainingRoomService.Persistence.Contexts;
 
 namespace Neuralm.Services.TrainingRoomService.Persistence.Migrations
 {
     [DbContext(typeof(TrainingRoomDbContext))]
-    partial class TrainingRoomDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200712104005_AddStagnentCounter")]
+    partial class AddStagnentCounter
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
