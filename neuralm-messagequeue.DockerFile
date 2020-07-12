@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0 AS base
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS base
 
 ARG CERTIFICATE_PATH
 ARG CERTIFICATE_PASSWORD
@@ -11,7 +11,7 @@ WORKDIR /app
 EXPOSE 5000
 EXPOSE 5001
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0 AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 WORKDIR /src
 COPY ["src/Neuralm.Services/Neuralm.Services.MessageQueue/Neuralm.Services.MessageQueue.NeuralmMQ/Neuralm.Services.MessageQueue.NeuralmMQ.csproj", "src/Neuralm.Services/Neuralm.Services.MessageQueue/Neuralm.Services.MessageQueue.NeuralmMQ/"]
 RUN dotnet restore "src/Neuralm.Services/Neuralm.Services.MessageQueue/Neuralm.Services.MessageQueue.NeuralmMQ/Neuralm.Services.MessageQueue.NeuralmMQ.csproj"

@@ -1,9 +1,9 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0 AS base
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0 AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 WORKDIR /src
 COPY ["src/Neuralm.Services/Neuralm.Services.UserService/Neuralm.Services.UserService.Rest/Neuralm.Services.UserService.Rest.csproj", "src/Neuralm.Services/Neuralm.Services.UserService/Neuralm.Services.UserService.Rest/"]
 RUN dotnet restore "src/Neuralm.Services/Neuralm.Services.UserService/Neuralm.Services.UserService.Rest/Neuralm.Services.UserService.Rest.csproj"

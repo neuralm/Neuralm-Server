@@ -13,7 +13,7 @@ These instructions will get you a copy of the project up and running on your loc
 You will need the following tools:
 
 * [Visual Studio 2019](https://www.visualstudio.com/downloads/)
-* [.NET Core SDK 3.0](https://dotnet.microsoft.com/download/dotnet-core/3.0)
+* [.NET Core SDK 3.1](https://dotnet.microsoft.com/download/dotnet-core/3.1)
 * [Docker](https://www.docker.com/)
 
 ### Setup
