@@ -202,6 +202,9 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             // For each species determine the amount of organisms that is allowed to survive
             foreach (Species species in Species)
             {
+                // If the species is stagnant don't let it reproduce 
+                if(species.StagnantCounter >= TrainingRoomSettings.MaxStagnantTime) continue;
+                
                 double fraction = species.SpeciesScore / TotalScore;
                 double amountOfOrganisms = TrainingRoomSettings.OrganismCount * fraction;
                 rest += amountOfOrganisms % 1;
@@ -228,6 +231,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                     TrainingRoomSettings = TrainingRoomSettings, 
                     Generation = Generation + 1
                 }));
+                totalOrganisms++;
             }
 
             // Increases the generation.

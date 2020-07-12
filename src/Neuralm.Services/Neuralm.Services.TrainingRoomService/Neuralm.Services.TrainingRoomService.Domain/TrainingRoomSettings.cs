@@ -107,11 +107,17 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// Gets and sets the seed.
         /// </summary>
         public int Seed { get; private set; }
+        
+        /// <summary>
+        /// How long a species can be stagnant before being killed.
+        /// </summary>
+        public uint MaxStagnantTime { get; private set; }
 
         /// <summary>
         /// Gets the Random based on the <see cref="Seed"/>.
         /// </summary>
         public Random Random => _random ??= _random = new Random(Seed);
+
 
         /// <summary>
         /// EFCore entity constructor IGNORE!
@@ -142,13 +148,14 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <param name="topAmountToSurvive">How many % of the brains in each species survive [0,1].</param>
         /// <param name="enableConnectionChance">The chance a disabled connection gets enabled when crossover happens [0,1].</param>
         /// <param name="seed">The seed for the pseudo-random generator.</param>
+        /// <param name="maxStagnantTime">How long a species can be stagnant before being killed.</param>
         public TrainingRoomSettings(
             Guid trainingRoomId,
             uint organismCount, uint inputCount, uint outputCount,
             double c1, double c2, double c3,
             double threshold, double addConnectionChance, double addNodeChance,
             double crossOverChance, double interSpeciesChance, double mutationChance,
-            double mutateWeightChance, double weightReassignChance, double topAmountToSurvive, double enableConnectionChance, int seed)
+            double mutateWeightChance, double weightReassignChance, double topAmountToSurvive, double enableConnectionChance, int seed, uint maxStagnantTime)
         {
             Id = Guid.NewGuid();
             TrainingRoomId = trainingRoomId;
@@ -169,6 +176,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             TopAmountToSurvive = topAmountToSurvive;
             EnableConnectionChance = enableConnectionChance;
             Seed = seed;
+            MaxStagnantTime = maxStagnantTime;
         }
     }
 }

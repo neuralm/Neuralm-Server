@@ -24,7 +24,17 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// Gets and sets the species score.
         /// </summary>
         public double SpeciesScore { get; private set; }
+
+        /// <summary>
+        /// The highest score this species has achieved
+        /// </summary>
+        public double HighScore { get; private set; }
         
+        /// <summary>
+        /// How long this species has not achieved a new HighScore
+        /// </summary>
+        public uint StagnantCounter { get; private set; }
+
         /// <summary>
         /// Gets and sets the training room id.
         /// </summary>
@@ -104,11 +114,21 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 markForRemoval(organism);
             }
 
+            // Increment the stagnant counter
+            StagnantCounter++;
+
             // Remove all organisms from the last generation.
             Organisms.RemoveAll(o => o.Generation == generation - 1);
 
             // Sum all of the scores of the current generation.
             SpeciesScore = Organisms.Sum(organism => organism.Score);
+
+            // Check for a new high score. Update it and reset the stagnant counter if needed.
+            if (SpeciesScore > HighScore)
+            {
+                HighScore = SpeciesScore;
+                StagnantCounter = 0;
+            }
 
             // Sort the organisms to make sure they are in other from good to bad.
             Organisms.Sort((a, b) =>
