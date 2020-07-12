@@ -174,6 +174,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
                     if (DbContext.Entry(species).State == EntityState.Detached)
                     {
                         MarkSpeciesAsAdded(species);
+                        continue;
                     }
                     foreach (Organism organism in species.Organisms)
                     {
