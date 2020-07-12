@@ -159,8 +159,9 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// Does 1 generation.
         /// kills the worst ones, mutate and breed and make the system ready for a new generation.
         /// </summary>
-        /// <param name="markForRemoval">The action to mark organisms for removal.</param>
-        public void EndGeneration(Action<Organism> markForRemoval)
+        /// <param name="markOrganismForRemoval">The action to mark organisms for removal.</param>
+        /// <param name="markSpeciesForRemoval">The action to mark species for removal.</param>
+        public void EndGeneration(Action<Organism> markOrganismForRemoval, Action<Species> markSpeciesForRemoval)
         {
             // Verifies that all organisms of the current generation are evaluated, otherwise throw an exception.
             if (!AllOrganismsInCurrentGenerationAreEvaluated())
@@ -183,7 +184,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 }
 
                 // Reproduce with the given training room settings.
-                species.PostGeneration(TrainingRoomSettings.TopAmountToSurvive, Generation, markForRemoval);
+                species.PostGeneration(TrainingRoomSettings.TopAmountToSurvive, Generation, markOrganismForRemoval);
 
                 // Calculate the total score for all species.
                 TotalScore += species.SpeciesScore;
@@ -198,14 +199,14 @@ namespace Neuralm.Services.TrainingRoomService.Domain
 
             // Prepare total organisms value.
             double totalOrganisms = 0;
-            
+
             // For each species determine the amount of organisms that is allowed to survive
             foreach (Species species in Species)
             {
                 // If the species is stagnant don't let it reproduce 
                 if (species.StagnantCounter >= TrainingRoomSettings.MaxStagnantTime)
                 {
-                    species.Organisms.ForEach(markForRemoval);
+                    markSpeciesForRemoval(species);
                     species.Organisms.Clear();
                     continue;
                 }
@@ -234,7 +235,8 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 AddOrganism(_organismFactory.Create(new OrganismFactoryArgument()
                 {
                     TrainingRoomSettings = TrainingRoomSettings, 
-                    Generation = Generation + 1
+                    Generation = Generation + 1,
+                    InnovationFunction = GetInnovationNumber
                 }));
                 totalOrganisms++;
             }

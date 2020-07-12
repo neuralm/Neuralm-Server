@@ -33,6 +33,11 @@ namespace Neuralm.Services.TrainingRoomService.Domain.FactoryArguments
         /// Gets and sets the organism creation type.
         /// </summary>
         public OrganismCreationType CreationType { get; set; }
+
+        /// <summary>
+        /// Gets and sets the innovation function.
+        /// </summary>
+        public Func<uint, uint, uint> InnovationFunction { get; set; }
     }
 
     /// <summary>

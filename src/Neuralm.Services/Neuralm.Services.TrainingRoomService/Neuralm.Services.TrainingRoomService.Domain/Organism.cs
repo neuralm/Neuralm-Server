@@ -95,12 +95,23 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// </summary>
         /// <param name="trainingRoomSettings">The training room settings.</param>
         /// <param name="innovationFunction">The innovation function.</param>
-        public Organism(TrainingRoomSettings trainingRoomSettings, Func<uint, uint, uint> innovationFunction) : this(0, trainingRoomSettings)
+        public Organism(TrainingRoomSettings trainingRoomSettings, Func<uint, uint, uint> innovationFunction) : this(trainingRoomSettings, innovationFunction, 0)
         {
-            // if the generation is 0, add initial mutations.
+            
+        }
+
+
+        /// <summary>
+        /// Initializes an instance of the <see cref="Organism"/> class.
+        /// </summary>
+        /// <param name="trainingRoomSettings">The training room settings.</param>
+        /// <param name="innovationFunction">The innovation function.</param>
+        /// <param name="generation">The generation.</param>
+        public Organism(TrainingRoomSettings trainingRoomSettings, Func<uint, uint, uint> innovationFunction, uint generation) : this(generation, trainingRoomSettings)
+        {
             AddConnectionMutation(trainingRoomSettings, innovationFunction);
         }
-        
+
         /// <summary>
         /// Initializes an instance of the <see cref="Organism"/> class.
         /// </summary>

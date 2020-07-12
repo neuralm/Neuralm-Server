@@ -1,8 +1,7 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Messages.Interfaces;
+using System.Threading.Tasks;
 
 namespace Neuralm.Services.RegistryService.Infrastructure
 {

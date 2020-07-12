@@ -184,7 +184,10 @@ namespace Neuralm.Services.TrainingRoomService.Application.Services
                 await _trainingSessionRepository.SaveChangesAsync();
                 _logger.LogInformation("CLEARED LEASED ORGANISMS AND SAVED CHANGES!!!");
 
-                trainingSession.TrainingRoom.EndGeneration((organism) => _trainingSessionRepository.MarkForRemoval(organism));
+                trainingSession.TrainingRoom.EndGeneration(
+                    (organism) => _trainingSessionRepository.MarkOrganismForRemoval(organism),
+                    (species) => _trainingSessionRepository.MarkSpeciesForRemoval(species));
+
                 message = "Successfully updated the organisms and advanced a generation!";
 
                 await _trainingSessionRepository.UpdateOrganismsAsync(trainingSession);

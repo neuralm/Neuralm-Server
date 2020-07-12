@@ -299,7 +299,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                 for (int i = 0; i < 15; i++)
                 {
                     _trainingRoom.Species.ForEach(species => species.Organisms.ForEach(o => { o.Score = 1; o.IsEvaluated = true; }));
-                    _trainingRoom.EndGeneration(o => { });
+                    _trainingRoom.EndGeneration(o => { }, o => { });
                 }
                 
                 Assert.AreEqual(15, (int)_trainingRoom.Generation);
@@ -359,7 +359,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                         xor.Test((EvaluatableOrganism) o);
                         o.IsEvaluated = true;
                     }));
-                    _trainingRoom.EndGeneration(o => { });
+                    _trainingRoom.EndGeneration(o => { }, o => { });
                 }
 
                 Assert.AreEqual(15, (int)_trainingRoom.Generation);
