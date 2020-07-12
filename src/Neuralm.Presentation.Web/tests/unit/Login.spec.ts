@@ -203,7 +203,9 @@ describe('Login.vue', () => {
 
   it('is not able to navigate to dashboard page', async () => {
     wrapper.vm.$router.push('/dashboard')
-      .catch((rejected) => {})
+      .catch((rejected) => {
+        // ignore
+      })
       .finally(() => expect(wrapper.vm.$route.name).toBe('login'));
   });
 });

@@ -14,6 +14,11 @@ namespace Neuralm.Services.TrainingRoomService.Messages.Dtos
         public Guid Id { get; set; }
 
         /// <summary>
+        /// Gets and sets the id.
+        /// </summary>
+        public Guid SpeciesId { get; set; }
+
+        /// <summary>
         /// Gets and sets the list of connection genes.
         /// </summary>
         public List<ConnectionGeneDto> ConnectionGenes { get; set; }

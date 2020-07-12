@@ -12,6 +12,7 @@ export default class Organism {
   private hiddenNodes: HiddenNode[];
 
   public id: string;
+  public speciesId: string;
   public connectionGenes: ConnectionGene[];
   public score: number;
   public generation: number;
@@ -22,8 +23,9 @@ export default class Organism {
   /**
    * Initializes a new instance of the Organism class.
    */
-  constructor(id: string, connectionGenes: ConnectionGene[], score: number, generation: number, name: string, inputNodes: InputNode[], outputNodes: OutputNode[]) {
+  constructor(id: string, speciesId: string, connectionGenes: ConnectionGene[], score: number, generation: number, name: string, inputNodes: InputNode[], outputNodes: OutputNode[]) {
     this.id = id;
+    this.speciesId = speciesId;
     this.connectionGenes = connectionGenes;
     this.score = score;
     this.generation = generation;

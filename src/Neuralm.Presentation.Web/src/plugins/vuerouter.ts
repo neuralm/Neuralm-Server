@@ -56,15 +56,12 @@ export default class NeuralmRouter extends Router {
   public async push(location: RawLocation): Promise<Route> {
     try {
       return super.push(location);
-    }
-    catch (err) {
+    } catch (err) {
       if (err === undefined) {
         return Promise.resolve((undefined as any));
-      }
-      else if (err.name !== 'NavigationDuplicated') {
+      } else if (err.name !== 'NavigationDuplicated') {
         return Promise.reject(err);
-      }
-      else {
+      } else {
         return Promise.resolve(({ message: 'Router failsafe triggered' } as any));
       }
     }

@@ -14,6 +14,7 @@ describe('Organism', () => {
   ${-3} | ${-2} | ${-1} | ${0.21281378940936574}
   `('evaluate organism with inputs: [$inA, $inB, $inC] expects: $expected', ({inA, inB, inC, expected}): void => {
     const organismId: string = Guid.newGuid().toString();
+    const speciesId: string = Guid.newGuid().toString();
     const inputNodes: InputNode[] = [
       new InputNode(Guid.newGuid().toString(), 0),
       new InputNode(Guid.newGuid().toString(), 1),
@@ -30,7 +31,7 @@ describe('Organism', () => {
       new ConnectionGene(Guid.newGuid().toString(), organismId, 4, 3, 1, true),
       new ConnectionGene(Guid.newGuid().toString(), organismId, 0, 4, 1, true)
     ];
-    const organism: Organism = new Organism(organismId, connectionGenes, 0, 0, 'coolio', inputNodes, outputNodes);
+    const organism: Organism = new Organism(organismId, speciesId, connectionGenes, 0, 0, 'coolio', inputNodes, outputNodes);
     expect(organism.evaluate([inA, inB, inC])[0]).toBeCloseTo(expected, 15);
   });
 });

@@ -109,7 +109,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         internal void PostGeneration(double topAmountToSurvive, uint generation, Action<Organism> markForRemoval)
         {
             // Mark organisms for removal.
-            foreach(Organism organism in Organisms.Where(o => o.Generation == generation - 1))
+            foreach (Organism organism in Organisms.Where(o => o.Generation == generation - 1))
             {
                 markForRemoval(organism);
             }
