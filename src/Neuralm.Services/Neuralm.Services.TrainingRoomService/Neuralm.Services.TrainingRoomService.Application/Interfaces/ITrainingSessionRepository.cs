@@ -34,6 +34,12 @@ namespace Neuralm.Services.TrainingRoomService.Application.Interfaces
         /// Marks the organism for removal.
         /// </summary>
         /// <param name="organism">The organism to mark.</param>
-        void MarkForRemoval(Organism organism);
+        void MarkOrganismForRemoval(Organism organism);
+
+        /// <summary>
+        /// Marks the species for removal.
+        /// </summary>
+        /// <param name="species">The species to mark.</param>
+        void MarkSpeciesForRemoval(Species species);
     }
 }

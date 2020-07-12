@@ -120,7 +120,9 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                     WeightReassignChance = 0.1,
                     TopAmountToSurvive = 0.5,
                     EnableConnectionChance = 0.25,
-                    Seed = 1
+                    Seed = 1,
+                    MaxStagnantTime = 15,
+                    ChampionCloneMinSpeciesSize = 5
                 },
                 AuthorizedTrainers = new List<TrainerDto>(),
                 TrainingSessions = new List<TrainingSessionDto>()

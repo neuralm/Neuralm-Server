@@ -15,7 +15,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         {
             return argument.CreationType switch
                 {
-                OrganismCreationType.NEW => new Organism(argument.Generation, argument.TrainingRoomSettings),
+                OrganismCreationType.NEW => new Organism(argument.TrainingRoomSettings, argument.InnovationFunction, argument.Generation),
                 OrganismCreationType.NEW_WITH_GENES => new Organism(argument.Id, argument.TrainingRoomSettings, argument.Generation, argument.ConnectionGenes),
                 _ => throw new ArgumentOutOfRangeException()
                 };

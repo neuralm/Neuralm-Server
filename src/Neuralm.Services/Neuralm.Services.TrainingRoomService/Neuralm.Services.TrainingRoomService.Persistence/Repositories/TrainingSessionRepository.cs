@@ -68,25 +68,7 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
             {
                 foreach (Species species in trainingSession.TrainingRoom.Species.Where(species => DbContext.Entry(species).State != EntityState.Unchanged))
                 {
-                    DbContext.Entry(species).State = EntityState.Added;
-                    foreach (Organism organism in species.Organisms)
-                    {
-                        DbContext.Entry(organism).State = EntityState.Added;
-                        foreach (OrganismInputNode inputNode in organism.Inputs)
-                        {
-                            DbContext.Entry(inputNode).State = EntityState.Added;
-                            DbContext.Entry(inputNode.InputNode).State = EntityState.Added;
-                        }
-                        foreach (OrganismOutputNode outputNode in organism.Outputs)
-                        {
-                            DbContext.Entry(outputNode).State = EntityState.Added;
-                            DbContext.Entry(outputNode.OutputNode).State = EntityState.Added;
-                        }
-                        foreach (ConnectionGene connectionGene in organism.ConnectionGenes)
-                        {
-                            DbContext.Entry(connectionGene).State = EntityState.Added;
-                        }
-                    }
+                    MarkSpeciesAsAdded(species);
                 }
 
                 foreach (LeasedOrganism leasedOrganism in trainingSession.LeasedOrganisms)
@@ -105,6 +87,29 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
                 Logger.LogError(ex, ex.Message);
                 throw;
             }
+        }
+
+        private void MarkSpeciesAsAdded(Species species)
+        {
+            foreach (Organism organism in species.Organisms)
+            {
+                DbContext.Entry(organism).State = EntityState.Added;
+                foreach (OrganismInputNode inputNode in organism.Inputs)
+                {
+                    DbContext.Entry(inputNode).State = EntityState.Added;
+                    DbContext.Entry(inputNode.InputNode).State = EntityState.Added;
+                }
+                foreach (OrganismOutputNode outputNode in organism.Outputs)
+                {
+                    DbContext.Entry(outputNode).State = EntityState.Added;
+                    DbContext.Entry(outputNode.OutputNode).State = EntityState.Added;
+                }
+                foreach (ConnectionGene connectionGene in organism.ConnectionGenes)
+                {
+                    DbContext.Entry(connectionGene).State = EntityState.Added;
+                }
+            }
+            DbContext.Entry(species).State = EntityState.Added;
         }
 
         /// <inheritdoc cref="ITrainingSessionRepository.InsertLeasedOrganismsAsync(TrainingSession)"/>
@@ -127,8 +132,8 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
             }
         }
 
-        /// <inheritdoc cref="ITrainingSessionRepository.MarkForRemoval(Organism)"/>
-        public void MarkForRemoval(Organism organism)
+        /// <inheritdoc cref="ITrainingSessionRepository.MarkOrganismForRemoval(Organism)"/>
+        public void MarkOrganismForRemoval(Organism organism)
         {
             DbContext.Entry(organism).State = EntityState.Deleted;
             foreach (OrganismInputNode inputNode in organism.Inputs)
@@ -147,6 +152,16 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
             }
         }
 
+        /// <inheritdoc cref="ITrainingSessionRepository.MarkSpeciesForRemoval(Species)"/>
+        public void MarkSpeciesForRemoval(Species species)
+        {
+            foreach (Organism organism in species.Organisms)
+            {
+                MarkOrganismForRemoval(organism);
+            }
+            DbContext.Entry(species).State = EntityState.Deleted;
+        }
+
         /// <inheritdoc cref="ITrainingSessionRepository.UpdateOrganismsAsync(TrainingSession)"/>
         public async Task UpdateOrganismsAsync(TrainingSession trainingSession)
         {
@@ -156,6 +171,11 @@ namespace Neuralm.Services.TrainingRoomService.Persistence.Repositories
                 foreach (Species species in trainingSession.TrainingRoom.Species)
                 {
                     Logger.LogInformation($"{species.GetType()} -> {DbContext.Entry(species).State} | Organisms: {species.Organisms.Count}");
+                    if (DbContext.Entry(species).State == EntityState.Detached)
+                    {
+                        MarkSpeciesAsAdded(species);
+                        continue;
+                    }
                     foreach (Organism organism in species.Organisms)
                     {
                         bool newGenes = false;

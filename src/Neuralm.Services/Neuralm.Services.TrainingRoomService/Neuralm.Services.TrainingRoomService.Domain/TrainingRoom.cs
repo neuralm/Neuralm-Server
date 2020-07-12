@@ -137,7 +137,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             // and add it if true.
             foreach (Species species in Species)
             {
-                if (!species.IsSameSpecies(organism, TrainingRoomSettings))
+                if (species.StagnantCounter >= TrainingRoomSettings.MaxStagnantTime || !species.IsSameSpecies(organism, TrainingRoomSettings))
                     continue;
                 species.AddOrganism(organism);
                 return;
@@ -159,8 +159,9 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// Does 1 generation.
         /// kills the worst ones, mutate and breed and make the system ready for a new generation.
         /// </summary>
-        /// <param name="markForRemoval">The action to mark organisms for removal.</param>
-        public void EndGeneration(Action<Organism> markForRemoval)
+        /// <param name="markOrganismForRemoval">The action to mark organisms for removal.</param>
+        /// <param name="markSpeciesForRemoval">The action to mark species for removal.</param>
+        public void EndGeneration(Action<Organism> markOrganismForRemoval, Action<Species> markSpeciesForRemoval)
         {
             // Verifies that all organisms of the current generation are evaluated, otherwise throw an exception.
             if (!AllOrganismsInCurrentGenerationAreEvaluated())
@@ -183,7 +184,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 }
 
                 // Reproduce with the given training room settings.
-                species.PostGeneration(TrainingRoomSettings.TopAmountToSurvive, Generation, markForRemoval);
+                species.PostGeneration(TrainingRoomSettings.TopAmountToSurvive, Generation, markOrganismForRemoval);
 
                 // Calculate the total score for all species.
                 TotalScore += species.SpeciesScore;
@@ -202,6 +203,14 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             // For each species determine the amount of organisms that is allowed to survive
             foreach (Species species in Species)
             {
+                // If the species is stagnant don't let it reproduce 
+                if (species.StagnantCounter >= TrainingRoomSettings.MaxStagnantTime)
+                {
+                    markSpeciesForRemoval(species);
+                    species.Organisms.Clear();
+                    continue;
+                }
+                
                 double fraction = species.SpeciesScore / TotalScore;
                 double amountOfOrganisms = TrainingRoomSettings.OrganismCount * fraction;
                 rest += amountOfOrganisms % 1;
@@ -213,6 +222,14 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 }
 
                 amountOfOrganisms = Math.Floor(amountOfOrganisms);
+
+                if (amountOfOrganisms > 1 && species.Organisms.Count > TrainingRoomSettings.ChampionCloneMinSpeciesSize)
+                {
+                    amountOfOrganisms--;
+                    totalOrganisms++;
+                    species.AddOrganism(species.GetChampion().Clone(TrainingRoomSettings));
+                }
+                
                 for (int i = 0; i < amountOfOrganisms; i++)
                 {
                     species.AddOrganism(ProduceOrganism(species));
@@ -226,8 +243,10 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 AddOrganism(_organismFactory.Create(new OrganismFactoryArgument()
                 {
                     TrainingRoomSettings = TrainingRoomSettings, 
-                    Generation = Generation + 1
+                    Generation = Generation + 1,
+                    InnovationFunction = GetInnovationNumber
                 }));
+                totalOrganisms++;
             }
 
             // Increases the generation.

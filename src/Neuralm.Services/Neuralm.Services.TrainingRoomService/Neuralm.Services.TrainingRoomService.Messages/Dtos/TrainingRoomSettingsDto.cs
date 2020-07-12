@@ -96,5 +96,15 @@ namespace Neuralm.Services.TrainingRoomService.Messages.Dtos
         /// Gets and sets the seed.
         /// </summary>
         public int Seed { get; set; }
+        
+        /// <summary>
+        /// How long a species can be stagnant before being killed.
+        /// </summary>
+        public uint MaxStagnantTime { get; set; }
+        
+        /// <summary>
+        /// How many organisms are needed before the champion will be cloned 
+        /// </summary>
+        public uint ChampionCloneMinSpeciesSize { get; set; }
     }
 }

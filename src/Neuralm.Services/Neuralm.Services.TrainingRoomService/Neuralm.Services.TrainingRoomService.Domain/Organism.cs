@@ -95,12 +95,37 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// </summary>
         /// <param name="trainingRoomSettings">The training room settings.</param>
         /// <param name="innovationFunction">The innovation function.</param>
-        public Organism(TrainingRoomSettings trainingRoomSettings, Func<uint, uint, uint> innovationFunction) : this(0, trainingRoomSettings)
+        public Organism(TrainingRoomSettings trainingRoomSettings, Func<uint, uint, uint> innovationFunction) : this(trainingRoomSettings, innovationFunction, 0)
         {
-            // if the generation is 0, add initial mutations.
-            AddConnectionMutation(trainingRoomSettings, innovationFunction);
+            
         }
-        
+
+
+        /// <summary>
+        /// Initializes an instance of the <see cref="Organism"/> class.
+        /// </summary>
+        /// <param name="trainingRoomSettings">The training room settings.</param>
+        /// <param name="innovationFunction">The innovation function.</param>
+        /// <param name="generation">The generation.</param>
+        public Organism(TrainingRoomSettings trainingRoomSettings, Func<uint, uint, uint> innovationFunction, uint generation) : this(generation, trainingRoomSettings)
+        {
+            foreach (OrganismInputNode organismInputNode in Inputs)
+            {
+                InputNode inputNode = organismInputNode.InputNode;
+                
+                foreach (OrganismOutputNode organismOutputNode in Outputs)
+                {
+                    OutputNode outputNode = organismOutputNode.OutputNode;
+                    
+                    // Create a new connection gene from the start and end nodes.
+                    ConnectionGene connection = CreateConnectionGene(innovationFunction(inputNode.NodeIdentifier, outputNode.NodeIdentifier), inputNode.NodeIdentifier, outputNode.NodeIdentifier, trainingRoomSettings.Random.NextDouble() * 2 - 1);
+
+                    // Add the connection gene.
+                    ConnectionGenes.Add(connection);
+                }
+            }
+        }
+
         /// <summary>
         /// Initializes an instance of the <see cref="Organism"/> class.
         /// </summary>
