@@ -21,4 +21,5 @@ export default interface TrainingRoomSettings {
   enableConnectionChance: number;
   seed: number;
   maxStagnantTime: number;
+  championCloneMinSpeciesSize: number;
 }

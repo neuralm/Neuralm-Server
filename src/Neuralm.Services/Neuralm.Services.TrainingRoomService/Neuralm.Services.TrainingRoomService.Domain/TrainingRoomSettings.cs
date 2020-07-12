@@ -112,6 +112,11 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// How long a species can be stagnant before being killed.
         /// </summary>
         public uint MaxStagnantTime { get; private set; }
+        
+        /// <summary>
+        /// How many organisms are needed before the champion will be cloned 
+        /// </summary>
+        public uint ChampionCloneMinSpeciesSize { get; private set; }
 
         /// <summary>
         /// Gets the Random based on the <see cref="Seed"/>.
@@ -149,13 +154,15 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <param name="enableConnectionChance">The chance a disabled connection gets enabled when crossover happens [0,1].</param>
         /// <param name="seed">The seed for the pseudo-random generator.</param>
         /// <param name="maxStagnantTime">How long a species can be stagnant before being killed.</param>
+        /// <param name="championCloneMinSpeciesSize">How many organisms a species needs before its champion will be cloned instead of mutated</param>
         public TrainingRoomSettings(
             Guid trainingRoomId,
             uint organismCount, uint inputCount, uint outputCount,
             double c1, double c2, double c3,
             double threshold, double addConnectionChance, double addNodeChance,
             double crossOverChance, double interSpeciesChance, double mutationChance,
-            double mutateWeightChance, double weightReassignChance, double topAmountToSurvive, double enableConnectionChance, int seed, uint maxStagnantTime)
+            double mutateWeightChance, double weightReassignChance, double topAmountToSurvive, 
+            double enableConnectionChance, int seed, uint maxStagnantTime, uint championCloneMinSpeciesSize)
         {
             Id = Guid.NewGuid();
             TrainingRoomId = trainingRoomId;
@@ -177,6 +184,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             EnableConnectionChance = enableConnectionChance;
             Seed = seed;
             MaxStagnantTime = maxStagnantTime;
+            ChampionCloneMinSpeciesSize = championCloneMinSpeciesSize;
         }
     }
 }

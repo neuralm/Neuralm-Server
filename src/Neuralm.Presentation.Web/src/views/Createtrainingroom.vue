@@ -85,6 +85,11 @@
                     <v-text-field-with-validation rules="required" v-model="trainingroom.trainingRoomSettings.maxStagnantTime" label="MaxStagnantTime" type="number"/>
                   </v-col>
                 </v-row>
+                <v-row>
+                  <v-col>
+                    <v-text-field-with-validation rules="required" v-model="trainingroom.trainingRoomSettings.championCloneMinSpeciesSize" label="ChampionCloneMinSpeciesSize" type="number"/>
+                  </v-col>
+                </v-row>
             </v-card-text>
             <v-card-actions>
               <v-spacer />
@@ -147,7 +152,8 @@ function getOwner(): Owner {
         topAmountToSurvive: 0.5,
         enableConnectionChance: 0.25,
         seed: 1,
-        maxStagnantTime: 15
+        maxStagnantTime: 15,
+        championCloneMinSpeciesSize: 5
       },
       trainingSessions: [],
       authorizedTrainers: []
