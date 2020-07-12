@@ -8,6 +8,11 @@ namespace Neuralm.Services.Common.Application.Interfaces
     public interface IMessageSerializer
     {
         /// <summary>
+        /// Gets the serializer type.
+        /// </summary>
+        string SerializerType { get; }
+
+        /// <summary>
         /// Serializes the object into a byte array.
         /// </summary>
         /// <param name="message">The message object.</param>

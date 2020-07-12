@@ -1,18 +1,27 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using Neuralm.Services.Common.Application.Interfaces;
-using Neuralm.Services.Common.Configurations;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Security.Claims;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
+using Microsoft.IdentityModel.Tokens;
+using Neuralm.Services.Common.Application;
+using Neuralm.Services.Common.Application.Interfaces;
+using Neuralm.Services.Common.Configurations;
+using Neuralm.Services.Common.Domain;
 using Neuralm.Services.Common.Infrastructure.Services;
+using Neuralm.Services.Common.Messages;
+using Neuralm.Services.Common.Messages.Dtos;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Security.Claims;
 
 namespace Neuralm.Services.Common.Mapping
 {
@@ -45,7 +54,7 @@ namespace Neuralm.Services.Common.Mapping
         /// <returns>Returns the service collection to chain further upon.</returns>
         public static IServiceCollection AddAutoMapper(this IServiceCollection serviceCollection, Assembly assembly)
         {
-            serviceCollection.AddAutoMapper(new[] { assembly });
+            serviceCollection.AddAutoMapper(new[] { assembly, Assembly.GetAssembly(typeof(StartupExtensions)) });
             return serviceCollection;
         }
 
@@ -127,7 +136,7 @@ namespace Neuralm.Services.Common.Mapping
                     new Claim(ClaimTypes.Role, "Service")
                 };
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessTokenService.GenerateAccessToken(claims)}");
-                client.BaseAddress = new Uri($"http://{registryServiceConfiguration.Host}:{registryServiceConfiguration.Port.ToString()}");
+                client.BaseAddress = new Uri($"http://{registryServiceConfiguration.Host}:{registryServiceConfiguration.Port}");
             });
             return serviceCollection;
         }
@@ -144,6 +153,56 @@ namespace Neuralm.Services.Common.Mapping
             ServiceConfiguration serviceConfiguration = configuration.GetSection("Service").Get<ServiceConfiguration>();
             app.ApplicationServices.GetService<IStartupService>().RegisterServiceAsync(serviceName,
                 serviceConfiguration.Host, serviceConfiguration.Port);
+            return app;
+        }
+
+        /// <summary>
+        /// Adds the health service to the service collection.
+        /// </summary>
+        /// <param name="serviceCollection">The service collection.</param>
+        /// <returns>Returns <see cref="IApplicationBuilder"/> to chain further upon.</returns>
+        public static IServiceCollection AddHealthChecks<TDbContext>(this IServiceCollection serviceCollection) where TDbContext : DbContext
+        {
+            serviceCollection.AddHealthChecks()
+                .AddDbContextCheck<TDbContext>("Database");
+            return serviceCollection;
+        }
+
+        /// <summary>
+        /// Maps the controller and health check end points.
+        /// </summary>
+        /// <param name="app">The application builder. </param>
+        /// <param name="serviceName">The service name. </param>
+        /// <returns>Returns <see cref="IApplicationBuilder"/> to chain further upon.</returns>
+        public static IApplicationBuilder MapControllerAndHealthCheckEndPoints(this IApplicationBuilder app, string serviceName)
+        {
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapHealthChecks($"{serviceName}/health", new HealthCheckOptions()
+                {
+                    ResponseWriter = async (context, result) =>
+                    {
+                        IMessageSerializer messageSerializer = app.ApplicationServices.GetService<IMessageSerializer>();
+                        IMapper mapper = app.ApplicationServices.GetService<IMapper>();
+                        Guid requestId = Guid.Empty;
+                        ServiceHealthCheckResponse response;
+                        if (context.Request.Headers.ContainsKey("Request-Id") && Guid.TryParse(context.Request.Headers["Request-Id"].FirstOrDefault(), out requestId))
+                        {
+                            ServiceHealthReport report = result.ToServiceHealthReport();
+                            response = new ServiceHealthCheckResponse(requestId, mapper.Map<ServiceHealthReportDto>(report), "", true);
+                        }
+                        else
+                        {
+                            response = new ServiceHealthCheckResponse(requestId, null, "Please provide a 'Request-Id' header with request id as valid guid.", false);
+                        }
+
+                        string json = messageSerializer.SerializeToString(response);
+                        context.Response.ContentType = $"application/{messageSerializer.SerializerType}";
+                        await context.Response.WriteAsync(json);
+                    }
+                });
+            });
             return app;
         }
 

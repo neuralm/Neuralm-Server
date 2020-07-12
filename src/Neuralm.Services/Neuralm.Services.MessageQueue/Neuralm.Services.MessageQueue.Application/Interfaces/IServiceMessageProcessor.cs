@@ -1,5 +1,5 @@
-﻿using System;
-using Neuralm.Services.Common.Application.Interfaces;
+﻿using Neuralm.Services.Common.Application.Interfaces;
+using System;
 
 namespace Neuralm.Services.MessageQueue.Application.Interfaces
 {
@@ -14,5 +14,18 @@ namespace Neuralm.Services.MessageQueue.Application.Interfaces
         /// <param name="messageId">The message id.</param>
         /// <param name="networkConnector">The network connector.</param>
         void AddClientMessage(Guid messageId, INetworkConnector networkConnector);
+
+        /// <summary>
+        /// Adds a service health check listener.
+        /// </summary>
+        /// <param name="messageId">The message id.</param>
+        /// <param name="serviceHealthCheckListener">The service health check listener.</param>
+        void AddServiceHealthCheckMessageListener(Guid messageId, ServiceHealthCheckListener serviceHealthCheckListener);
+
+        /// <summary>
+        /// Removes a health check listener for the given message id.
+        /// </summary>
+        /// <param name="messageId">The message id.</param>
+        void RemoveServiceHealthCheckMessageListener(Guid messageId);
     }
 }

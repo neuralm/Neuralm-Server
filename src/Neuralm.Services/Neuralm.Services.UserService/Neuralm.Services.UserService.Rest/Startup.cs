@@ -41,10 +41,7 @@ namespace Neuralm.Services.UserService.Rest
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.MapControllerAndHealthCheckEndPoints("user");
 
             app.RegisterService(Configuration, "UserService");
         }

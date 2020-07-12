@@ -77,7 +77,9 @@ namespace Neuralm.Services.UserService.Mapping
             #endregion Services
 
             serviceCollection.VerifyDatabaseConnection<UserDbContext>();
-            
+
+            serviceCollection.AddHealthChecks<UserDbContext>();
+
             return serviceCollection;
         }
     }

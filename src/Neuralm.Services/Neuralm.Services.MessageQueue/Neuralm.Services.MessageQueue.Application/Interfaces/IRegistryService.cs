@@ -16,6 +16,14 @@ namespace Neuralm.Services.MessageQueue.Application.Interfaces
         /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
         Task StartReceivingServiceEndPointsAsync(CancellationToken cancellationToken);
 
+
+        /// <summary>
+        /// Starts monitoring known services with health checks.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Returns an awaitable <see cref="Task"/>.</returns>
+        Task StartMonitoringServicesAsync(CancellationToken cancellationToken);
+
         /// <summary>
         /// Adds services.
         /// </summary>

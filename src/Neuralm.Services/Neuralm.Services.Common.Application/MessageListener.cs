@@ -1,10 +1,10 @@
-﻿using Neuralm.Services.Common.Observer;
-using Neuralm.Services.Common.Domain;
+﻿using Neuralm.Services.Common.Domain;
+using Neuralm.Services.Common.Observer;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Neuralm.Services.Common.Infrastructure.Messaging
+namespace Neuralm.Services.Common.Application
 {
     /// <summary>
     /// Represents the <see cref="MessageListener{T}"/> class.

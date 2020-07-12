@@ -77,6 +77,8 @@ namespace Neuralm.Services.RegistryService.Mapping
             
             serviceCollection.VerifyDatabaseConnection<ServiceDbContext>();
 
+            serviceCollection.AddHealthChecks<ServiceDbContext>();
+
             return serviceCollection;
         }
         

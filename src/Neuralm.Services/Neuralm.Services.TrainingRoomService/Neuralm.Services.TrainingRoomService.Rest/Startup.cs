@@ -41,10 +41,7 @@ namespace Neuralm.Services.TrainingRoomService.Rest
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.MapControllerAndHealthCheckEndPoints("trainingroom");
 
             app.RegisterService(Configuration, "TrainingRoomService");
         }

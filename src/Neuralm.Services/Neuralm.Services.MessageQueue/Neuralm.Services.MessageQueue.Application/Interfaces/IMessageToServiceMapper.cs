@@ -15,6 +15,11 @@ namespace Neuralm.Services.MessageQueue.Application.Interfaces
         IReadOnlyDictionary<Type, IServiceConnector> MessageToServiceMap { get; }
 
         /// <summary>
+        /// Gets the service map.
+        /// </summary>
+        IReadOnlyDictionary<Guid, IServiceConnector> ServiceMap { get; }
+
+        /// <summary>
         /// Adds a service.
         /// </summary>
         /// <param name="id">The service id.</param>

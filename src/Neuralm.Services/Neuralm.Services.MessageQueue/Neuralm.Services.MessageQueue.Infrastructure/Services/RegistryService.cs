@@ -2,6 +2,9 @@
 using Microsoft.Extensions.Options;
 using Neuralm.Services.Common.Application.Interfaces;
 using Neuralm.Services.Common.Infrastructure.Networking;
+using Neuralm.Services.Common.Messages;
+using Neuralm.Services.Common.Messages.Dtos;
+using Neuralm.Services.MessageQueue.Application;
 using Neuralm.Services.MessageQueue.Application.Configurations;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
 using Neuralm.Services.MessageQueue.Infrastructure.Messaging;
@@ -11,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using IRegistryService = Neuralm.Services.MessageQueue.Application.Interfaces.IRegistryService;
@@ -98,13 +102,13 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
         /// <inheritdoc cref="IRegistryService.AddService(AddServiceCommand)"/>
         public Task AddService(AddServiceCommand addServiceCommand)
         {
-            return AddService(addServiceCommand.Service.Id, addServiceCommand.Service.Name, 
+            return AddService(addServiceCommand.Service.Id, addServiceCommand.Service.Name,
                 addServiceCommand.Service.Host, addServiceCommand.Service.Port);
         }
 
         private async Task AddService(Guid id, string name, string host, int port)
         {
-            Uri baseUrl = new Uri($"http://{host}:{port.ToString()}/{name.ToLower().Replace("service", "")}");
+            Uri baseUrl = new Uri($"http://{host}:{port}/{name.ToLower().Replace("service", "")}");
             INetworkConnector networkConnector = new HttpNetworkConnector(_messageSerializer, _serviceMessageProcessor, baseUrl, _accessTokenService, _httpNetworkConnectorLogger);
             await networkConnector.ConnectAsync(CancellationToken.None);
             networkConnector.Start();
@@ -115,6 +119,76 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Services
         public Task RemoveService(RemoveServiceCommand removeServiceCommand)
         {
             return Task.Run(() => _messageToServiceMapper.RemoveService(removeServiceCommand.ServiceId));
+        }
+
+        /// <inheritdoc cref="IRegistryService.StartMonitoringServicesAsync(CancellationToken)"/>
+        public async Task StartMonitoringServicesAsync(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                Dictionary<Guid, ServiceHealthCheckListener> healthCheckListeners = new Dictionary<Guid, ServiceHealthCheckListener>();
+                List<Task<(bool, Guid, Guid, string, ServiceHealthCheckResponse)>> healthCheckTasks = new List<Task<(bool, Guid, Guid, string, ServiceHealthCheckResponse)>>();
+                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+                if (_messageToServiceMapper.ServiceMap.Count() > 0)
+                {
+                    foreach (var (id, serviceConnector) in _messageToServiceMapper.ServiceMap)
+                    {
+                        ServiceHealthCheckListener messageListener = new ServiceHealthCheckListener();
+                        ServiceHealthCheckRequest serviceHealthCheckRequest = new ServiceHealthCheckRequest();
+                        serviceConnector.EnqueueMessage(serviceHealthCheckRequest);
+                        _serviceMessageProcessor.AddServiceHealthCheckMessageListener(serviceHealthCheckRequest.Id, messageListener);
+                        healthCheckListeners.Add(id, messageListener);
+                        healthCheckTasks.Add(messageListener.ReceiveMessageAsync(cancellationTokenSource.Token)
+                            .ContinueWith<(bool, Guid, Guid, string, ServiceHealthCheckResponse)>((task) =>
+                           {
+                                if (task.IsCompletedSuccessfully)
+                                    return (true, id, serviceHealthCheckRequest.Id, serviceConnector.Name, task.Result);
+                                else
+                                    return (false, id, serviceHealthCheckRequest.Id, serviceConnector.Name, null);
+                            }));
+                    }
+
+                    StringBuilder stringBuilder = new StringBuilder();
+                    foreach ((bool success, Guid id, Guid requestId, string name, ServiceHealthCheckResponse response) in await Task.WhenAll(healthCheckTasks))
+                    {
+                        stringBuilder.AppendLine(new string('-', 20));
+                        stringBuilder.AppendLine($"Service: {name}");
+                        stringBuilder.AppendLine($"Id: {id}");
+                        stringBuilder.AppendLine($"Success: {success && response.Success}");
+                        if (success && response.Success)
+                        {
+                            stringBuilder.AppendLine($"Status: {response.ServiceHealthReport.Status}");
+                            stringBuilder.AppendLine($"Total duration in milliseconds: {response.ServiceHealthReport.TotalDuration.Milliseconds}");
+
+                            foreach (HealthCheckDto healthCheck in response.ServiceHealthReport.HealthChecks)
+                            {
+                                stringBuilder.AppendLine($"\tHealth check: {healthCheck.Name}");
+                                stringBuilder.AppendLine($"\tStatus: {healthCheck.Status}");
+                                stringBuilder.AppendLine($"\tDuration in milliseconds: {healthCheck.Duration.Milliseconds}");
+
+                                if (!(healthCheck.Description is null))
+                                    stringBuilder.AppendLine($"\tDescription: {healthCheck.Description}");
+                            }
+                        }
+                        else
+                        {
+                            stringBuilder.AppendLine($"Removing {id} from service map!");
+                            // TODO: notify registry service that a service has stopped responding?
+                            _messageToServiceMapper.RemoveService(id);
+                        }
+                        stringBuilder.AppendLine(new string('-', 20));
+                        _serviceMessageProcessor.RemoveServiceHealthCheckMessageListener(requestId);
+                    }
+                    _registryServiceLogger.LogInformation(stringBuilder.ToString());
+                }
+                else
+                {
+                    _registryServiceLogger.LogInformation("No services registered yet.");
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(60), cancellationToken);
+            }
         }
     }
 }

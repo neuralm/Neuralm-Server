@@ -41,10 +41,7 @@ namespace Neuralm.Services.RegistryService.Rest
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.MapControllerAndHealthCheckEndPoints("registry");
 
             app.StartRegistryServiceAsync();
         }

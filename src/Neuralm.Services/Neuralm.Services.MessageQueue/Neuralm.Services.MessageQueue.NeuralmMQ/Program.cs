@@ -78,6 +78,9 @@ namespace Neuralm.Services.MessageQueue.NeuralmMQ
             _ = Task.Run(async () => await registryService.StartReceivingServiceEndPointsAsync(cancellationToken), cancellationToken);
             Console.WriteLine("Started RegistryService EndPoint.");
 
+            _ = Task.Run(async () => await registryService.StartMonitoringServicesAsync(cancellationToken), cancellationToken);
+            Console.WriteLine("Started monitoring services.");
+
             IClientMessageProcessor clientMessageProcessor = genericServiceProvider.GetService<IClientMessageProcessor>();
             _ = Task.Run(async () => await clientMessageProcessor.StartAsync(cancellationToken), cancellationToken);
             Console.WriteLine("Started client messaging EndPoint.");

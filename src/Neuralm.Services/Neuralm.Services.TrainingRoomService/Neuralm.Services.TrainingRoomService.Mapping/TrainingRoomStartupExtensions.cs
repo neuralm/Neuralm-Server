@@ -96,6 +96,8 @@ namespace Neuralm.Services.TrainingRoomService.Mapping
 
             serviceCollection.VerifyDatabaseConnection<TrainingRoomDbContext>();
 
+            serviceCollection.AddHealthChecks<TrainingRoomDbContext>();
+
             return serviceCollection;
         }
     }

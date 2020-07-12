@@ -25,6 +25,9 @@ namespace Neuralm.Services.MessageQueue.Infrastructure
         /// <inheritdoc cref="IMessageToServiceMapper.MessageToServiceMap"/>
         public IReadOnlyDictionary<Type, IServiceConnector> MessageToServiceMap => _messageToServiceMap;
 
+        /// <inheritdoc cref="IMessageToServiceMapper.ServiceMap"/>
+        public IReadOnlyDictionary<Guid, IServiceConnector> ServiceMap => _serviceMap;
+
         /// <summary>
         /// Initializes an instance of the <see cref="MessageToServiceMapper"/> class.
         /// </summary>

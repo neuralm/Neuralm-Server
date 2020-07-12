@@ -5,6 +5,7 @@ using Neuralm.Services.Common.Application.Serializers;
 using Neuralm.Services.Common.Application.Services;
 using Neuralm.Services.Common.Infrastructure;
 using Neuralm.Services.Common.Mapping;
+using Neuralm.Services.Common.Messages;
 using Neuralm.Services.Common.Patterns;
 using Neuralm.Services.MessageQueue.Application;
 using Neuralm.Services.MessageQueue.Application.Interfaces;
@@ -39,7 +40,7 @@ namespace Neuralm.Services.MessageQueue.Mapping
             {
                 List<Type> types = new List<Type>
                 {
-                    typeof(RegisterRequest), typeof(CreateTrainingRoomRequest)
+                    typeof(RegisterRequest), typeof(CreateTrainingRoomRequest), typeof(ServiceHealthCheckRequest)
                 };
                 IMessageTypeCache messageTypeCache = serviceCollection.GetService<IFactory<IMessageTypeCache, IEnumerable<Type>>>().Create(types);
                 return new ClientMessageTypeCache(messageTypeCache);

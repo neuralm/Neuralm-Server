@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <LangVersion>8</LangVersion>
     <AssemblyName>Neuralm.Services.UserService.Rest</AssemblyName>
     <RootNamespace>Neuralm.Services.UserService.Rest</RootNamespace>

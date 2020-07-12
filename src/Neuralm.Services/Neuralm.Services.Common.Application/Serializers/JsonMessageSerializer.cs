@@ -10,7 +10,10 @@ namespace Neuralm.Services.Common.Application.Serializers
     public sealed class JsonMessageSerializer : IMessageSerializer
     {
         private readonly JsonSerializerOptions _jsonSerializerOptions;
-        
+
+        /// <inheritdoc cref="IMessageSerializer.SerializerType"/>
+        public string SerializerType => "json";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonMessageSerializer"/> class.
         /// </summary>

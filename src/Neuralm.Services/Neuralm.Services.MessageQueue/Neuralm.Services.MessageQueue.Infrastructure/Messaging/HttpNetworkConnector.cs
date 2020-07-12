@@ -90,15 +90,18 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
                     "GetAll" => 
                         new HttpRequestMessage(messageAttribute.Method, httpClientBaseAddress),
                     "Get" when message is IGetRequest getRequest => 
-                        new HttpRequestMessage(messageAttribute.Method,$"{httpClientBaseAddress}{getRequest.GetId.ToString()}"),
+                        new HttpRequestMessage(messageAttribute.Method, $"{httpClientBaseAddress}{getRequest.GetId}"),
                     "Get" when message is PaginationRequest paginationRequest => 
-                        new HttpRequestMessage(messageAttribute.Method,$"{httpClientBaseAddress}{paginationRequest.PageNumber.ToString()}/{paginationRequest.PageSize.ToString()}"),
+                        new HttpRequestMessage(messageAttribute.Method, $"{httpClientBaseAddress}{paginationRequest.PageNumber}/{paginationRequest.PageSize}"),
                     _ => 
                         new HttpRequestMessage(messageAttribute.Method, httpClientBaseAddress)
                     {
-                        Content = new StringContent(_messageSerializer.SerializeToString(message), Encoding.UTF8, "application/json")
+                        Content = new StringContent(_messageSerializer.SerializeToString(message), Encoding.UTF8, $"application/{_messageSerializer.SerializerType}")
                     }
                 };
+
+                httpRequestMessage.Headers.Add("Request-Id", message.Id.ToString());
+
                 HttpResponseMessage response = await _httpClient.SendAsync(httpRequestMessage, cancellationToken);
                 _logger.LogInformation($"REST RESPONSE: {await response.Content.ReadAsStringAsync()}");
                 byte[] bytes = await response.Content.ReadAsByteArrayAsync();
@@ -165,8 +168,7 @@ namespace Neuralm.Services.MessageQueue.Infrastructure.Messaging
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "The HttpNetworkConnector failed to send a message.");
-                throw;
+                _logger.LogError(e.Message, "The HttpNetworkConnector failed to send a message.");
             }
         }
 
