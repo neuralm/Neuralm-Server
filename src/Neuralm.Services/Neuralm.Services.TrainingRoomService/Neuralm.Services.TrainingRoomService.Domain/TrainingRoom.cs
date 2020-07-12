@@ -226,7 +226,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 {
                     amountOfOrganisms--;
                     totalOrganisms++;
-                    species.AddOrganism(species.GetChampion());
+                    species.AddOrganism(species.GetChampion().Clone(TrainingRoomSettings));
                 }
                 
                 for (int i = 0; i < amountOfOrganisms; i++)
