@@ -109,7 +109,21 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         /// <param name="generation">The generation.</param>
         public Organism(TrainingRoomSettings trainingRoomSettings, Func<uint, uint, uint> innovationFunction, uint generation) : this(generation, trainingRoomSettings)
         {
-            AddConnectionMutation(trainingRoomSettings, innovationFunction);
+            foreach (OrganismInputNode organismInputNode in Inputs)
+            {
+                InputNode inputNode = organismInputNode.InputNode;
+                
+                foreach (OrganismOutputNode organismOutputNode in Outputs)
+                {
+                    OutputNode outputNode = organismOutputNode.OutputNode;
+                    
+                    // Create a new connection gene from the start and end nodes.
+                    ConnectionGene connection = CreateConnectionGene(innovationFunction(inputNode.NodeIdentifier, outputNode.NodeIdentifier), inputNode.NodeIdentifier, outputNode.NodeIdentifier, trainingRoomSettings.Random.NextDouble() * 2 - 1);
+
+                    // Add the connection gene.
+                    ConnectionGenes.Add(connection);
+                }
+            }
         }
 
         /// <summary>
