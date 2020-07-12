@@ -22,7 +22,17 @@ namespace Neuralm.Services.TrainingRoomService.Messages.Dtos
         /// Gets and sets the species score.
         /// </summary>
         public double SpeciesScore { get; set; }
+
+        /// <summary>
+        /// The highest score this species has achieved
+        /// </summary>
+        public double HighScore { get; private set; }
         
+        /// <summary>
+        /// How long this species has not achieved a new HighScore
+        /// </summary>
+        public uint StagnantCounter { get; private set; }
+
         /// <summary>
         /// Gets and sets the training room id.
         /// </summary>
