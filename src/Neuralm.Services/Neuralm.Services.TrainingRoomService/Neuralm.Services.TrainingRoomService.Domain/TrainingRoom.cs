@@ -137,7 +137,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             // and add it if true.
             foreach (Species species in Species)
             {
-                if (!species.IsSameSpecies(organism, TrainingRoomSettings))
+                if (species.StagnantCounter >= TrainingRoomSettings.MaxStagnantTime || !species.IsSameSpecies(organism, TrainingRoomSettings))
                     continue;
                 species.AddOrganism(organism);
                 return;
@@ -198,12 +198,17 @@ namespace Neuralm.Services.TrainingRoomService.Domain
 
             // Prepare total organisms value.
             double totalOrganisms = 0;
-
+            
             // For each species determine the amount of organisms that is allowed to survive
             foreach (Species species in Species)
             {
                 // If the species is stagnant don't let it reproduce 
-                if (species.StagnantCounter >= TrainingRoomSettings.MaxStagnantTime) continue;
+                if (species.StagnantCounter >= TrainingRoomSettings.MaxStagnantTime)
+                {
+                    species.Organisms.ForEach(markForRemoval);
+                    species.Organisms.Clear();
+                    continue;
+                }
                 
                 double fraction = species.SpeciesScore / TotalScore;
                 double amountOfOrganisms = TrainingRoomSettings.OrganismCount * fraction;

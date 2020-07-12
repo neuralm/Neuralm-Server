@@ -122,11 +122,12 @@ namespace Neuralm.Services.TrainingRoomService.Domain
 
             // Sum all of the scores of the current generation.
             SpeciesScore = Organisms.Sum(organism => organism.Score);
+            double highestScore = Organisms.Max(organism => organism.Score);
 
             // Check for a new high score. Update it and reset the stagnant counter if needed.
-            if (SpeciesScore > HighScore)
+            if (highestScore > HighScore)
             {
-                HighScore = SpeciesScore;
+                HighScore = highestScore;
                 StagnantCounter = 0;
             }
 
