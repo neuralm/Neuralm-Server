@@ -193,5 +193,25 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             return
                 $"Id: {Id}, Organisms: {Organisms.Count}, SpeciesScore: {SpeciesScore}, TrainingRoomId: {TrainingRoomId}";
         }
+
+        /// <summary>
+        /// Get the champion organism for this species
+        /// </summary>
+        /// <returns>The organism with the highest score in this species</returns>
+        public Organism GetChampion()
+        {
+            double highScore = double.MinValue;
+            Organism highest = null;
+            foreach (Organism organism in Organisms)
+            {
+                if (organism.Score > highScore)
+                {
+                    highScore = organism.Score;
+                    highest = organism;
+                }
+            }
+
+            return highest;
+        }
     }
 }

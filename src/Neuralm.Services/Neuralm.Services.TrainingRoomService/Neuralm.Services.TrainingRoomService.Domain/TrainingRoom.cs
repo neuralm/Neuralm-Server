@@ -222,6 +222,14 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 }
 
                 amountOfOrganisms = Math.Floor(amountOfOrganisms);
+
+                if (amountOfOrganisms > 1 && species.Organisms.Count > TrainingRoomSettings.ChampionCloneMinSpeciesSize)
+                {
+                    amountOfOrganisms--;
+                    totalOrganisms++;
+                    species.AddOrganism(species.GetChampion().Clone(TrainingRoomSettings));
+                }
+                
                 for (int i = 0; i < amountOfOrganisms; i++)
                 {
                     species.AddOrganism(ProduceOrganism(species));
