@@ -1,7 +1,6 @@
-﻿using Neuralm.Services.TrainingRoomService.Domain;
-using System;
+﻿using System;
 
-namespace Neuralm.Services.TrainingRoomService.Tests.Evaluatables
+namespace Neuralm.Services.TrainingRoomService.Domain.Evaluatables
 {
     public class EvaluatableConnectionGene : ConnectionGene
     {

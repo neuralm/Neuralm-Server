@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Neuralm.Services.TrainingRoomService.Tests.Evaluatables
+namespace Neuralm.Services.TrainingRoomService.Domain.Evaluatables
 {
     /// <inheritdoc />
     public class EvaluatableOrganism : Organism
@@ -24,13 +24,41 @@ namespace Neuralm.Services.TrainingRoomService.Tests.Evaluatables
             // Generates a random name for the organism.
             Name = GenerateName(trainingRoomSettings.Random.Next);
         }
+        
+        // public EvaluatableOrganism(TrainingRoomSettings ts, Func<uint, uint, uint> innovationFunction, uint genes, uint hiddenNodes)
+        // {
+        //     for (int i = 0; i < genes; i++)
+        //     {
+        //         CreateAndAddNode()
+        //         AddConnectionMutation(ts, innovationFunction);
+        //     }
+        // }
 
         public EvaluatableOrganism(TrainingRoomSettings trainingRoomSettings, Func<uint, uint, uint> innovationFunction) : 
             this(0, trainingRoomSettings)
         {
             AddConnectionMutation(trainingRoomSettings, innovationFunction);
         }
+        
+        public EvaluatableOrganism(TrainingRoomSettings trainingRoomSettings, Func<uint, uint, uint> innovationFunction, uint generation) : this(generation, trainingRoomSettings)
+        {
+            foreach (OrganismInputNode organismInputNode in Inputs)
+            {
+                InputNode inputNode = organismInputNode.InputNode;
+                
+                foreach (OrganismOutputNode organismOutputNode in Outputs)
+                {
+                    OutputNode outputNode = organismOutputNode.OutputNode;
+                    
+                    // Create a new connection gene from the start and end nodes.
+                    ConnectionGene connection = CreateConnectionGene(innovationFunction(inputNode.NodeIdentifier, outputNode.NodeIdentifier), inputNode.NodeIdentifier, outputNode.NodeIdentifier, trainingRoomSettings.Random.NextDouble() * 2 - 1);
 
+                    // Add the connection gene.
+                    ConnectionGenes.Add(connection);
+                }
+            }
+        }
+        
         public EvaluatableOrganism(Guid id, TrainingRoomSettings trainingRoomSettings, uint generation, List<ConnectionGene> connectionGenes)
         {
             Id = id;
@@ -65,9 +93,21 @@ namespace Neuralm.Services.TrainingRoomService.Tests.Evaluatables
 
         protected override Node CreateAndAddNode(uint nodeIdentifier)
         {
-            EvaluatableHiddenNode evaluatableHiddenNode = new EvaluatableHiddenNode(nodeIdentifier);
-            HiddenNodes.Add(evaluatableHiddenNode);
-            return evaluatableHiddenNode;
+            // Tries to find the node in the hidden nodes list, if not found returns a default.
+            EvaluatableHiddenNode node = (EvaluatableHiddenNode) HiddenNodes.FirstOrDefault(n => n.NodeIdentifier == nodeIdentifier);
+
+            // If the node is not equal to default return the given node.
+            if (node != default)
+                return node;
+
+            // If no node was found then create a hidden node.
+            node = new EvaluatableHiddenNode(nodeIdentifier);
+
+            // Add it to the hidden nodes list.
+            HiddenNodes.Add(node);
+
+            // Return the hidden node.
+            return node;
         }
 
         protected override ConnectionGene CreateConnectionGene(uint innovationNumber, uint inNodeId, uint outNodeId, double weight, bool enabled = true)

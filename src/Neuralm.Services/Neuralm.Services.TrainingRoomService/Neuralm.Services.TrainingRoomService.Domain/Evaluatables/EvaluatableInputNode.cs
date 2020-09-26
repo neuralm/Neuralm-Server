@@ -1,7 +1,7 @@
 ﻿using System;
 using Neuralm.Services.TrainingRoomService.Domain;
 
-namespace Neuralm.Services.TrainingRoomService.Tests.Evaluatables
+namespace Neuralm.Services.TrainingRoomService.Domain.Evaluatables
 {
     public class EvaluatableInputNode : InputNode, IEvaluatableNode
     {

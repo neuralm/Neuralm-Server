@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Neuralm.Services.TrainingRoomService\Neuralm.Services.TrainingRoomService.Application\Neuralm.Services.TrainingRoomService.Application.csproj" />
+      <ProjectReference Include="..\Neuralm.Services.TrainingRoomService\Neuralm.Services.TrainingRoomService.Domain\Neuralm.Services.TrainingRoomService.Domain.csproj" />
+    </ItemGroup>
+
+</Project>

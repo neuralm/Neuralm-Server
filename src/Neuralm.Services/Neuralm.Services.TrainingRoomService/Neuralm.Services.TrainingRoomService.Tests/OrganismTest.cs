@@ -2,10 +2,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Neuralm.Services.Common.Patterns;
 using Neuralm.Services.TrainingRoomService.Domain;
 using Neuralm.Services.TrainingRoomService.Domain.FactoryArguments;
-using Neuralm.Services.TrainingRoomService.Tests.Evaluatables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Neuralm.Services.TrainingRoomService.Domain.Evaluatables;
 
 namespace Neuralm.Services.TrainingRoomService.Tests
 {
@@ -362,6 +362,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
                         o.IsEvaluated = true;
                     }));
                     _trainingRoom.EndGeneration(o => { }, o => { });
+                    Console.WriteLine($"Gen: {i}, TotalScore: {_trainingRoom.TotalScore}, HighestOrganismScore: {_trainingRoom.HighestOrganismScore}, LowestOrganismScore: {_trainingRoom.LowestOrganismScore}");
                 }
 
                 Assert.AreEqual(15, (int)_trainingRoom.Generation);

@@ -244,7 +244,8 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 {
                     TrainingRoomSettings = TrainingRoomSettings, 
                     Generation = Generation + 1,
-                    InnovationFunction = GetInnovationNumber
+                    InnovationFunction = GetInnovationNumber,
+                    CreationType = OrganismCreationType.NEW
                 }));
                 totalOrganisms++;
             }

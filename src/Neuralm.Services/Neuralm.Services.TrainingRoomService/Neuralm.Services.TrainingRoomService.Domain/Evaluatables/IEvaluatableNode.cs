@@ -1,4 +1,4 @@
-﻿namespace Neuralm.Services.TrainingRoomService.Tests.Evaluatables
+﻿namespace Neuralm.Services.TrainingRoomService.Domain.Evaluatables
 {
     public interface IEvaluatableNode
     {

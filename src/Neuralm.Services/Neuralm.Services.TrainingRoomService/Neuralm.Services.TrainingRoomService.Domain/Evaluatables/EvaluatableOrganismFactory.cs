@@ -3,7 +3,7 @@ using Neuralm.Services.Common.Patterns;
 using Neuralm.Services.TrainingRoomService.Domain;
 using Neuralm.Services.TrainingRoomService.Domain.FactoryArguments;
 
-namespace Neuralm.Services.TrainingRoomService.Tests.Evaluatables
+namespace Neuralm.Services.TrainingRoomService.Domain.Evaluatables
 {
     public class EvaluatableOrganismFactory : IFactory<Organism, OrganismFactoryArgument>
     {
