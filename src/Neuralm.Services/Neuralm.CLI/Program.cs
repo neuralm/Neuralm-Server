@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Neuralm.Services.Common.Patterns;
 using Neuralm.Services.TrainingRoomService.Domain;
 using Neuralm.Services.TrainingRoomService.Domain.Evaluatables;
@@ -27,7 +28,9 @@ namespace Neuralm.CLI
                     o.IsEvaluated = true;
                 }));
                 _trainingRoom.EndGeneration(o => { }, o => { });
-                Console.WriteLine($"Gen: {i}, TotalScore: {_trainingRoom.TotalScore}, HighestOrganismScore: {_trainingRoom.HighestOrganismScore}, LowestOrganismScore: {_trainingRoom.LowestOrganismScore}, Species: {_trainingRoom.Species.Count}");
+
+                int organismCount = _trainingRoom.Species.Sum(s => s.Organisms.FindAll(o => o.Generation == i+1).Count);
+                Console.WriteLine($"Gen: {i}, TotalScore: {_trainingRoom.TotalScore}, HighestOrganismScore: {_trainingRoom.HighestOrganismScore}, LowestOrganismScore: {_trainingRoom.LowestOrganismScore}, Species: {_trainingRoom.Species.Count}, Organisms: {organismCount}");
             }
         }
 
