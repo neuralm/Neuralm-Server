@@ -343,7 +343,7 @@ namespace Neuralm.Services.TrainingRoomService.Tests
 
                 for (int i = 0; i < trainingRoomSettings.OrganismCount; i++)
                 {
-                    EvaluatableOrganism organism = new EvaluatableOrganism(trainingRoomSettings, _trainingRoom.GetInnovationNumber) { IsLeased = true };
+                    EvaluatableOrganism organism = new EvaluatableOrganism(trainingRoomSettings, _trainingRoom.GetInnovationNumber, 0) { IsLeased = true };
                     _trainingRoom.AddOrganism(organism);
                 }
                 _trainingRoom.IncreaseNodeIdTo(trainingRoomSettings.InputCount + trainingRoomSettings.OutputCount);

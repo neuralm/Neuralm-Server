@@ -39,7 +39,7 @@ namespace Neuralm.CLI
 
             //Create a training room with really high mutation settings
             TrainingRoomSettings trainingRoomSettings = new TrainingRoomSettings(trainingRoomId: trainingRoomId,
-                                                                                 organismCount: 200,
+                                                                                 organismCount: 50,
                                                                                  inputCount: 3,
                                                                                  outputCount: 1,
                                                                                  c1: 1,
@@ -63,7 +63,7 @@ namespace Neuralm.CLI
 
             for (int i = 0; i < trainingRoomSettings.OrganismCount; i++)
             {
-                EvaluatableOrganism organism = new EvaluatableOrganism(trainingRoomSettings, _trainingRoom.GetInnovationNumber) { IsLeased = true };
+                EvaluatableOrganism organism = new EvaluatableOrganism(trainingRoomSettings, _trainingRoom.GetInnovationNumber, 0) { IsLeased = true };
                 _trainingRoom.AddOrganism(organism);
             }
             _trainingRoom.IncreaseNodeIdTo(trainingRoomSettings.InputCount + trainingRoomSettings.OutputCount);

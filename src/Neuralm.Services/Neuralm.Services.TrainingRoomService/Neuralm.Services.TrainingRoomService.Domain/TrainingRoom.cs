@@ -135,14 +135,15 @@ namespace Neuralm.Services.TrainingRoomService.Domain
         {
             // For each species in the species check if the organism is of the same species
             // and add it if true.
-            foreach (Species species in Species)
+            Species species = Species.FirstOrDefault(spcs =>
+                spcs.StagnantCounter < TrainingRoomSettings.MaxStagnantTime &&
+                spcs.IsSameSpecies(organism, TrainingRoomSettings));
+            if (species != default(Species))
             {
-                if (species.StagnantCounter >= TrainingRoomSettings.MaxStagnantTime || !species.IsSameSpecies(organism, TrainingRoomSettings))
-                    continue;
                 species.AddOrganism(organism);
                 return;
             }
-
+            
             // If the organism does not belong to any of the species create a new species and add it to the species.
             Species.Add(new Species(organism, Id));
         }
@@ -183,6 +184,10 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                     LowestOrganismScore = Math.Min(organism.Score, LowestOrganismScore);
                 }
 
+                // FIXME: How is this possible??????????
+                if (species.Organisms.Count == 0)
+                    continue;
+                
                 // Reproduce with the given training room settings.
                 species.PostGeneration(TrainingRoomSettings.TopAmountToSurvive, Generation, markOrganismForRemoval);
 
@@ -237,6 +242,9 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                 totalOrganisms += amountOfOrganisms;
             }
 
+            // Removes any species that have died out.
+            Species.RemoveAll(species => !species.Organisms.Any());
+            
             // If the total organisms count is lower than the amount specified in the training room settings then add more.
             while (totalOrganisms < TrainingRoomSettings.OrganismCount)
             {
@@ -252,9 +260,6 @@ namespace Neuralm.Services.TrainingRoomService.Domain
 
             // Increases the generation.
             Generation++;
-
-            // Removes any species that have died out.
-            Species.RemoveAll(species => !species.Organisms.Any());
 
             // Resets the mutation to innovation map.
             _mutationToInnovation.Clear();

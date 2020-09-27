@@ -122,7 +122,8 @@ namespace Neuralm.Services.TrainingRoomService.Domain
 
             // Sum all of the scores of the current generation.
             SpeciesScore = Organisms.Sum(organism => organism.Score);
-            double highestScore = Organisms.Max(organism => organism.Score);
+
+            double highestScore = Organisms.Any() ? Organisms.Max(organism => organism.Score) : 0;
 
             // Check for a new high score. Update it and reset the stagnant counter if needed.
             if (highestScore > HighScore)
@@ -154,7 +155,8 @@ namespace Neuralm.Services.TrainingRoomService.Domain
             }
 
             // Sets the current organisms to a certain amount of the top organisms that have been sorted before.
-            Organisms.RemoveRange(organismsToSurvive - 1, Organisms.Count - organismsToSurvive);
+            if (Organisms.Any())
+                Organisms.RemoveRange(organismsToSurvive - 1, Organisms.Count - organismsToSurvive);
         }
 
         /// <summary>

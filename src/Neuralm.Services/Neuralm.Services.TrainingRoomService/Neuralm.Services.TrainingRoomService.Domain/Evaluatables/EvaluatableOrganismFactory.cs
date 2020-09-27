@@ -11,7 +11,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain.Evaluatables
         {
             return argument.CreationType switch
                 {
-                OrganismCreationType.NEW => new EvaluatableOrganism(argument.Generation, argument.TrainingRoomSettings),
+                OrganismCreationType.NEW => new EvaluatableOrganism(argument.TrainingRoomSettings, argument.InnovationFunction, argument.Generation),
                 OrganismCreationType.NEW_WITH_GENES => new EvaluatableOrganism(argument.Id, argument.TrainingRoomSettings, argument.Generation, argument.ConnectionGenes),
                 _ => throw new ArgumentOutOfRangeException()
                 };

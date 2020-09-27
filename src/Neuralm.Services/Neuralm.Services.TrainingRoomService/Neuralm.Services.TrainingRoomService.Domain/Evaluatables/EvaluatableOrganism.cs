@@ -8,7 +8,30 @@ namespace Neuralm.Services.TrainingRoomService.Domain.Evaluatables
     /// <inheritdoc />
     public class EvaluatableOrganism : Organism
     {
-        public EvaluatableOrganism(uint generation, TrainingRoomSettings trainingRoomSettings)
+        // public EvaluatableOrganism(uint generation, TrainingRoomSettings trainingRoomSettings)
+        // {
+        //     Id = Guid.NewGuid();
+        //
+        //     // Sets the current generation.
+        //     Generation = generation;
+        //
+        //     // Initializes the list of connection genes.
+        //     ConnectionGenes = new List<ConnectionGene>();
+        //
+        //     // Initializes the Input & Output lists for the many to many relations.
+        //     GenerateInputAndOutputNodes(trainingRoomSettings);
+        //
+        //     // Generates a random name for the organism.
+        //     Name = GenerateName(trainingRoomSettings.Random.Next);
+        // }
+        
+        // public EvaluatableOrganism(TrainingRoomSettings trainingRoomSettings, Func<uint, uint, uint> innovationFunction) : 
+        //     this(0, trainingRoomSettings)
+        // {
+        //     AddConnectionMutation(trainingRoomSettings, innovationFunction);
+        // }
+        
+        public EvaluatableOrganism(TrainingRoomSettings trainingRoomSettings, Func<uint, uint, uint> innovationFunction, uint generation)
         {
             Id = Guid.NewGuid();
 
@@ -23,25 +46,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain.Evaluatables
 
             // Generates a random name for the organism.
             Name = GenerateName(trainingRoomSettings.Random.Next);
-        }
-        
-        // public EvaluatableOrganism(TrainingRoomSettings ts, Func<uint, uint, uint> innovationFunction, uint genes, uint hiddenNodes)
-        // {
-        //     for (int i = 0; i < genes; i++)
-        //     {
-        //         CreateAndAddNode()
-        //         AddConnectionMutation(ts, innovationFunction);
-        //     }
-        // }
-
-        public EvaluatableOrganism(TrainingRoomSettings trainingRoomSettings, Func<uint, uint, uint> innovationFunction) : 
-            this(0, trainingRoomSettings)
-        {
-            AddConnectionMutation(trainingRoomSettings, innovationFunction);
-        }
-        
-        public EvaluatableOrganism(TrainingRoomSettings trainingRoomSettings, Func<uint, uint, uint> innovationFunction, uint generation) : this(generation, trainingRoomSettings)
-        {
+            
             foreach (OrganismInputNode organismInputNode in Inputs)
             {
                 InputNode inputNode = organismInputNode.InputNode;
