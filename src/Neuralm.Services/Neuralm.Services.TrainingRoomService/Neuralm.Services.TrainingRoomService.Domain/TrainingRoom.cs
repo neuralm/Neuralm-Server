@@ -204,15 +204,17 @@ namespace Neuralm.Services.TrainingRoomService.Domain
 
             // Prepare total organisms value.
             double totalOrganisms = 0;
-
+            
             // For each species determine the amount of organisms that is allowed to survive
-            foreach (Species species in Species)
+            for (int i = Species.Count - 1; i >= 0; i--)
             {
+                Species species = Species[i];
                 // If the species is stagnant don't let it reproduce 
-                if (species.StagnantCounter >= TrainingRoomSettings.MaxStagnantTime)
+                if (species.StagnantCounter >= TrainingRoomSettings.MaxStagnantTime || !species.Organisms.Any())
                 {
                     markSpeciesForRemoval(species);
                     species.Organisms.Clear();
+                    Species.RemoveAt(i);
                     continue;
                 }
                 
@@ -237,7 +239,7 @@ namespace Neuralm.Services.TrainingRoomService.Domain
                     species.AddOrganism(champion);
                 }
                 
-                for (int i = 0; i < amountOfOrganisms; i++)
+                for (int j = 0; j < amountOfOrganisms; j++)
                 {
                     species.AddOrganism(ProduceOrganism(species));
                 }
