@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Neuralm.Services.Common;
 using Neuralm.Services.Common.Patterns;
 using Neuralm.Services.TrainingRoomService.Domain;
 using Neuralm.Services.TrainingRoomService.Domain.Evaluatables;
@@ -30,7 +32,11 @@ namespace Neuralm.CLI
                 _trainingRoom.EndGeneration(o => { }, o => { });
 
                 int organismCount = _trainingRoom.Species.Sum(s => s.Organisms.FindAll(o => o.Generation == i+1).Count);
+
+                Organism org = _trainingRoom.Species.SelectMany(species => species.Organisms).GetMax(o => o.Score);
+                
                 Console.WriteLine($"Gen: {i}, TotalScore: {_trainingRoom.TotalScore}, HighestOrganismScore: {_trainingRoom.HighestOrganismScore}, LowestOrganismScore: {_trainingRoom.LowestOrganismScore}, Species: {_trainingRoom.Species.Count}, Organisms: {organismCount}");
+                Console.WriteLine($"Best Organism: {org}");
             }
         }
 
@@ -42,7 +48,7 @@ namespace Neuralm.CLI
 
             //Create a training room with really high mutation settings
             TrainingRoomSettings trainingRoomSettings = new TrainingRoomSettings(trainingRoomId: trainingRoomId,
-                                                                                 organismCount: 50,
+                                                                                 organismCount: 200,
                                                                                  inputCount: 3,
                                                                                  outputCount: 1,
                                                                                  c1: 1,
@@ -59,7 +65,7 @@ namespace Neuralm.CLI
                                                                                  topAmountToSurvive: 0.5,
                                                                                  enableConnectionChance: 0.25,
                                                                                  seed: 1,
-                                                                                 maxStagnantTime: 5,
+                                                                                 maxStagnantTime: 15,
                                                                                  championCloneMinSpeciesSize: 5);
             _organismFactory = new EvaluatableOrganismFactory();
             _trainingRoom = new TrainingRoom(trainingRoomId, _fakeUser, _roomName, trainingRoomSettings, _organismFactory);
