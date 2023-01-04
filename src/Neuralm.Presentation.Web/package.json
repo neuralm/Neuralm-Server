@@ -29,10 +29,10 @@
   "devDependencies": {
     "@mdi/font": "^4.9.95",
     "@types/jest": "^24.9.1",
-    "@vue/cli-plugin-babel": "^3.12.1",
+    "@vue/cli-plugin-babel": "^5.0.8",
     "@vue/cli-plugin-typescript": "^3.12.1",
-    "@vue/cli-plugin-unit-jest": "^4.4.6",
-    "@vue/cli-service": "^4.4.6",
+    "@vue/cli-plugin-unit-jest": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
     "@vue/test-utils": "1.0.0-beta.29",
     "css-loader": "^3.6.0",
     "flush-promises": "^1.0.2",
